@@ -260,14 +260,14 @@ public:
 		// Descriptor
 		// Font uses a separate descriptor pool
 		std::array<VkDescriptorPoolSize, 1>					poolSizes;
-		poolSizes[0] = vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1);
+		poolSizes[0]									= vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1);
 
 		VkDescriptorPoolCreateInfo							descriptorPoolInfo		= vks::initializers::descriptorPoolCreateInfo(static_cast<uint32_t>(poolSizes.size()), poolSizes.data(), 1);
 		VK_CHECK_RESULT(vkCreateDescriptorPool(vulkanDevice->logicalDevice, &descriptorPoolInfo, nullptr, &descriptorPool));
 
 		// Descriptor set layout
 		std::array<VkDescriptorSetLayoutBinding, 1>			setLayoutBindings;
-		setLayoutBindings[0] = vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, 0);
+		setLayoutBindings[0]							= vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, 0);
 
 		VkDescriptorSetLayoutCreateInfo						descriptorSetLayoutInfo	= vks::initializers::descriptorSetLayoutCreateInfo(setLayoutBindings.data(), static_cast<uint32_t>(setLayoutBindings.size()));
 		VK_CHECK_RESULT(vkCreateDescriptorSetLayout(vulkanDevice->logicalDevice, &descriptorSetLayoutInfo, nullptr, &descriptorSetLayout));
@@ -283,7 +283,7 @@ public:
 		VkDescriptorImageInfo								texDescriptor			= vks::initializers::descriptorImageInfo(sampler, view, VK_IMAGE_LAYOUT_GENERAL);
 
 		std::array<VkWriteDescriptorSet, 1>					writeDescriptorSets;
-		writeDescriptorSets[0] = vks::initializers::writeDescriptorSet(descriptorSet, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0, &texDescriptor);
+		writeDescriptorSets[0]							= vks::initializers::writeDescriptorSet(descriptorSet, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0, &texDescriptor);
 		vkUpdateDescriptorSets(vulkanDevice->logicalDevice, static_cast<uint32_t>(writeDescriptorSets.size()), writeDescriptorSets.data(), 0, NULL);
 
 		// Pipeline cache
@@ -320,13 +320,13 @@ public:
 		VkPipelineDynamicStateCreateInfo					dynamicState			= vks::initializers::pipelineDynamicStateCreateInfo			(dynamicStateEnables.data(), static_cast<uint32_t>(dynamicStateEnables.size()), 0);
 		
 		std::array<VkVertexInputBindingDescription, 2>		vertexBindings			= {};
-		vertexBindings[0]	= vks::initializers::vertexInputBindingDescription(0, sizeof(glm::vec4), VK_VERTEX_INPUT_RATE_VERTEX);
-		vertexBindings[1]	= vks::initializers::vertexInputBindingDescription(1, sizeof(glm::vec4), VK_VERTEX_INPUT_RATE_VERTEX);
+		vertexBindings[0]								= vks::initializers::vertexInputBindingDescription(0, sizeof(glm::vec4), VK_VERTEX_INPUT_RATE_VERTEX);
+		vertexBindings[1]								= vks::initializers::vertexInputBindingDescription(1, sizeof(glm::vec4), VK_VERTEX_INPUT_RATE_VERTEX);
 
 		std::array<VkVertexInputAttributeDescription, 2>	vertexAttribs			= {};
 		
-		vertexAttribs[0]	= vks::initializers::vertexInputAttributeDescription(0, 0, VK_FORMAT_R32G32_SFLOAT, 0);					// Position
-		vertexAttribs[1]	= vks::initializers::vertexInputAttributeDescription(1, 1, VK_FORMAT_R32G32_SFLOAT, sizeof(glm::vec2));	// UV
+		vertexAttribs[0]								= vks::initializers::vertexInputAttributeDescription(0, 0, VK_FORMAT_R32G32_SFLOAT, 0);					// Position
+		vertexAttribs[1]								= vks::initializers::vertexInputAttributeDescription(1, 1, VK_FORMAT_R32G32_SFLOAT, sizeof(glm::vec2));	// UV
 
 		VkPipelineVertexInputStateCreateInfo				inputState				= vks::initializers::pipelineVertexInputStateCreateInfo();
 		inputState.vertexBindingDescriptionCount		= static_cast<uint32_t>(vertexBindings.size());
@@ -465,7 +465,7 @@ public:
 		for (auto letter : text)
 		{
 			stb_fontchar										* charData				= &stbFontData[(uint32_t)letter - STB_FIRST_CHAR];
-			textWidth	+= charData->advance * charW;
+			textWidth										+= charData->advance * charW;
 		}
 
 		switch (align)
