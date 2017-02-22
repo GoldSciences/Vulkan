@@ -292,7 +292,7 @@ namespace vks
 
 			if (is.is_open())
 			{
-				size_t size = is.tellg();
+				size_t size = (size_t)is.tellg();
 				is.seekg(0, std::ios::beg);
 				char* shaderCode = new char[size];
 				is.read(shaderCode, size);

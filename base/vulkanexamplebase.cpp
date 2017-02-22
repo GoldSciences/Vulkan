@@ -2031,7 +2031,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR pCmdLine, int nCmdShow)	
 {					
-	for (size_t i = 0; i < __argc; i++) { VulkanExampleBase::args.push_back(__argv[i]); }
+	for (size_t i = 0; i < (size_t)__argc; i++) { VulkanExampleBase::args.push_back(__argv[i]); }
 	createVulkanExample(&vulkanExample);			
 	vulkanExample->initVulkan();					
 	vulkanExample->setupWindow(hInstance, WndProc);	

@@ -429,7 +429,7 @@ namespace vks
 			// Copy texture data into staging buffer
 			uint8_t *data;
 			VK_CHECK_RESULT(vkMapMemory(device->logicalDevice, stagingMemory, 0, memReqs.size, 0, (void **)&data));
-			memcpy(data, buffer, bufferSize);
+			memcpy(data, buffer, (size_t)bufferSize);
 			vkUnmapMemory(device->logicalDevice, stagingMemory);
 
 			VkBufferImageCopy bufferCopyRegion = {};

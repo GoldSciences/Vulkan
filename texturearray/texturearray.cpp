@@ -335,7 +335,7 @@ public:
 		renderPassBeginInfo.clearValueCount = 2;
 		renderPassBeginInfo.pClearValues = clearValues;
 
-		for (int32_t i = 0; i < drawCmdBuffers.size(); ++i)
+		for (size_t i = 0; i < drawCmdBuffers.size(); ++i)
 		{
 			// Set target frame buffer
 			renderPassBeginInfo.framebuffer = frameBuffers[i];
@@ -610,7 +610,7 @@ public:
 		float offset = -1.5f;
 		uint32_t index = 0;
 		float center = (layerCount*offset) / 2;
-		for (int32_t i = 0; i < (int32_t)layerCount; i++)
+		for (size_t i = 0; i < layerCount; i++)
 		{
 			// Instance model matrix
 			uboVS.instance[i].model = glm::translate(glm::mat4(), glm::vec3(0.0f, i * offset - center, 0.0f));

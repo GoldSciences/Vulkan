@@ -205,7 +205,7 @@ public:
 		VkRect2D scissor;
 		VkDeviceSize offsets[1] = { 0 };
 
-		for (int32_t i = 0; i < drawCmdBuffers.size(); ++i)
+		for (size_t i = 0; i < drawCmdBuffers.size(); ++i)
 		{
 
 			VK_CHECK_RESULT(vkBeginCommandBuffer(drawCmdBuffers[i], &cmdBufInfo));

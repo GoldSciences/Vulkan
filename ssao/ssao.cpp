@@ -666,7 +666,7 @@ public:
 		renderPassBeginInfo.clearValueCount = 2;
 		renderPassBeginInfo.pClearValues = clearValues;
 
-		for (int32_t i = 0; i < drawCmdBuffers.size(); ++i)
+		for (size_t i = 0; i < drawCmdBuffers.size(); ++i)
 		{
 			// Set target frame buffer
 			renderPassBeginInfo.framebuffer = VulkanExampleBase::frameBuffers[i];

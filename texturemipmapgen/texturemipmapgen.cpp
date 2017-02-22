@@ -382,7 +382,7 @@ public:
 		renderPassBeginInfo.clearValueCount = 2;
 		renderPassBeginInfo.pClearValues = clearValues;
 
-		for (int32_t i = 0; i < drawCmdBuffers.size(); ++i)
+		for (size_t i = 0; i < drawCmdBuffers.size(); ++i)
 		{
 			// Set target frame buffer
 			renderPassBeginInfo.framebuffer = frameBuffers[i];
@@ -563,7 +563,7 @@ public:
 
 		// Binding 2: Sampler array
 		std::vector<VkDescriptorImageInfo> samplerDescriptors;
-		for (auto i = 0; i < samplers.size(); i++)
+		for (size_t i = 0; i < samplers.size(); i++)
 		{
 			samplerDescriptors.push_back(vks::initializers::descriptorImageInfo(samplers[i], VK_NULL_HANDLE, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL));
 		}

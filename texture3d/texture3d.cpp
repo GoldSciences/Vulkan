@@ -331,11 +331,11 @@ public:
 		const float noiseScale = static_cast<float>(rand() % 10) + 4.0f;
 
 #pragma omp parallel for
-		for (int32_t z = 0; z < (int32_t)texture.depth; z++)
+		for (uint32_t z = 0; z < texture.depth; z++)
 		{
 			for (uint32_t y = 0; y < texture.height; y++)
 			{
-				for (int32_t x = 0; x < (int32_t)texture.width; x++)
+				for (uint32_t x = 0; x < texture.width; x++)
 				{
 					float nx = (float)x / (float)texture.width;
 					float ny = (float)y / (float)texture.height;
@@ -474,7 +474,7 @@ public:
 		renderPassBeginInfo.clearValueCount = 2;
 		renderPassBeginInfo.pClearValues = clearValues;
 
-		for (int32_t i = 0; i < drawCmdBuffers.size(); ++i)
+		for (size_t i = 0; i < drawCmdBuffers.size(); ++i)
 		{
 			// Set target frame buffer
 			renderPassBeginInfo.framebuffer = frameBuffers[i];

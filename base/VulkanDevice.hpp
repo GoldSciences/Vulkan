@@ -367,7 +367,7 @@ namespace vks
 			{
 				void *mapped;
 				VK_CHECK_RESULT(vkMapMemory(logicalDevice, *memory, 0, size, 0, &mapped));
-				memcpy(mapped, data, size);
+				memcpy(mapped, data, (size_t)size);
 				vkUnmapMemory(logicalDevice, *memory);
 			}
 
@@ -414,7 +414,7 @@ namespace vks
 			if (data != nullptr)
 			{
 				VK_CHECK_RESULT(buffer->map());
-				memcpy(buffer->mapped, data, size);
+				memcpy(buffer->mapped, data, (size_t)size);
 				buffer->unmap();
 			}
 

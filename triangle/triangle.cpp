@@ -274,7 +274,7 @@ public:
 		renderPassBeginInfo.clearValueCount = 2;
 		renderPassBeginInfo.pClearValues = clearValues;
 	
-		for (int32_t i = 0; i < drawCmdBuffers.size(); ++i)
+		for (size_t i = 0; i < drawCmdBuffers.size(); ++i)
 		{
 			// Set target frame buffer
 			renderPassBeginInfo.framebuffer = frameBuffers[i];
@@ -807,7 +807,7 @@ public:
 
 		if (is.is_open())
 		{
-			shaderSize = is.tellg();
+			shaderSize = (size_t)is.tellg();
 			is.seekg(0, std::ios::beg);
 			// Copy file contents into a buffer
 			shaderCode = new char[shaderSize];
