@@ -2057,7 +2057,6 @@ void android_main(android_app* state)
 }
 #elif defined(_DIRECT2DISPLAY)
 // Linux entry point with direct to display wsi
-#define VULKAN_EXAMPLE_EXPORT_FUNCTIONS()								
 static void handleEvent()                                	
 {					
 }					
