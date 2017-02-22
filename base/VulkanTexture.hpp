@@ -214,35 +214,13 @@ namespace vks
 				subresourceRange.levelCount = mipLevels;
 				subresourceRange.layerCount = 1;
 
-				// Image barrier for optimal image (target)
-				// Optimal image will be used as destination for the copy
-				vks::tools::setImageLayout(
-					copyCmd,
-					image,
-					VK_IMAGE_ASPECT_COLOR_BIT,
-					VK_IMAGE_LAYOUT_UNDEFINED,
-					VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-					subresourceRange);
+				
+				vks::tools::setImageLayout(copyCmd, image, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, subresourceRange);				// Image barrier for optimal image (target). Optimal image will be used as destination for the copy.
 
-				// Copy mip levels from staging buffer
-				vkCmdCopyBufferToImage(
-					copyCmd,
-					stagingBuffer,
-					image,
-					VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-					static_cast<uint32_t>(bufferCopyRegions.size()),
-					bufferCopyRegions.data()
-				);
+				vkCmdCopyBufferToImage(copyCmd, stagingBuffer, image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, static_cast<uint32_t>(bufferCopyRegions.size()), bufferCopyRegions.data());	// Copy mip levels from staging buffer.
 
-				// Change texture image layout to shader read after all mip levels have been copied
 				this->imageLayout = imageLayout;
-				vks::tools::setImageLayout(
-					copyCmd,
-					image,
-					VK_IMAGE_ASPECT_COLOR_BIT,
-					VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-					imageLayout,
-					subresourceRange);
+				vks::tools::setImageLayout(copyCmd, image, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, imageLayout, subresourceRange);								// Change texture image layout to shader read after all mip levels have been copied.
 
 				device->flushCommandBuffer(copyCmd, copyQueue);
 

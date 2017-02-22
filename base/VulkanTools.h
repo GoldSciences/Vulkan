@@ -39,8 +39,8 @@
 #if defined(__ANDROID__)
 #define VK_CHECK_RESULT(f)																				\
 {																										\
-	VkResult vk_result_value = (f);																					\
-	if (res != VK_SUCCESS)																				\
+	VkResult vk_result_value = (f);																		\
+	if (vk_result_value != VK_SUCCESS)																	\
 	{																									\
 		LOGE("Fatal : VkResult is \" %s \" in %s at line %d", vks::tools::errorString(vk_result_value).c_str(), __FILE__, __LINE__); \
 		assert(vk_result_value == VK_SUCCESS);																		\
@@ -62,48 +62,46 @@ namespace vks
 {
 	namespace tools
 	{
-		/** @brief Returns an error code as a string */
-		std::string errorString(VkResult errorCode);
-
-		/** @brief Returns the device type as a string */
-		std::string physicalDeviceTypeString(VkPhysicalDeviceType type);
+		
+		std::string		errorString					(VkResult errorCode);			//	Returns an error code as a string 
+		std::string		physicalDeviceTypeString	(VkPhysicalDeviceType type);	//	Returns the device type as a string
 
 		// Selected a suitable supported depth format starting with 32 bit down to 16 bit
 		// Returns false if none of the depth formats in the list is supported by the device
-		VkBool32 getSupportedDepthFormat(VkPhysicalDevice physicalDevice, VkFormat *depthFormat);
+		VkBool32		getSupportedDepthFormat		(VkPhysicalDevice physicalDevice, VkFormat *depthFormat);
 
 		// Put an image memory barrier for setting an image layout on the sub resource into the given command buffer
-		void setImageLayout(
-			VkCommandBuffer cmdbuffer,
-			VkImage image,
-			VkImageAspectFlags aspectMask,
-			VkImageLayout oldImageLayout,
-			VkImageLayout newImageLayout,
-			VkImageSubresourceRange subresourceRange,
-			VkPipelineStageFlags srcStageMask = VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,
-			VkPipelineStageFlags dstStageMask = VK_PIPELINE_STAGE_ALL_COMMANDS_BIT);
+		void			setImageLayout				
+			(	VkCommandBuffer				cmdbuffer
+			,	VkImage						image
+			,	VkImageAspectFlags			aspectMask
+			,	VkImageLayout				oldImageLayout
+			,	VkImageLayout				newImageLayout
+			,	VkImageSubresourceRange		subresourceRange
+			,	VkPipelineStageFlags		srcStageMask = VK_PIPELINE_STAGE_ALL_COMMANDS_BIT
+			,	VkPipelineStageFlags		dstStageMask = VK_PIPELINE_STAGE_ALL_COMMANDS_BIT
+			);
 		// Uses a fixed sub resource layout with first mip level and layer
-		void setImageLayout(
-			VkCommandBuffer cmdbuffer,
-			VkImage image,
-			VkImageAspectFlags aspectMask,
-			VkImageLayout oldImageLayout,
-			VkImageLayout newImageLayout,
-			VkPipelineStageFlags srcStageMask = VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,
-			VkPipelineStageFlags dstStageMask = VK_PIPELINE_STAGE_ALL_COMMANDS_BIT);
+		void			setImageLayout			
+			(	VkCommandBuffer				cmdbuffer
+			,	VkImage						image
+			,	VkImageAspectFlags			aspectMask
+			,	VkImageLayout				oldImageLayout
+			,	VkImageLayout				newImageLayout
+			,	VkPipelineStageFlags		srcStageMask = VK_PIPELINE_STAGE_ALL_COMMANDS_BIT
+			,	VkPipelineStageFlags		dstStageMask = VK_PIPELINE_STAGE_ALL_COMMANDS_BIT
+			);
 
 		// Display error message and exit on fatal error
-		void exitFatal(std::string message, std::string caption);
+		void			exitFatal					(std::string message, std::string caption);
 
-		// Load a SPIR-V shader (binary) 
+		
 #if defined(__ANDROID__)
-		VkShaderModule loadShader(AAssetManager* assetManager, const char *fileName, VkDevice device, VkShaderStageFlagBits stage);
+		VkShaderModule	loadShader					(AAssetManager* assetManager, const char *fileName, VkDevice device, VkShaderStageFlagBits stage);		// Load a SPIR-V shader (binary) 
 #else
-		VkShaderModule loadShader(const char *fileName, VkDevice device, VkShaderStageFlagBits stage);
+		VkShaderModule	loadShader					(const char *fileName, VkDevice device, VkShaderStageFlagBits stage);									// Load a SPIR-V shader (binary) 
 #endif
 
-		// Load a GLSL shader (text)
-		// Note: GLSL support requires vendor-specific extensions to be enabled and is not a core-feature of Vulkan
-		VkShaderModule loadShaderGLSL(const char *fileName, VkDevice device, VkShaderStageFlagBits stage);
+		VkShaderModule	loadShaderGLSL				(const char *fileName, VkDevice device, VkShaderStageFlagBits stage);									// Load a GLSL shader (text). GLSL support requires vendor-specific extensions to be enabled and is not a core-feature of Vulkan.
 	}
 }

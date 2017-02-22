@@ -54,19 +54,18 @@ namespace vks
 			return bufferMemoryBarrier;
 		}
 
-		inline VkMemoryBarrier							memoryBarrier							()																											{ return {VK_STRUCTURE_TYPE_MEMORY_BARRIER			, };	}
-		inline VkImageCreateInfo						imageCreateInfo							()																											{ return {VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO		, };	}
-		inline VkSamplerCreateInfo						samplerCreateInfo						()																											{ return {VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO		, };	}
-		inline VkImageViewCreateInfo					imageViewCreateInfo						()																											{ return {VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO	, };	}
-		inline VkFramebufferCreateInfo					framebufferCreateInfo					()																											{ return {VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO	, };	}
-		inline VkSemaphoreCreateInfo					semaphoreCreateInfo						()																											{ return {VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO	, };	}
-		inline VkFenceCreateInfo						fenceCreateInfo							(VkFenceCreateFlags flags = 0)																				{ return {VK_STRUCTURE_TYPE_FENCE_CREATE_INFO, 0, flags};	}
-		inline VkEventCreateInfo						eventCreateInfo							()																											{ return {VK_STRUCTURE_TYPE_EVENT_CREATE_INFO		, };	}
-		inline VkSubmitInfo								submitInfo								()																											{ return {VK_STRUCTURE_TYPE_SUBMIT_INFO				, };	}
-		inline VkViewport								viewport								(float width, float height, float minDepth, float maxDepth)													{ return {0, 0, width, height, minDepth, maxDepth};			}
-		inline VkRect2D									rect2D									(int32_t width, int32_t height, int32_t offsetX, int32_t offsetY)											{ return { {offsetX, offsetY}, {width, height}};			}
-		inline VkBufferCreateInfo						bufferCreateInfo						()																											{ return {VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO		,};		}
-
+		inline VkMemoryBarrier							memoryBarrier							()																											{ return {VK_STRUCTURE_TYPE_MEMORY_BARRIER			, };				}
+		inline VkImageCreateInfo						imageCreateInfo							()																											{ return {VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO		, };				}
+		inline VkSamplerCreateInfo						samplerCreateInfo						()																											{ return {VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO		, };				}
+		inline VkImageViewCreateInfo					imageViewCreateInfo						()																											{ return {VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO	, };				}
+		inline VkFramebufferCreateInfo					framebufferCreateInfo					()																											{ return {VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO	, };				}
+		inline VkSemaphoreCreateInfo					semaphoreCreateInfo						()																											{ return {VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO	, };				}
+		inline VkFenceCreateInfo						fenceCreateInfo							(VkFenceCreateFlags flags = 0)																				{ return {VK_STRUCTURE_TYPE_FENCE_CREATE_INFO, 0, flags};				}
+		inline VkEventCreateInfo						eventCreateInfo							()																											{ return {VK_STRUCTURE_TYPE_EVENT_CREATE_INFO		, };				}
+		inline VkSubmitInfo								submitInfo								()																											{ return {VK_STRUCTURE_TYPE_SUBMIT_INFO				, };				}
+		inline VkViewport								viewport								(float width, float height, float minDepth, float maxDepth)													{ return {0, 0, width, height, minDepth, maxDepth};						}
+		inline VkRect2D									rect2D									(int32_t width, int32_t height, int32_t offsetX, int32_t offsetY)											{ return { {offsetX, offsetY}, {(uint32_t)width, (uint32_t)height}};	}
+		inline VkBufferCreateInfo						bufferCreateInfo						()																											{ return {VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO		,};					}
 		inline VkBufferCreateInfo						bufferCreateInfo						(VkBufferUsageFlags usage, VkDeviceSize size)																{
 			VkBufferCreateInfo												bufCreateInfo {};
 			bufCreateInfo.sType											= VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
@@ -75,11 +74,7 @@ namespace vks
 			return bufCreateInfo;
 		}
 
-		inline VkDescriptorPoolCreateInfo				descriptorPoolCreateInfo				(
-			uint32_t poolSizeCount,
-			VkDescriptorPoolSize* pPoolSizes,
-			uint32_t maxSets)
-		{
+		inline VkDescriptorPoolCreateInfo				descriptorPoolCreateInfo				(uint32_t poolSizeCount, VkDescriptorPoolSize* pPoolSizes, uint32_t maxSets)								{
 			VkDescriptorPoolCreateInfo										descriptorPoolInfo {};
 			descriptorPoolInfo.sType									= VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
 			descriptorPoolInfo.poolSizeCount							= poolSizeCount;
@@ -88,10 +83,7 @@ namespace vks
 			return descriptorPoolInfo;
 		}
 
-		inline VkDescriptorPoolCreateInfo				descriptorPoolCreateInfo				(
-			const std::vector<VkDescriptorPoolSize>& poolSizes,
-			uint32_t maxSets)
-		{
+		inline VkDescriptorPoolCreateInfo				descriptorPoolCreateInfo				(const std::vector<VkDescriptorPoolSize>& poolSizes, uint32_t maxSets)										{
 			VkDescriptorPoolCreateInfo										descriptorPoolInfo{};
 			descriptorPoolInfo.sType									= VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
 			descriptorPoolInfo.poolSizeCount							= static_cast<uint32_t>(poolSizes.size());
@@ -100,22 +92,14 @@ namespace vks
 			return descriptorPoolInfo;
 		}
 
-		inline VkDescriptorPoolSize						descriptorPoolSize						(
-			VkDescriptorType type,
-			uint32_t descriptorCount)
-		{
+		inline VkDescriptorPoolSize						descriptorPoolSize						(VkDescriptorType type, uint32_t descriptorCount)															{
 			VkDescriptorPoolSize											descriptorPoolSize {};
 			descriptorPoolSize.type										= type;
 			descriptorPoolSize.descriptorCount							= descriptorCount;
 			return descriptorPoolSize;
 		}
 
-		inline VkDescriptorSetLayoutBinding				descriptorSetLayoutBinding				(
-			VkDescriptorType type,
-			VkShaderStageFlags stageFlags,
-			uint32_t binding,
-			uint32_t descriptorCount = 1)
-		{
+		inline VkDescriptorSetLayoutBinding				descriptorSetLayoutBinding				(VkDescriptorType type, VkShaderStageFlags stageFlags, uint32_t binding, uint32_t descriptorCount = 1)		{
 			VkDescriptorSetLayoutBinding									setLayoutBinding {};
 			setLayoutBinding.descriptorType								= type;
 			setLayoutBinding.stageFlags									= stageFlags;
@@ -124,10 +108,7 @@ namespace vks
 			return setLayoutBinding;
 		}
 
-		inline VkDescriptorSetLayoutCreateInfo			descriptorSetLayoutCreateInfo			(
-			const VkDescriptorSetLayoutBinding* pBindings,
-			uint32_t bindingCount)
-		{
+		inline VkDescriptorSetLayoutCreateInfo			descriptorSetLayoutCreateInfo			(const VkDescriptorSetLayoutBinding* pBindings, uint32_t bindingCount)										{
 			VkDescriptorSetLayoutCreateInfo									descriptorSetLayoutCreateInfo {};
 			descriptorSetLayoutCreateInfo.sType							= VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
 			descriptorSetLayoutCreateInfo.pBindings						= pBindings;
@@ -135,8 +116,7 @@ namespace vks
 			return descriptorSetLayoutCreateInfo;
 		}
 
-		inline VkDescriptorSetLayoutCreateInfo			descriptorSetLayoutCreateInfo			(const std::vector<VkDescriptorSetLayoutBinding>& bindings)
-		{
+		inline VkDescriptorSetLayoutCreateInfo			descriptorSetLayoutCreateInfo			(const std::vector<VkDescriptorSetLayoutBinding>& bindings)													{
 			VkDescriptorSetLayoutCreateInfo									descriptorSetLayoutCreateInfo{};
 			descriptorSetLayoutCreateInfo.sType							= VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
 			descriptorSetLayoutCreateInfo.pBindings						= bindings.data();
@@ -144,9 +124,7 @@ namespace vks
 			return descriptorSetLayoutCreateInfo;
 		}
 
-		inline VkPipelineLayoutCreateInfo				pipelineLayoutCreateInfo				(const VkDescriptorSetLayout* pSetLayouts,
-			uint32_t setLayoutCount = 1)
-		{
+		inline VkPipelineLayoutCreateInfo				pipelineLayoutCreateInfo				(const VkDescriptorSetLayout* pSetLayouts, uint32_t setLayoutCount = 1)										{
 			VkPipelineLayoutCreateInfo										pipelineLayoutCreateInfo {};
 			pipelineLayoutCreateInfo.sType								= VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
 			pipelineLayoutCreateInfo.setLayoutCount						= setLayoutCount;
@@ -154,19 +132,14 @@ namespace vks
 			return pipelineLayoutCreateInfo;
 		}
 
-		inline VkPipelineLayoutCreateInfo				pipelineLayoutCreateInfo				(uint32_t setLayoutCount = 1)
-		{
+		inline VkPipelineLayoutCreateInfo				pipelineLayoutCreateInfo				(uint32_t setLayoutCount = 1)																				{
 			VkPipelineLayoutCreateInfo										pipelineLayoutCreateInfo{};
 			pipelineLayoutCreateInfo.sType								= VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
 			pipelineLayoutCreateInfo.setLayoutCount						= setLayoutCount;
 			return pipelineLayoutCreateInfo;
 		}
 
-		inline VkDescriptorSetAllocateInfo				descriptorSetAllocateInfo				(
-			VkDescriptorPool descriptorPool,
-			const VkDescriptorSetLayout* pSetLayouts,
-			uint32_t descriptorSetCount)
-		{
+		inline VkDescriptorSetAllocateInfo				descriptorSetAllocateInfo				(VkDescriptorPool descriptorPool, const VkDescriptorSetLayout* pSetLayouts, uint32_t descriptorSetCount)	{
 			VkDescriptorSetAllocateInfo										descriptorSetAllocateInfo {};
 			descriptorSetAllocateInfo.sType								= VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
 			descriptorSetAllocateInfo.descriptorPool					= descriptorPool;
@@ -175,8 +148,7 @@ namespace vks
 			return descriptorSetAllocateInfo;
 		}
 
-		inline VkDescriptorImageInfo					descriptorImageInfo						(VkSampler sampler, VkImageView imageView, VkImageLayout imageLayout)
-		{
+		inline VkDescriptorImageInfo					descriptorImageInfo						(VkSampler sampler, VkImageView imageView, VkImageLayout imageLayout)										{
 			VkDescriptorImageInfo											descriptorImageInfo {};
 			descriptorImageInfo.sampler									= sampler;
 			descriptorImageInfo.imageView								= imageView;
@@ -218,7 +190,7 @@ namespace vks
 			return writeDescriptorSet;
 		}
 
-		inline VkVertexInputBindingDescription			vertexInputBindingDescription			(uint32_t binding, uint32_t stride, VkVertexInputRate inputRate)	{
+		inline VkVertexInputBindingDescription			vertexInputBindingDescription			(uint32_t binding, uint32_t stride, VkVertexInputRate inputRate)											{
 			VkVertexInputBindingDescription									vInputBindDescription {};
 			vInputBindDescription.binding								= binding;
 			vInputBindDescription.stride								= stride;
@@ -226,12 +198,7 @@ namespace vks
 			return vInputBindDescription;
 		}
 
-		inline VkVertexInputAttributeDescription		vertexInputAttributeDescription			(
-			uint32_t binding,
-			uint32_t location,
-			VkFormat format,
-			uint32_t offset)
-		{
+		inline VkVertexInputAttributeDescription		vertexInputAttributeDescription			(uint32_t binding, uint32_t location, VkFormat format, uint32_t offset)										{
 			VkVertexInputAttributeDescription								vInputAttribDescription {};
 			vInputAttribDescription.location							= location;
 			vInputAttribDescription.binding								= binding;
