@@ -718,20 +718,20 @@ void VulkanExampleBase::initVulkan()
 		// List available GPUs
 		if (args[i] == std::string("-listgpus"))
 		{
-			uint32_t gpuCount = 0;
-			VK_CHECK_RESULT(vkEnumeratePhysicalDevices(instance, &gpuCount, nullptr));
-			if (gpuCount == 0) 
+			uint32_t myGpuCount = 0;
+			VK_CHECK_RESULT(vkEnumeratePhysicalDevices(instance, &myGpuCount, nullptr));
+			if (myGpuCount == 0) 
 				std::cerr << "No Vulkan devices found!" << std::endl;
 			else 
 			{
 				// Enumerate devices
 				std::cout << "Available Vulkan devices" << std::endl;
-				std::vector<VkPhysicalDevice> devices(gpuCount);
-				VK_CHECK_RESULT(vkEnumeratePhysicalDevices(instance, &gpuCount, devices.data()));
-				for (uint32_t i = 0; i < gpuCount; i++) {
+				std::vector<VkPhysicalDevice> devices(myGpuCount);
+				VK_CHECK_RESULT(vkEnumeratePhysicalDevices(instance, &myGpuCount, devices.data()));
+				for (uint32_t igpu = 0; igpu < myGpuCount; igpu++) {
 					VkPhysicalDeviceProperties deviceProperties;
-					vkGetPhysicalDeviceProperties(devices[i], &deviceProperties);
-					std::cout << "Device [" << i << "] : " << deviceProperties.deviceName << std::endl;
+					vkGetPhysicalDeviceProperties(devices[igpu], &deviceProperties);
+					std::cout << "Device [" << igpu << "] : " << deviceProperties.deviceName << std::endl;
 					std::cout << " Type: " << vks::tools::physicalDeviceTypeString(deviceProperties.deviceType) << std::endl;
 					std::cout << " API: " << (deviceProperties.apiVersion >> 22) << "." << ((deviceProperties.apiVersion >> 12) & 0x3ff) << "." << (deviceProperties.apiVersion & 0xfff) << std::endl;
 				}
@@ -1842,13 +1842,17 @@ static VulkanExampleBase * vulkanExample	= nullptr;
 LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {									
 	if (vulkanExample != NULL)		
-	{								
 		vulkanExample->handleMessages(hWnd, uMsg, wParam, lParam);			
-	}								
+
 	return (DefWindowProc(hWnd, uMsg, wParam, lParam));						
 }								
 
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR pCmdLine, int nCmdShow)	
+int WINAPI WinMain (
+    _In_ HINSTANCE hInstance,
+    _In_opt_ HINSTANCE hPrevInstance,
+    _In_ LPSTR lpCmdLine,
+    _In_ int nShowCmd
+    )
 {					
 	for (size_t i = 0; i < (size_t)__argc; i++) { VulkanExampleBase::args.push_back(__argv[i]); }
 	createVulkanExample(&vulkanExample);			
@@ -1908,9 +1912,8 @@ int main(const int argc, const char *argv[])
 static void handleEvent(const xcb_generic_event_t *event)	
 {					
 	if (vulkanExample != NULL)								
-	{				
 		vulkanExample->handleEvent(event);					
-	}				
+
 }					
 int main(const int argc, const char *argv[])			    
 {					
