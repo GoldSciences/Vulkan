@@ -312,17 +312,13 @@ void VulkanExampleBase::renderLoop()
 					updateView = true;
 				}
 				if (updateView)
-				{
 					viewChanged();
-				}
 			}
 			else
 			{
 				updateView = camera.updatePad(gamePadState.axisLeft, gamePadState.axisRight, frameTimer);
 				if (updateView)
-				{
 					viewChanged();
-				}
 			}
 		}
 	}
@@ -342,17 +338,13 @@ void VulkanExampleBase::renderLoop()
 		frameTimer = tDiff / 1000.0f;
 		camera.update(frameTimer);
 		if (camera.moving())
-		{
 			viewUpdated = true;
-		}
 		// Convert to clamped timer value
 		if (!paused)
 		{
 			timer += timerSpeed * frameTimer;
 			if (timer > 1.0)
-			{
 				timer -= 1.0f;
-			}
 		}
 		fpsTimer += (float)tDiff;
 		if (fpsTimer > 1000.0f)
@@ -1765,9 +1757,8 @@ void VulkanExampleBase::setupRenderPass()
 void VulkanExampleBase::windowResize()
 {
 	if (!prepared)
-	{
 		return;
-	}
+
 	prepared = false;
 
 	// Ensure all operations on the device have been finished before destroying resources
@@ -1786,9 +1777,8 @@ void VulkanExampleBase::windowResize()
 	setupDepthStencil();
 	
 	for (uint32_t i = 0; i < frameBuffers.size(); i++)
-	{
 		vkDestroyFramebuffer(device, frameBuffers[i], nullptr);
-	}
+
 	setupFrameBuffer();
 
 	// Command buffers need to be recreated as they may store
@@ -1814,11 +1804,6 @@ void VulkanExampleBase::windowResize()
 	prepared = true;
 }
 
-void VulkanExampleBase::windowResized()
-{
-	// Can be overriden in derived class
-}
-
 void VulkanExampleBase::initSwapchain()
 {
 #if defined(_WIN32)
@@ -1834,7 +1819,7 @@ void VulkanExampleBase::initSwapchain()
 #endif
 }
 
-static VulkanExampleBase * vulkanExample	= nullptr;
+static	VulkanExampleBase	* vulkanExample		= nullptr;
 
 // OS specific macros for the example main entry points
 #if defined(_WIN32)
@@ -1847,11 +1832,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	return (DefWindowProc(hWnd, uMsg, wParam, lParam));						
 }								
 
-int WINAPI WinMain (
-    _In_ HINSTANCE hInstance,
-    _In_opt_ HINSTANCE hPrevInstance,
-    _In_ LPSTR lpCmdLine,
-    _In_ int nShowCmd
+int WINAPI WinMain 
+    ( _In_		HINSTANCE	hInstance
+    , _In_opt_	HINSTANCE	hPrevInstance
+    , _In_		LPSTR		lpCmdLine
+    , _In_		int			nShowCmd
     )
 {					
 	for (size_t i = 0; i < (size_t)__argc; i++) { VulkanExampleBase::args.push_back(__argv[i]); }
@@ -1871,10 +1856,10 @@ void android_main(android_app* state)
 {					
 	app_dummy();	
 	createVulkanExample(&vulkanExample);					
-	state->userData = VulkanExampleBase;					
-	state->onAppCmd = VulkanExampleBase::handleAppCommand;	
-	state->onInputEvent = VulkanExampleBase::handleAppInput;
-	androidApp = state;
+	state->userData			= VulkanExampleBase;					
+	state->onAppCmd			= VulkanExampleBase::handleAppCommand;	
+	state->onInputEvent		= VulkanExampleBase::handleAppInput;
+	androidApp				= state;
 	vulkanExample->renderLoop();							
 	deleteVulkanExample(&vulkanExample);					
 }

@@ -108,9 +108,7 @@ namespace vks
 			imageMemoryBarrier.image = image;
 			imageMemoryBarrier.subresourceRange = subresourceRange;
 
-			// Source layouts (old)
-			// Source access mask controls actions that have to be finished on the old layout
-			// before it will be transitioned to the new layout
+			// Source layouts (old). Source access mask controls actions that have to be finished on the old layout before it will be transitioned to the new layout
 			VkAccessFlags			& srcMask			= imageMemoryBarrier.srcAccessMask;
 			switch (oldImageLayout)
 			{
@@ -123,22 +121,21 @@ namespace vks
 			case VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL			: srcMask = VK_ACCESS_SHADER_READ_BIT;									break;	// Image is read by a shader.			Make sure any shader reads from the image have been finished
 			}
 
-			// Target layouts (new)
-			// Destination access mask controls the dependency for the new image layout
+			// Target layouts (new). Destination access mask controls the dependency for the new image layout
 			VkAccessFlags			& dstMask			= imageMemoryBarrier.dstAccessMask;
 			switch (newImageLayout)
 			{
 			case VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL				: dstMask = VK_ACCESS_TRANSFER_WRITE_BIT;								break;	// Image will be used as a transfer destination.			Make sure any writes to the image have been finished	
 			case VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL	: dstMask = dstMask | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;		break;	// Image layout will be used as a depth/stencil attachment.	Make sure any writes to depth/stencil buffer have been finished
-			case VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL				:	// Image will be used as a transfer source.						Make sure any reads from and writes to the image have been finished
+			case VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL				:																				// Image will be used as a transfer source.					Make sure any reads from and writes to the image have been finished
 				srcMask = srcMask | VK_ACCESS_TRANSFER_READ_BIT;
 				dstMask = VK_ACCESS_TRANSFER_READ_BIT;
 				break;	
-			case VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL			:	// Image will be used as a color attachment.					Make sure any writes to the color buffer have been finished
+			case VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL			:																				// Image will be used as a color attachment.					Make sure any writes to the color buffer have been finished
 				srcMask = VK_ACCESS_TRANSFER_READ_BIT;
 				dstMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
 				break; 
-			case VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL			:	// Image will be read in a shader (sampler, input attachment).	Make sure any writes to the image have been finished
+			case VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL			:																				// Image will be read in a shader (sampler, input attachment).	Make sure any writes to the image have been finished
 				if (imageMemoryBarrier.srcAccessMask == 0)
 					imageMemoryBarrier.srcAccessMask = VK_ACCESS_HOST_WRITE_BIT | VK_ACCESS_TRANSFER_WRITE_BIT;
 
@@ -235,27 +232,27 @@ namespace vks
 #else
 		VkShaderModule loadShader(const char *fileName, VkDevice device, VkShaderStageFlagBits stage)
 		{
-			std::ifstream is(fileName, std::ios::binary | std::ios::in | std::ios::ate);
+			std::ifstream							is(fileName, std::ios::binary | std::ios::in | std::ios::ate);
 
 			if (is.is_open())
 			{
-				size_t size = (size_t)is.tellg();
+				size_t										size				= (size_t)is.tellg();
 				is.seekg(0, std::ios::beg);
-				char* shaderCode = new char[size];
+				char										* shaderCode		= new char[size];
 				is.read(shaderCode, size);
 				is.close();
 
 				assert(size > 0);
 
-				VkShaderModule shaderModule;
-				VkShaderModuleCreateInfo moduleCreateInfo{};
-				moduleCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-				moduleCreateInfo.codeSize = size;
-				moduleCreateInfo.pCode = (uint32_t*)shaderCode;
+				VkShaderModule									shaderModule;
+				VkShaderModuleCreateInfo						moduleCreateInfo{};
+				moduleCreateInfo.sType						= VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+				moduleCreateInfo.codeSize					= size;
+				moduleCreateInfo.pCode						= (uint32_t*)shaderCode;
 
 				VK_CHECK_RESULT(vkCreateShaderModule(device, &moduleCreateInfo, NULL, &shaderModule));
 
-				delete[] shaderCode;
+				delete[]									shaderCode;
 
 				return shaderModule;
 			}
@@ -269,23 +266,23 @@ namespace vks
 
 		VkShaderModule loadShaderGLSL(const char *fileName, VkDevice device, VkShaderStageFlagBits stage)
 		{
-			std::string shaderSrc = readTextFile(fileName);
-			const char *shaderCode = shaderSrc.c_str();
-			size_t size = strlen(shaderCode);
+			std::string										shaderSrc		= readTextFile(fileName);
+			const char										* shaderCode	= shaderSrc.c_str();
+			size_t											size			= strlen(shaderCode);
 			assert(size > 0);
 
-			VkShaderModule shaderModule;
-			VkShaderModuleCreateInfo moduleCreateInfo;
-			moduleCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-			moduleCreateInfo.pNext = NULL;
-			moduleCreateInfo.codeSize = 3 * sizeof(uint32_t) + size + 1;
-			moduleCreateInfo.pCode = (uint32_t*)malloc(moduleCreateInfo.codeSize);
-			moduleCreateInfo.flags = 0;
+			VkShaderModule									shaderModule;
+			VkShaderModuleCreateInfo						moduleCreateInfo;
+			moduleCreateInfo.sType						= VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+			moduleCreateInfo.pNext						= NULL;
+			moduleCreateInfo.codeSize					= 3 * sizeof(uint32_t) + size + 1;
+			moduleCreateInfo.pCode						= (uint32_t*)malloc(moduleCreateInfo.codeSize);
+			moduleCreateInfo.flags						= 0;
 
 			// Magic SPV number
-			((uint32_t *)moduleCreateInfo.pCode)[0] = 0x07230203;
-			((uint32_t *)moduleCreateInfo.pCode)[1] = 0;
-			((uint32_t *)moduleCreateInfo.pCode)[2] = stage;
+			((uint32_t *)moduleCreateInfo.pCode)[0]		= 0x07230203;
+			((uint32_t *)moduleCreateInfo.pCode)[1]		= 0;
+			((uint32_t *)moduleCreateInfo.pCode)[2]		= stage;
 			memcpy(((uint32_t *)moduleCreateInfo.pCode + 3), shaderCode, size + 1);
 
 			VK_CHECK_RESULT(vkCreateShaderModule(device, &moduleCreateInfo, NULL, &shaderModule));
