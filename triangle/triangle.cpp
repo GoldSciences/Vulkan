@@ -1095,5 +1095,5 @@ public:
 };
 
 // These functions create and delete an instance of the VulkanExample type and are currently used by the different main() implementations.
-int	createVulkanExample(VulkanExampleBase** vulkanExampleBase)	{	VulkanExample* vulkanExample = (VulkanExample*)*vulkanExampleBase; *vulkanExampleBase = new VulkanExample();	if(vulkanExample) delete(vulkanExample); return vulkanExampleBase	? 0 : -1;	}
-int	deleteVulkanExample(VulkanExampleBase** vulkanExampleBase)	{	VulkanExample* vulkanExample = (VulkanExample*)*vulkanExampleBase; *vulkanExampleBase = nullptr;				if(vulkanExample) delete(vulkanExample); return vulkanExample		? 0 : -1;	}
+int	createVulkanExample(VulkanExampleBase** vulkanExampleBase)	{	if(0 == vulkanExampleBase) return -1;	VulkanExample* vulkanExample = (VulkanExample*)*vulkanExampleBase; *vulkanExampleBase = new VulkanExample();	if(vulkanExample) delete(vulkanExample); return vulkanExampleBase	? 0 : -1;	}
+int	deleteVulkanExample(VulkanExampleBase** vulkanExampleBase)	{	if(0 == vulkanExampleBase) return -1;	VulkanExample* vulkanExample = (VulkanExample*)*vulkanExampleBase; *vulkanExampleBase = nullptr;				if(vulkanExample) delete(vulkanExample); return vulkanExample		? 0 : -1;	}

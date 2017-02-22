@@ -264,10 +264,10 @@ public:
 
 extern "C"
 {
-	int	createVulkanExample	(VulkanExampleBase** vulkanExample);
-	int	deleteVulkanExample	(VulkanExampleBase** vulkanExample);
+	int	createVulkanExample	(VulkanExampleBase** _vulkanExample);
+	int	deleteVulkanExample	(VulkanExampleBase** _vulkanExample);
 }
 
 #define VULKAN_EXAMPLE_EXPORT_FUNCTIONS()	\
-	int	createVulkanExample(VulkanExampleBase** vulkanExampleBase)	{	VulkanExample* vulkanExample = (VulkanExample*)*vulkanExampleBase; *vulkanExampleBase = new VulkanExample();	if(vulkanExample) delete(vulkanExample); return vulkanExampleBase	? 0 : -1;	}	\
-	int	deleteVulkanExample(VulkanExampleBase** vulkanExampleBase)	{	VulkanExample* vulkanExample = (VulkanExample*)*vulkanExampleBase; *vulkanExampleBase = nullptr;				if(vulkanExample) delete(vulkanExample); return vulkanExample		? 0 : -1;	}
+	int	createVulkanExample(VulkanExampleBase** _vulkanExampleBase)	{ if(0 == _vulkanExampleBase) return -1; VulkanExample* _vulkanExample = (VulkanExample*)*_vulkanExampleBase; *_vulkanExampleBase = new VulkanExample();	if(_vulkanExample) delete(_vulkanExample); return _vulkanExampleBase	? 0 : -1;	}	\
+	int	deleteVulkanExample(VulkanExampleBase** _vulkanExampleBase)	{ if(0 == _vulkanExampleBase) return -1; VulkanExample* _vulkanExample = (VulkanExample*)*_vulkanExampleBase; *_vulkanExampleBase = nullptr;				if(_vulkanExample) { delete(_vulkanExample); return 0; } return -1;					}

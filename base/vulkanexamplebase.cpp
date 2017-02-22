@@ -1834,7 +1834,7 @@ void VulkanExampleBase::initSwapchain()
 #endif
 }
 
-VulkanExampleBase *vulkanExample	= nullptr;
+static VulkanExampleBase * vulkanExample	= nullptr;
 
 // OS specific macros for the example main entry points
 #if defined(_WIN32)
@@ -1848,7 +1848,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	return (DefWindowProc(hWnd, uMsg, wParam, lParam));						
 }								
 
-int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR pCmdLine, int nCmdShow)	
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR pCmdLine, int nCmdShow)	
 {					
 	for (size_t i = 0; i < (size_t)__argc; i++) { VulkanExampleBase::args.push_back(__argv[i]); }
 	createVulkanExample(&vulkanExample);			
