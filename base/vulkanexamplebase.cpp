@@ -12,15 +12,15 @@ std::vector<const char*> VulkanExampleBase::args;
 
 VkResult VulkanExampleBase::createInstance(bool enableValidation)
 {
-	this->settings.validation = enableValidation;
+	this->settings.validation					= enableValidation;
 
-	VkApplicationInfo appInfo = {};
-	appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-	appInfo.pApplicationName = name.c_str();
-	appInfo.pEngineName = name.c_str();
-	appInfo.apiVersion = VK_API_VERSION_1_0;
+	VkApplicationInfo								appInfo						= {};
+	appInfo.sType								= VK_STRUCTURE_TYPE_APPLICATION_INFO;
+	appInfo.pApplicationName					= name.c_str();
+	appInfo.pEngineName							= name.c_str();
+	appInfo.apiVersion							= VK_API_VERSION_1_0;
 
-	std::vector<const char*> instanceExtensions = { VK_KHR_SURFACE_EXTENSION_NAME };
+	std::vector<const char*>						instanceExtensions = { VK_KHR_SURFACE_EXTENSION_NAME };
 
 	// Enable surface extensions depending on os
 #if defined(_WIN32)
@@ -35,36 +35,34 @@ VkResult VulkanExampleBase::createInstance(bool enableValidation)
 	instanceExtensions.push_back(VK_KHR_XCB_SURFACE_EXTENSION_NAME);
 #endif
 
-	VkInstanceCreateInfo instanceCreateInfo = {};
-	instanceCreateInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-	instanceCreateInfo.pNext = NULL;
-	instanceCreateInfo.pApplicationInfo = &appInfo;
+	VkInstanceCreateInfo							instanceCreateInfo			= {};
+	instanceCreateInfo.sType					= VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
+	instanceCreateInfo.pNext					= NULL;
+	instanceCreateInfo.pApplicationInfo			= &appInfo;
 	if (instanceExtensions.size() > 0)
 	{
 		if (settings.validation)
-		{
 			instanceExtensions.push_back(VK_EXT_DEBUG_REPORT_EXTENSION_NAME);
-		}
-		instanceCreateInfo.enabledExtensionCount = (uint32_t)instanceExtensions.size();
-		instanceCreateInfo.ppEnabledExtensionNames = instanceExtensions.data();
+
+		instanceCreateInfo.enabledExtensionCount	= (uint32_t)instanceExtensions.size();
+		instanceCreateInfo.ppEnabledExtensionNames	= instanceExtensions.data();
 	}
 	if (settings.validation)
 	{
-		instanceCreateInfo.enabledLayerCount = vks::debug::validationLayerCount;
-		instanceCreateInfo.ppEnabledLayerNames = vks::debug::validationLayerNames;
+		instanceCreateInfo.enabledLayerCount		= vks::debug::validationLayerCount;
+		instanceCreateInfo.ppEnabledLayerNames		= vks::debug::validationLayerNames;
 	}
 	return vkCreateInstance(&instanceCreateInfo, nullptr, &instance);
 }
 
 std::string VulkanExampleBase::getWindowTitle()
 {
-	std::string device(deviceProperties.deviceName);
-	std::string windowTitle;
-	windowTitle = title + " - " + device;
+	std::string											device(deviceProperties.deviceName);
+	std::string											windowTitle;
+	windowTitle										= title + " - " + device;
 	if (!enableTextOverlay)
-	{
 		windowTitle += " - " + std::to_string(frameCounter) + " fps";
-	}
+
 	return windowTitle;
 }
 
@@ -79,12 +77,9 @@ const std::string VulkanExampleBase::getAssetPath()
 
 bool VulkanExampleBase::checkCommandBuffers()
 {
-	for (auto& cmdBuffer : drawCmdBuffers)
-	{
+	for (auto& cmdBuffer : drawCmdBuffers) {
 		if (cmdBuffer == VK_NULL_HANDLE)
-		{
 			return false;
-		}
 	}
 	return true;
 }
@@ -94,12 +89,7 @@ void VulkanExampleBase::createCommandBuffers()
 	// Create one command buffer for each swap chain image and reuse for rendering
 	drawCmdBuffers.resize(swapChain.imageCount);
 
-	VkCommandBufferAllocateInfo cmdBufAllocateInfo =
-		vks::initializers::commandBufferAllocateInfo(
-			cmdPool,
-			VK_COMMAND_BUFFER_LEVEL_PRIMARY,
-			static_cast<uint32_t>(drawCmdBuffers.size()));
-
+	VkCommandBufferAllocateInfo							cmdBufAllocateInfo		= vks::initializers::commandBufferAllocateInfo(cmdPool, VK_COMMAND_BUFFER_LEVEL_PRIMARY, static_cast<uint32_t>(drawCmdBuffers.size()));
 	VK_CHECK_RESULT(vkAllocateCommandBuffers(device, &cmdBufAllocateInfo, drawCmdBuffers.data()));
 }
 
@@ -110,20 +100,14 @@ void VulkanExampleBase::destroyCommandBuffers()
 
 VkCommandBuffer VulkanExampleBase::createCommandBuffer(VkCommandBufferLevel level, bool begin)
 {
-	VkCommandBuffer cmdBuffer;
-
-	VkCommandBufferAllocateInfo cmdBufAllocateInfo =
-		vks::initializers::commandBufferAllocateInfo(
-			cmdPool,
-			level,
-			1);
-
+	VkCommandBuffer										cmdBuffer;
+	VkCommandBufferAllocateInfo							cmdBufAllocateInfo		= vks::initializers::commandBufferAllocateInfo(cmdPool, level, 1);
 	VK_CHECK_RESULT(vkAllocateCommandBuffers(device, &cmdBufAllocateInfo, &cmdBuffer));
 
 	// If requested, also start the new command buffer
 	if (begin)
 	{
-		VkCommandBufferBeginInfo cmdBufInfo = vks::initializers::commandBufferBeginInfo();
+		VkCommandBufferBeginInfo							cmdBufInfo				= vks::initializers::commandBufferBeginInfo();
 		VK_CHECK_RESULT(vkBeginCommandBuffer(cmdBuffer, &cmdBufInfo));
 	}
 
@@ -139,18 +123,16 @@ void VulkanExampleBase::flushCommandBuffer(VkCommandBuffer commandBuffer, VkQueu
 	
 	VK_CHECK_RESULT(vkEndCommandBuffer(commandBuffer));
 
-	VkSubmitInfo submitInfo = {};
-	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-	submitInfo.commandBufferCount = 1;
-	submitInfo.pCommandBuffers = &commandBuffer;
+	VkSubmitInfo										submitInfo = {};
+	submitInfo.sType								= VK_STRUCTURE_TYPE_SUBMIT_INFO;
+	submitInfo.commandBufferCount					= 1;
+	submitInfo.pCommandBuffers						= &commandBuffer;
 
 	VK_CHECK_RESULT(vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE));
 	VK_CHECK_RESULT(vkQueueWaitIdle(queue));
 
 	if (free)
-	{
 		vkFreeCommandBuffers(device, cmdPool, 1, &commandBuffer);
-	}
 }
 
 void VulkanExampleBase::createPipelineCache()
@@ -163,48 +145,38 @@ void VulkanExampleBase::createPipelineCache()
 void VulkanExampleBase::prepare()
 {
 	if (vulkanDevice->enableDebugMarkers)
-	{
 		vks::debugmarker::setup(device);
-	}
-	createCommandPool();
-	setupSwapChain();
-	createCommandBuffers();
-	setupDepthStencil();
-	setupRenderPass();
-	createPipelineCache();
-	setupFrameBuffer();
+
+	createCommandPool		();
+	setupSwapChain			();
+	createCommandBuffers	();
+	setupDepthStencil		();
+	setupRenderPass			();
+	createPipelineCache		();
+	setupFrameBuffer		();
 
 	if (enableTextOverlay)
 	{
 		// Load the text rendering shaders
-		std::vector<VkPipelineShaderStageCreateInfo> shaderStages;
+		std::vector<VkPipelineShaderStageCreateInfo>		shaderStages;
 		shaderStages.push_back(loadShader(getAssetPath() + "shaders/base/textoverlay.vert.spv", VK_SHADER_STAGE_VERTEX_BIT));
 		shaderStages.push_back(loadShader(getAssetPath() + "shaders/base/textoverlay.frag.spv", VK_SHADER_STAGE_FRAGMENT_BIT));
-		textOverlay = new VulkanTextOverlay(
-			vulkanDevice,
-			queue,
-			frameBuffers,
-			swapChain.colorFormat,
-			depthFormat,
-			&width,
-			&height,
-			shaderStages
-			);
+		textOverlay = new VulkanTextOverlay(vulkanDevice, queue, frameBuffers, swapChain.colorFormat, depthFormat, &width, &height, shaderStages );
 		updateTextOverlay();
 	}
 }
 
 VkPipelineShaderStageCreateInfo VulkanExampleBase::loadShader(std::string fileName, VkShaderStageFlagBits stage)
 {
-	VkPipelineShaderStageCreateInfo shaderStage = {};
-	shaderStage.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-	shaderStage.stage = stage;
+	VkPipelineShaderStageCreateInfo						shaderStage		= {};
+	shaderStage.sType								= VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+	shaderStage.stage								= stage;
 #if defined(__ANDROID__)
-	shaderStage.module = vks::tools::loadShader(androidApp->activity->assetManager, fileName.c_str(), device, stage);
+	shaderStage.module								= vks::tools::loadShader(androidApp->activity->assetManager, fileName.c_str(), device, stage);
 #else
-	shaderStage.module = vks::tools::loadShader(fileName.c_str(), device, stage);
+	shaderStage.module								= vks::tools::loadShader(fileName.c_str(), device, stage);
 #endif
-	shaderStage.pName = "main"; // todo : make param
+	shaderStage.pName								= "main"; // todo : make param
 	assert(shaderStage.module != VK_NULL_HANDLE);
 	shaderModules.push_back(shaderStage.module);
 	return shaderStage;
@@ -212,16 +184,16 @@ VkPipelineShaderStageCreateInfo VulkanExampleBase::loadShader(std::string fileNa
 
 void VulkanExampleBase::renderLoop()
 {
-	destWidth = width;
-	destHeight = height;
+	destWidth										= width;
+	destHeight										= height;
 #if defined(_WIN32)
-	MSG msg;
+	MSG													msg;
 	while (TRUE)
 	{
-		auto tStart = std::chrono::high_resolution_clock::now();
+		auto												tStart				= std::chrono::high_resolution_clock::now();
 		if (viewUpdated)
 		{
-			viewUpdated = false;
+			viewUpdated										= false;
 			viewChanged();
 		}
 
@@ -232,63 +204,54 @@ void VulkanExampleBase::renderLoop()
 		}
 
 		if (msg.message == WM_QUIT)
-		{
 			break;
-		}
 
 		render();
 		frameCounter++;
-		auto tEnd = std::chrono::high_resolution_clock::now();
-		auto tDiff = std::chrono::duration<double, std::milli>(tEnd - tStart).count();
-		frameTimer = (float)tDiff / 1000.0f;
+		auto												tEnd				= std::chrono::high_resolution_clock::now();
+		auto												tDiff				= std::chrono::duration<double, std::milli>(tEnd - tStart).count();
+		frameTimer										= (float)tDiff / 1000.0f;
 		camera.update(frameTimer);
 		if (camera.moving())
-		{
-			viewUpdated = true;
-		}
+			viewUpdated										= true;
 		// Convert to clamped timer value
 		if (!paused)
 		{
 			timer += timerSpeed * frameTimer;
 			if (timer > 1.0)
-			{
 				timer -= 1.0f;
-			}
 		}
 		fpsTimer += (float)tDiff;
 		if (fpsTimer > 1000.0f)
 		{
-			if (!enableTextOverlay)
-			{
-				std::string windowTitle = getWindowTitle();
+			if (!enableTextOverlay) {
+				std::string											windowTitle			= getWindowTitle();
 				SetWindowText(window, windowTitle.c_str());
 			}
-			lastFPS = static_cast<uint32_t>(1.0f / frameTimer);
+			lastFPS											= static_cast<uint32_t>(1.0f / frameTimer);
 			updateTextOverlay();
-			fpsTimer = 0.0f;
-			frameCounter = 0;
+			fpsTimer										= 0.0f;
+			frameCounter									= 0;
 		}
 	}
 #elif defined(__ANDROID__)
 	while (1)
 	{
-		int ident;
-		int events;
-		struct android_poll_source* source;
-		bool destroy = false;
+		int												ident;
+		int												events;
+		struct											android_poll_source	* source;
+		bool											destroy				= false;
 
-		focused = true;
+		focused										= true;
 
 		while ((ident = ALooper_pollAll(focused ? 0 : -1, NULL, &events, (void**)&source)) >= 0)
 		{
 			if (source != NULL)
-			{
 				source->process(androidApp, source);
-			}
-			if (androidApp->destroyRequested != 0)
-			{
+
+			if (androidApp->destroyRequested != 0) {
 				LOGD("Android app destroy requested");
-				destroy = true;
+				destroy										= true;
 				break;
 			}
 		}
@@ -296,42 +259,37 @@ void VulkanExampleBase::renderLoop()
 		// App destruction requested
 		// Exit loop, example will be destroyed in application main
 		if (destroy)
-		{
 			break;
-		}
 
 		// Render frame
 		if (prepared)
 		{
-			auto tStart = std::chrono::high_resolution_clock::now();
+			auto											tStart		= std::chrono::high_resolution_clock::now();
 			render();
 			frameCounter++;
-			auto tEnd = std::chrono::high_resolution_clock::now();
-			auto tDiff = std::chrono::duration<double, std::milli>(tEnd - tStart).count();
-			frameTimer = tDiff / 1000.0f;
+			auto											tEnd		= std::chrono::high_resolution_clock::now();
+			auto											tDiff		= std::chrono::duration<double, std::milli>(tEnd - tStart).count();
+			frameTimer									= tDiff / 1000.0f;
 			camera.update(frameTimer);
 			// Convert to clamped timer value
-			if (!paused)
-			{
-				timer += timerSpeed * frameTimer;
+			if (!paused) {
+				timer	+= timerSpeed * frameTimer;
 				if (timer > 1.0)
-				{
 					timer -= 1.0f;
-				}
 			}
-			fpsTimer += (float)tDiff;
+			fpsTimer									+= (float)tDiff;
 			if (fpsTimer > 1000.0f)
 			{
-				lastFPS = frameCounter;
+				lastFPS										= frameCounter;
 				updateTextOverlay();
-				fpsTimer = 0.0f;
-				frameCounter = 0;
+				fpsTimer									= 0.0f;
+				frameCounter								= 0;
 			}
 			// Check gamepad state
-			const float deadZone = 0.0015f;
+			const float										deadZone	= 0.0015f;
 			// todo : check if gamepad is present
 			// todo : time based and relative axis positions
-			bool updateView = false;
+			bool											updateView	= false;
 			if (camera.type != Camera::CameraType::firstperson)
 			{
 				// Rotate
@@ -530,11 +488,6 @@ void VulkanExampleBase::updateTextOverlay()
 	textOverlay->endTextUpdate();
 }
 
-void VulkanExampleBase::getOverlayText(VulkanTextOverlay *textOverlay)
-{
-	// Can be overriden in derived class
-}
-
 void VulkanExampleBase::prepareFrame()
 {
 	// Acquire the next image from the swap chaing
@@ -548,7 +501,7 @@ void VulkanExampleBase::submitFrame()
 	if (submitTextOverlay)
 	{
 		// Wait for color attachment output to finish before rendering the text overlay
-		VkPipelineStageFlags stageFlags = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+		VkPipelineStageFlags	stageFlags = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
 		submitInfo.pWaitDstStageMask = &stageFlags;
 
 		// Set semaphores
@@ -844,16 +797,12 @@ void VulkanExampleBase::initVulkan()
 
 	// Create synchronization objects
 	VkSemaphoreCreateInfo semaphoreCreateInfo = vks::initializers::semaphoreCreateInfo();
-	// Create a semaphore used to synchronize image presentation
-	// Ensures that the image is displayed before we start submitting new commands to the queu
-	VK_CHECK_RESULT(vkCreateSemaphore(device, &semaphoreCreateInfo, nullptr, &semaphores.presentComplete));
-	// Create a semaphore used to synchronize command submission
-	// Ensures that the image is not presented until all commands have been sumbitted and executed
-	VK_CHECK_RESULT(vkCreateSemaphore(device, &semaphoreCreateInfo, nullptr, &semaphores.renderComplete));
-	// Create a semaphore used to synchronize command submission
-	// Ensures that the image is not presented until all commands for the text overlay have been sumbitted and executed
-	// Will be inserted after the render complete semaphore if the text overlay is enabled
-	VK_CHECK_RESULT(vkCreateSemaphore(device, &semaphoreCreateInfo, nullptr, &semaphores.textOverlayComplete));
+	
+	VK_CHECK_RESULT(vkCreateSemaphore(device, &semaphoreCreateInfo, nullptr, &semaphores.presentComplete));		// Create a semaphore used to synchronize image presentation. Ensures that the image is displayed before we start submitting new commands to the queu
+	VK_CHECK_RESULT(vkCreateSemaphore(device, &semaphoreCreateInfo, nullptr, &semaphores.renderComplete));		// Create a semaphore used to synchronize command submission. Ensures that the image is not presented until all commands have been sumbitted and executed
+	
+	VK_CHECK_RESULT(vkCreateSemaphore(device, &semaphoreCreateInfo, nullptr, &semaphores.textOverlayComplete));	// Create a semaphore used to synchronize command submission. Ensures that the image is not presented until all commands for the text overlay have been sumbitted and executed.
+																												// Will be inserted after the render complete semaphore if the text overlay is enabled
 
 	// Set up submit info structure
 	// Semaphores will stay the same during application lifetime
@@ -922,13 +871,9 @@ HWND VulkanExampleBase::setupWindow(HINSTANCE hinstance, WNDPROC wndproc)
 			if (ChangeDisplaySettings(&dmScreenSettings, CDS_FULLSCREEN) != DISP_CHANGE_SUCCESSFUL)
 			{
 				if (MessageBox(NULL, "Fullscreen Mode not supported!\n Switch to window mode?", "Error", MB_YESNO | MB_ICONEXCLAMATION) == IDYES)
-				{
 					settings.fullscreen = false;
-				}
 				else
-				{
 					return false;
-				}
 			}
 		}
 
@@ -1026,18 +971,10 @@ void VulkanExampleBase::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 		{
 			switch (wParam)
 			{
-			case KEY_W:
-				camera.keys.up = true;
-				break;
-			case KEY_S:
-				camera.keys.down = true;
-				break;
-			case KEY_A:
-				camera.keys.left = true;
-				break;
-			case KEY_D:
-				camera.keys.right = true;
-				break;
+			case KEY_W: camera.keys.up		= true; break;
+			case KEY_S: camera.keys.down	= true; break;
+			case KEY_A: camera.keys.left	= true; break;
+			case KEY_D: camera.keys.right	= true; break;
 			}
 		}
 
@@ -1048,18 +985,10 @@ void VulkanExampleBase::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 		{
 			switch (wParam)
 			{
-			case KEY_W:
-				camera.keys.up = false;
-				break;
-			case KEY_S:
-				camera.keys.down = false;
-				break;
-			case KEY_A:
-				camera.keys.left = false;
-				break;
-			case KEY_D:
-				camera.keys.right = false;
-				break;
+			case KEY_W: camera.keys.up		= false; break;
+			case KEY_S: camera.keys.down	= false; break;
+			case KEY_A: camera.keys.left	= false; break;
+			case KEY_D: camera.keys.right	= false; break;
 			}
 		}
 		break;
@@ -1152,36 +1081,22 @@ int32_t VulkanExampleBase::handleAppInput(struct android_app* app, AInputEvent* 
 
 	if (AInputEvent_getType(event) == AINPUT_EVENT_TYPE_KEY)
 	{
-		int32_t keyCode = AKeyEvent_getKeyCode((const AInputEvent*)event);
-		int32_t action = AKeyEvent_getAction((const AInputEvent*)event);
-		int32_t button = 0;
+		int32_t keyCode	= AKeyEvent_getKeyCode((const AInputEvent*)event);
+		int32_t action	= AKeyEvent_getAction((const AInputEvent*)event);
+		int32_t button	= 0;
 
 		if (action == AKEY_EVENT_ACTION_UP)
 			return 0;
 
 		switch (keyCode)
 		{
-		case AKEYCODE_BUTTON_A:
-			vulkanExample->keyPressed(GAMEPAD_BUTTON_A);
-			break;
-		case AKEYCODE_BUTTON_B:
-			vulkanExample->keyPressed(GAMEPAD_BUTTON_B);
-			break;
-		case AKEYCODE_BUTTON_X:
-			vulkanExample->keyPressed(GAMEPAD_BUTTON_X);
-			break;
-		case AKEYCODE_BUTTON_Y:
-			vulkanExample->keyPressed(GAMEPAD_BUTTON_Y);
-			break;
-		case AKEYCODE_BUTTON_L1:
-			vulkanExample->keyPressed(GAMEPAD_BUTTON_L1);
-			break;
-		case AKEYCODE_BUTTON_R1:
-			vulkanExample->keyPressed(GAMEPAD_BUTTON_R1);
-			break;
-		case AKEYCODE_BUTTON_START:
-			vulkanExample->paused = !vulkanExample->paused;
-			break;
+		case AKEYCODE_BUTTON_A		: vulkanExample->keyPressed(GAMEPAD_BUTTON_A);		break;
+		case AKEYCODE_BUTTON_B		: vulkanExample->keyPressed(GAMEPAD_BUTTON_B);		break;
+		case AKEYCODE_BUTTON_X		: vulkanExample->keyPressed(GAMEPAD_BUTTON_X);		break;
+		case AKEYCODE_BUTTON_Y		: vulkanExample->keyPressed(GAMEPAD_BUTTON_Y);		break;
+		case AKEYCODE_BUTTON_L1		: vulkanExample->keyPressed(GAMEPAD_BUTTON_L1);		break;
+		case AKEYCODE_BUTTON_R1		: vulkanExample->keyPressed(GAMEPAD_BUTTON_R1);		break;
+		case AKEYCODE_BUTTON_START	: vulkanExample->paused = !vulkanExample->paused;	break;
 		};
 
 		LOGD("Button %d pressed", keyCode);
@@ -1315,17 +1230,10 @@ void VulkanExampleBase::pointerButton(struct wl_pointer *pointer,
 {
 	switch (button)
 	{
-	case BTN_LEFT:
-		mouseButtons.left = !!state;
-		break;
-	case BTN_MIDDLE:
-		mouseButtons.middle = !!state;
-		break;
-	case BTN_RIGHT:
-		mouseButtons.right = !!state;
-		break;
-	default:
-		break;
+	case BTN_LEFT	: mouseButtons.left		= !!state; break;
+	case BTN_MIDDLE	: mouseButtons.middle	= !!state; break;
+	case BTN_RIGHT	: mouseButtons.right	= !!state; break;
+	default			: break;
 	}
 }
 
@@ -1383,28 +1291,18 @@ void VulkanExampleBase::keyboardKey(struct wl_keyboard *keyboard,
 {
 	switch (key)
 	{
-	case KEY_W:
-		camera.keys.up = !!state;
-		break;
-	case KEY_S:
-		camera.keys.down = !!state;
-		break;
-	case KEY_A:
-		camera.keys.left = !!state;
-		break;
-	case KEY_D:
-		camera.keys.right = !!state;
-		break;
-	case KEY_P:
+	case KEY_W		: camera.keys.up	= !!state;	break;
+	case KEY_S		: camera.keys.down	= !!state;	break;
+	case KEY_A		: camera.keys.left	= !!state;	break;
+	case KEY_D		: camera.keys.right	= !!state;	break;
+	case KEY_ESC	: quit				= true;		break;
+	case KEY_P		:
 		if (state)
 			paused = !paused;
 		break;
-	case KEY_F1:
+	case KEY_F1		:
 		if (state && enableTextOverlay)
 			textOverlay->visible = !textOverlay->visible;
-		break;
-	case KEY_ESC:
-		quit = true;
 		break;
 	}
 
@@ -1674,23 +1572,17 @@ void VulkanExampleBase::handleEvent(const xcb_generic_event_t *event)
 	case XCB_BUTTON_PRESS:
 	{
 		xcb_button_press_event_t *press = (xcb_button_press_event_t *)event;
-		if (press->detail == XCB_BUTTON_INDEX_1)
-			mouseButtons.left = true;
-		if (press->detail == XCB_BUTTON_INDEX_2)
-			mouseButtons.middle = true;
-		if (press->detail == XCB_BUTTON_INDEX_3)
-			mouseButtons.right = true;
+		if (press->detail == XCB_BUTTON_INDEX_1) mouseButtons.left		= true;
+		if (press->detail == XCB_BUTTON_INDEX_2) mouseButtons.middle	= true;
+		if (press->detail == XCB_BUTTON_INDEX_3) mouseButtons.right		= true;
 	}
 	break;
 	case XCB_BUTTON_RELEASE:
 	{
 		xcb_button_press_event_t *press = (xcb_button_press_event_t *)event;
-		if (press->detail == XCB_BUTTON_INDEX_1)
-			mouseButtons.left = false;
-		if (press->detail == XCB_BUTTON_INDEX_2)
-			mouseButtons.middle = false;
-		if (press->detail == XCB_BUTTON_INDEX_3)
-			mouseButtons.right = false;
+		if (press->detail == XCB_BUTTON_INDEX_1) mouseButtons.left		= false;
+		if (press->detail == XCB_BUTTON_INDEX_2) mouseButtons.middle	= false;
+		if (press->detail == XCB_BUTTON_INDEX_3) mouseButtons.right		= false;
 	}
 	break;
 	case XCB_KEY_PRESS:
@@ -1698,25 +1590,14 @@ void VulkanExampleBase::handleEvent(const xcb_generic_event_t *event)
 		const xcb_key_release_event_t *keyEvent = (const xcb_key_release_event_t *)event;
 		switch (keyEvent->detail)
 		{
-			case KEY_W:
-				camera.keys.up = true;
-				break;
-			case KEY_S:
-				camera.keys.down = true;
-				break;
-			case KEY_A:
-				camera.keys.left = true;
-				break;
-			case KEY_D:
-				camera.keys.right = true;
-				break;
-			case KEY_P:
-				paused = !paused;
-				break;
-			case KEY_F1:
-				if (enableTextOverlay)
-				{
-					textOverlay->visible = !textOverlay->visible;
+			case KEY_W	: camera.keys.up	= true; break;
+			case KEY_S	: camera.keys.down	= true; break;
+			case KEY_A	: camera.keys.left	= true; break;
+			case KEY_D	: camera.keys.right	= true; break;
+			case KEY_P	: paused			= !paused; break;
+			case KEY_F1	:
+				if (enableTextOverlay) {
+					textOverlay->visible		= !textOverlay->visible;
 				}
 				break;				
 		}
@@ -1727,37 +1608,25 @@ void VulkanExampleBase::handleEvent(const xcb_generic_event_t *event)
 		const xcb_key_release_event_t *keyEvent = (const xcb_key_release_event_t *)event;
 		switch (keyEvent->detail)
 		{
-			case KEY_W:
-				camera.keys.up = false;
-				break;
-			case KEY_S:
-				camera.keys.down = false;
-				break;
-			case KEY_A:
-				camera.keys.left = false;
-				break;
-			case KEY_D:
-				camera.keys.right = false;
-				break;			
-			case KEY_ESCAPE:
-				quit = true;
+			case KEY_W		: camera.keys.up	= false; break;
+			case KEY_S		: camera.keys.down	= false; break;
+			case KEY_A		: camera.keys.left	= false; break;
+			case KEY_D		: camera.keys.right	= false; break;			
+			case KEY_ESCAPE	: quit				= true;
 				break;
 		}
 		keyPressed(keyEvent->detail);
 	}
 	break;
-	case XCB_DESTROY_NOTIFY:
-		quit = true;
-		break;
-	case XCB_CONFIGURE_NOTIFY:
+	case XCB_DESTROY_NOTIFY		: quit	= true;		break;
+	case XCB_CONFIGURE_NOTIFY	:
 	{
-		const xcb_configure_notify_event_t *cfgEvent = (const xcb_configure_notify_event_t *)event;
+		const xcb_configure_notify_event_t	* cfgEvent	= (const xcb_configure_notify_event_t *)event;
 		if ((prepared) && ((cfgEvent->width != width) || (cfgEvent->height != height)))
 		{
 				destWidth = cfgEvent->width;
 				destHeight = cfgEvent->height;
-				if ((destWidth > 0) && (destHeight > 0))
-				{
+				if ((destWidth > 0) && (destHeight > 0)){
 					windowResize();
 				}
 		}
@@ -1769,22 +1638,7 @@ void VulkanExampleBase::handleEvent(const xcb_generic_event_t *event)
 }
 #endif
 
-void VulkanExampleBase::viewChanged()
-{
-	// Can be overrdiden in derived class
-}
-
-void VulkanExampleBase::keyPressed(uint32_t keyCode)
-{
-	// Can be overriden in derived class
-}
-
-void VulkanExampleBase::buildCommandBuffers()
-{
-	// Can be overriden in derived class
-}
-
-void VulkanExampleBase::createCommandPool()
+void VulkanExampleBase::createCommandPool	()
 {
 	VkCommandPoolCreateInfo cmdPoolInfo = {};
 	cmdPoolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
@@ -2008,11 +1862,6 @@ void VulkanExampleBase::initSwapchain()
 #elif defined(__linux__)
 	swapChain.initSurface(connection, window);
 #endif
-}
-
-void VulkanExampleBase::setupSwapChain()
-{
-	swapChain.create(&width, &height, settings.vsync);
 }
 
 VulkanExampleBase *vulkanExample	= nullptr;
