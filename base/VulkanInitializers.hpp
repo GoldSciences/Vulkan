@@ -182,7 +182,13 @@ namespace vks
 			return pipelineInputAssemblyStateCreateInfo;
 		}
 
-		inline VkPipelineRasterizationStateCreateInfo	pipelineRasterizationStateCreateInfo	(VkPolygonMode polygonMode, VkCullModeFlags cullMode, VkFrontFace frontFace, VkPipelineRasterizationStateCreateFlags flags = 0) {
+		inline VkPipelineRasterizationStateCreateInfo	pipelineRasterizationStateCreateInfo	
+		(	VkPolygonMode							polygonMode
+		,	VkCullModeFlags							cullMode
+		,	VkFrontFace								frontFace
+		,	VkPipelineRasterizationStateCreateFlags	flags = 0
+		) 
+		{
 			VkPipelineRasterizationStateCreateInfo							pipelineRasterizationStateCreateInfo {};
 			pipelineRasterizationStateCreateInfo.sType					= VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
 			pipelineRasterizationStateCreateInfo.polygonMode			= polygonMode;

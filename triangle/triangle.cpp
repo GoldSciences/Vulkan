@@ -38,29 +38,29 @@ class VulkanExample : public VulkanExampleBase
 public:
 	// Vertex layout used in this example
 	struct Vertex {
-		float position[3];
-		float color[3];
+		float					position[3];
+		float					color[3];
 	};
 
 	// Vertex buffer and attributes
 	struct {
-		VkDeviceMemory memory;															// Handle to the device memory for this buffer
-		VkBuffer buffer;																// Handle to the Vulkan buffer object that the memory is bound to
+		VkDeviceMemory			memory;												// Handle to the device memory for this buffer
+		VkBuffer				buffer;												// Handle to the Vulkan buffer object that the memory is bound to
 	}						vertices;
 
 	// Index buffer
 	struct 
 	{
-		VkDeviceMemory memory;		
-		VkBuffer buffer;			
-		uint32_t count;
+		VkDeviceMemory			memory;		
+		VkBuffer				buffer;			
+		uint32_t				count;
 	}						indices;
 
 	// Uniform buffer block object
 	struct {
-		VkDeviceMemory memory;		
-		VkBuffer buffer;			
-		VkDescriptorBufferInfo descriptor;
+		VkDeviceMemory			memory;		
+		VkBuffer				buffer;			
+		VkDescriptorBufferInfo	descriptor;
 	}						uniformBufferVS;
 
 	// For simplicity we use the same uniform block layout as in the shader:
@@ -75,9 +75,9 @@ public:
 	// This way we can just memcopy the ubo data to the ubo
 	// Note: You should use data types that align with the GPU in order to avoid manual padding (vec4, mat4)
 	struct {
-		glm::mat4 projectionMatrix;
-		glm::mat4 modelMatrix;
-		glm::mat4 viewMatrix;
+		glm::mat4				projectionMatrix;
+		glm::mat4				modelMatrix;
+		glm::mat4				viewMatrix;
 	}						uboVS;
 
 	// The pipeline layout is used by a pipline to access the descriptor sets 
@@ -153,9 +153,7 @@ public:
 			if ((typeBits & 1) == 1)
 			{
 				if ((deviceMemoryProperties.memoryTypes[i].propertyFlags & properties) == properties)
-				{						
 					return i;
-				}
 			}
 			typeBits >>= 1;
 		}
@@ -191,20 +189,20 @@ public:
 	// If begin is true, the command buffer is also started so we can start adding commands
 	VkCommandBuffer			getCommandBuffer						(bool begin)
 	{
-		VkCommandBuffer cmdBuffer;
+		VkCommandBuffer										cmdBuffer;
 
-		VkCommandBufferAllocateInfo cmdBufAllocateInfo = {};
-		cmdBufAllocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-		cmdBufAllocateInfo.commandPool = cmdPool;
-		cmdBufAllocateInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-		cmdBufAllocateInfo.commandBufferCount = 1;
+		VkCommandBufferAllocateInfo							cmdBufAllocateInfo	= {};
+		cmdBufAllocateInfo.sType						= VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+		cmdBufAllocateInfo.commandPool					= cmdPool;
+		cmdBufAllocateInfo.level						= VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+		cmdBufAllocateInfo.commandBufferCount			= 1;
 	
 		VK_CHECK_RESULT(vkAllocateCommandBuffers(device, &cmdBufAllocateInfo, &cmdBuffer));
 
 		// If requested, also start the new command buffer
 		if (begin)
 		{
-			VkCommandBufferBeginInfo cmdBufInfo = vks::initializers::commandBufferBeginInfo();
+			VkCommandBufferBeginInfo							cmdBufInfo		= vks::initializers::commandBufferBeginInfo();
 			VK_CHECK_RESULT(vkBeginCommandBuffer(cmdBuffer, &cmdBufInfo));
 		}
 
@@ -228,7 +226,7 @@ public:
 		VkFenceCreateInfo									fenceCreateInfo					= {};
 		fenceCreateInfo.sType							= VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
 		fenceCreateInfo.flags							= 0;
-		VkFence fence;
+		VkFence												fence;
 		VK_CHECK_RESULT(vkCreateFence(device, &fenceCreateInfo, nullptr, &fence));
 
 		// Submit to the queue
@@ -981,8 +979,7 @@ public:
 		vkDestroyShaderModule(device, shaderStages[1].module, nullptr);
 	}
 
-	void					prepareUniformBuffers					()
-	{
+	void					prepareUniformBuffers					()		{
 		// Prepare and initialize a uniform buffer block containing shader uniforms
 		// Single uniforms like in OpenGL are no longer present in Vulkan. All Shader uniforms are passed via uniform buffer blocks
 		VkMemoryRequirements memReqs;
@@ -1023,8 +1020,7 @@ public:
 		updateUniformBuffers();
 	}
 
-	void					updateUniformBuffers					()
-	{
+	void					updateUniformBuffers					()		{
 		// Update matrices
 		uboVS.projectionMatrix = glm::perspective(glm::radians(60.0f), (float)width / (float)height, 0.1f, 256.0f);
 
@@ -1044,8 +1040,7 @@ public:
 		vkUnmapMemory(device, uniformBufferVS.memory);
 	}
 
-	void					prepare									()
-	{
+	void					prepare									()		{
 		VulkanExampleBase::prepare();
 		prepareSynchronizationPrimitives();
 		prepareVertices(USE_STAGING);
