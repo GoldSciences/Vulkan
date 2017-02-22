@@ -555,28 +555,19 @@ VulkanExampleBase::VulkanExampleBase(bool enableValidation)
 	// Parse command line arguments
 	for (size_t i = 0; i < args.size(); i++)
 	{
-		if (args[i] == std::string("-validation"))
-		{
-			settings.validation = true;
-		}
-		if (args[i] == std::string("-vsync"))
-		{
-			settings.vsync = true;
-		}
-		if (args[i] == std::string("-fullscreen"))
-		{
-			settings.fullscreen = true;
-		}
+		if (args[i] == std::string("-validation"	))	settings.validation		= true;
+		if (args[i] == std::string("-vsync"			))	settings.vsync			= true;
+		if (args[i] == std::string("-fullscreen"	))	settings.fullscreen		= true;
 		if ((args[i] == std::string("-w")) || (args[i] == std::string("-width")))
 		{
-			char* endptr;
-			uint32_t w = strtol(args[i + 1], &endptr, 10);
+			char*		endptr	= nullptr;
+			uint32_t	w = strtol(args[i + 1], &endptr, 10);
 			if (endptr != args[i + 1]) { width = w; };
 		}
 		if ((args[i] == std::string("-h")) || (args[i] == std::string("-height")))
 		{
-			char* endptr;
-			uint32_t h = strtol(args[i + 1], &endptr, 10);
+			char*		endptr	= nullptr;
+			uint32_t	h = strtol(args[i + 1], &endptr, 10);
 			if (endptr != args[i + 1]) { height = h; };
 		}
 	}
@@ -608,20 +599,16 @@ VulkanExampleBase::~VulkanExampleBase()
 	// Clean up Vulkan resources
 	swapChain.cleanup();
 	if (descriptorPool != VK_NULL_HANDLE)
-	{
 		vkDestroyDescriptorPool(device, descriptorPool, nullptr);
-	}
+
 	destroyCommandBuffers();
 	vkDestroyRenderPass(device, renderPass, nullptr);
 	for (uint32_t i = 0; i < frameBuffers.size(); i++)
-	{
 		vkDestroyFramebuffer(device, frameBuffers[i], nullptr);
-	}
 
 	for (auto& shaderModule : shaderModules)
-	{
 		vkDestroyShaderModule(device, shaderModule, nullptr);
-	}
+
 	vkDestroyImageView(device, depthStencil.view, nullptr);
 	vkDestroyImage(device, depthStencil.image, nullptr);
 	vkFreeMemory(device, depthStencil.mem, nullptr);
@@ -635,16 +622,11 @@ VulkanExampleBase::~VulkanExampleBase()
 	vkDestroySemaphore(device, semaphores.textOverlayComplete, nullptr);
 
 	if (enableTextOverlay)
-	{
 		delete textOverlay;
-	}
 
 	delete vulkanDevice;
-
 	if (settings.validation)
-	{
 		vks::debug::freeDebugCallback(instance);
-	}
 
 	vkDestroyInstance(instance, nullptr);
 
@@ -674,14 +656,12 @@ VulkanExampleBase::~VulkanExampleBase()
 
 void VulkanExampleBase::initVulkan()
 {
-	VkResult err;
+	VkResult	err;
 
 	// Vulkan instance
-	err = createInstance(settings.validation);
+	err		= createInstance(settings.validation);
 	if (err)
-	{
 		vks::tools::exitFatal("Could not create Vulkan instance : \n" + vks::tools::errorString(err), "Fatal error");
-	}
 
 #if defined(__ANDROID__)
 	loadVulkanFunctions(instance);
@@ -690,11 +670,9 @@ void VulkanExampleBase::initVulkan()
 	// If requested, we enable the default validation layers for debugging
 	if (settings.validation)
 	{
-		// The report flags determine what type of messages for the layers will be displayed
-		// For validating (debugging) an appplication the error and warning bits should suffice
-		VkDebugReportFlagsEXT debugReportFlags = VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT | VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT;
-		// Additional flags include performance info, loader and layer debug messages, etc.
-		vks::debug::setupDebugging(instance, debugReportFlags, VK_NULL_HANDLE);
+		// The report flags determine what type of messages for the layers will be displayed. For validating (debugging) an appplication the error and warning bits should suffice.
+		VkDebugReportFlagsEXT	debugReportFlags	= VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT | VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT;
+		vks::debug::setupDebugging(instance, debugReportFlags, VK_NULL_HANDLE);	// Additional flags include performance info, loader and layer debug messages, etc.
 	}
 
 	// Physical device
@@ -728,9 +706,7 @@ void VulkanExampleBase::initVulkan()
 			if (endptr != args[i + 1]) 
 			{ 
 				if (index > gpuCount - 1)
-				{
 					std::cerr << "Selected device index " << index << " is out of range, reverting to device 0 (use -listgpus to show available Vulkan devices)" << std::endl;
-				} 
 				else
 				{
 					std::cout << "Selected Vulkan device " << index << std::endl;
@@ -745,9 +721,7 @@ void VulkanExampleBase::initVulkan()
 			uint32_t gpuCount = 0;
 			VK_CHECK_RESULT(vkEnumeratePhysicalDevices(instance, &gpuCount, nullptr));
 			if (gpuCount == 0) 
-			{
 				std::cerr << "No Vulkan devices found!" << std::endl;
-			}
 			else 
 			{
 				// Enumerate devices
@@ -1049,12 +1023,8 @@ void VulkanExampleBase::handleMessages(HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 			}
 		}
 		break;
-	case WM_ENTERSIZEMOVE:
-		resizing = true;
-		break;
-	case WM_EXITSIZEMOVE:
-		resizing = false;
-		break;
+	case WM_ENTERSIZEMOVE	: resizing = true;		break;
+	case WM_EXITSIZEMOVE	: resizing = false;		break;
 	}
 }
 #elif defined(__ANDROID__)
