@@ -63,8 +63,9 @@ namespace vks
 	namespace tools
 	{
 		
-		std::string		errorString					(VkResult errorCode);			//	Returns an error code as a string 
-		std::string		physicalDeviceTypeString	(VkPhysicalDeviceType type);	//	Returns the device type as a string
+		void			exitFatal					(std::string message, std::string caption);	// Display error message and exit on fatal error
+		std::string		errorString					(VkResult errorCode);						//	Returns an error code as a string 
+		std::string		physicalDeviceTypeString	(VkPhysicalDeviceType type);				//	Returns the device type as a string
 
 		// Selected a suitable supported depth format starting with 32 bit down to 16 bit
 		// Returns false if none of the depth formats in the list is supported by the device
@@ -92,8 +93,6 @@ namespace vks
 			,	VkPipelineStageFlags		dstStageMask = VK_PIPELINE_STAGE_ALL_COMMANDS_BIT
 			);
 
-		// Display error message and exit on fatal error
-		void			exitFatal					(std::string message, std::string caption);
 
 		
 #if defined(__ANDROID__)
@@ -101,7 +100,6 @@ namespace vks
 #else
 		VkShaderModule	loadShader					(const char *fileName, VkDevice device, VkShaderStageFlagBits stage);									// Load a SPIR-V shader (binary) 
 #endif
-
 		VkShaderModule	loadShaderGLSL				(const char *fileName, VkDevice device, VkShaderStageFlagBits stage);									// Load a GLSL shader (text). GLSL support requires vendor-specific extensions to be enabled and is not a core-feature of Vulkan.
 	}
 }
