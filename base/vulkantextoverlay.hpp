@@ -42,14 +42,14 @@
 class VulkanTextOverlay
 {
 private:
-	vks::VulkanDevice *vulkanDevice;
+	vks::VulkanDevice *vulkanDevice		= nullptr;
 
 	VkQueue queue;
 	VkFormat colorFormat;
 	VkFormat depthFormat;
 
-	uint32_t *frameBufferWidth;
-	uint32_t *frameBufferHeight;
+	uint32_t *frameBufferWidth			= nullptr;
+	uint32_t *frameBufferHeight			= nullptr;
 
 	VkSampler sampler;
 	VkImage image;
@@ -105,9 +105,7 @@ public:
 
 		this->frameBuffers.resize(framebuffers.size());
 		for (uint32_t i = 0; i < framebuffers.size(); i++)
-		{
 			this->frameBuffers[i] = &framebuffers[i];
-		}
 
 		this->shaderStages = shaderstages;
 
@@ -154,32 +152,21 @@ public:
 		// Command buffer
 
 		// Pool
-		VkCommandPoolCreateInfo cmdPoolInfo = {};
-		cmdPoolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-		cmdPoolInfo.queueFamilyIndex = vulkanDevice->queueFamilyIndices.graphics; 
-		cmdPoolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
+		VkCommandPoolCreateInfo								cmdPoolInfo = {};
+		cmdPoolInfo.sType				= VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+		cmdPoolInfo.queueFamilyIndex	= vulkanDevice->queueFamilyIndices.graphics; 
+		cmdPoolInfo.flags				= VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
 		VK_CHECK_RESULT(vkCreateCommandPool(vulkanDevice->logicalDevice, &cmdPoolInfo, nullptr, &commandPool));
 
-		VkCommandBufferAllocateInfo cmdBufAllocateInfo =
-			vks::initializers::commandBufferAllocateInfo(
-				commandPool,
-				VK_COMMAND_BUFFER_LEVEL_PRIMARY,
-				(uint32_t)cmdBuffers.size());
-
+		VkCommandBufferAllocateInfo							cmdBufAllocateInfo = vks::initializers::commandBufferAllocateInfo(commandPool, VK_COMMAND_BUFFER_LEVEL_PRIMARY, (uint32_t)cmdBuffers.size());
 		VK_CHECK_RESULT(vkAllocateCommandBuffers(vulkanDevice->logicalDevice, &cmdBufAllocateInfo, cmdBuffers.data()));
-
-		// Vertex buffer
-		VK_CHECK_RESULT(vulkanDevice->createBuffer(
-			VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-			&vertexBuffer,
-			MAX_CHAR_COUNT * sizeof(glm::vec4)));
+		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &vertexBuffer, MAX_CHAR_COUNT * sizeof(glm::vec4)));	// Vertex buffer
 
 		// Map persistent
 		vertexBuffer.map();
 
 		// Font texture
-		VkImageCreateInfo imageInfo = vks::initializers::imageCreateInfo();
+		VkImageCreateInfo									imageInfo = vks::initializers::imageCreateInfo();
 		imageInfo.imageType = VK_IMAGE_TYPE_2D;
 		imageInfo.format = VK_FORMAT_R8_UNORM;
 		imageInfo.extent.width = STB_FONT_WIDTH;
@@ -194,8 +181,8 @@ public:
 		imageInfo.initialLayout = VK_IMAGE_LAYOUT_PREINITIALIZED;
 		VK_CHECK_RESULT(vkCreateImage(vulkanDevice->logicalDevice, &imageInfo, nullptr, &image));
 
-		VkMemoryRequirements memReqs;
-		VkMemoryAllocateInfo allocInfo = vks::initializers::memoryAllocateInfo();
+		VkMemoryRequirements								memReqs;
+		VkMemoryAllocateInfo								allocInfo = vks::initializers::memoryAllocateInfo();
 		vkGetImageMemoryRequirements(vulkanDevice->logicalDevice, image, &memReqs);
 		allocInfo.allocationSize = memReqs.size;
 		allocInfo.memoryTypeIndex = vulkanDevice->getMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
@@ -203,35 +190,25 @@ public:
 		VK_CHECK_RESULT(vkBindImageMemory(vulkanDevice->logicalDevice, image, imageMemory, 0));
 
 		// Staging
-		vks::Buffer stagingBuffer;
-
-		VK_CHECK_RESULT(vulkanDevice->createBuffer(
-			VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-			&stagingBuffer,
-			allocInfo.allocationSize));
+		vks::Buffer											stagingBuffer;
+		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &stagingBuffer, allocInfo.allocationSize));
 
 		stagingBuffer.map();
 		memcpy(stagingBuffer.mapped, &font24pixels[0][0], STB_FONT_WIDTH * STB_FONT_HEIGHT);	// Only one channel, so data size = W * H (*R8)
 		stagingBuffer.unmap();
 
 		// Copy to image
-		VkCommandBuffer copyCmd;
+		VkCommandBuffer										copyCmd;
 		cmdBufAllocateInfo.commandBufferCount = 1;
 		VK_CHECK_RESULT(vkAllocateCommandBuffers(vulkanDevice->logicalDevice, &cmdBufAllocateInfo, &copyCmd));
 
-		VkCommandBufferBeginInfo cmdBufInfo = vks::initializers::commandBufferBeginInfo();
+		VkCommandBufferBeginInfo							cmdBufInfo = vks::initializers::commandBufferBeginInfo();
 		VK_CHECK_RESULT(vkBeginCommandBuffer(copyCmd, &cmdBufInfo));
 
 		// Prepare for transfer
-		vks::tools::setImageLayout(
-			copyCmd,
-			image,
-			VK_IMAGE_ASPECT_COLOR_BIT,
-			VK_IMAGE_LAYOUT_PREINITIALIZED,
-			VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+		vks::tools::setImageLayout(copyCmd, image, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_LAYOUT_PREINITIALIZED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 
-		VkBufferImageCopy bufferCopyRegion = {};
+		VkBufferImageCopy									bufferCopyRegion = {};
 		bufferCopyRegion.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
 		bufferCopyRegion.imageSubresource.mipLevel = 0;
 		bufferCopyRegion.imageSubresource.layerCount = 1;
@@ -239,28 +216,16 @@ public:
 		bufferCopyRegion.imageExtent.height = STB_FONT_HEIGHT;
 		bufferCopyRegion.imageExtent.depth = 1;
 
-		vkCmdCopyBufferToImage(
-			copyCmd,
-			stagingBuffer.buffer,
-			image,
-			VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-			1,
-			&bufferCopyRegion
-			);
+		vkCmdCopyBufferToImage(copyCmd, stagingBuffer.buffer, image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &bufferCopyRegion);
 
 		// Prepare for shader read
-		vks::tools::setImageLayout(
-			copyCmd,
-			image,
-			VK_IMAGE_ASPECT_COLOR_BIT,
-			VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-			VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+		vks::tools::setImageLayout(copyCmd, image, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
 		VK_CHECK_RESULT(vkEndCommandBuffer(copyCmd));
 
-		VkSubmitInfo submitInfo = vks::initializers::submitInfo();
-		submitInfo.commandBufferCount = 1;
-		submitInfo.pCommandBuffers = &copyCmd;
+		VkSubmitInfo										submitInfo = vks::initializers::submitInfo();
+		submitInfo.commandBufferCount	= 1;
+		submitInfo.pCommandBuffers		= &copyCmd;
 
 		VK_CHECK_RESULT(vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE));
 		VK_CHECK_RESULT(vkQueueWaitIdle(queue));
@@ -269,182 +234,118 @@ public:
 
 		vkFreeCommandBuffers(vulkanDevice->logicalDevice, commandPool, 1, &copyCmd);
 
-		VkImageViewCreateInfo imageViewInfo = vks::initializers::imageViewCreateInfo();
-		imageViewInfo.image = image;
-		imageViewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
-		imageViewInfo.format = imageInfo.format;
-		imageViewInfo.components = { VK_COMPONENT_SWIZZLE_R, VK_COMPONENT_SWIZZLE_G, VK_COMPONENT_SWIZZLE_B,	VK_COMPONENT_SWIZZLE_A };
-		imageViewInfo.subresourceRange = { VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1 };
+		VkImageViewCreateInfo								imageViewInfo = vks::initializers::imageViewCreateInfo();
+		imageViewInfo.image				= image;
+		imageViewInfo.viewType			= VK_IMAGE_VIEW_TYPE_2D;
+		imageViewInfo.format			= imageInfo.format;
+		imageViewInfo.components		= { VK_COMPONENT_SWIZZLE_R, VK_COMPONENT_SWIZZLE_G, VK_COMPONENT_SWIZZLE_B,	VK_COMPONENT_SWIZZLE_A };
+		imageViewInfo.subresourceRange	= { VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1 };
 		VK_CHECK_RESULT(vkCreateImageView(vulkanDevice->logicalDevice, &imageViewInfo, nullptr, &view));
 
 		// Sampler
-		VkSamplerCreateInfo samplerInfo = vks::initializers::samplerCreateInfo();
-		samplerInfo.magFilter = VK_FILTER_LINEAR;
-		samplerInfo.minFilter = VK_FILTER_LINEAR;
-		samplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
-		samplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
-		samplerInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
-		samplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
-		samplerInfo.mipLodBias = 0.0f;
-		samplerInfo.compareOp = VK_COMPARE_OP_NEVER;
-		samplerInfo.minLod = 0.0f;
-		samplerInfo.maxLod = 1.0f;
-		samplerInfo.borderColor = VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
+		VkSamplerCreateInfo									samplerInfo = vks::initializers::samplerCreateInfo();
+		samplerInfo.magFilter		= VK_FILTER_LINEAR;
+		samplerInfo.minFilter		= VK_FILTER_LINEAR;
+		samplerInfo.mipmapMode		= VK_SAMPLER_MIPMAP_MODE_LINEAR;
+		samplerInfo.addressModeU	= VK_SAMPLER_ADDRESS_MODE_REPEAT;
+		samplerInfo.addressModeV	= VK_SAMPLER_ADDRESS_MODE_REPEAT;
+		samplerInfo.addressModeW	= VK_SAMPLER_ADDRESS_MODE_REPEAT;
+		samplerInfo.mipLodBias		= 0.0f;
+		samplerInfo.compareOp		= VK_COMPARE_OP_NEVER;
+		samplerInfo.minLod			= 0.0f;
+		samplerInfo.maxLod			= 1.0f;
+		samplerInfo.borderColor		= VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
 		VK_CHECK_RESULT(vkCreateSampler(vulkanDevice->logicalDevice, &samplerInfo, nullptr, &sampler));
 
 		// Descriptor
 		// Font uses a separate descriptor pool
-		std::array<VkDescriptorPoolSize, 1> poolSizes;
+		std::array<VkDescriptorPoolSize, 1>					poolSizes;
 		poolSizes[0] = vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1);
 
-		VkDescriptorPoolCreateInfo descriptorPoolInfo =
-			vks::initializers::descriptorPoolCreateInfo(
-				static_cast<uint32_t>(poolSizes.size()),
-				poolSizes.data(),
-				1);
-
+		VkDescriptorPoolCreateInfo							descriptorPoolInfo = vks::initializers::descriptorPoolCreateInfo(static_cast<uint32_t>(poolSizes.size()), poolSizes.data(), 1);
 		VK_CHECK_RESULT(vkCreateDescriptorPool(vulkanDevice->logicalDevice, &descriptorPoolInfo, nullptr, &descriptorPool));
 
 		// Descriptor set layout
-		std::array<VkDescriptorSetLayoutBinding, 1> setLayoutBindings;
+		std::array<VkDescriptorSetLayoutBinding, 1>			setLayoutBindings;
 		setLayoutBindings[0] = vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, 0);
 
-		VkDescriptorSetLayoutCreateInfo descriptorSetLayoutInfo =
-			vks::initializers::descriptorSetLayoutCreateInfo(
-				setLayoutBindings.data(),
-				static_cast<uint32_t>(setLayoutBindings.size()));
-
+		VkDescriptorSetLayoutCreateInfo						descriptorSetLayoutInfo	= vks::initializers::descriptorSetLayoutCreateInfo(setLayoutBindings.data(), static_cast<uint32_t>(setLayoutBindings.size()));
 		VK_CHECK_RESULT(vkCreateDescriptorSetLayout(vulkanDevice->logicalDevice, &descriptorSetLayoutInfo, nullptr, &descriptorSetLayout));
 
 		// Pipeline layout
-		VkPipelineLayoutCreateInfo pipelineLayoutInfo =
-			vks::initializers::pipelineLayoutCreateInfo(
-				&descriptorSetLayout,
-				1);
-
+		VkPipelineLayoutCreateInfo							pipelineLayoutInfo		= vks::initializers::pipelineLayoutCreateInfo(&descriptorSetLayout, 1);
 		VK_CHECK_RESULT(vkCreatePipelineLayout(vulkanDevice->logicalDevice, &pipelineLayoutInfo, nullptr, &pipelineLayout));
 
 		// Descriptor set
-		VkDescriptorSetAllocateInfo descriptorSetAllocInfo =
-			vks::initializers::descriptorSetAllocateInfo(
-				descriptorPool,
-				&descriptorSetLayout,
-				1);
-
+		VkDescriptorSetAllocateInfo							descriptorSetAllocInfo	= vks::initializers::descriptorSetAllocateInfo(descriptorPool, &descriptorSetLayout, 1);
 		VK_CHECK_RESULT(vkAllocateDescriptorSets(vulkanDevice->logicalDevice, &descriptorSetAllocInfo, &descriptorSet));
 
-		VkDescriptorImageInfo texDescriptor =
-			vks::initializers::descriptorImageInfo(
-				sampler,
-				view,
-				VK_IMAGE_LAYOUT_GENERAL);
+		VkDescriptorImageInfo								texDescriptor			= vks::initializers::descriptorImageInfo(sampler, view, VK_IMAGE_LAYOUT_GENERAL);
 
-		std::array<VkWriteDescriptorSet, 1> writeDescriptorSets;
+		std::array<VkWriteDescriptorSet, 1>					writeDescriptorSets;
 		writeDescriptorSets[0] = vks::initializers::writeDescriptorSet(descriptorSet, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0, &texDescriptor);
 		vkUpdateDescriptorSets(vulkanDevice->logicalDevice, static_cast<uint32_t>(writeDescriptorSets.size()), writeDescriptorSets.data(), 0, NULL);
 
 		// Pipeline cache
-		VkPipelineCacheCreateInfo pipelineCacheCreateInfo = {};
+		VkPipelineCacheCreateInfo							pipelineCacheCreateInfo = {};
 		pipelineCacheCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
 		VK_CHECK_RESULT(vkCreatePipelineCache(vulkanDevice->logicalDevice, &pipelineCacheCreateInfo, nullptr, &pipelineCache));
 
 		// Command buffer execution fence
-		VkFenceCreateInfo fenceCreateInfo = vks::initializers::fenceCreateInfo();
+		VkFenceCreateInfo									fenceCreateInfo = vks::initializers::fenceCreateInfo();
 		VK_CHECK_RESULT(vkCreateFence(vulkanDevice->logicalDevice, &fenceCreateInfo, nullptr, &fence));
 	}
 
-	/**
-	* Prepare a separate pipeline for the font rendering decoupled from the main application
-	*/
+	// Prepare a separate pipeline for the font rendering decoupled from the main application
 	void preparePipeline()
 	{
-		VkPipelineInputAssemblyStateCreateInfo inputAssemblyState =
-			vks::initializers::pipelineInputAssemblyStateCreateInfo(
-				VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP,
-				0,
-				VK_FALSE);
-
-		VkPipelineRasterizationStateCreateInfo rasterizationState =
-			vks::initializers::pipelineRasterizationStateCreateInfo(
-				VK_POLYGON_MODE_FILL,
-				VK_CULL_MODE_BACK_BIT,
-				VK_FRONT_FACE_CLOCKWISE,
-				0);
+		VkPipelineInputAssemblyStateCreateInfo				inputAssemblyState	= vks::initializers::pipelineInputAssemblyStateCreateInfo(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP, 0, VK_FALSE);
+		VkPipelineRasterizationStateCreateInfo				rasterizationState	= vks::initializers::pipelineRasterizationStateCreateInfo(VK_POLYGON_MODE_FILL, VK_CULL_MODE_BACK_BIT, VK_FRONT_FACE_CLOCKWISE, 0);
 
 		// Enable blending
-		VkPipelineColorBlendAttachmentState blendAttachmentState =
-			vks::initializers::pipelineColorBlendAttachmentState(0xf, VK_TRUE);
+		VkPipelineColorBlendAttachmentState					blendAttachmentState = vks::initializers::pipelineColorBlendAttachmentState(0xf, VK_TRUE);
+		blendAttachmentState.srcColorBlendFactor	= VK_BLEND_FACTOR_ONE;
+		blendAttachmentState.dstColorBlendFactor	= VK_BLEND_FACTOR_ONE;
+		blendAttachmentState.colorBlendOp			= VK_BLEND_OP_ADD;
+		blendAttachmentState.srcAlphaBlendFactor	= VK_BLEND_FACTOR_ONE;
+		blendAttachmentState.dstAlphaBlendFactor	= VK_BLEND_FACTOR_ONE;
+		blendAttachmentState.alphaBlendOp			= VK_BLEND_OP_ADD;
+		blendAttachmentState.colorWriteMask			= VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
 
-		blendAttachmentState.srcColorBlendFactor = VK_BLEND_FACTOR_ONE;
-		blendAttachmentState.dstColorBlendFactor = VK_BLEND_FACTOR_ONE;
-		blendAttachmentState.colorBlendOp = VK_BLEND_OP_ADD;
-		blendAttachmentState.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
-		blendAttachmentState.dstAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
-		blendAttachmentState.alphaBlendOp = VK_BLEND_OP_ADD;
-		blendAttachmentState.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
+		VkPipelineColorBlendStateCreateInfo					colorBlendState		= vks::initializers::pipelineColorBlendStateCreateInfo		(1, &blendAttachmentState);
+		VkPipelineDepthStencilStateCreateInfo				depthStencilState	= vks::initializers::pipelineDepthStencilStateCreateInfo	(VK_FALSE,VK_FALSE,VK_COMPARE_OP_LESS_OR_EQUAL);
+		VkPipelineViewportStateCreateInfo					viewportState		= vks::initializers::pipelineViewportStateCreateInfo		(1, 1, 0);
+		VkPipelineMultisampleStateCreateInfo				multisampleState	= vks::initializers::pipelineMultisampleStateCreateInfo		(VK_SAMPLE_COUNT_1_BIT,0);
+		std::vector<VkDynamicState>							dynamicStateEnables	= {VK_DYNAMIC_STATE_VIEWPORT,VK_DYNAMIC_STATE_SCISSOR};
+		VkPipelineDynamicStateCreateInfo					dynamicState		= vks::initializers::pipelineDynamicStateCreateInfo			(dynamicStateEnables.data(), static_cast<uint32_t>(dynamicStateEnables.size()), 0);
+		
+		std::array<VkVertexInputBindingDescription, 2>		vertexBindings		= {};
+		vertexBindings[0]	= vks::initializers::vertexInputBindingDescription(0, sizeof(glm::vec4), VK_VERTEX_INPUT_RATE_VERTEX);
+		vertexBindings[1]	= vks::initializers::vertexInputBindingDescription(1, sizeof(glm::vec4), VK_VERTEX_INPUT_RATE_VERTEX);
 
-		VkPipelineColorBlendStateCreateInfo colorBlendState =
-			vks::initializers::pipelineColorBlendStateCreateInfo(
-				1,
-				&blendAttachmentState);
+		std::array<VkVertexInputAttributeDescription, 2>	vertexAttribs		= {};
+		
+		vertexAttribs[0]	= vks::initializers::vertexInputAttributeDescription(0, 0, VK_FORMAT_R32G32_SFLOAT, 0);					// Position
+		vertexAttribs[1]	= vks::initializers::vertexInputAttributeDescription(1, 1, VK_FORMAT_R32G32_SFLOAT, sizeof(glm::vec2));	// UV
 
-		VkPipelineDepthStencilStateCreateInfo depthStencilState =
-			vks::initializers::pipelineDepthStencilStateCreateInfo(
-				VK_FALSE,
-				VK_FALSE,
-				VK_COMPARE_OP_LESS_OR_EQUAL);
+		VkPipelineVertexInputStateCreateInfo				inputState			= vks::initializers::pipelineVertexInputStateCreateInfo();
+		inputState.vertexBindingDescriptionCount	= static_cast<uint32_t>(vertexBindings.size());
+		inputState.pVertexBindingDescriptions		= vertexBindings.data();
+		inputState.vertexAttributeDescriptionCount	= static_cast<uint32_t>(vertexAttribs.size());
+		inputState.pVertexAttributeDescriptions		= vertexAttribs.data();
 
-		VkPipelineViewportStateCreateInfo viewportState =
-			vks::initializers::pipelineViewportStateCreateInfo(1, 1, 0);
+		VkGraphicsPipelineCreateInfo						pipelineCreateInfo	= vks::initializers::pipelineCreateInfo(pipelineLayout, renderPass, 0);
 
-		VkPipelineMultisampleStateCreateInfo multisampleState =
-			vks::initializers::pipelineMultisampleStateCreateInfo(
-				VK_SAMPLE_COUNT_1_BIT,
-				0);
-
-		std::vector<VkDynamicState> dynamicStateEnables = {
-			VK_DYNAMIC_STATE_VIEWPORT,
-			VK_DYNAMIC_STATE_SCISSOR
-		};
-
-		VkPipelineDynamicStateCreateInfo dynamicState =
-			vks::initializers::pipelineDynamicStateCreateInfo(
-				dynamicStateEnables.data(),
-				static_cast<uint32_t>(dynamicStateEnables.size()),
-				0);
-
-		std::array<VkVertexInputBindingDescription, 2> vertexBindings = {};
-		vertexBindings[0] = vks::initializers::vertexInputBindingDescription(0, sizeof(glm::vec4), VK_VERTEX_INPUT_RATE_VERTEX);
-		vertexBindings[1] = vks::initializers::vertexInputBindingDescription(1, sizeof(glm::vec4), VK_VERTEX_INPUT_RATE_VERTEX);
-
-		std::array<VkVertexInputAttributeDescription, 2> vertexAttribs = {};
-		// Position
-		vertexAttribs[0] = vks::initializers::vertexInputAttributeDescription(0, 0, VK_FORMAT_R32G32_SFLOAT, 0);
-		// UV
-		vertexAttribs[1] = vks::initializers::vertexInputAttributeDescription(1, 1, VK_FORMAT_R32G32_SFLOAT, sizeof(glm::vec2));
-
-		VkPipelineVertexInputStateCreateInfo inputState = vks::initializers::pipelineVertexInputStateCreateInfo();
-		inputState.vertexBindingDescriptionCount = static_cast<uint32_t>(vertexBindings.size());
-		inputState.pVertexBindingDescriptions = vertexBindings.data();
-		inputState.vertexAttributeDescriptionCount = static_cast<uint32_t>(vertexAttribs.size());
-		inputState.pVertexAttributeDescriptions = vertexAttribs.data();
-
-		VkGraphicsPipelineCreateInfo pipelineCreateInfo =
-			vks::initializers::pipelineCreateInfo(
-				pipelineLayout,
-				renderPass,
-				0);
-
-		pipelineCreateInfo.pVertexInputState = &inputState;
-		pipelineCreateInfo.pInputAssemblyState = &inputAssemblyState;
-		pipelineCreateInfo.pRasterizationState = &rasterizationState;
-		pipelineCreateInfo.pColorBlendState = &colorBlendState;
-		pipelineCreateInfo.pMultisampleState = &multisampleState;
-		pipelineCreateInfo.pViewportState = &viewportState;
-		pipelineCreateInfo.pDepthStencilState = &depthStencilState;
-		pipelineCreateInfo.pDynamicState = &dynamicState;
-		pipelineCreateInfo.stageCount = static_cast<uint32_t>(shaderStages.size());
-		pipelineCreateInfo.pStages = shaderStages.data();
+		pipelineCreateInfo.pVertexInputState		= &inputState;
+		pipelineCreateInfo.pInputAssemblyState		= &inputAssemblyState;
+		pipelineCreateInfo.pRasterizationState		= &rasterizationState;
+		pipelineCreateInfo.pColorBlendState			= &colorBlendState;
+		pipelineCreateInfo.pMultisampleState		= &multisampleState;
+		pipelineCreateInfo.pViewportState			= &viewportState;
+		pipelineCreateInfo.pDepthStencilState		= &depthStencilState;
+		pipelineCreateInfo.pDynamicState			= &dynamicState;
+		pipelineCreateInfo.stageCount				= static_cast<uint32_t>(shaderStages.size());
+		pipelineCreateInfo.pStages					= shaderStages.data();
 
 		VK_CHECK_RESULT(vkCreateGraphicsPipelines(vulkanDevice->logicalDevice, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipeline));
 	}
@@ -454,7 +355,7 @@ public:
 	*/
 	void prepareRenderPass()
 	{
-		VkAttachmentDescription attachments[2] = {};
+		VkAttachmentDescription		attachments[2]			= {};
 
 		// Color attachment
 		attachments[0].format = colorFormat;
@@ -477,15 +378,15 @@ public:
 		attachments[1].initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 		attachments[1].finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 
-		VkAttachmentReference colorReference = {};
+		VkAttachmentReference		colorReference			= {};
 		colorReference.attachment = 0;
 		colorReference.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 
-		VkAttachmentReference depthReference = {};
+		VkAttachmentReference		depthReference			= {};
 		depthReference.attachment = 1;
 		depthReference.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 
-		VkSubpassDependency subpassDependencies[2] = {};
+		VkSubpassDependency			subpassDependencies[2]	= {};
 
 		// Transition from final to initial (VK_SUBPASS_EXTERNAL refers to all commmands executed outside of the actual renderpass)
 		subpassDependencies[0].srcSubpass = VK_SUBPASS_EXTERNAL;
@@ -505,7 +406,7 @@ public:
 		subpassDependencies[1].dstAccessMask = VK_ACCESS_MEMORY_READ_BIT;
 		subpassDependencies[1].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
 
-		VkSubpassDescription subpassDescription = {};
+		VkSubpassDescription		subpassDescription = {};
 		subpassDescription.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
 		subpassDescription.flags = 0;
 		subpassDescription.inputAttachmentCount = 0;
@@ -517,7 +418,7 @@ public:
 		subpassDescription.preserveAttachmentCount = 0;
 		subpassDescription.pPreserveAttachments = NULL;
 
-		VkRenderPassCreateInfo renderPassInfo = {};
+		VkRenderPassCreateInfo		renderPassInfo = {};
 		renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
 		renderPassInfo.pNext = NULL;
 		renderPassInfo.attachmentCount = 2;
@@ -535,8 +436,8 @@ public:
 	*/
 	void beginTextUpdate()
 	{
-		mappedLocal = (glm::vec4*)vertexBuffer.mapped;
-		numLetters = 0;
+		mappedLocal	= (glm::vec4*)vertexBuffer.mapped;
+		numLetters	= 0;
 	}
 
 	/**
@@ -627,12 +528,12 @@ public:
 	*/
 	void updateCommandBuffers()
 	{
-		VkCommandBufferBeginInfo cmdBufInfo = vks::initializers::commandBufferBeginInfo();
-
-		VkRenderPassBeginInfo renderPassBeginInfo = vks::initializers::renderPassBeginInfo();
-		renderPassBeginInfo.renderPass = renderPass;
-		renderPassBeginInfo.renderArea.extent.width = *frameBufferWidth;
-		renderPassBeginInfo.renderArea.extent.height = *frameBufferHeight;
+		VkCommandBufferBeginInfo	cmdBufInfo			= vks::initializers::commandBufferBeginInfo();
+		
+		VkRenderPassBeginInfo		renderPassBeginInfo	= vks::initializers::renderPassBeginInfo();
+		renderPassBeginInfo.renderPass					= renderPass;
+		renderPassBeginInfo.renderArea.extent.width		= *frameBufferWidth;
+		renderPassBeginInfo.renderArea.extent.height	= *frameBufferHeight;
 		// None of the attachments will be cleared
 		renderPassBeginInfo.clearValueCount = 0;
 		renderPassBeginInfo.pClearValues = nullptr;
@@ -644,35 +545,29 @@ public:
 			VK_CHECK_RESULT(vkBeginCommandBuffer(cmdBuffers[i], &cmdBufInfo));
 
 			if (vks::debugmarker::active)
-			{
 				vks::debugmarker::beginRegion(cmdBuffers[i], "Text overlay", glm::vec4(1.0f, 0.94f, 0.3f, 1.0f));
-			}
 
 			vkCmdBeginRenderPass(cmdBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 
-			VkViewport viewport = vks::initializers::viewport((float)*frameBufferWidth, (float)*frameBufferHeight, 0.0f, 1.0f);
+			VkViewport					viewport		= vks::initializers::viewport((float)*frameBufferWidth, (float)*frameBufferHeight, 0.0f, 1.0f);
 			vkCmdSetViewport(cmdBuffers[i], 0, 1, &viewport);
 
-			VkRect2D scissor = vks::initializers::rect2D(*frameBufferWidth, *frameBufferHeight, 0, 0);
+			VkRect2D					scissor			= vks::initializers::rect2D(*frameBufferWidth, *frameBufferHeight, 0, 0);
 			vkCmdSetScissor(cmdBuffers[i], 0, 1, &scissor);
 			
 			vkCmdBindPipeline(cmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
 			vkCmdBindDescriptorSets(cmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSet, 0, NULL);
 
-			VkDeviceSize offsets = 0;
+			VkDeviceSize				offsets			= 0;
 			vkCmdBindVertexBuffers(cmdBuffers[i], 0, 1, &vertexBuffer.buffer, &offsets);
 			vkCmdBindVertexBuffers(cmdBuffers[i], 1, 1, &vertexBuffer.buffer, &offsets);
 			for (uint32_t j = 0; j < numLetters; j++)
-			{
 				vkCmdDraw(cmdBuffers[i], 4, 1, j * 4, 0);
-			}
 
 			vkCmdEndRenderPass(cmdBuffers[i]);
 
 			if (vks::debugmarker::active)
-			{
 				vks::debugmarker::endRegion(cmdBuffers[i]);
-			}
 
 			VK_CHECK_RESULT(vkEndCommandBuffer(cmdBuffers[i]));
 		}
@@ -684,9 +579,7 @@ public:
 	void submit(VkQueue queue, uint32_t bufferindex, VkSubmitInfo submitInfo)
 	{
 		if (!visible)
-		{
 			return;
-		}
 
 		submitInfo.pCommandBuffers = &cmdBuffers[bufferindex];
 		submitInfo.commandBufferCount = 1;
@@ -705,12 +598,7 @@ public:
 	{
 		vkFreeCommandBuffers(vulkanDevice->logicalDevice, commandPool, static_cast<uint32_t>(cmdBuffers.size()), cmdBuffers.data());
 
-		VkCommandBufferAllocateInfo cmdBufAllocateInfo =
-			vks::initializers::commandBufferAllocateInfo(
-				commandPool,
-				VK_COMMAND_BUFFER_LEVEL_PRIMARY,
-				static_cast<uint32_t>(cmdBuffers.size()));
-
+		VkCommandBufferAllocateInfo	cmdBufAllocateInfo	= vks::initializers::commandBufferAllocateInfo(commandPool, VK_COMMAND_BUFFER_LEVEL_PRIMARY, static_cast<uint32_t>(cmdBuffers.size()));
 		VK_CHECK_RESULT(vkAllocateCommandBuffers(vulkanDevice->logicalDevice, &cmdBufAllocateInfo, cmdBuffers.data()));
 	}
 
