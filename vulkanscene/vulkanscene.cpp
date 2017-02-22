@@ -1,34 +1,17 @@
-/*
-* Vulkan Demo Scene 
-*
-* Don't take this a an example, it's more of a personal playground
-*
-* Copyright (C) 2016 by Sascha Willems - www.saschawillems.de
-*
-* Note : Different license than the other examples!
-*
-* This code is licensed under the Mozilla Public License Version 2.0 (http://opensource.org/licenses/MPL-2.0)
-*/
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <assert.h>
-#include <vector>
-
-#define GLM_FORCE_RADIANS
-#define GLM_FORCE_DEPTH_ZERO_TO_ONE
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/matrix_inverse.hpp>
-
-#include <vulkan/vulkan.h>
+// Vulkan Demo Scene - Don't take this a an example, it's more of a personal playground
+// 
+// Copyright (C) 2016 by Sascha Willems - www.saschawillems.de
+// 
+// Note : Different license than the other examples! 
+// This code is licensed under the Mozilla Public License Version 2.0 (http://opensource.org/licenses/MPL-2.0)
 #include "vulkanexamplebase.h"
 #include "VulkanTexture.hpp"
 #include "VulkanModel.hpp"
 
-#define VERTEX_BUFFER_BIND_ID 0
-#define ENABLE_VALIDATION false
+#include <glm/gtc/matrix_inverse.hpp>
+
+#define VERTEX_BUFFER_BIND_ID	0
+#define ENABLE_VALIDATION		false
 
 class VulkanExample : public VulkanExampleBase
 {
@@ -76,9 +59,9 @@ public:
 	}									textures;
 
 	struct {
-		VkPipeline							logos	= VK_NULL_HANDLE;
-		VkPipeline							models	= VK_NULL_HANDLE;
-		VkPipeline							skybox	= VK_NULL_HANDLE;
+		VkPipeline							logos						= VK_NULL_HANDLE;
+		VkPipeline							models						= VK_NULL_HANDLE;
+		VkPipeline							skybox						= VK_NULL_HANDLE;
 	} pipelines;
 
 	VkPipelineLayout					pipelineLayout;
@@ -89,11 +72,11 @@ public:
 
 										VulkanExample				()									: VulkanExampleBase(ENABLE_VALIDATION)
 	{
-		zoom = -3.75f;
-		rotationSpeed = 0.5f;
-		rotation = glm::vec3(15.0f, 0.f, 0.0f);
-		enableTextOverlay = true;
-		title = "Vulkan Demo Scene - (c) 2016 by Sascha Willems";
+		zoom											= -3.75f;
+		rotationSpeed									= 0.5f;
+		rotation										= glm::vec3(15.0f, 0.f, 0.0f);
+		enableTextOverlay								= true;
+		title											= "Vulkan Demo Scene - (c) 2016 by Sascha Willems";
 	}
 
 										~VulkanExample				()									{
@@ -119,9 +102,9 @@ public:
 		for (size_t i = 0; i < modelFiles.size(); i++) {
 			DemoModel											model;
 			model.pipeline									= modelPipelines[i];
-			vks::ModelCreateInfo modelCreateInfo(glm::vec3(1.0f), glm::vec3(1.0f), glm::vec3(0.0f));
+			vks::ModelCreateInfo								modelCreateInfo(glm::vec3(1.0f), glm::vec3(1.0f), glm::vec3(0.0f));
 			if (modelFiles[i] != "cube.obj")
-				modelCreateInfo.center.y += 1.15f;
+				modelCreateInfo.center.y	+= 1.15f;
 
 			model.model.loadFromFile(getAssetPath() + "models/" + modelFiles[i], vertexLayout, &modelCreateInfo, vulkanDevice, queue);
 			demoModels.push_back(model);
@@ -209,13 +192,13 @@ public:
 	}
 
 	void								preparePipelines			()									{
-		VkPipelineInputAssemblyStateCreateInfo					inputAssemblyState		= vks::initializers::pipelineInputAssemblyStateCreateInfo(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, 0, VK_FALSE);
-		VkPipelineRasterizationStateCreateInfo					rasterizationState		= vks::initializers::pipelineRasterizationStateCreateInfo(VK_POLYGON_MODE_FILL, VK_CULL_MODE_BACK_BIT, VK_FRONT_FACE_CLOCKWISE, 0);
-		VkPipelineColorBlendAttachmentState						blendAttachmentState	= vks::initializers::pipelineColorBlendAttachmentState(0xf, VK_FALSE);
-		VkPipelineColorBlendStateCreateInfo						colorBlendState			= vks::initializers::pipelineColorBlendStateCreateInfo(1, &blendAttachmentState);
-		VkPipelineDepthStencilStateCreateInfo					depthStencilState		= vks::initializers::pipelineDepthStencilStateCreateInfo(VK_TRUE, VK_TRUE, VK_COMPARE_OP_LESS_OR_EQUAL);
-		VkPipelineViewportStateCreateInfo						viewportState			= vks::initializers::pipelineViewportStateCreateInfo(1, 1, 0);
-		VkPipelineMultisampleStateCreateInfo					multisampleState		= vks::initializers::pipelineMultisampleStateCreateInfo(VK_SAMPLE_COUNT_1_BIT, 0);
+		VkPipelineInputAssemblyStateCreateInfo					stateInputAssembly		= vks::initializers::pipelineInputAssemblyStateCreateInfo(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, 0, VK_FALSE);
+		VkPipelineRasterizationStateCreateInfo					stateRasterization		= vks::initializers::pipelineRasterizationStateCreateInfo(VK_POLYGON_MODE_FILL, VK_CULL_MODE_BACK_BIT, VK_FRONT_FACE_CLOCKWISE, 0);
+		VkPipelineColorBlendAttachmentState						stateBlendAttachment	= vks::initializers::pipelineColorBlendAttachmentState(0xf, VK_FALSE);
+		VkPipelineColorBlendStateCreateInfo						stateColorBlend			= vks::initializers::pipelineColorBlendStateCreateInfo(1, &stateBlendAttachment);
+		VkPipelineDepthStencilStateCreateInfo					stateDepthStencil		= vks::initializers::pipelineDepthStencilStateCreateInfo(VK_TRUE, VK_TRUE, VK_COMPARE_OP_LESS_OR_EQUAL);
+		VkPipelineViewportStateCreateInfo						stateViewport			= vks::initializers::pipelineViewportStateCreateInfo(1, 1, 0);
+		VkPipelineMultisampleStateCreateInfo					stateMultisample		= vks::initializers::pipelineMultisampleStateCreateInfo(VK_SAMPLE_COUNT_1_BIT, 0);
 		std::vector<VkDynamicState>								dynamicStateEnables		= 
 		{	VK_DYNAMIC_STATE_VIEWPORT
 		,	VK_DYNAMIC_STATE_SCISSOR
@@ -226,12 +209,12 @@ public:
 		// Load shaders
 		std::array<VkPipelineShaderStageCreateInfo, 2>			shaderStages			= {};
 		VkGraphicsPipelineCreateInfo							pipelineCreateInfo		= vks::initializers::pipelineCreateInfo(pipelineLayout, renderPass, 0);
-		pipelineCreateInfo.pInputAssemblyState				= &inputAssemblyState;
-		pipelineCreateInfo.pRasterizationState				= &rasterizationState;
-		pipelineCreateInfo.pColorBlendState					= &colorBlendState;
-		pipelineCreateInfo.pMultisampleState				= &multisampleState;
-		pipelineCreateInfo.pViewportState					= &viewportState;
-		pipelineCreateInfo.pDepthStencilState				= &depthStencilState;
+		pipelineCreateInfo.pInputAssemblyState				= &stateInputAssembly;
+		pipelineCreateInfo.pRasterizationState				= &stateRasterization;
+		pipelineCreateInfo.pColorBlendState					= &stateColorBlend;
+		pipelineCreateInfo.pMultisampleState				= &stateMultisample;
+		pipelineCreateInfo.pViewportState					= &stateViewport;
+		pipelineCreateInfo.pDepthStencilState				= &stateDepthStencil;
 		pipelineCreateInfo.pDynamicState					= &dynamicState;
 		pipelineCreateInfo.stageCount						= static_cast<uint32_t>(shaderStages.size());
 		pipelineCreateInfo.pStages							= shaderStages.data();
@@ -245,12 +228,12 @@ public:
 		,	vks::initializers::vertexInputAttributeDescription(VERTEX_BUFFER_BIND_ID, 3, VK_FORMAT_R32G32B32_SFLOAT, sizeof(float) * 8)		// Location 3: Color		
 		};
 
-		VkPipelineVertexInputStateCreateInfo					vertexInputState		= vks::initializers::pipelineVertexInputStateCreateInfo();
-		vertexInputState.vertexBindingDescriptionCount		= 1;
-		vertexInputState.pVertexBindingDescriptions			= &vertexInputBinding;
-		vertexInputState.vertexAttributeDescriptionCount	= static_cast<uint32_t>(vertexInputAttributes.size());
-		vertexInputState.pVertexAttributeDescriptions		= vertexInputAttributes.data();
-		pipelineCreateInfo.pVertexInputState				= &vertexInputState;
+		VkPipelineVertexInputStateCreateInfo					stateVertexInput		= vks::initializers::pipelineVertexInputStateCreateInfo();
+		stateVertexInput.vertexBindingDescriptionCount		= 1;
+		stateVertexInput.pVertexBindingDescriptions			= &vertexInputBinding;
+		stateVertexInput.vertexAttributeDescriptionCount	= static_cast<uint32_t>(vertexInputAttributes.size());
+		stateVertexInput.pVertexAttributeDescriptions		= vertexInputAttributes.data();
+		pipelineCreateInfo.pVertexInputState				= &stateVertexInput;
 
 		// Default mesh rendering pipeline
 		shaderStages[0]										= loadShader(getAssetPath() + "shaders/vulkanscene/mesh.vert.spv", VK_SHADER_STAGE_VERTEX_BIT);
@@ -263,8 +246,8 @@ public:
 		VK_CHECK_RESULT(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipelines.logos));
 
 		// Pipeline for the sky sphere
-		rasterizationState.cullMode							= VK_CULL_MODE_FRONT_BIT; // Inverted culling
-		depthStencilState.depthWriteEnable					= VK_FALSE; // No depth writes
+		stateRasterization.cullMode							= VK_CULL_MODE_FRONT_BIT; // Inverted culling
+		stateDepthStencil.depthWriteEnable					= VK_FALSE; // No depth writes
 		shaderStages[0]										= loadShader(getAssetPath() + "shaders/vulkanscene/skybox.vert.spv", VK_SHADER_STAGE_VERTEX_BIT);
 		shaderStages[1]										= loadShader(getAssetPath() + "shaders/vulkanscene/skybox.frag.spv", VK_SHADER_STAGE_FRAGMENT_BIT);
 		VK_CHECK_RESULT(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipelines.skybox));
