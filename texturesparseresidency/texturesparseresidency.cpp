@@ -516,23 +516,23 @@ public:
 		VK_CHECK_RESULT(vkCreateSampler(device, &sampler, nullptr, &texture.sampler));
 
 		// Create image view
-		VkImageViewCreateInfo view = vks::initializers::imageViewCreateInfo();
-		view.image = VK_NULL_HANDLE;
-		view.viewType = VK_IMAGE_VIEW_TYPE_2D;
-		view.format = format;
-		view.components = { VK_COMPONENT_SWIZZLE_R, VK_COMPONENT_SWIZZLE_G, VK_COMPONENT_SWIZZLE_B, VK_COMPONENT_SWIZZLE_A };
-		view.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-		view.subresourceRange.baseMipLevel = 0;
-		view.subresourceRange.baseArrayLayer = 0;
-		view.subresourceRange.layerCount = 1;
-		view.subresourceRange.levelCount = texture.mipLevels;
-		view.image = texture.image;
+		VkImageViewCreateInfo										view					= vks::initializers::imageViewCreateInfo();
+		view.image												= VK_NULL_HANDLE;
+		view.viewType											= VK_IMAGE_VIEW_TYPE_2D;
+		view.format												= format;
+		view.components											= { VK_COMPONENT_SWIZZLE_R, VK_COMPONENT_SWIZZLE_G, VK_COMPONENT_SWIZZLE_B, VK_COMPONENT_SWIZZLE_A };
+		view.subresourceRange.aspectMask						= VK_IMAGE_ASPECT_COLOR_BIT;
+		view.subresourceRange.baseMipLevel						= 0;
+		view.subresourceRange.baseArrayLayer					= 0;
+		view.subresourceRange.layerCount						= 1;
+		view.subresourceRange.levelCount						= texture.mipLevels;
+		view.image												= texture.image;
 		VK_CHECK_RESULT(vkCreateImageView(device, &view, nullptr, &texture.view));
 
 		// Fill image descriptor image info that can be used during the descriptor set setup
-		texture.descriptor.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-		texture.descriptor.imageView = texture.view;
-		texture.descriptor.sampler = texture.sampler;
+		texture.descriptor.imageLayout							= VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+		texture.descriptor.imageView							= texture.view;
+		texture.descriptor.sampler								= texture.sampler;
 
 		// Fill smallest (non-tail) mip map leve
 		fillVirtualTexture(lastFilledMip);
@@ -549,13 +549,13 @@ public:
 
 	void											buildCommandBuffers			()
 	{
-		VkCommandBufferBeginInfo									cmdBufInfo = vks::initializers::commandBufferBeginInfo();
+		VkCommandBufferBeginInfo									cmdBufInfo				= vks::initializers::commandBufferBeginInfo();
 
 		VkClearValue												clearValues[2];
 		clearValues[0].color									= { { 0.0f, 0.0f, 0.2f, 1.0f } };
 		clearValues[1].depthStencil								= { 1.0f, 0 };
 
-		VkRenderPassBeginInfo										renderPassBeginInfo = vks::initializers::renderPassBeginInfo();
+		VkRenderPassBeginInfo										renderPassBeginInfo		= vks::initializers::renderPassBeginInfo();
 		renderPassBeginInfo.renderPass							= renderPass;
 		renderPassBeginInfo.renderArea.offset.x					= 0;
 		renderPassBeginInfo.renderArea.offset.y					= 0;
@@ -573,16 +573,16 @@ public:
 
 			vkCmdBeginRenderPass	(drawCmdBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 				
-			VkViewport													viewport	= vks::initializers::viewport((float)width, (float)height, 0.0f, 1.0f);
+			VkViewport													viewport					= vks::initializers::viewport((float)width, (float)height, 0.0f, 1.0f);
 			vkCmdSetViewport		(drawCmdBuffers[i], 0, 1, &viewport);
 
-			VkRect2D													scissor		= vks::initializers::rect2D(width, height, 0, 0);
+			VkRect2D													scissor						= vks::initializers::rect2D(width, height, 0, 0);
 			vkCmdSetScissor			(drawCmdBuffers[i], 0, 1, &scissor);
 
 			vkCmdBindDescriptorSets	(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSet, 0, NULL);
 			vkCmdBindPipeline		(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines.solid);
 
-			VkDeviceSize												offsets[1]	= { 0 };
+			VkDeviceSize												offsets[1]					= { 0 };
 			vkCmdBindVertexBuffers	(drawCmdBuffers[i], VERTEX_BUFFER_BIND_ID, 1, &heightMap->vertexBuffer.buffer, offsets);
 			vkCmdBindIndexBuffer	(drawCmdBuffers[i], heightMap->indexBuffer.buffer, 0, VK_INDEX_TYPE_UINT32);
 			vkCmdDrawIndexed		(drawCmdBuffers[i], heightMap->indexCount, 1, 0, 0, 0);
@@ -705,7 +705,7 @@ public:
 		shaderStages[0] = loadShader(getAssetPath() + "shaders/texturesparseresidency/sparseresidency.vert.spv", VK_SHADER_STAGE_VERTEX_BIT);
 		shaderStages[1] = loadShader(getAssetPath() + "shaders/texturesparseresidency/sparseresidency.frag.spv", VK_SHADER_STAGE_FRAGMENT_BIT);
 
-		VkGraphicsPipelineCreateInfo								pipelineCreateInfo		= vks::initializers::pipelineCreateInfo(pipelineLayout, renderPass, 0);
+		VkGraphicsPipelineCreateInfo								pipelineCreateInfo			= vks::initializers::pipelineCreateInfo(pipelineLayout, renderPass, 0);
 		pipelineCreateInfo.pVertexInputState					= &vertices.inputState;
 		pipelineCreateInfo.pInputAssemblyState					= &inputAssemblyState;
 		pipelineCreateInfo.pRasterizationState					= &rasterizationState;
@@ -733,7 +733,7 @@ public:
 	{
 		// Vertex shader
 		uboVS.projection										= glm::perspective(glm::radians(60.0f), (float)width / (float)height, 0.001f, 256.0f);
-		glm::mat4													viewMatrix = glm::translate(glm::mat4(), glm::vec3(0.0f, 0.0f, zoom));
+		glm::mat4													viewMatrix					= glm::translate(glm::mat4(), glm::vec3(0.0f, 0.0f, zoom));
 
 		uboVS.model												= viewMatrix * glm::translate(glm::mat4(), cameraPos);
 		uboVS.model												= glm::rotate(uboVS.model, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
@@ -822,7 +822,7 @@ public:
 				page.allocate(device, memoryTypeIndex);
 
 				// Current mip level scaling
-				uint32_t													scale = texture.width / (texture.width >> page.mipLevel);
+				uint32_t													scale						= texture.width / (texture.width >> page.mipLevel);
 
 				for (uint32_t x = 0; x < scale; x++)
 				{
@@ -907,7 +907,7 @@ public:
 
 	virtual void									getOverlayText				(VulkanTextOverlay *textOverlay)
 	{
-		uint32_t													respages = 0;
+		uint32_t													respages	= 0;
 		std::for_each(texture.pages.begin(), texture.pages.end(), [&respages](VirtualTexturePage page) { respages += (page.imageMemoryBind.memory != VK_NULL_HANDLE) ? 1 :0; });
 		std::stringstream											ss;
 		ss << std::setprecision(2) << std::fixed << uboVS.lodBias;
