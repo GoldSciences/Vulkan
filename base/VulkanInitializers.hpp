@@ -264,13 +264,14 @@ namespace vks
 			pipelineTessellationStateCreateInfo.patchControlPoints		= patchControlPoints;
 			return pipelineTessellationStateCreateInfo;
 		}
-
 		inline VkGraphicsPipelineCreateInfo				pipelineCreateInfo						(VkPipelineLayout layout, VkRenderPass renderPass, VkPipelineCreateFlags flags = 0)									{
 			VkGraphicsPipelineCreateInfo									pipelineCreateInfo {};
 			pipelineCreateInfo.sType									= VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
 			pipelineCreateInfo.layout									= layout;
 			pipelineCreateInfo.renderPass								= renderPass;
 			pipelineCreateInfo.flags									= flags;
+			pipelineCreateInfo.basePipelineIndex						= -1;
+			pipelineCreateInfo.basePipelineHandle						= VK_NULL_HANDLE;
 			return pipelineCreateInfo;
 		}
 

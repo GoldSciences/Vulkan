@@ -12,12 +12,6 @@
 class VulkanExample : public VulkanExampleBase
 {
 public:
-	struct {
-		VkPipelineVertexInputStateCreateInfo inputState;
-		std::vector<VkVertexInputBindingDescription> bindingDescriptions;
-		std::vector<VkVertexInputAttributeDescription> attributeDescriptions;
-	} vertices;
-
 	// Vertex layout for the models
 	vks::VertexLayout vertexLayout = vks::VertexLayout({
 		vks::VERTEX_COMPONENT_POSITION,
@@ -119,125 +113,103 @@ public:
 		}
 	}
 
-	void prepareVertices()
-	{
-		// Binding description
-		vertices.bindingDescriptions.resize(1);
-		vertices.bindingDescriptions[0] = vks::initializers::vertexInputBindingDescription(VERTEX_BUFFER_BIND_ID, vertexLayout.stride(), VK_VERTEX_INPUT_RATE_VERTEX);
-		// Attribute descriptions
-		// Describes memory layout and shader positions
-		vertices.attributeDescriptions.resize(4);
-		// Location 0 : Position
-		vertices.attributeDescriptions[0] = vks::initializers::vertexInputAttributeDescription(VERTEX_BUFFER_BIND_ID, 0, VK_FORMAT_R32G32B32_SFLOAT, 0);		// Location 1 : Normal
-		vertices.attributeDescriptions[1] = vks::initializers::vertexInputAttributeDescription(VERTEX_BUFFER_BIND_ID, 1, VK_FORMAT_R32G32B32_SFLOAT, sizeof(float) * 3);		// Location 2 : Texture coordinates
-		vertices.attributeDescriptions[2] = vks::initializers::vertexInputAttributeDescription(VERTEX_BUFFER_BIND_ID, 2, VK_FORMAT_R32G32_SFLOAT, sizeof(float) * 6);
-		// Location 3 : Color
-		vertices.attributeDescriptions[3] =
-			vks::initializers::vertexInputAttributeDescription(
-				VERTEX_BUFFER_BIND_ID,
-				3,
-				VK_FORMAT_R32G32B32_SFLOAT,
-				sizeof(float) * 8);
-
-		vertices.inputState										= vks::initializers::pipelineVertexInputStateCreateInfo();
-		vertices.inputState.vertexBindingDescriptionCount		= static_cast<uint32_t>(vertices.bindingDescriptions.size());
-		vertices.inputState.pVertexBindingDescriptions			= vertices.bindingDescriptions.data();
-		vertices.inputState.vertexAttributeDescriptionCount		= static_cast<uint32_t>(vertices.attributeDescriptions.size());
-		vertices.inputState.pVertexAttributeDescriptions		= vertices.attributeDescriptions.data();
-	}
-
 	void setupDescriptorPool()
 	{
 		// Example uses one ubo and one image sampler
-		std::vector<VkDescriptorPoolSize> poolSizes = {
-			vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1),
-		};
+		std::vector<VkDescriptorPoolSize>			poolSizes							= 
+			{	vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1),
+			};
 
-		VkDescriptorPoolCreateInfo descriptorPoolInfo =
-			vks::initializers::descriptorPoolCreateInfo(
-				static_cast<uint32_t>(poolSizes.size()),
-				poolSizes.data(),
-				2);
+		VkDescriptorPoolCreateInfo					descriptorPoolInfo					= vks::initializers::descriptorPoolCreateInfo(static_cast<uint32_t>(poolSizes.size()), poolSizes.data(), 2);
 
 		VK_CHECK_RESULT(vkCreateDescriptorPool(device, &descriptorPoolInfo, nullptr, &descriptorPool));
 	}
 
 	void setupDescriptorSetLayout()
 	{
-		std::vector<VkDescriptorSetLayoutBinding> setLayoutBindings = {			
-			vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT, 0),	// Binding 0 : Vertex shader uniform buffer
-		};
+		std::vector<VkDescriptorSetLayoutBinding>	setLayoutBindings = 
+			{	vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT, 0),			// Binding 0 : Vertex shader uniform buffer
+			};
 
 		VkDescriptorSetLayoutCreateInfo						descriptorLayout			= vks::initializers::descriptorSetLayoutCreateInfo(setLayoutBindings.data(), static_cast<uint32_t>(setLayoutBindings.size()));
-
 		VK_CHECK_RESULT(vkCreateDescriptorSetLayout(device, &descriptorLayout, nullptr, &descriptorSetLayout));
 
 		VkPipelineLayoutCreateInfo							pPipelineLayoutCreateInfo	= vks::initializers::pipelineLayoutCreateInfo(&descriptorSetLayout, 1);
-
 		VK_CHECK_RESULT(vkCreatePipelineLayout(device, &pPipelineLayoutCreateInfo, nullptr, &pipelineLayout));
 	}
 
-	void setupDescriptorSet()
+	void												setupDescriptorSet					()
 	{
-		VkDescriptorSetAllocateInfo							allocInfo = vks::initializers::descriptorSetAllocateInfo(descriptorPool, &descriptorSetLayout, 1);
-
+		VkDescriptorSetAllocateInfo							allocInfo					= vks::initializers::descriptorSetAllocateInfo(descriptorPool, &descriptorSetLayout, 1);
 		VK_CHECK_RESULT(vkAllocateDescriptorSets(device, &allocInfo, &descriptorSet));
 
-		std::vector<VkWriteDescriptorSet> writeDescriptorSets = {			
-			vks::initializers::writeDescriptorSet(descriptorSet, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 0, &uniformBuffer.descriptor),	// Binding 0 : Vertex shader uniform buffer
-		};
+		std::vector<VkWriteDescriptorSet> writeDescriptorSets = 
+			{	vks::initializers::writeDescriptorSet(descriptorSet, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 0, &uniformBuffer.descriptor)	// Binding 0 : Vertex shader uniform buffer
+			};
 
 		vkUpdateDescriptorSets(device, static_cast<uint32_t>(writeDescriptorSets.size()), writeDescriptorSets.data(), 0, NULL);
 	}
 
-	void preparePipelines()
+	void												preparePipelines					()
 	{
-		VkPipelineInputAssemblyStateCreateInfo				inputAssemblyState		= vks::initializers::pipelineInputAssemblyStateCreateInfo(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, 0, VK_FALSE);
-		VkPipelineRasterizationStateCreateInfo				rasterizationState		= vks::initializers::pipelineRasterizationStateCreateInfo(VK_POLYGON_MODE_FILL, VK_CULL_MODE_BACK_BIT, VK_FRONT_FACE_CLOCKWISE, 0);
-		VkPipelineColorBlendAttachmentState					blendAttachmentState	= vks::initializers::pipelineColorBlendAttachmentState(0xf, VK_FALSE);
-		VkPipelineColorBlendStateCreateInfo					colorBlendState			= vks::initializers::pipelineColorBlendStateCreateInfo(1, &blendAttachmentState);
-		VkPipelineDepthStencilStateCreateInfo				depthStencilState		= vks::initializers::pipelineDepthStencilStateCreateInfo(VK_TRUE, VK_TRUE, VK_COMPARE_OP_LESS_OR_EQUAL);
-		VkPipelineViewportStateCreateInfo					viewportState			= vks::initializers::pipelineViewportStateCreateInfo(1, 1, 0);
-		VkPipelineMultisampleStateCreateInfo				multisampleState		= vks::initializers::pipelineMultisampleStateCreateInfo(VK_SAMPLE_COUNT_1_BIT, 0);
-		std::vector<VkDynamicState>							dynamicStateEnables		= {VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR};
-		VkPipelineDynamicStateCreateInfo					dynamicState			= vks::initializers::pipelineDynamicStateCreateInfo(dynamicStateEnables.data(), static_cast<uint32_t>(dynamicStateEnables.size()), 0);
+		VkPipelineInputAssemblyStateCreateInfo					inputAssemblyState		= vks::initializers::pipelineInputAssemblyStateCreateInfo(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, 0, VK_FALSE);
+		VkPipelineRasterizationStateCreateInfo					rasterizationState		= vks::initializers::pipelineRasterizationStateCreateInfo(VK_POLYGON_MODE_FILL, VK_CULL_MODE_BACK_BIT, VK_FRONT_FACE_CLOCKWISE, 0);
+		VkPipelineColorBlendAttachmentState						blendAttachmentState	= vks::initializers::pipelineColorBlendAttachmentState(0xf, VK_FALSE);
+		VkPipelineColorBlendStateCreateInfo						colorBlendState			= vks::initializers::pipelineColorBlendStateCreateInfo(1, &blendAttachmentState);
+		VkPipelineDepthStencilStateCreateInfo					depthStencilState		= vks::initializers::pipelineDepthStencilStateCreateInfo(VK_TRUE, VK_TRUE, VK_COMPARE_OP_LESS_OR_EQUAL);
+		VkPipelineViewportStateCreateInfo						viewportState			= vks::initializers::pipelineViewportStateCreateInfo(1, 1, 0);
+		VkPipelineMultisampleStateCreateInfo					multisampleState		= vks::initializers::pipelineMultisampleStateCreateInfo(VK_SAMPLE_COUNT_1_BIT, 0);
+		std::vector<VkDynamicState>								dynamicStateEnables		= {VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR};
+		VkPipelineDynamicStateCreateInfo						dynamicState			= vks::initializers::pipelineDynamicStateCreateInfo(dynamicStateEnables.data(), static_cast<uint32_t>(dynamicStateEnables.size()), 0);
 
-		// Spherical environment rendering pipeline
-		// Load shaders
-		std::array<VkPipelineShaderStageCreateInfo, 2> shaderStages = {};
-		shaderStages[0] = loadShader(getAssetPath() + "shaders/screenshot/mesh.vert.spv", VK_SHADER_STAGE_VERTEX_BIT);
-		shaderStages[1] = loadShader(getAssetPath() + "shaders/screenshot/mesh.frag.spv", VK_SHADER_STAGE_FRAGMENT_BIT);
+		VkGraphicsPipelineCreateInfo							pipelineCreateInfo		= vks::initializers::pipelineCreateInfo(pipelineLayout, renderPass, 0);
 
-		VkGraphicsPipelineCreateInfo pipelineCreateInfo = vks::initializers::pipelineCreateInfo(pipelineLayout, renderPass, 0);
+		std::array<VkPipelineShaderStageCreateInfo, 2>			shaderStages;
 
-		pipelineCreateInfo.pVertexInputState = &vertices.inputState;
-		pipelineCreateInfo.pInputAssemblyState = &inputAssemblyState;
-		pipelineCreateInfo.pRasterizationState = &rasterizationState;
-		pipelineCreateInfo.pColorBlendState = &colorBlendState;
-		pipelineCreateInfo.pMultisampleState = &multisampleState;
-		pipelineCreateInfo.pViewportState = &viewportState;
-		pipelineCreateInfo.pDepthStencilState = &depthStencilState;
-		pipelineCreateInfo.pDynamicState = &dynamicState;
-		pipelineCreateInfo.stageCount = static_cast<uint32_t>(shaderStages.size());
-		pipelineCreateInfo.pStages = shaderStages.data();
+		pipelineCreateInfo.pInputAssemblyState				= &inputAssemblyState;
+		pipelineCreateInfo.pRasterizationState				= &rasterizationState;
+		pipelineCreateInfo.pColorBlendState					= &colorBlendState;
+		pipelineCreateInfo.pMultisampleState				= &multisampleState;
+		pipelineCreateInfo.pViewportState					= &viewportState;
+		pipelineCreateInfo.pDepthStencilState				= &depthStencilState;
+		pipelineCreateInfo.pDynamicState					= &dynamicState;
+		pipelineCreateInfo.stageCount						= static_cast<uint32_t>(shaderStages.size());
+		pipelineCreateInfo.pStages							= shaderStages.data();
 
+		// Vertex bindings and attributes
+		// Binding description
+		std::vector<VkVertexInputBindingDescription>			vertexInputBindings		= 
+		{	vks::initializers::vertexInputBindingDescription(0, vertexLayout.stride(), VK_VERTEX_INPUT_RATE_VERTEX)
+		};
+
+		// Attribute descriptions
+		std::vector<VkVertexInputAttributeDescription>			vertexInputAttributes	= 
+		{	vks::initializers::vertexInputAttributeDescription(0, 0, VK_FORMAT_R32G32B32_SFLOAT, 0)						// Position
+		,	vks::initializers::vertexInputAttributeDescription(0, 1, VK_FORMAT_R32G32B32_SFLOAT, sizeof(float) * 3)		// Normal
+		,	vks::initializers::vertexInputAttributeDescription(0, 2, VK_FORMAT_R32G32B32_SFLOAT, sizeof(float) * 6)		// Color
+		};
+
+		VkPipelineVertexInputStateCreateInfo					vertexInputState		= vks::initializers::pipelineVertexInputStateCreateInfo();
+		vertexInputState.vertexBindingDescriptionCount		= static_cast<uint32_t>(vertexInputBindings.size());
+		vertexInputState.pVertexBindingDescriptions			= vertexInputBindings.data();
+		vertexInputState.vertexAttributeDescriptionCount	= static_cast<uint32_t>(vertexInputAttributes.size());
+		vertexInputState.pVertexAttributeDescriptions		= vertexInputAttributes.data();
+
+		pipelineCreateInfo.pVertexInputState				= &vertexInputState;
+
+		// Mesh rendering pipeline
+		shaderStages[0]										= loadShader(getAssetPath() + "shaders/screenshot/mesh.vert.spv", VK_SHADER_STAGE_VERTEX_BIT);
+		shaderStages[1]										= loadShader(getAssetPath() + "shaders/screenshot/mesh.frag.spv", VK_SHADER_STAGE_FRAGMENT_BIT);
 		VK_CHECK_RESULT(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipeline));
 	}
 
-	void prepareUniformBuffers()
-	{
+	void												prepareUniformBuffers				()										{
 		// Vertex shader uniform buffer block
-		vulkanDevice->createBuffer(
-			VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-			&uniformBuffer,
-			sizeof(uboVS));
-
+		vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBuffer, sizeof(uboVS));
 		updateUniformBuffers();
 	}
 
-	void updateUniformBuffers()
-	{
+	void												updateUniformBuffers				()										{
 		uboVS.projection = camera.matrices.perspective;
 		uboVS.view = camera.matrices.view;
 		uboVS.model = glm::mat4();
@@ -251,31 +223,35 @@ public:
 	// This is done using a blit from the swapchain image to a linear image whose memory content is then saved as a ppm image
 	// Getting the image date directly from a swapchain image wouldn't work as they're usually stored in an implementation dependant optimal tiling format
 	// Note: This requires the swapchain images to be created with the VK_IMAGE_USAGE_TRANSFER_SRC_BIT flag (see VulkanSwapChain::create)
-	void saveScreenshot(const char *filename)
-	{
+	void												saveScreenshot						(const char *filename)					{
 		// Get format properties for the swapchain color format
-		VkFormatProperties formatProps;
-		vkGetPhysicalDeviceFormatProperties(physicalDevice, swapChain.colorFormat, &formatProps);
+		VkFormatProperties										formatProps;
 
-		// Check if the device supports blitting to linear images 
-		if (!(formatProps.linearTilingFeatures & VK_FORMAT_FEATURE_BLIT_SRC_BIT)) {
-			std::cerr << "Error: Device does not support blitting to linear tiled images!" << std::endl;
-			return;
-		}
+		bool supportsBlit = true;
+
+		// Check blit support for source and destination
 
 		// Check if the device supports blitting from optimal images (the swapchain images are in optimal format)
-		if (!(formatProps.optimalTilingFeatures & VK_FORMAT_FEATURE_BLIT_DST_BIT)) {
-			std::cerr << "Error: Device does not support blitting from optimal tiled images!" << std::endl;
-			return;
+		vkGetPhysicalDeviceFormatProperties(physicalDevice, swapChain.colorFormat, &formatProps);
+		if (!(formatProps.optimalTilingFeatures & VK_FORMAT_FEATURE_BLIT_SRC_BIT)) {
+			std::cerr << "Device does not support blitting from optimal tiled images, using copy instead of blit!" << std::endl;
+			supportsBlit = false;
 		}
 
-		// Source for the blit is the last rendered swapchain image
+		// Check if the device supports blitting to linear images 
+		vkGetPhysicalDeviceFormatProperties(physicalDevice, VK_FORMAT_R8G8B8A8_UNORM, &formatProps);
+		if (!(formatProps.linearTilingFeatures & VK_FORMAT_FEATURE_BLIT_DST_BIT)) {
+			std::cerr << "Device does not support blitting to linear tiled images, using copy instead of blit!" << std::endl;
+			supportsBlit = false;
+		}
+
+		// Source for the copy is the last rendered swapchain image
 		VkImage srcImage = swapChain.images[currentBuffer];
 	
 		// Create the linear tiled destination image to copy to and to read the memory from
 		VkImageCreateInfo imgCreateInfo(vks::initializers::imageCreateInfo());
 		imgCreateInfo.imageType = VK_IMAGE_TYPE_2D;
-		// Note that vkCmdBlitImage will also do format conversions if the swapchain color format would differ
+		// Note that vkCmdBlitImage (if supported) will also do format conversions if the swapchain color format would differ
 		imgCreateInfo.format = VK_FORMAT_R8G8B8A8_UNORM;
 		imgCreateInfo.extent.width = width;
 		imgCreateInfo.extent.height = height;
@@ -301,69 +277,95 @@ public:
 		VK_CHECK_RESULT(vkBindImageMemory(device, dstImage, dstImageMemory, 0));
 
 		// Do the actual blit from the swapchain image to our host visible destination image
-		VkCommandBuffer copyCmd = vulkanDevice->createCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY, true);
-
+		VkCommandBuffer						copyCmd				= vulkanDevice->createCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY, true);
+		VkImageMemoryBarrier				imageMemoryBarrier	= vks::initializers::imageMemoryBarrier();
+		
 		// Transition destination image to transfer destination layout
-		vks::tools::setImageLayout(
-			copyCmd,
-			dstImage,
-			VK_IMAGE_ASPECT_COLOR_BIT,
-			VK_IMAGE_LAYOUT_UNDEFINED,
-			VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-			VK_PIPELINE_STAGE_TRANSFER_BIT,
-			VK_PIPELINE_STAGE_TRANSFER_BIT);
+		vks::tools::insertImageMemoryBarrier
+			(	copyCmd
+			,	dstImage
+			,	0
+			,	VK_ACCESS_TRANSFER_WRITE_BIT
+			,	VK_IMAGE_LAYOUT_UNDEFINED
+			,	VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL
+			,	VK_PIPELINE_STAGE_TRANSFER_BIT
+			,	VK_PIPELINE_STAGE_TRANSFER_BIT
+			,	VkImageSubresourceRange{ VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1 }
+			);
 
 		// Transition swapchain image from present to transfer source layout
-		vks::tools::setImageLayout(
-			copyCmd,
-			srcImage,
-			VK_IMAGE_ASPECT_COLOR_BIT,
-			VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
-			VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
-			VK_PIPELINE_STAGE_TRANSFER_BIT,
-			VK_PIPELINE_STAGE_TRANSFER_BIT);
+		vks::tools::insertImageMemoryBarrier
+			(	copyCmd
+			,	srcImage
+			,	VK_ACCESS_MEMORY_READ_BIT
+			,	VK_ACCESS_TRANSFER_READ_BIT
+			,	VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
+			,	VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL
+			,	VK_PIPELINE_STAGE_TRANSFER_BIT
+			,	VK_PIPELINE_STAGE_TRANSFER_BIT
+			,	VkImageSubresourceRange{ VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1 }
+			);
 
-		// Define the region to blit (we will blit the whole swapchain image)
-		VkOffset3D blitSize;
-		blitSize.x = width;
-		blitSize.y = height;
-		blitSize.z = 1;
-		VkImageBlit imageBlitRegion{};
-		imageBlitRegion.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-		imageBlitRegion.srcSubresource.layerCount = 1;
-		imageBlitRegion.srcOffsets[1] = blitSize;
-		imageBlitRegion.dstSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-		imageBlitRegion.dstSubresource.layerCount = 1;
-		imageBlitRegion.dstOffsets[1] = blitSize;
+		// If source and destination support blit we'll blit as this also does automatic format conversion (e.g. from BGR to RGB)
+		if (supportsBlit)
+		{
+			// Define the region to blit (we will blit the whole swapchain image)
+			VkOffset3D blitSize;
+			blitSize.x = width;
+			blitSize.y = height;
+			blitSize.z = 1;
+			VkImageBlit imageBlitRegion{};
+			imageBlitRegion.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+			imageBlitRegion.srcSubresource.layerCount = 1;
+			imageBlitRegion.srcOffsets[1] = blitSize;
+			imageBlitRegion.dstSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+			imageBlitRegion.dstSubresource.layerCount = 1;
+			imageBlitRegion.dstOffsets[1] = blitSize;
 
-		// Issue the blit command
-		vkCmdBlitImage(
-			copyCmd, 
-			srcImage, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
-			dstImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 
-			1,
-			&imageBlitRegion, 
-			VK_FILTER_NEAREST);
+			// Issue the blit command
+			vkCmdBlitImage(copyCmd, srcImage, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, dstImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &imageBlitRegion, VK_FILTER_NEAREST);
+		}
+		else
+		{
+			// Otherwise use image copy (requires us to manually flip components)
+			VkImageCopy imageCopyRegion{};
+			imageCopyRegion.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+			imageCopyRegion.srcSubresource.layerCount = 1;
+			imageCopyRegion.dstSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+			imageCopyRegion.dstSubresource.layerCount = 1;
+			imageCopyRegion.extent.width = width;
+			imageCopyRegion.extent.height = height;
+			imageCopyRegion.extent.depth = 1;
+
+			// Issue the copy command
+			vkCmdCopyImage(copyCmd, srcImage, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, dstImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &imageCopyRegion);
+		}
 
 		// Transition destination image to general layout, which is the required layout for mapping the image memory later on
-		vks::tools::setImageLayout(
-			copyCmd,
-			dstImage,
-			VK_IMAGE_ASPECT_COLOR_BIT,
-			VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-			VK_IMAGE_LAYOUT_GENERAL,
-			VK_PIPELINE_STAGE_TRANSFER_BIT,
-			VK_PIPELINE_STAGE_TRANSFER_BIT);
+		vks::tools::insertImageMemoryBarrier
+			(	copyCmd
+			,	dstImage
+			,	VK_ACCESS_TRANSFER_WRITE_BIT
+			,	VK_ACCESS_MEMORY_READ_BIT
+			,	VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL
+			,	VK_IMAGE_LAYOUT_GENERAL
+			,	VK_PIPELINE_STAGE_TRANSFER_BIT
+			,	VK_PIPELINE_STAGE_TRANSFER_BIT
+			,	VkImageSubresourceRange{ VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1 }
+			);
 
 		// Transition back the swap chain image after the blit is done
-		vks::tools::setImageLayout(
-			copyCmd,
-			srcImage,
-			VK_IMAGE_ASPECT_COLOR_BIT,
-			VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
-			VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
-			VK_PIPELINE_STAGE_TRANSFER_BIT,
-			VK_PIPELINE_STAGE_TRANSFER_BIT);
+		vks::tools::insertImageMemoryBarrier
+			(	copyCmd
+			,	srcImage
+			,	VK_ACCESS_TRANSFER_READ_BIT
+			,	VK_ACCESS_MEMORY_READ_BIT
+			,	VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL
+			,	VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
+			,	VK_PIPELINE_STAGE_TRANSFER_BIT
+			,	VK_PIPELINE_STAGE_TRANSFER_BIT
+			,	VkImageSubresourceRange{ VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1 }
+			);
 
 		vulkanDevice->flushCommandBuffer(copyCmd, queue);
 
@@ -384,13 +386,31 @@ public:
 		// ppm header
 		file << "P6\n" << width << "\n" << height << "\n" << 255 << "\n";
 
+		// If source is BGR (destination is always RGB) and we can't use blit (which does automatic conversion), we'll have to manually swizzle color components
+		bool colorSwizzle = false;
+		// Check if source is BGR 
+		// Note: Not complete, only contains most common and basic BGR surface formats for demonstation purposes
+		if (!supportsBlit)
+		{
+			std::vector<VkFormat> formatsBGR = { VK_FORMAT_B8G8R8A8_SRGB, VK_FORMAT_B8G8R8A8_UNORM, VK_FORMAT_B8G8R8A8_SNORM };
+			colorSwizzle = (std::find(formatsBGR.begin(), formatsBGR.end(), swapChain.colorFormat) != formatsBGR.end());
+		}
+
 		// ppm binary pixel data
 		for (uint32_t y = 0; y < height; y++) 
 		{
 			unsigned int *row = (unsigned int*)data;
 			for (uint32_t x = 0; x < width; x++) 
 			{
-				file.write((char*)row, 3);
+				if (colorSwizzle) 
+				{ 
+					file.write((char*)row+2, 1);
+					file.write((char*)row+1, 1);
+					file.write((char*)row, 1);
+				}
+				else {
+					file.write((char*)row, 3);
+				}
 				row++;
 			}
 			data += subResourceLayout.rowPitch;
@@ -416,11 +436,9 @@ public:
 		VulkanExampleBase::submitFrame();
 	}
 
-	void prepare()
-	{
+	void												prepare								()										{
 		VulkanExampleBase::prepare();
 		loadAssets();
-		prepareVertices();
 		prepareUniformBuffers();
 		setupDescriptorSetLayout();
 		preparePipelines();
@@ -430,26 +448,12 @@ public:
 		prepared = true;
 	}
 
-	virtual void render()
-	{
-		if (!prepared)
-			return;
-		draw();
-	}
-
-	virtual void viewChanged()
-	{
-		updateUniformBuffers();
-	}
-
-	virtual void keyPressed(uint32_t keyCode)
-	{
-		switch (keyCode)
-		{
-		case KEY_F2:
-		case GAMEPAD_BUTTON_A:
-			saveScreenshot("screenshot.ppm");
-			break;
+	virtual void										render								()										{ if (!prepared) return; draw(); }
+	virtual void										viewChanged							()										{ updateUniformBuffers(); }
+	virtual void										keyPressed							(uint32_t keyCode)						{
+		switch (keyCode) {
+		case KEY_F2				:
+		case GAMEPAD_BUTTON_A	: saveScreenshot("screenshot.ppm"); break;
 		}
 	}
 

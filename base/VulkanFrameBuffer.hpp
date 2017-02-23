@@ -26,7 +26,6 @@ namespace vks
 		VkFormat								format;
 		VkImageSubresourceRange					subresourceRange;
 		VkAttachmentDescription					description;
-		VkImageLayout							initialLayout;
 
 		// Returns true if the attachment has a depth component
 		bool									hasDepth			()																			{
@@ -99,24 +98,18 @@ namespace vks
 			attachment.format						= createinfo.format;
 
 			VkImageAspectFlags							aspectMask			= VK_FLAGS_NONE;
-			VkImageLayout								imageLayout;
 
 			// Select aspect mask and layout depending on usage
 
 			// Color attachment
-			if (createinfo.usage & VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT) {
-				aspectMask								= VK_IMAGE_ASPECT_COLOR_BIT;
-				attachment.initialLayout				= VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-				imageLayout								= (createinfo.usage & VK_IMAGE_USAGE_SAMPLED_BIT) ? VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL : VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-			}
+			if (createinfo.usage & VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT)
+				aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
 
 			// Depth (and/or stencil) attachment
-			if (createinfo.usage & VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT)	 {
-				if (attachment.hasDepth		())	aspectMask	= VK_IMAGE_ASPECT_DEPTH_BIT;
-				if (attachment.hasStencil	())	aspectMask	= aspectMask | VK_IMAGE_ASPECT_STENCIL_BIT;
-
-				attachment.initialLayout				= VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
-				imageLayout								= (createinfo.usage & VK_IMAGE_USAGE_SAMPLED_BIT) ? VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL : VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+			if (createinfo.usage & VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT)
+			{
+				if (attachment.hasDepth())		aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
+				if (attachment.hasStencil())	aspectMask |= VK_IMAGE_ASPECT_STENCIL_BIT;
 			}
 
 			assert(aspectMask > 0);
@@ -170,9 +163,9 @@ namespace vks
 			// Final layout
 			// If not, final layout depends on attachment type
 			if (attachment.hasDepth() || attachment.hasStencil())
-				attachment.description.finalLayout		= VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+				attachment.description.finalLayout		= VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
 			else
-				attachment.description.finalLayout		= VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+				attachment.description.finalLayout		= VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
 			attachments.push_back(attachment);
 

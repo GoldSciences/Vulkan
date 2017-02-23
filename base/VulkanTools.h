@@ -93,6 +93,21 @@ namespace vks
 			,	VkPipelineStageFlags		dstStageMask = VK_PIPELINE_STAGE_ALL_COMMANDS_BIT
 			);
 
+		// Insert an image memory barrier into the command buffer
+		void			insertImageMemoryBarrier
+			(	VkCommandBuffer				cmdbuffer
+			,	VkImage						image
+			,	VkAccessFlags				srcAccessMask
+			,	VkAccessFlags				dstAccessMask
+			,	VkImageLayout				oldImageLayout
+			,	VkImageLayout				newImageLayout
+			,	VkPipelineStageFlags		srcStageMask
+			,	VkPipelineStageFlags		dstStageMask
+			,	VkImageSubresourceRange		subresourceRange
+			);
+
+		// Display error message and exit on fatal error
+		void exitFatal(std::string message, std::string caption);
 
 		
 #if defined(__ANDROID__)
