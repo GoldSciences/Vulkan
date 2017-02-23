@@ -38,11 +38,9 @@ vks::VertexLayout									vertexLayout					= vks::VertexLayout(
 ,	vks::VERTEX_COMPONENT_DUMMY_VEC4
 });
 
-// Maximum number of bones per mesh
-// Must not be higher than same const in skinning shader
-#define MAX_BONES 64
-// Maximum number of bones per vertex
-#define MAX_BONES_PER_VERTEX 4
+
+#define MAX_BONES 64			// Maximum number of bones per mesh. Must not be higher than same const in skinning shader
+#define MAX_BONES_PER_VERTEX 4	// Maximum number of bones per vertex
 
 // Skinned mesh class
 

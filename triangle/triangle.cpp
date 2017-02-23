@@ -27,23 +27,23 @@ public:
 
 	// Vertex buffer and attributes
 	struct {
-		VkDeviceMemory			memory;												// Handle to the device memory for this buffer
-		VkBuffer				buffer;												// Handle to the Vulkan buffer object that the memory is bound to
+		VkDeviceMemory			memory									= VK_NULL_HANDLE;												// Handle to the device memory for this buffer
+		VkBuffer				buffer									= VK_NULL_HANDLE;												// Handle to the Vulkan buffer object that the memory is bound to
 	}						vertices;
 
 	// Index buffer
 	struct 
 	{
-		VkDeviceMemory			memory;		
-		VkBuffer				buffer;			
-		uint32_t				count;
+		VkDeviceMemory			memory									= VK_NULL_HANDLE;		
+		VkBuffer				buffer									= VK_NULL_HANDLE;			
+		uint32_t				count									= 0;
 	}						indices;
 
 	// Uniform buffer block object
 	struct {
-		VkDeviceMemory			memory;		
-		VkBuffer				buffer;			
-		VkDescriptorBufferInfo	descriptor;
+		VkDeviceMemory			memory									= VK_NULL_HANDLE;		
+		VkBuffer				buffer									= VK_NULL_HANDLE;			
+		VkDescriptorBufferInfo	descriptor								= {};
 	}						uniformBufferVS;
 
 	// For simplicity we use the same uniform block layout as in the shader:
@@ -66,21 +66,18 @@ public:
 	// The pipeline layout is used by a pipline to access the descriptor sets 
 	// It defines interface (without binding any actual data) between the shader stages used by the pipeline and the shader resources
 	// A pipeline layout can be shared among multiple pipelines as long as their interfaces match
-	VkPipelineLayout		pipelineLayout;
+	VkPipelineLayout		pipelineLayout							= VK_NULL_HANDLE;
 
 	// Pipelines (often called "pipeline state objects") are used to bake all states that affect a pipeline
 	// While in OpenGL every state can be changed at (almost) any time, Vulkan requires to layout the graphics (and compute) pipeline states upfront
 	// So for each combination of non-dynamic pipeline states you need a new pipeline (there are a few exceptions to this not discussed here)
 	// Even though this adds a new dimension of planing ahead, it's a great opportunity for performance optimizations by the driver
-	VkPipeline				pipeline;
+	VkPipeline				pipeline								= VK_NULL_HANDLE;
 
 	// The descriptor set layout describes the shader binding layout (without actually referencing descriptor)
 	// Like the pipeline layout it's pretty much a blueprint and can be used with different descriptor sets as long as their layout matches
-	VkDescriptorSetLayout	descriptorSetLayout;
-
-	// The descriptor set stores the resources bound to the binding points in a shader
-	// It connects the binding points of the different shaders with the buffers and images used for those bindings
-	VkDescriptorSet			descriptorSet;
+	VkDescriptorSetLayout	descriptorSetLayout						= VK_NULL_HANDLE;
+	VkDescriptorSet			descriptorSet							= VK_NULL_HANDLE;	// The descriptor set stores the resources bound to the binding points in a shader. It connects the binding points of the different shaders with the buffers and images used for those bindings
 
 
 	// Synchronization primitives. Synchronization is an important concept of Vulkan that OpenGL mostly hid away. Getting this right is crucial to using Vulkan.
@@ -91,15 +88,13 @@ public:
 
 	std::vector<VkFence>	waitFences;					// Fences. Used to check the completion of queue operations (e.g. command buffer execution)
 
-							VulkanExample							() : VulkanExampleBase(ENABLE_VALIDATION)
-	{
+							VulkanExample							() : VulkanExampleBase(ENABLE_VALIDATION)						{
 		zoom											= -2.5f;
 		title											= "Vulkan Example - Basic indexed triangle";
 		// Values not set here are initialized in the base class constructor
 	}
 
-							~VulkanExample							()
-	{
+							~VulkanExample							()																{
 		// Clean up used Vulkan resources 
 		// Note: Inherited destructor cleans up resources stored in base class
 		vkDestroyPipeline				(device, pipeline, nullptr);
@@ -128,13 +123,11 @@ public:
 	// This is necessary as implementations can offer an arbitrary number of memory types with different
 	// memory properties. 
 	// You can check http://vulkan.gpuinfo.org/ for details on different memory configurations
-	uint32_t				getMemoryTypeIndex						(uint32_t typeBits, VkMemoryPropertyFlags properties)
-	{
+	uint32_t				getMemoryTypeIndex						(uint32_t typeBits, VkMemoryPropertyFlags properties)			{
 		// Iterate over all memory types available for the device used in this example
 		for (uint32_t i = 0; i < deviceMemoryProperties.memoryTypeCount; i++)
 		{
-			if ((typeBits & 1) == 1)
-			{
+			if ((typeBits & 1) == 1) {
 				if ((deviceMemoryProperties.memoryTypes[i].propertyFlags & properties) == properties)
 					return i;
 			}
@@ -145,8 +138,7 @@ public:
 	}
 
 	// Create the Vulkan synchronization primitives used in this example
-	void					prepareSynchronizationPrimitives		()
-	{
+	void					prepareSynchronizationPrimitives		()																{
 		// Semaphores (Used for correct command ordering)
 		VkSemaphoreCreateInfo								semaphoreCreateInfo								= {};
 		semaphoreCreateInfo.sType						= VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
@@ -170,8 +162,7 @@ public:
 
 	// Get a new command buffer from the command pool
 	// If begin is true, the command buffer is also started so we can start adding commands
-	VkCommandBuffer			getCommandBuffer						(bool begin)
-	{
+	VkCommandBuffer			getCommandBuffer						(bool begin)													{
 		VkCommandBuffer										cmdBuffer;
 
 		VkCommandBufferAllocateInfo							cmdBufAllocateInfo								= {};
@@ -194,8 +185,7 @@ public:
 
 	// End the command buffer and submit it to the queue
 	// Uses a fence to ensure command buffer has finished executing before deleting it
-	void					flushCommandBuffer						(VkCommandBuffer commandBuffer)
-	{
+	void					flushCommandBuffer						(VkCommandBuffer commandBuffer)									{
 		assert(commandBuffer != VK_NULL_HANDLE);
 
 		VK_CHECK_RESULT(vkEndCommandBuffer(commandBuffer));
@@ -222,8 +212,7 @@ public:
 	// Build separate command buffers for every framebuffer image
 	// Unlike in OpenGL all rendering commands are recorded once into command buffers that are then resubmitted to the queue
 	// This allows to generate work upfront and from multiple threads, one of the biggest advantages of Vulkan
-	void					buildCommandBuffers						()
-	{
+	void					buildCommandBuffers						()																{
 		VkCommandBufferBeginInfo							cmdBufInfo										= {};
 		cmdBufInfo.sType								= VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 		cmdBufInfo.pNext								= nullptr;
@@ -256,43 +245,36 @@ public:
 			// This will clear the color and depth attachment
 			vkCmdBeginRenderPass(drawCmdBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 
-			// Update dynamic viewport state
+			
 			VkViewport											viewport										= {};
 			viewport.height									= (float)height;
-			viewport.width									= (float)width;
-			viewport.minDepth								= (float) 0.0f;
-			viewport.maxDepth								= (float) 1.0f;
-			vkCmdSetViewport(drawCmdBuffers[i], 0, 1, &viewport);
+			viewport.width									= (float) width;
+			viewport.minDepth								= (float)  0.0f;
+			viewport.maxDepth								= (float)  1.0f;
+			vkCmdSetViewport(drawCmdBuffers[i], 0, 1, &viewport);									// Update dynamic viewport state
 
-			// Update dynamic scissor state
-			VkRect2D											scissor											= {};
+			VkRect2D											scissor											= {};	
 			scissor.extent.width							= width;
 			scissor.extent.height							= height;
 			scissor.offset.x								= 0;
 			scissor.offset.y								= 0;
-			vkCmdSetScissor(drawCmdBuffers[i], 0, 1, &scissor);
+			vkCmdSetScissor(drawCmdBuffers[i], 0, 1, &scissor);										// Update dynamic scissor state
 
-			// Bind descriptor sets describing shader binding points
-			vkCmdBindDescriptorSets(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSet, 0, nullptr);
-
-			vkCmdBindPipeline(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);	// Bind the rendering pipeline. The pipeline (state object) contains all states of the rendering pipeline, binding it will set all the states specified at pipeline creation time
+			
+			vkCmdBindDescriptorSets(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSet, 0, nullptr);	// Bind descriptor sets describing shader binding points
+			vkCmdBindPipeline(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);		// Bind the rendering pipeline. The pipeline (state object) contains all states of the rendering pipeline, binding it will set all the states specified at pipeline creation time
 			
 			VkDeviceSize										offsets[1]										= { 0 };
-			vkCmdBindVertexBuffers(drawCmdBuffers[i], 0, 1, &vertices.buffer, offsets);			// Bind triangle vertex buffer (contains position and colors)
-			vkCmdBindIndexBuffer(drawCmdBuffers[i], indices.buffer, 0, VK_INDEX_TYPE_UINT32);	// Bind triangle index buffer
-			vkCmdDrawIndexed(drawCmdBuffers[i], indices.count, 1, 0, 0, 1);						// Draw indexed triangle
+			vkCmdBindVertexBuffers(drawCmdBuffers[i], 0, 1, &vertices.buffer, offsets);				// Bind triangle vertex buffer (contains position and colors)
+			vkCmdBindIndexBuffer(drawCmdBuffers[i], indices.buffer, 0, VK_INDEX_TYPE_UINT32);		// Bind triangle index buffer
+			vkCmdDrawIndexed(drawCmdBuffers[i], indices.count, 1, 0, 0, 1);							// Draw indexed triangle
 
 			vkCmdEndRenderPass(drawCmdBuffers[i]);
-
-			// Ending the render pass will add an implicit barrier transitioning the frame buffer color attachment to 
-			// VK_IMAGE_LAYOUT_PRESENT_SRC_KHR for presenting it to the windowing system
-
-			VK_CHECK_RESULT(vkEndCommandBuffer(drawCmdBuffers[i]));
+			VK_CHECK_RESULT(vkEndCommandBuffer(drawCmdBuffers[i]));									// Ending the render pass will add an implicit barrier transitioning the frame buffer color attachment to VK_IMAGE_LAYOUT_PRESENT_SRC_KHR for presenting it to the windowing system
 		}
 	}
 
-	void					draw									()
-	{
+	void					draw									()																{
 		
 		VK_CHECK_RESULT(swapChain.acquireNextImage(presentCompleteSemaphore, &currentBuffer));		// Get next image in the swap chain (back/front buffer)
 
@@ -322,8 +304,7 @@ public:
 
 	// Prepare vertex and index buffers for an indexed triangle
 	// Also uploads them to device local memory using staging and initializes vertex input and attribute binding to match the vertex shader
-	void					prepareVertices							(bool useStagingBuffers)
-	{
+	void					prepareVertices							(bool useStagingBuffers)										{
 		// A note on memory management in Vulkan in general:
 		//	This is a very complex topic and while it's fine for an example application to to small individual memory allocations that is not
 		//	what should be done a real-world application, where you should allocate large chunkgs of memory at once isntead.
@@ -490,8 +471,7 @@ public:
 		}
 	}
 
-	void					setupDescriptorPool						()
-	{
+	void					setupDescriptorPool						()																{
 		// We need to tell the API the number of max. requested descriptors per type
 		VkDescriptorPoolSize									typeCounts[1];
 		// This example only uses one descriptor type (uniform buffer) and only requests one descriptor of this type
@@ -515,8 +495,7 @@ public:
 		VK_CHECK_RESULT(vkCreateDescriptorPool(device, &descriptorPoolInfo, nullptr, &descriptorPool));
 	}
 
-	void					setupDescriptorSetLayout				()
-	{
+	void					setupDescriptorSetLayout				()																{
 		// Setup layout of descriptors used in this example
 		// Basically connects the different shader stages to descriptors for binding uniform buffers, image samplers, etc.
 		// So every shader binding should map to one descriptor set layout binding
@@ -547,8 +526,7 @@ public:
 		VK_CHECK_RESULT(vkCreatePipelineLayout(device, &pPipelineLayoutCreateInfo, nullptr, &pipelineLayout));
 	}
 
-	void					setupDescriptorSet						()
-	{
+	void					setupDescriptorSet						()																{
 		// Allocate a new descriptor set from the global descriptor pool
 		VkDescriptorSetAllocateInfo								allocInfo									= {};
 		allocInfo.sType										= VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
@@ -578,8 +556,7 @@ public:
 
 	// Create the depth (and stencil) buffer attachments used by our framebuffers
 	// Note: Override of virtual function in the base class and called from within VulkanExampleBase::prepare
-	void					setupDepthStencil						()
-	{
+	void					setupDepthStencil						()																{
 		// Create an optimal image used as the depth stencil attachment
 		VkImageCreateInfo										image										= {};	
 		image.sType											= VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
@@ -623,8 +600,7 @@ public:
 
 	// Create a frame buffer for each swap chain image
 	// Note: Override of virtual function in the base class and called from within VulkanExampleBase::prepare
-	void					setupFrameBuffer						()
-	{
+	void					setupFrameBuffer						()																{
 		// Create a frame buffer for every image in the swapchain
 		frameBuffers.resize(swapChain.imageCount);
 		for (size_t i = 0; i < frameBuffers.size(); i++)
@@ -651,8 +627,7 @@ public:
 	// This allows the driver to know up-front what the rendering will look like and is a good opportunity to optimize especially on tile-based renderers (with multiple subpasses)
 	// Using sub pass dependencies also adds implicit layout transitions for the attachment used, so we don't need to add explicit image memory barriers to transform them
 	// Note: Override of virtual function in the base class and called from within VulkanExampleBase::prepare
-	void					setupRenderPass							()
-	{
+	void					setupRenderPass							()																{
 		// This example will use a single render pass with one subpass
 
 		// Descriptors for the attachments used by this renderpass
@@ -743,8 +718,7 @@ public:
 	// Vulkan loads it's shaders from an immediate binary representation called SPIR-V
 	// Shaders are compiled offline from e.g. GLSL using the reference glslang compiler
 	// This function loads such a shader from a binary file and returns a shader module structure
-	VkShaderModule			loadSPIRVShader							(std::string filename)
-	{
+	VkShaderModule			loadSPIRVShader							(std::string filename)											{
 		size_t													shaderSize;
 		char													* shaderCode								= nullptr;
 
@@ -794,8 +768,7 @@ public:
 		}
 	}
 
-	void					preparePipelines						()
-	{
+	void					preparePipelines						()																{
 		// Create the graphics pipeline used in this example
 		// Vulkan uses the concept of rendering pipelines to encapsulate fixed states, replacing OpenGL's complex state machine
 		// A pipeline is then stored and hashed on the GPU making pipeline changes very fast
@@ -953,7 +926,7 @@ public:
 		vkDestroyShaderModule(device, shaderStages[1].module, nullptr);
 	}
 
-	void					prepareUniformBuffers					()		{
+	void					prepareUniformBuffers					()																{
 		// Prepare and initialize a uniform buffer block containing shader uniforms
 		// Single uniforms like in OpenGL are no longer present in Vulkan. All Shader uniforms are passed via uniform buffer blocks
 		VkMemoryRequirements									memReqs;
@@ -990,7 +963,7 @@ public:
 		updateUniformBuffers();
 	}
 
-	void					updateUniformBuffers					()		{
+	void					updateUniformBuffers					()																{
 		// Update matrices
 		uboVS.projectionMatrix								= glm::perspective(glm::radians(60.0f), (float)width / (float)height, 0.1f, 256.0f);
 
@@ -1010,7 +983,7 @@ public:
 		vkUnmapMemory(device, uniformBufferVS.memory);
 	}
 
-	void					prepare									()		{
+	void					prepare									()																{
 		VulkanExampleBase::prepare();
 		prepareSynchronizationPrimitives();
 		prepareVertices(USE_STAGING);
@@ -1023,14 +996,13 @@ public:
 		prepared = true;
 	}
 
-	virtual void			render									()		{
+	// This function is called by the base example class each time the view is changed by user input
+	virtual void			viewChanged								()																{ updateUniformBuffers(); }
+	virtual void			render									()																{
 		if (!prepared)
 			return;
 		draw();
 	}
-	
-	// This function is called by the base example class each time the view is changed by user input
-	virtual void			viewChanged								()		{ updateUniformBuffers(); }
 };
 
 // These functions create and delete an instance of the VulkanExample type and are currently used by the different main() implementations.
