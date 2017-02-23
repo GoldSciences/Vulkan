@@ -43,17 +43,17 @@ public:
 	float			movementSpeed		= 1.0f;
 
 	struct {
-		glm::mat4 perspective;
-		glm::mat4 view;
-	} matrices;
+		glm::mat4		perspective;
+		glm::mat4		view;
+	}				matrices;
 
 	struct {
-		bool	left						= false
-			,	right						= false
-			,	up							= false
-			,	down						= false
+		bool			left						= false
+			,			right						= false
+			,			up							= false
+			,			down						= false
 			;
-	} keys;
+	}				keys;
 
 	bool			moving				()															{ return keys.left || keys.right || keys.up || keys.down; }
 	void			setPerspective		(float fov, float aspect, float znear, float zfar)			{
@@ -96,11 +96,9 @@ public:
 	bool			updatePad			(glm::vec2 axisLeft, glm::vec2 axisRight, float deltaTime)	{
 		bool									retVal		= false;
 
-		if (type == CameraType::firstperson)
-		{
+		if (type == CameraType::firstperson) {
 			// Use the common console thumbstick layout		
 			// Left = view, right = move
-
 			const float								deadZone	= 0.0015f;
 			const float								range		= 1.0f - deadZone;
 
