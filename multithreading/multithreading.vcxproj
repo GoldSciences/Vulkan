@@ -14,10 +14,6 @@
     <ClCompile Include="multithreading.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\base\frustum.hpp" />
-    <ClInclude Include="..\base\threadpool.hpp" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="..\data\shaders\multithreading\phong.frag" />
     <None Include="..\data\shaders\multithreading\phong.vert" />
     <None Include="..\data\shaders\multithreading\starsphere.frag" />
