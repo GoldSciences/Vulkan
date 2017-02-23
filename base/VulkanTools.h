@@ -53,7 +53,7 @@
 	if (vk_result_value != VK_SUCCESS)																														\
 	{																																						\
 		std::cout << "Fatal : VkResult is \"" << vks::tools::errorString(vk_result_value) << "\" in " << __FILE__ << " at line " << __LINE__ << std::endl;	\
-		/*assert(vk_result_value == VK_SUCCESS);*/																												\
+		assert(vk_result_value == VK_SUCCESS);																												\
 	}																																						\
 }
 #endif

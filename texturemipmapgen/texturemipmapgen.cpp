@@ -21,83 +21,82 @@ class VulkanExample : public VulkanExampleBase
 {
 public:
 	struct Texture {
-		VkImage image;
-		VkImageLayout imageLayout;
-		VkDeviceMemory deviceMemory;
-		VkImageView view;
-		uint32_t width, height;
-		uint32_t mipLevels;
-	} texture;
+		VkImage													image			= VK_NULL_HANDLE;
+		VkImageLayout											imageLayout		;
+		VkDeviceMemory											deviceMemory	= VK_NULL_HANDLE;
+		VkImageView												view			= VK_NULL_HANDLE;
+		uint32_t												width, height;
+		uint32_t												mipLevels;
+	}														texture;
 
 	// To demonstrate mip mapping and filtering this example uses separate samplers
-	std::vector<std::string> samplerNames{ "No mip maps" , "With mip maps (bilinear)" , "With mip maps (anisotropic)" };
-	std::vector<VkSampler> samplers;
+	std::vector<std::string>								samplerNames{ "No mip maps" , "With mip maps (bilinear)" , "With mip maps (anisotropic)" };
+	std::vector<VkSampler>									samplers;
 
 	// Vertex layout for the models
-	vks::VertexLayout vertexLayout = vks::VertexLayout({
+	vks::VertexLayout										vertexLayout				= vks::VertexLayout({
 		vks::VERTEX_COMPONENT_POSITION,
 		vks::VERTEX_COMPONENT_UV,
 		vks::VERTEX_COMPONENT_NORMAL,
 	});
 
 	struct {
-		vks::Model tunnel;
-	} models;
+		vks::Model												tunnel;
+	}														models;
 
 	struct {
-		VkPipelineVertexInputStateCreateInfo inputState;
-		std::vector<VkVertexInputBindingDescription> bindingDescriptions;
-		std::vector<VkVertexInputAttributeDescription> attributeDescriptions;
-	} vertices;
+		VkPipelineVertexInputStateCreateInfo					inputState;
+		std::vector<VkVertexInputBindingDescription>			bindingDescriptions;
+		std::vector<VkVertexInputAttributeDescription>			attributeDescriptions;
+	}														vertices;
 
 	vks::Buffer uniformBufferVS;
 
 	struct uboVS {
-		glm::mat4 projection;
-		glm::mat4 view;
-		glm::mat4 model;
-		glm::vec4 viewPos;
-		float lodBias = 0.0f;
-		uint32_t samplerIndex = 2;
-	} uboVS;
+		glm::mat4												projection;
+		glm::mat4												view;
+		glm::mat4												model;
+		glm::vec4												viewPos;
+		float													lodBias						= 0.0f;
+		uint32_t												samplerIndex				= 2;
+	}														uboVS;
 
 	struct {
-		VkPipeline solid;
-	} pipelines;
+		VkPipeline												solid;
+	}														pipelines;
 
-	VkPipelineLayout pipelineLayout;
-	VkDescriptorSet descriptorSet;
-	VkDescriptorSetLayout descriptorSetLayout;
+	VkPipelineLayout										pipelineLayout;
+	VkDescriptorSet											descriptorSet;
+	VkDescriptorSetLayout									descriptorSetLayout;
 
-	VulkanExample() : VulkanExampleBase(ENABLE_VALIDATION)
+															VulkanExample				() : VulkanExampleBase(ENABLE_VALIDATION)
 	{
-		title = "Vulkan Example - Runtime mip map generation";
-		enableTextOverlay = true;
-		camera.type = Camera::CameraType::firstperson;
+		title													= "Vulkan Example - Runtime mip map generation";
+		enableTextOverlay										= true;
+		camera.type												= Camera::CameraType::firstperson;
 		camera.setPerspective(60.0f, (float)width / (float)height, 0.1f, 1024.0f);
 		camera.setRotation(glm::vec3(0.0f, 90.0f, 0.0f));
 		camera.setTranslation(glm::vec3(40.75f, 0.0f, 0.0f));
-		camera.movementSpeed = 2.5f;
-		camera.rotationSpeed = 0.5f;
-		timerSpeed *= 0.05f;
-		paused = true;
+		camera.movementSpeed									= 2.5f;
+		camera.rotationSpeed									= 0.5f;
+		timerSpeed												*= 0.05f;
+		paused													= true;
 	}
 
-	~VulkanExample()
+															~VulkanExample				()
 	{
 		destroyTextureImage(texture);
 		vkDestroyPipeline(device, pipelines.solid, nullptr);
 		vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
 		vkDestroyDescriptorSetLayout(device, descriptorSetLayout, nullptr);
 		uniformBufferVS.destroy();
-		for (auto sampler : samplers)
-		{
+		for (VkSampler& sampler : samplers)
 			vkDestroySampler(device, sampler, nullptr);
-		}
+
 		models.tunnel.destroy();
 	}
 
-	void loadTexture(std::string fileName, VkFormat format, bool forceLinearTiling)
+	void													loadTexture					(std::string fileName, VkFormat format, bool forceLinearTiling)
 	{
 #if defined(__ANDROID__)
 		// Textures are stored inside the apk on Android (compressed)
@@ -201,7 +200,7 @@ public:
 		vkCmdCopyBufferToImage(copyCmd, stagingBuffer, texture.image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &bufferCopyRegion);
 
 		// Transition first mip level to transfer source for read during blit
-		texture.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+		texture.imageLayout										= VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 		vks::tools::setImageLayout(copyCmd, texture.image, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, subresourceRange);
 
 		VulkanExampleBase::flushCommandBuffer(copyCmd, queue, true);
@@ -305,14 +304,14 @@ public:
 	}
 
 	// Free all Vulkan resources used a texture object
-	void destroyTextureImage(Texture texture)
+	void													destroyTextureImage			(Texture texture)
 	{
 		vkDestroyImageView	(device, texture.view			, nullptr);
 		vkDestroyImage		(device, texture.image			, nullptr);
 		vkFreeMemory		(device, texture.deviceMemory	, nullptr);
 	}
 
-	void buildCommandBuffers()
+	void													buildCommandBuffers			()
 	{
 		VkCommandBufferBeginInfo									cmdBufInfo					= vks::initializers::commandBufferBeginInfo();
 
@@ -356,7 +355,7 @@ public:
 		}
 	}
 
-	void draw()
+	void													draw						()
 	{
 		VulkanExampleBase::prepareFrame();
 
@@ -370,13 +369,13 @@ public:
 		VulkanExampleBase::submitFrame();
 	}
 
-	void loadAssets()
+	void													loadAssets					()
 	{
 		models.tunnel.loadFromFile(getAssetPath() + "models/tunnel_cylinder.dae", vertexLayout, 1.0f, vulkanDevice, queue);
 		loadTexture(getAssetPath() + "textures/metalplate_nomips_rgba.ktx", VK_FORMAT_R8G8B8A8_UNORM, false);
 	}
 
-	void setupVertexDescriptions()
+	void													setupVertexDescriptions		()
 	{
 		// Binding description
 		vertices.bindingDescriptions.resize(1);
@@ -397,7 +396,7 @@ public:
 		vertices.inputState.pVertexAttributeDescriptions		= vertices.attributeDescriptions.data();
 	}
 
-	void setupDescriptorPool()
+	void													setupDescriptorPool			()
 	{
 		std::vector<VkDescriptorPoolSize>							poolSizes					=
 		{	vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER	, 1)	// Vertex shader UBO
@@ -409,7 +408,7 @@ public:
 		VK_CHECK_RESULT(vkCreateDescriptorPool(device, &descriptorPoolInfo, nullptr, &descriptorPool));
 	}
 
-	void setupDescriptorSetLayout()
+	void													setupDescriptorSetLayout	()
 	{
 		std::vector<VkDescriptorSetLayoutBinding>					setLayoutBindings;
 		setLayoutBindings.push_back(vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT, 0));	// Binding 0: Vertex shader uniform buffer
@@ -422,7 +421,7 @@ public:
 		VK_CHECK_RESULT(vkCreatePipelineLayout(device, &pPipelineLayoutCreateInfo, nullptr, &pipelineLayout));
 	}
 
-	void setupDescriptorSet()
+	void													setupDescriptorSet			()
 	{
 		VkDescriptorSetAllocateInfo									allocInfo					= vks::initializers::descriptorSetAllocateInfo(descriptorPool, &descriptorSetLayout, 1);
 		VK_CHECK_RESULT(vkAllocateDescriptorSets(device, &allocInfo, &descriptorSet));
@@ -453,7 +452,7 @@ public:
 		vkUpdateDescriptorSets(device, static_cast<uint32_t>(writeDescriptorSets.size()), writeDescriptorSets.data(), 0, NULL);
 	}
 
-	void preparePipelines()
+	void													preparePipelines			()
 	{
 		VkPipelineInputAssemblyStateCreateInfo						inputAssemblyState			= vks::initializers::pipelineInputAssemblyStateCreateInfo(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, 0, VK_FALSE);
 
@@ -487,14 +486,14 @@ public:
 	}
 
 	// Prepare and initialize uniform buffer containing shader uniforms
-	void prepareUniformBuffers()
+	void													prepareUniformBuffers		()
 	{
 		// Vertex shader uniform buffer block
 		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBufferVS, sizeof(uboVS), &uboVS));
 		updateUniformBuffers();
 	}
 
-	void updateUniformBuffers()
+	void													updateUniformBuffers		()
 	{
 		uboVS.projection										= camera.matrices.perspective;
 		uboVS.view												= camera.matrices.view;
@@ -505,7 +504,7 @@ public:
 		uniformBufferVS.unmap();
 	}
 
-	void prepare()
+	void													prepare						()
 	{
 		VulkanExampleBase::prepare();
 		loadAssets();
@@ -519,7 +518,7 @@ public:
 		prepared = true;
 	}
 
-	virtual void render()
+	virtual void											render						()
 	{
 		if (!prepared)
 			return;
@@ -530,12 +529,12 @@ public:
 			updateUniformBuffers();
 	}
 
-	virtual void viewChanged()
+	virtual void											viewChanged					()
 	{
 		updateUniformBuffers();
 	}
 
-	void changeLodBias(float delta)
+	void													changeLodBias				(float delta)
 	{
 		uboVS.lodBias											+= delta;
 		if (uboVS.lodBias < 0.0f)				uboVS.lodBias	= 0.0f;
@@ -544,14 +543,14 @@ public:
 		updateTextOverlay();
 	}
 
-	void toggleSampler()
+	void													toggleSampler				()
 	{
 		uboVS.samplerIndex										= (uboVS.samplerIndex < static_cast<uint32_t>(samplers.size()) - 1) ? uboVS.samplerIndex + 1 : 0;
 		updateUniformBuffers();
 		updateTextOverlay();
 	}
 	
-	virtual void keyPressed(uint32_t keyCode)
+	virtual void											keyPressed					(uint32_t keyCode)
 	{
 		switch (keyCode)
 		{
@@ -570,7 +569,7 @@ public:
 		}
 	}
 
-	virtual void getOverlayText(VulkanTextOverlay *textOverlay)
+	virtual void											getOverlayText				(VulkanTextOverlay *textOverlay)
 	{
 		std::stringstream											ss;
 		ss << std::setprecision(2) << std::fixed << uboVS.lodBias;
