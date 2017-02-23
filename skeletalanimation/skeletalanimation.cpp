@@ -178,13 +178,11 @@ private:
 		{
 			uint32_t												frameIndex		= 0;
 			for (uint32_t i = 0; i < pNodeAnim->mNumPositionKeys - 1; i++)
-			{
 				if (time < (float)pNodeAnim->mPositionKeys[i + 1].mTime)
 				{
 					frameIndex = i;
 					break;
 				}
-			}
 
 			aiVectorKey												currentFrame	= pNodeAnim->mPositionKeys[frameIndex];
 			aiVectorKey												nextFrame		= pNodeAnim->mPositionKeys[(frameIndex + 1) % pNodeAnim->mNumPositionKeys];
@@ -213,13 +211,11 @@ private:
 		{
 			uint32_t												frameIndex		= 0;
 			for (uint32_t i = 0; i < pNodeAnim->mNumRotationKeys - 1; i++)
-			{
 				if (time < (float)pNodeAnim->mRotationKeys[i + 1].mTime)
 				{
 					frameIndex = i;
 					break;
 				}
-			}
 
 			aiQuatKey												currentFrame	= pNodeAnim->mRotationKeys[frameIndex];
 			aiQuatKey												nextFrame		= pNodeAnim->mRotationKeys[(frameIndex + 1) % pNodeAnim->mNumRotationKeys];
