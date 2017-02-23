@@ -46,7 +46,9 @@ namespace vks
 		}
 
 	public:
-												Thread			()									: worker(std::thread(&Thread::queueLoop, this))		{}
+												Thread			()									{
+				worker	= std::thread(&Thread::queueLoop, this);									
+			}
 												~Thread			()									{
 			if (worker.joinable()) {
 				wait();
