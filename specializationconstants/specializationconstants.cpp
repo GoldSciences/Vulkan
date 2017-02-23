@@ -18,13 +18,13 @@ class VulkanExample: public VulkanExampleBase
 {
 public:
 	struct {
-		VkPipelineVertexInputStateCreateInfo				inputState				= {};
-		std::vector<VkVertexInputBindingDescription>		bindingDescriptions		;
-		std::vector<VkVertexInputAttributeDescription>		attributeDescriptions	;
-	}													vertices;
+		VkPipelineVertexInputStateCreateInfo					inputState				= {};
+		std::vector<VkVertexInputBindingDescription>			bindingDescriptions		;
+		std::vector<VkVertexInputAttributeDescription>			attributeDescriptions	;
+	}														vertices;
 
 	// Vertex layout for the models
-	vks::VertexLayout									vertexLayout				= vks::VertexLayout({
+	vks::VertexLayout										vertexLayout				= vks::VertexLayout({
 		vks::VERTEX_COMPONENT_POSITION,
 		vks::VERTEX_COMPONENT_NORMAL,
 		vks::VERTEX_COMPONENT_UV,
@@ -32,33 +32,33 @@ public:
 	});
 
 	struct {
-		vks::Model											cube;
-	}													models;
+		vks::Model												cube;
+	}														models;
 
 	struct {
-		vks::Texture2D										colormap;
-	}													textures;
+		vks::Texture2D											colormap;
+	}														textures;
 
-	vks::Buffer											uniformBuffer;
+	vks::Buffer												uniformBuffer;
 
 	// Same uniform buffer layout as shader
 	struct UBOVS {
-		glm::mat4											projection;
-		glm::mat4											modelView;
-		glm::vec4											lightPos					= glm::vec4(0.0f, -2.0f, 1.0f, 0.0f);
-	}													uboVS;
+		glm::mat4												projection;
+		glm::mat4												modelView;
+		glm::vec4												lightPos					= glm::vec4(0.0f, -2.0f, 1.0f, 0.0f);
+	}														uboVS;
 
-	VkPipelineLayout									pipelineLayout				= VK_NULL_HANDLE;
-	VkDescriptorSet										descriptorSet				= VK_NULL_HANDLE;
-	VkDescriptorSetLayout								descriptorSetLayout			= VK_NULL_HANDLE;
+	VkPipelineLayout										pipelineLayout				= VK_NULL_HANDLE;
+	VkDescriptorSet											descriptorSet				= VK_NULL_HANDLE;
+	VkDescriptorSetLayout									descriptorSetLayout			= VK_NULL_HANDLE;
 
 	struct {
-		VkPipeline											phong;
-		VkPipeline											toon;
-		VkPipeline											textured;
-	}													pipelines;
+		VkPipeline												phong;
+		VkPipeline												toon;
+		VkPipeline												textured;
+	}														pipelines;
 
-														VulkanExample				()	: VulkanExampleBase(ENABLE_VALIDATION)
+															VulkanExample				()	: VulkanExampleBase(ENABLE_VALIDATION)
 	{
 		title													= "Vulkan Example - Specialization constants";
 		enableTextOverlay										= true;
@@ -68,7 +68,7 @@ public:
 		camera.setTranslation(glm::vec3(0.0f, 0.0f, -2.0f));
 	}
 
-														~VulkanExample				()
+															~VulkanExample				()
 	{
 		vkDestroyPipeline(device, pipelines.phong, nullptr);
 		vkDestroyPipeline(device, pipelines.textured, nullptr);
@@ -82,7 +82,7 @@ public:
 		uniformBuffer.destroy();
 	}
 
-	void												buildCommandBuffers			()
+	void													buildCommandBuffers			()
 	{		 
 		VkCommandBufferBeginInfo									cmdBufInfo						= vks::initializers::commandBufferBeginInfo();
 		VkClearValue												clearValues[2];
@@ -141,13 +141,13 @@ public:
 		}
 	}
 
-	void												loadAssets					()
+	void													loadAssets					()
 	{
 		models.cube.loadFromFile(getAssetPath() + "models/color_teapot_spheres.dae", vertexLayout, 0.1f, vulkanDevice, queue);
 		textures.colormap.loadFromFile(getAssetPath() + "textures/metalplate_nomips_rgba.ktx", VK_FORMAT_R8G8B8A8_UNORM, vulkanDevice, queue);
 	}
 
-	void												setupVertexDescriptions		()
+	void													setupVertexDescriptions		()
 	{
 		// Binding description
 		vertices.bindingDescriptions.resize(1);
@@ -170,7 +170,7 @@ public:
 		vertices.inputState.pVertexAttributeDescriptions		= vertices.attributeDescriptions.data();
 	}
 
-	void												setupDescriptorPool			()
+	void													setupDescriptorPool			()
 	{
 		std::vector<VkDescriptorPoolSize>							poolSizes					=
 		{	vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1)
@@ -181,7 +181,7 @@ public:
 		VK_CHECK_RESULT(vkCreateDescriptorPool(device, &descriptorPoolInfo, nullptr, &descriptorPool));
 	}
 
-	void												setupDescriptorSetLayout	()
+	void													setupDescriptorSetLayout	()
 	{
 		std::vector<VkDescriptorSetLayoutBinding>					setLayoutBindings			=		
 		{	vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT, 0)
@@ -195,7 +195,7 @@ public:
 		VK_CHECK_RESULT(vkCreatePipelineLayout(device, &pPipelineLayoutCreateInfo, nullptr, &pipelineLayout));
 	}
 
-	void												setupDescriptorSet			()
+	void													setupDescriptorSet			()
 	{
 		VkDescriptorSetAllocateInfo									allocInfo					= vks::initializers::descriptorSetAllocateInfo(descriptorPool, &descriptorSetLayout, 1);
 
@@ -209,7 +209,7 @@ public:
 		vkUpdateDescriptorSets(device, static_cast<uint32_t>(writeDescriptorSets.size()), writeDescriptorSets.data(), 0, NULL);
 	}
 
-	void												preparePipelines			()
+	void													preparePipelines			()
 	{
 		VkPipelineInputAssemblyStateCreateInfo						inputAssemblyState			= vks::initializers::pipelineInputAssemblyStateCreateInfo(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, 0, VK_FALSE);
 		VkPipelineRasterizationStateCreateInfo						rasterizationState			= vks::initializers::pipelineRasterizationStateCreateInfo(VK_POLYGON_MODE_FILL, VK_CULL_MODE_NONE, VK_FRONT_FACE_CLOCKWISE, 0);
@@ -291,7 +291,7 @@ public:
 	}
 
 	// Prepare and initialize uniform buffer containing shader uniforms
-	void												prepareUniformBuffers		()
+	void													prepareUniformBuffers		()
 	{
 		// Create the vertex shader uniform buffer block
 		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBuffer, sizeof(uboVS)));
@@ -300,15 +300,15 @@ public:
 		updateUniformBuffers();
 	}
 
-	void												updateUniformBuffers		()
+	void													updateUniformBuffers		()
 	{
 		uboVS.projection										= camera.matrices.perspective;
 		uboVS.modelView											= camera.matrices.view;
 
 		memcpy(uniformBuffer.mapped, &uboVS, sizeof(uboVS));
 	}
-
-	void												draw						()
+		
+	void													draw						()
 	{
 		VulkanExampleBase::prepareFrame();
 
@@ -319,7 +319,7 @@ public:
 		VulkanExampleBase::submitFrame();
 	}
 
-	void												prepare						()
+	void													prepare						()
 	{
 		VulkanExampleBase::prepare();
 		loadAssets();
@@ -333,8 +333,8 @@ public:
 		prepared = true;
 	}
 
-	virtual void										viewChanged					()		{ updateUniformBuffers(); }
-	virtual void										render						()
+	virtual void											viewChanged					()		{ updateUniformBuffers(); }
+	virtual void											render						()
 	{
 		if (!prepared)
 			return;
