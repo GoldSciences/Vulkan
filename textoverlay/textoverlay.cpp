@@ -1,34 +1,18 @@
-/*
-* Vulkan Example - Text overlay rendering on-top of an existing scene using a separate render pass
-*
-* Copyright (C) 2016 by Sascha Willems - www.saschawillems.de
-*
-* This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
-*/
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <assert.h>
-#include <vector>
-#include <sstream>
-#include <iomanip>
-
-#define GLM_FORCE_RADIANS
-#define GLM_FORCE_DEPTH_ZERO_TO_ONE
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/matrix_inverse.hpp>
-
-#include <vulkan/vulkan.h>
-
+// Vulkan Example - Text overlay rendering on-top of an existing scene using a separate render pass
+// 
+// Copyright (C) 2016 by Sascha Willems - www.saschawillems.de
+// 
+// This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 #include "vulkanexamplebase.h"
-#include "VulkanDevice.hpp"
-#include "VulkanBuffer.hpp"
 #include "VulkanModel.hpp"
 #include "VulkanTexture.hpp"
 
 #include "../external/stb/stb_font_consolas_24_latin1.inl"
+
+#include <glm/gtc/matrix_inverse.hpp>
+#include <sstream>
+#include <iomanip>
+
 
 #define VERTEX_BUFFER_BIND_ID 0
 #define ENABLE_VALIDATION false
@@ -50,11 +34,11 @@ public:
 	VulkanTextOverlay									* textOverlay				= nullptr;
 
 	// Vertex layout for the models
-	vks::VertexLayout									vertexLayout				= vks::VertexLayout({
-		vks::VERTEX_COMPONENT_POSITION,
-		vks::VERTEX_COMPONENT_NORMAL,
-		vks::VERTEX_COMPONENT_UV,
-		vks::VERTEX_COMPONENT_COLOR,
+	vks::VertexLayout									vertexLayout				= vks::VertexLayout(
+	{	vks::VERTEX_COMPONENT_POSITION
+	,	vks::VERTEX_COMPONENT_NORMAL
+	,	vks::VERTEX_COMPONENT_UV
+	,	vks::VERTEX_COMPONENT_COLOR
 	});
 
 	struct {
@@ -96,59 +80,58 @@ public:
 
 														VulkanExample				()	: VulkanExampleBase(ENABLE_VALIDATION)
 	{
-		zoom = -4.5f;
-		zoomSpeed = 2.5f;
-		rotation = { -25.0f, 0.0f, 0.0f };
-		title = "Vulkan Example - Text overlay";
-		// Disable text overlay of the example base class
-		enableTextOverlay = false;
+		zoom												= -4.5f;
+		zoomSpeed											= 2.5f;
+		rotation											= { -25.0f, 0.0f, 0.0f };
+		title												= "Vulkan Example - Text overlay";
+		enableTextOverlay									= false;		// Disable text overlay of the example base class
 	}
 
 														~VulkanExample				()								{
-		vkDestroyPipeline(device, pipelines.solid, nullptr);
-		vkDestroyPipeline(device, pipelines.background, nullptr);
-		vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
+		vkDestroyPipeline			(device, pipelines.solid, nullptr);
+		vkDestroyPipeline			(device, pipelines.background, nullptr);
+		vkDestroyPipelineLayout		(device, pipelineLayout, nullptr);
 		vkDestroyDescriptorSetLayout(device, descriptorSetLayout, nullptr);
-		models.cube.destroy();
-		textures.background.destroy();
-		textures.cube.destroy();
-		uniformBuffer.destroy();
+		models.cube			.destroy();
+		textures.background	.destroy();
+		textures.cube		.destroy();
+		uniformBuffer		.destroy();
 		delete(textOverlay);
 	}
 
 	void												buildCommandBuffers			()								{
-		VkCommandBufferBeginInfo cmdBufInfo = vks::initializers::commandBufferBeginInfo();
+		VkCommandBufferBeginInfo							cmdBufInfo						= vks::initializers::commandBufferBeginInfo();
 
-		VkClearValue clearValues[3];
+		VkClearValue										clearValues	[3];
 
-		clearValues[0].color = { { 0.0f, 0.0f, 0.0f, 1.0f } };
-		clearValues[1].depthStencil = { 1.0f, 0 };
+		clearValues[0].color								= { { 0.0f, 0.0f, 0.0f, 1.0f } };
+		clearValues[1].depthStencil							= { 1.0f, 0 };
 
-		VkRenderPassBeginInfo renderPassBeginInfo = vks::initializers::renderPassBeginInfo();
-		renderPassBeginInfo.renderPass = renderPass;
-		renderPassBeginInfo.renderArea.extent.width = width;
-		renderPassBeginInfo.renderArea.extent.height = height;
-		renderPassBeginInfo.clearValueCount = 2;
-		renderPassBeginInfo.pClearValues = clearValues;
+		VkRenderPassBeginInfo									renderPassBeginInfo			= vks::initializers::renderPassBeginInfo();
+		renderPassBeginInfo.renderPass						= renderPass;
+		renderPassBeginInfo.renderArea.extent.width			= width;
+		renderPassBeginInfo.renderArea.extent.height		= height;
+		renderPassBeginInfo.clearValueCount					= 2;
+		renderPassBeginInfo.pClearValues					= clearValues;
 
 		for (size_t i = 0; i < drawCmdBuffers.size(); ++i)
 		{
 			// Set target frame buffer
-			renderPassBeginInfo.framebuffer = frameBuffers[i];
+			renderPassBeginInfo.framebuffer						= frameBuffers[i];
 
 			VK_CHECK_RESULT(vkBeginCommandBuffer(drawCmdBuffers[i], &cmdBufInfo));
 
 			vkCmdBeginRenderPass(drawCmdBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 
-			VkViewport viewport = vks::initializers::viewport((float)width, (float)height, 0.0f, 1.0f);
+			VkViewport												viewport					= vks::initializers::viewport((float)width, (float)height, 0.0f, 1.0f);
 			vkCmdSetViewport(drawCmdBuffers[i], 0, 1, &viewport);
 
-			VkRect2D scissor = vks::initializers::rect2D(width, height, 0, 0);
+			VkRect2D												scissor						= vks::initializers::rect2D(width, height, 0, 0);
 			vkCmdSetScissor(drawCmdBuffers[i], 0, 1, &scissor);
 
 			vkCmdBindDescriptorSets(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSets.background, 0, NULL);
 
-			VkDeviceSize offsets[1] = { 0 };
+			VkDeviceSize											offsets[1]					= { 0 };
 			vkCmdBindVertexBuffers(drawCmdBuffers[i], VERTEX_BUFFER_BIND_ID, 1, &models.cube.vertices.buffer, offsets);
 			vkCmdBindIndexBuffer(drawCmdBuffers[i], models.cube.indices.buffer, 0, VK_INDEX_TYPE_UINT32);
 
@@ -175,7 +158,7 @@ public:
 
 		textOverlay->addText(title, 5.0f, 5.0f, VulkanTextOverlay::alignLeft);
 
-		std::stringstream ss;
+		std::stringstream										ss;
 		ss << std::fixed << std::setprecision(2) << (frameTimer * 1000.0f) << "ms (" << lastFPS << " fps)";
 		textOverlay->addText(ss.str(), 5.0f, 25.0f, VulkanTextOverlay::alignLeft);
 
@@ -190,9 +173,9 @@ public:
 			{
 				for (int32_t z = -1; z <= 1; z += 2)
 				{
-					std::stringstream vpos;
+					std::stringstream										vpos;
 					vpos << std::showpos << x << "/" << y << "/" << z;
-					glm::vec3 projected = glm::project(glm::vec3((float)x, (float)y, (float)z), uboVS.model, uboVS.projection, glm::vec4(0, 0, (float)width, (float)height));
+					glm::vec3												projected = glm::project(glm::vec3((float)x, (float)y, (float)z), uboVS.model, uboVS.projection, glm::vec4(0, 0, (float)width, (float)height));
 					textOverlay->addText(vpos.str(), projected.x, projected.y + (y > -1 ? 5.0f : -20.0f), VulkanTextOverlay::alignCenter);
 				}
 			}
@@ -293,22 +276,22 @@ public:
 	}
 
 	void												preparePipelines			()								{
-		VkPipelineInputAssemblyStateCreateInfo					inputAssemblyState		= vks::initializers::pipelineInputAssemblyStateCreateInfo(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, 0, VK_FALSE);
-		VkPipelineRasterizationStateCreateInfo					rasterizationState		= vks::initializers::pipelineRasterizationStateCreateInfo(VK_POLYGON_MODE_FILL, VK_CULL_MODE_BACK_BIT, VK_FRONT_FACE_CLOCKWISE, 0);
-		VkPipelineColorBlendAttachmentState						blendAttachmentState	= vks::initializers::pipelineColorBlendAttachmentState(0xf, VK_FALSE);
-		VkPipelineColorBlendStateCreateInfo						colorBlendState			= vks::initializers::pipelineColorBlendStateCreateInfo(1, &blendAttachmentState);
-		VkPipelineDepthStencilStateCreateInfo					depthStencilState		= vks::initializers::pipelineDepthStencilStateCreateInfo(VK_TRUE, VK_TRUE, VK_COMPARE_OP_LESS_OR_EQUAL);
-		VkPipelineViewportStateCreateInfo						viewportState			= vks::initializers::pipelineViewportStateCreateInfo(1, 1, 0);
-		VkPipelineMultisampleStateCreateInfo					multisampleState		= vks::initializers::pipelineMultisampleStateCreateInfo(VK_SAMPLE_COUNT_1_BIT, 0);
-		std::vector<VkDynamicState>								dynamicStateEnables		= {VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR};
-		VkPipelineDynamicStateCreateInfo						dynamicState			= vks::initializers::pipelineDynamicStateCreateInfo(dynamicStateEnables.data(), static_cast<uint32_t>(dynamicStateEnables.size()), 0);
+		VkPipelineInputAssemblyStateCreateInfo					inputAssemblyState			= vks::initializers::pipelineInputAssemblyStateCreateInfo(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, 0, VK_FALSE);
+		VkPipelineRasterizationStateCreateInfo					rasterizationState			= vks::initializers::pipelineRasterizationStateCreateInfo(VK_POLYGON_MODE_FILL, VK_CULL_MODE_BACK_BIT, VK_FRONT_FACE_CLOCKWISE, 0);
+		VkPipelineColorBlendAttachmentState						blendAttachmentState		= vks::initializers::pipelineColorBlendAttachmentState(0xf, VK_FALSE);
+		VkPipelineColorBlendStateCreateInfo						colorBlendState				= vks::initializers::pipelineColorBlendStateCreateInfo(1, &blendAttachmentState);
+		VkPipelineDepthStencilStateCreateInfo					depthStencilState			= vks::initializers::pipelineDepthStencilStateCreateInfo(VK_TRUE, VK_TRUE, VK_COMPARE_OP_LESS_OR_EQUAL);
+		VkPipelineViewportStateCreateInfo						viewportState				= vks::initializers::pipelineViewportStateCreateInfo(1, 1, 0);
+		VkPipelineMultisampleStateCreateInfo					multisampleState			= vks::initializers::pipelineMultisampleStateCreateInfo(VK_SAMPLE_COUNT_1_BIT, 0);
+		std::vector<VkDynamicState>								dynamicStateEnables			= {VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR};
+		VkPipelineDynamicStateCreateInfo						dynamicState				= vks::initializers::pipelineDynamicStateCreateInfo(dynamicStateEnables.data(), static_cast<uint32_t>(dynamicStateEnables.size()), 0);
 
 		// Wire frame rendering pipeline
-		std::array<VkPipelineShaderStageCreateInfo, 2>			shaderStages			= {};
+		std::array<VkPipelineShaderStageCreateInfo, 2>			shaderStages				= {};
 		shaderStages[0] = loadShader(getAssetPath() + "shaders/textoverlay/mesh.vert.spv", VK_SHADER_STAGE_VERTEX_BIT);
 		shaderStages[1] = loadShader(getAssetPath() + "shaders/textoverlay/mesh.frag.spv", VK_SHADER_STAGE_FRAGMENT_BIT);
 
-		VkGraphicsPipelineCreateInfo							pipelineCreateInfo		= vks::initializers::pipelineCreateInfo(pipelineLayout, renderPass, 0);
+		VkGraphicsPipelineCreateInfo							pipelineCreateInfo			= vks::initializers::pipelineCreateInfo(pipelineLayout, renderPass, 0);
 
 		pipelineCreateInfo.pVertexInputState				= &vertices.inputState;
 		pipelineCreateInfo.pInputAssemblyState				= &inputAssemblyState;
@@ -348,7 +331,7 @@ public:
 		// Vertex shader
 		uboVS.projection									= glm::perspective(glm::radians(60.0f), (float)width / (float)height, 0.1f, 256.0f);
 
-		glm::mat4												viewMatrix = glm::translate(glm::mat4(), glm::vec3(0.0f, 0.0f, zoom));
+		glm::mat4												viewMatrix					= glm::translate(glm::mat4(), glm::vec3(0.0f, 0.0f, zoom));
 
 		uboVS.model											= viewMatrix * glm::translate(glm::mat4(), cameraPos);
 		uboVS.model											= glm::rotate(uboVS.model, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
@@ -375,9 +358,6 @@ public:
 		submitInfo.commandBufferCount						= 1;
 		submitInfo.pCommandBuffers							= &drawCmdBuffers[currentBuffer];
 
-		// Submit to queue
-		//VK_CHECK_RESULT(vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE));
-
 		// Submit text overlay to queue
 		textOverlay->submit(queue, currentBuffer, submitInfo);
 
@@ -401,9 +381,10 @@ public:
 	virtual void										render						()								{
 		if (!prepared)
 			return;
+		
 		draw();
-		if (frameCounter == 0)
-		{
+		
+		if (frameCounter == 0) {
 			vkDeviceWaitIdle(device);
 			updateTextOverlay();
 		}
@@ -417,8 +398,7 @@ public:
 
 	virtual void										windowResized				()								{ updateTextOverlay(); }
 	virtual void										keyPressed					(uint32_t keyCode)				{
-		switch (keyCode)
-		{
+		switch (keyCode) {
 		case KEY_KPADD:
 		case KEY_SPACE:
 			textOverlay->visible = !textOverlay->visible;
