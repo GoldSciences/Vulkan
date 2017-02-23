@@ -1,32 +1,16 @@
-/*
-* Vulkan Example - Text overlay rendering on-top of an existing scene using a separate render pass
-*
-* Copyright (C) 2016 by Sascha Willems - www.saschawillems.de
-*
-* This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
-*/
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <assert.h>
-#include <vector>
+// Vulkan Example - Text overlay rendering on-top of an existing scene using a separate render pass
+// 
+// Copyright (C) 2016 by Sascha Willems - www.saschawillems.de
+// 
+// This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 #include <sstream>
 #include <iomanip>
 
-#define GLM_FORCE_RADIANS
-#define GLM_FORCE_DEPTH_ZERO_TO_ONE
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/matrix_inverse.hpp>
-
-#include <vulkan/vulkan.h>
-
 #include "vulkanexamplebase.h"
-#include "VulkanDevice.hpp"
-#include "VulkanBuffer.hpp"
 #include "VulkanModel.hpp"
 #include "VulkanTexture.hpp"
+
+#include <glm/gtc/matrix_inverse.hpp>
 
 #include "../external/stb/stb_font_consolas_24_latin1.inl"
 
