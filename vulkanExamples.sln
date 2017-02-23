@@ -175,30 +175,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "deferredshadows", "deferred
 		{3977789C-B360-4E1B-A100-3D71A1567723} = {3977789C-B360-4E1B-A100-3D71A1567723}
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Base", "Base", "{09B9A54B-FC57-4A98-9671-5706FC3846C9}"
-	ProjectSection(SolutionItems) = preProject
-		base\camera.hpp = base\camera.hpp
-		base\frustum.hpp = base\frustum.hpp
-		base\threadpool.hpp = base\threadpool.hpp
-		base\vulkanandroid.cpp = base\vulkanandroid.cpp
-		base\vulkanandroid.h = base\vulkanandroid.h
-		base\VulkanBuffer.hpp = base\VulkanBuffer.hpp
-		base\vulkandebug.cpp = base\vulkandebug.cpp
-		base\vulkandebug.h = base\vulkandebug.h
-		base\VulkanDevice.hpp = base\VulkanDevice.hpp
-		base\vulkanexamplebase.cpp = base\vulkanexamplebase.cpp
-		base\vulkanexamplebase.h = base\vulkanexamplebase.h
-		base\VulkanFrameBuffer.hpp = base\VulkanFrameBuffer.hpp
-		base\VulkanHeightmap.hpp = base\VulkanHeightmap.hpp
-		base\VulkanInitializers.hpp = base\VulkanInitializers.hpp
-		base\VulkanModel.hpp = base\VulkanModel.hpp
-		base\vulkanswapchain.hpp = base\vulkanswapchain.hpp
-		base\vulkantextoverlay.hpp = base\vulkantextoverlay.hpp
-		base\VulkanTexture.hpp = base\VulkanTexture.hpp
-		base\VulkanTools.h = base\VulkanTools.h
-		base\VulkanTools.hpp = base\VulkanTools.hpp
-	EndProjectSection
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "indirectdraw", "indirectdraw\indirectdraw.vcxproj", "{2BBDD10F-2C9D-4BEA-8C7B-1C510A2CE08B}"
 	ProjectSection(ProjectDependencies) = postProject
 		{3977789C-B360-4E1B-A100-3D71A1567723} = {3977789C-B360-4E1B-A100-3D71A1567723}
