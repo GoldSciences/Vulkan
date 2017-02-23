@@ -17,7 +17,7 @@
 class VulkanExample : public VulkanExampleBase
 {
 public:
-	bool splitScreen = true;
+	bool													splitScreen					= true;
 
 	struct {
 		vks::Texture2D											colorMap;
@@ -69,8 +69,7 @@ public:
 	VkDescriptorSet											descriptorSet;
 	VkDescriptorSetLayout									descriptorSetLayout;		
 
-															VulkanExample				() : VulkanExampleBase(ENABLE_VALIDATION)
-	{
+															VulkanExample				() : VulkanExampleBase(ENABLE_VALIDATION)			{
 		zoom													= -6.5f;
 		rotation												= glm::vec3(-350.0f, 60.0f, 0.0f);
 		cameraPos												= glm::vec3(-3.0f, 2.3f, 0.0f);
@@ -83,8 +82,7 @@ public:
 		enabledFeatures.fillModeNonSolid						= VK_TRUE;
 	}
 
-															~VulkanExample				()
-	{
+															~VulkanExample				()													{
 		// Clean up used Vulkan resources 
 		// Note : Inherited destructor cleans up resources stored in base class
 		vkDestroyPipeline(device, pipelines.solid, nullptr);
@@ -101,18 +99,15 @@ public:
 		textures.colorMap.destroy();
 	}
 
-	void													reBuildCommandBuffers		()
-	{
-		if (!checkCommandBuffers())
-		{
+	void													reBuildCommandBuffers		()													{
+		if (!checkCommandBuffers ()) {
 			destroyCommandBuffers();
-			createCommandBuffers();
+			createCommandBuffers ();
 		}
 		buildCommandBuffers();
 	}
 
-	void													buildCommandBuffers			()
-	{
+	void													buildCommandBuffers			()													{
 		VkCommandBufferBeginInfo									cmdBufInfo						= vks::initializers::commandBufferBeginInfo();
 
 		VkClearValue												clearValues[2];
@@ -167,14 +162,12 @@ public:
 		}
 	}
 
-	void													loadAssets					()
-	{
+	void													loadAssets					()													{
 		models.object.loadFromFile(getAssetPath() + "models/lowpoly/deer.dae", vertexLayout, 1.0f, vulkanDevice, queue);
 		textures.colorMap.loadFromFile(getAssetPath() + "textures/deer.ktx", VK_FORMAT_BC3_UNORM_BLOCK, vulkanDevice, queue);
 	}
 
-	void													setupVertexDescriptions		()
-	{
+	void													setupVertexDescriptions		()													{
 		// Binding description
 		vertices.bindingDescriptions.resize(1);
 		vertices.bindingDescriptions[0]							= vks::initializers::vertexInputBindingDescription(VERTEX_BUFFER_BIND_ID, vertexLayout.stride(), VK_VERTEX_INPUT_RATE_VERTEX);
@@ -192,8 +185,7 @@ public:
 		vertices.inputState.pVertexAttributeDescriptions		= vertices.attributeDescriptions.data();
 	}
 
-	void													setupDescriptorPool			()
-	{
+	void													setupDescriptorPool			()													{
 		// Example uses two ubos and one combined image sampler
 		std::vector<VkDescriptorPoolSize>							poolSizes					=
 		{	vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 2)
@@ -205,8 +197,7 @@ public:
 		VK_CHECK_RESULT(vkCreateDescriptorPool(device, &descriptorPoolInfo, nullptr, &descriptorPool));
 	}
 
-	void													setupDescriptorSetLayout	()
-	{
+	void													setupDescriptorSetLayout	()													{
 		std::vector<VkDescriptorSetLayoutBinding>					setLayoutBindings			=
 		{	vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT, 0)		// Binding 0 : Tessellation control shader ubo
 		,	vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT, 1)	// Binding 1 : Tessellation evaluation shader ubo
@@ -221,8 +212,7 @@ public:
 		VK_CHECK_RESULT(vkCreatePipelineLayout(device, &pPipelineLayoutCreateInfo, nullptr, &pipelineLayout));
 	}
 
-	void													setupDescriptorSet			()
-	{
+	void													setupDescriptorSet			()													{
 		VkDescriptorSetAllocateInfo									allocInfo					= vks::initializers::descriptorSetAllocateInfo(descriptorPool, &descriptorSetLayout, 1);
 		VK_CHECK_RESULT(vkAllocateDescriptorSets(device, &allocInfo, &descriptorSet));
 
@@ -236,8 +226,7 @@ public:
 		vkUpdateDescriptorSets(device, static_cast<uint32_t>(writeDescriptorSets.size()), writeDescriptorSets.data(), 0, NULL);
 	}
 
-	void													preparePipelines			()
-	{
+	void													preparePipelines			()													{
 		VkPipelineInputAssemblyStateCreateInfo						inputAssemblyState			= vks::initializers::pipelineInputAssemblyStateCreateInfo(VK_PRIMITIVE_TOPOLOGY_PATCH_LIST, 0, VK_FALSE);
 		VkPipelineRasterizationStateCreateInfo						rasterizationState			= vks::initializers::pipelineRasterizationStateCreateInfo(VK_POLYGON_MODE_FILL, VK_CULL_MODE_BACK_BIT, VK_FRONT_FACE_COUNTER_CLOCKWISE, 0);
 		VkPipelineColorBlendAttachmentState							blendAttachmentState		= vks::initializers::pipelineColorBlendAttachmentState(0xf, VK_FALSE);
@@ -296,8 +285,7 @@ public:
 	}
 
 	// Prepare and initialize uniform buffer containing shader uniforms
-	void													prepareUniformBuffers		()
-	{
+	void													prepareUniformBuffers		()													{
 		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBuffers.tessEval, sizeof(uboTessEval)));			// Tessellation evaluation shader uniform buffer
 		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBuffers.tessControl, sizeof(uboTessControl)));	// Tessellation control shader uniform buffer
 
@@ -308,8 +296,7 @@ public:
 		updateUniformBuffers();
 	}
 
-	void													updateUniformBuffers		()
-	{
+	void													updateUniformBuffers		()													{
 		// Tessellation eval
 		glm::mat4 viewMatrix									= glm::mat4();
 		uboTessEval.projection									= glm::perspective(glm::radians(45.0f), (float)(width* ((splitScreen) ? 0.5f : 1.0f)) / (float)height, 0.1f, 256.0f);
@@ -325,8 +312,7 @@ public:
 		memcpy(uniformBuffers.tessControl.mapped, &uboTessControl, sizeof(uboTessControl));	// Tessellation control uniform block
 	}
 
-	void													draw						()
-	{
+	void													draw						()													{
 		VulkanExampleBase::prepareFrame();
 
 		submitInfo.commandBufferCount							= 1;
@@ -336,13 +322,10 @@ public:
 		VulkanExampleBase::submitFrame();
 	}
 
-	void													prepare						()
-	{
+	void													prepare						()													{
 		// Check if device supports tessellation shaders
 		if (!deviceFeatures.tessellationShader)
-		{
 			vks::tools::exitFatal("Selected GPU does not support tessellation shaders!", "Feature not supported");
-		}
 
 		VulkanExampleBase::prepare();
 		loadAssets();
@@ -356,8 +339,7 @@ public:
 		prepared = true;
 	}
 
-	virtual void											render						()
-	{
+	virtual void											render						()													{
 		if (!prepared)
 			return;
 		vkDeviceWaitIdle(device);
@@ -365,36 +347,22 @@ public:
 		vkDeviceWaitIdle(device);
 	}
 
-	virtual void											viewChanged					()
-	{
-		updateUniformBuffers();
-	}
-
-	virtual void											keyPressed					(uint32_t keyCode)
-	{
+	virtual void											viewChanged					()													{ updateUniformBuffers(); }
+	virtual void											keyPressed					(uint32_t keyCode)									{
 		switch (keyCode)
 		{
-		case KEY_KPADD:
-		case GAMEPAD_BUTTON_R1:
-			changeTessellationLevel(0.25);
-			break;
-		case KEY_KPSUB:
-		case GAMEPAD_BUTTON_L1:
-			changeTessellationLevel(-0.25);
-			break;
-		case KEY_W:
-		case GAMEPAD_BUTTON_A:
-			togglePipelines();
-			break;
-		case KEY_S:
-		case GAMEPAD_BUTTON_X:
-			toggleSplitScreen();
-			break;
+		case KEY_KPADD			:
+		case GAMEPAD_BUTTON_R1	: changeTessellationLevel( 0.25);	break;
+		case KEY_KPSUB			:
+		case GAMEPAD_BUTTON_L1	: changeTessellationLevel(-0.25);	break;
+		case KEY_W				:
+		case GAMEPAD_BUTTON_A	: togglePipelines();				break;
+		case KEY_S				:
+		case GAMEPAD_BUTTON_X	: toggleSplitScreen();				break;
 		}
 	}
 
-	virtual void											getOverlayText				(VulkanTextOverlay *textOverlay)
-	{
+	virtual void											getOverlayText				(VulkanTextOverlay *textOverlay)					{
 		std::stringstream											ss;
 		ss << std::setprecision(2) << std::fixed << uboTessControl.tessLevel;
 #if defined(__ANDROID__)
@@ -406,16 +374,14 @@ public:
 #endif
 	}
 
-	void													changeTessellationLevel		(float delta)
-	{
+	void													changeTessellationLevel		(float delta)										{
 		uboTessControl.tessLevel								+= delta;
 		uboTessControl.tessLevel								= fmax(1.0f, fmin(uboTessControl.tessLevel, 32.0f));	// Clamp
 		updateUniformBuffers();
 		updateTextOverlay();
 	}
 
-	void													togglePipelines				()
-	{
+	void													togglePipelines				()													{
 		if (pipelineRight == &pipelines.solid)
 		{
 			pipelineRight											= &pipelines.wire;
@@ -429,8 +395,7 @@ public:
 		reBuildCommandBuffers();
 	}
 
-	void													toggleSplitScreen			()
-	{
+	void													toggleSplitScreen			()													{
 		splitScreen												= !splitScreen;
 		updateUniformBuffers();
 		reBuildCommandBuffers();
