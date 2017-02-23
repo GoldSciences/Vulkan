@@ -85,18 +85,18 @@ public:
 															~VulkanExample				()													{
 		// Clean up used Vulkan resources 
 		// Note : Inherited destructor cleans up resources stored in base class
-		vkDestroyPipeline(device, pipelines.solid, nullptr);
-		vkDestroyPipeline(device, pipelines.wire, nullptr);
-		vkDestroyPipeline(device, pipelines.solidPassThrough, nullptr);
-		vkDestroyPipeline(device, pipelines.wirePassThrough, nullptr);
+		vkDestroyPipeline				(device, pipelines.solid			, nullptr);
+		vkDestroyPipeline				(device, pipelines.wire				, nullptr);
+		vkDestroyPipeline				(device, pipelines.solidPassThrough	, nullptr);
+		vkDestroyPipeline				(device, pipelines.wirePassThrough	, nullptr);
 
-		vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
-		vkDestroyDescriptorSetLayout(device, descriptorSetLayout, nullptr);
+		vkDestroyPipelineLayout			(device, pipelineLayout				, nullptr);
+		vkDestroyDescriptorSetLayout	(device, descriptorSetLayout		, nullptr);
 
-		models.object.destroy();
-		uniformBuffers.tessControl.destroy();
-		uniformBuffers.tessEval.destroy();
-		textures.colorMap.destroy();
+		models.object				.destroy();
+		uniformBuffers.tessControl	.destroy();
+		uniformBuffers.tessEval		.destroy();
+		textures.colorMap			.destroy();
 	}
 
 	void													reBuildCommandBuffers		()													{
