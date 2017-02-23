@@ -1,38 +1,23 @@
-/*
-* Vulkan Example - Dynamic uniform buffers
-*
-* Copyright (C) 2016 by Sascha Willems - www.saschawillems.de
-*
-* This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
-*
-* Summary:
-* Demonstrates the use of dynamic uniform buffers.
-*
-* Instead of using one uniform buffer per-object, this example allocates one big uniform buffer
-* with respect to the alignment reported by the device via minUniformBufferOffsetAlignment that
-* contains all matrices for the objects in the scene.
-*
-* The used descriptor type VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC then allows to set a dynamic
-* offset used to pass data from the single uniform buffer to the connected shader binding point.
-*/
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <assert.h>
-#include <vector>
-#include <array>
-#include <random>
-
-#define GLM_FORCE_RADIANS
-#define GLM_FORCE_DEPTH_ZERO_TO_ONE
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-
-#include <vulkan/vulkan.h>
+// Vulkan Example - Dynamic uniform buffers
+// 
+// Copyright (C) 2016 by Sascha Willems - www.saschawillems.de
+// 
+// This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
+// 
+// Summary:
+// Demonstrates the use of dynamic uniform buffers.
+// 
+// Instead of using one uniform buffer per-object, this example allocates one big uniform buffer
+// with respect to the alignment reported by the device via minUniformBufferOffsetAlignment that
+// contains all matrices for the objects in the scene.
+// 
+// The used descriptor type VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC then allows to set a dynamic
+// offset used to pass data from the single uniform buffer to the connected shader binding point.
 #include "vulkanexamplebase.h"
 #include "VulkanDevice.hpp"
 #include "VulkanBuffer.hpp"
+
+#include <random>
 
 #define VERTEX_BUFFER_BIND_ID 0
 #define ENABLE_VALIDATION false

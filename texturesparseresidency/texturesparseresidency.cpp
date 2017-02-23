@@ -1,39 +1,23 @@
-/*
-* Vulkan Example - Sparse texture residency example
-*
-* Copyright (C) 2016 by Sascha Willems - www.saschawillems.de
-*
-* This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
-*/
-
-/*
-todos: 
-- check sparse binding support on queue
-- residencyNonResidentStrict
-- meta data
-- Run-time image data upload
-*/
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <assert.h>
-#include <vector>
-#include <algorithm>
-#include <random>
-#include <chrono>
-
-#define GLM_FORCE_RADIANS
-#define GLM_FORCE_DEPTH_ZERO_TO_ONE
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-
-#include <vulkan/vulkan.h>
+// Vulkan Example - Sparse texture residency example
+// 
+// Copyright (C) 2016 by Sascha Willems - www.saschawillems.de
+// 
+// This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
+//
+// todos: 
+// - check sparse binding support on queue
+// - residencyNonResidentStrict
+// - meta data
+// - Run-time image data upload
 #include "vulkanexamplebase.h"
 #include "VulkanTexture.hpp"
 #include "VulkanDevice.hpp"
 #include "VulkanBuffer.hpp"
 #include "VulkanHeightmap.hpp"
+
+#include <algorithm>
+#include <random>
+#include <chrono>
 
 #define VERTEX_BUFFER_BIND_ID 0
 #define ENABLE_VALIDATION false

@@ -1,42 +1,26 @@
-/*
-* Vulkan Example - Indirect drawing 
-*
-* Copyright (C) 2016 by Sascha Willems - www.saschawillems.de
-*
-* This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
-*
-* Summary:
-* Use a device local buffer that stores draw commands for instanced rendering of different meshes stored
-* in the same buffer.
-*
-* Indirect drawing offloads draw command generation and offers the ability to update them on the GPU 
-* without the CPU having to touch the buffer again, also reducing the number of drawcalls.
-*
-* The example shows how to setup and fill such a buffer on the CPU side, stages it to the device and
-* shows how to render it using only one draw command.
-*
-* See readme.md for details
-*
-*/
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <assert.h>
-#include <time.h> 
-#include <vector>
-#include <random>
-
-#define GLM_FORCE_RADIANS
-#define GLM_FORCE_DEPTH_ZERO_TO_ONE
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-
-#include <vulkan/vulkan.h>
+// Vulkan Example - Indirect drawing 
+// 
+// Copyright (C) 2016 by Sascha Willems - www.saschawillems.de
+// 
+// This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
+// 
+// Summary:
+// Use a device local buffer that stores draw commands for instanced rendering of different meshes stored
+// in the same buffer.
+// 
+// Indirect drawing offloads draw command generation and offers the ability to update them on the GPU 
+// without the CPU having to touch the buffer again, also reducing the number of drawcalls.
+// 
+// The example shows how to setup and fill such a buffer on the CPU side, stages it to the device and
+// shows how to render it using only one draw command.
+// 
+// See readme.md for details
 #include "vulkanexamplebase.h"
 #include "VulkanBuffer.hpp"
 #include "VulkanTexture.hpp"
 #include "VulkanModel.hpp"
+
+#include <random>
 
 #define VERTEX_BUFFER_BIND_ID 0
 #define INSTANCE_BUFFER_BIND_ID 1

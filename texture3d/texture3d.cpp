@@ -1,30 +1,16 @@
-/*
-* Vulkan Example - 3D texture loading (and generation using perlin noise) example
-*
-* Copyright (C) 2016 by Sascha Willems - www.saschawillems.de
-*
-* This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
-*/
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <assert.h>
-#include <vector>
-#include <random>
-#include <numeric>
-#include <ctime>
-
-#define GLM_FORCE_RADIANS
-#define GLM_FORCE_DEPTH_ZERO_TO_ONE
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-
-#include <vulkan/vulkan.h>
+// Vulkan Example - 3D texture loading (and generation using perlin noise) example
+// 
+// Copyright (C) 2016 by Sascha Willems - www.saschawillems.de
+// 
+// This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 #include "vulkanexamplebase.h"
 #include "VulkanDevice.hpp"
 #include "VulkanBuffer.hpp"
 #include "VulkanModel.hpp"
+
+#include <random>
+#include <numeric>
+#include <ctime>
 
 #define VERTEX_BUFFER_BIND_ID 0
 #define ENABLE_VALIDATION false
