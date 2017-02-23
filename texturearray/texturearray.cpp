@@ -412,13 +412,7 @@ public:
 		// Describes memory layout and shader positions
 		vertices.attributeDescriptions.resize(2);
 		// Location 0 : Position
-		vertices.attributeDescriptions[0] =
-			vks::initializers::vertexInputAttributeDescription(
-				VERTEX_BUFFER_BIND_ID,
-				0,
-				VK_FORMAT_R32G32B32_SFLOAT,
-				0);
-		// Location 1 : Texture coordinates
+		vertices.attributeDescriptions[0] = vks::initializers::vertexInputAttributeDescription(VERTEX_BUFFER_BIND_ID, 0, VK_FORMAT_R32G32B32_SFLOAT, 0);		// Location 1 : Texture coordinates
 		vertices.attributeDescriptions[1] =
 			vks::initializers::vertexInputAttributeDescription(
 				VERTEX_BUFFER_BIND_ID,
