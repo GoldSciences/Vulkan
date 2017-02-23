@@ -429,7 +429,7 @@ public:
 		reBuildCommandBuffers();
 	}
 
-	void toggleSplitScreen()
+	void													toggleSplitScreen			()
 	{
 		splitScreen												= !splitScreen;
 		updateUniformBuffers();
