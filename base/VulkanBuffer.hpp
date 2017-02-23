@@ -1,13 +1,8 @@
-/*
-* Vulkan buffer class
-*
-* Encapsulates a Vulkan buffer
-*
-* Copyright (C) 2016 by Sascha Willems - www.saschawillems.de
-*
-* This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
-*/
-
+// Vulkan buffer class
+// 
+// Copyright (C) 2016 by Sascha Willems - www.saschawillems.de
+// 
+// This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 #pragma once
 
 #include <vector>
@@ -48,16 +43,10 @@ namespace vks
 			descriptor.range			= size;
 		}
 
-		// Copies the specified data to the mapped buffer
-		// 
-		// data					: Pointer to the data to copy
-		// size					: Size of the data to copy in machine units
+		// Copies the specified data to the mapped buffer. The size parameter is the size of the data to copy in machine units.
 		void						copyTo					(void* data, VkDeviceSize size)									{ assert(mapped); memcpy(mapped, data, (size_t)size); }
 
-		// Flush a memory range of the buffer to make it visible to the device. Only required for non-coherent memory. Returns VkResult of the flush call
-		// 
-		// size (Optional)		: Size of the memory range to flush. Pass VK_WHOLE_SIZE to flush the complete buffer range.
-		// offset (Optional)	: Byte offset from beginning
+		// Flush a memory range of the buffer to make it visible to the device. Only required for non-coherent memory. Returns VkResult of the flush call. Pass VK_WHOLE_SIZE to flush the complete buffer range.
 		VkResult					flush					(VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0)	{
 			VkMappedMemoryRange				mappedRange = {};
 			mappedRange.sType			= VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
@@ -67,10 +56,7 @@ namespace vks
 			return vkFlushMappedMemoryRanges(device, 1, &mappedRange);
 		}
 
-		// Invalidate a memory range of the buffer to make it visible to the host. Only required for non-coherent memory. Returns VkResult of the invalidate call
-		// 
-		// size (Optional)		: Size of the memory range to invalidate. Pass VK_WHOLE_SIZE to invalidate the complete buffer range.
-		// offset (Optional)	: Byte offset from beginning
+		// Invalidate a memory range of the buffer to make it visible to the host. Only required for non-coherent memory. Returns VkResult of the invalidate call. Pass VK_WHOLE_SIZE to invalidate the complete buffer range.
 		VkResult					invalidate				(VkDeviceSize size = VK_WHOLE_SIZE, VkDeviceSize offset = 0)	{
 			VkMappedMemoryRange				mappedRange = {};
 			mappedRange.sType			= VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
@@ -81,7 +67,7 @@ namespace vks
 		}
 
 		// Release all Vulkan resources held by this buffer
-		void						destroy()																				{
+		void						destroy					()																{
 			if(buffer)	vkDestroyBuffer(device, buffer, nullptr);
 			if(memory)	vkFreeMemory(device, memory, nullptr);
 		}

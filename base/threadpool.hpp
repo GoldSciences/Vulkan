@@ -1,11 +1,8 @@
-/*
-* Basic C++11 based thread pool with per-thread job queues
-*
-* Copyright (C) 2016 by Sascha Willems - www.saschawillems.de
-*
-* This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
-*/
-
+// Basic C++11 based thread pool with per-thread job queues
+// 
+// Copyright (C) 2016 by Sascha Willems - www.saschawillems.de
+// 
+// This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 #include <vector>
 #include <thread>
 #include <queue>
@@ -27,7 +24,7 @@ namespace vks
 		std::condition_variable					condition;
 
 		// Loop through all remaining jobs
-		void									queueLoop		()																{
+		void									queueLoop		()									{
 			while (true) {
 				std::function<void()>					job;
 				{
@@ -49,8 +46,8 @@ namespace vks
 		}
 
 	public:
-												Thread			()			: worker(std::thread(&Thread::queueLoop, this))		{}
-												~Thread			()			{
+												Thread			()									: worker(std::thread(&Thread::queueLoop, this))		{}
+												~Thread			()									{
 			if (worker.joinable()) {
 				wait();
 				queueMutex.lock();
@@ -62,8 +59,8 @@ namespace vks
 		}
 
 		
-		void									addJob			(std::function<void()> function)								{ std::lock_guard	<std::mutex> lock(queueMutex); jobQueue.push(std::move(function)); condition.notify_one();	}	// Add a new job to the thread's queue
-		void									wait			()																{ std::unique_lock	<std::mutex> lock(queueMutex); condition.wait(lock, [this]() { return jobQueue.empty(); });	}	// Wait until all work items have been finished
+		void									addJob			(std::function<void()> function)	{ std::lock_guard	<std::mutex> lock(queueMutex); jobQueue.push(std::move(function)); condition.notify_one();	}	// Add a new job to the thread's queue
+		void									wait			()									{ std::unique_lock	<std::mutex> lock(queueMutex); condition.wait(lock, [this]() { return jobQueue.empty(); });	}	// Wait until all work items have been finished
 	};	// class
 	
 	class ThreadPool
@@ -72,14 +69,14 @@ namespace vks
 		std::vector<std::unique_ptr<Thread>>	threads;
 
 		// Sets the number of threads to be allocted in this pool
-		void									setThreadCount	(uint32_t count)												{
+		void									setThreadCount	(uint32_t count)					{
 			threads.clear();
 			for (uint32_t i = 0; i < count; ++i)
 				threads.push_back(make_unique<Thread>());
 		}
 
 		// Wait until all threads have finished their work items
-		void									wait			()																{
+		void									wait			()									{
 			for (auto &thread : threads)
 				thread->wait();
 		}
