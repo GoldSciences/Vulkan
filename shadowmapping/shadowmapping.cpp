@@ -182,11 +182,11 @@ public:
 		attachmentDescription.initialLayout						= VK_IMAGE_LAYOUT_UNDEFINED;							// We don't care about initial layout of the attachment
 		attachmentDescription.finalLayout						= VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;		// Attachment will be transitioned to shader read at render pass end
 
-		VkAttachmentReference										depthReference							= {};
+		VkAttachmentReference										depthReference						= {};
 		depthReference.attachment								= 0;
 		depthReference.layout									= VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;		// Attachment will be used as depth/stencil during render pass
 
-		VkSubpassDescription										subpass									= {};
+		VkSubpassDescription										subpass								= {};
 		subpass.pipelineBindPoint								= VK_PIPELINE_BIND_POINT_GRAPHICS;
 		subpass.colorAttachmentCount							= 0;													// No color attachments
 		subpass.pDepthStencilAttachment							= &depthReference;										// Reference to our depth attachment
@@ -209,7 +209,7 @@ public:
 		dependencies[1].dstAccessMask							= VK_ACCESS_MEMORY_READ_BIT;
 		dependencies[1].dependencyFlags							= VK_DEPENDENCY_BY_REGION_BIT;
 
-		VkRenderPassCreateInfo										renderPassCreateInfo					= vks::initializers::renderPassCreateInfo();
+		VkRenderPassCreateInfo										renderPassCreateInfo				= vks::initializers::renderPassCreateInfo();
 		renderPassCreateInfo.attachmentCount					= 1;
 		renderPassCreateInfo.pAttachments						= &attachmentDescription;
 		renderPassCreateInfo.subpassCount						= 1;
@@ -226,10 +226,10 @@ public:
 		offscreenPass.width										= SHADOWMAP_DIM;
 		offscreenPass.height									= SHADOWMAP_DIM;
 
-		VkFormat													fbColorFormat							= FB_COLOR_FORMAT;
+		VkFormat													fbColorFormat						= FB_COLOR_FORMAT;
 
 		// For shadow mapping we only need a depth attachment
-		VkImageCreateInfo											image									= vks::initializers::imageCreateInfo();
+		VkImageCreateInfo											image								= vks::initializers::imageCreateInfo();
 		image.imageType											= VK_IMAGE_TYPE_2D;
 		image.extent.width										= offscreenPass.width;
 		image.extent.height										= offscreenPass.height;
@@ -242,7 +242,7 @@ public:
 		image.usage											= VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;		// We will sample directly from the depth attachment for the shadow mapping
 		VK_CHECK_RESULT(vkCreateImage(device, &image, nullptr, &offscreenPass.depth.image));
 
-		VkMemoryAllocateInfo										memAlloc								= vks::initializers::memoryAllocateInfo();
+		VkMemoryAllocateInfo										memAlloc							= vks::initializers::memoryAllocateInfo();
 		VkMemoryRequirements										memReqs;
 		vkGetImageMemoryRequirements(device, offscreenPass.depth.image, &memReqs);
 		memAlloc.allocationSize									= memReqs.size;
@@ -250,7 +250,7 @@ public:
 		VK_CHECK_RESULT(vkAllocateMemory(device, &memAlloc, nullptr, &offscreenPass.depth.mem));
 		VK_CHECK_RESULT(vkBindImageMemory(device, offscreenPass.depth.image, offscreenPass.depth.mem, 0));
 
-		VkImageViewCreateInfo										depthStencilView						= vks::initializers::imageViewCreateInfo();
+		VkImageViewCreateInfo										depthStencilView					= vks::initializers::imageViewCreateInfo();
 		depthStencilView.viewType								= VK_IMAGE_VIEW_TYPE_2D;
 		depthStencilView.format									= DEPTH_FORMAT;
 		depthStencilView.subresourceRange						= {};
@@ -264,7 +264,7 @@ public:
 
 		// Create sampler to sample from to depth attachment 
 		// Used to sample in the fragment shader for shadowed rendering
-		VkSamplerCreateInfo											sampler									= vks::initializers::samplerCreateInfo();
+		VkSamplerCreateInfo											sampler								= vks::initializers::samplerCreateInfo();
 		sampler.magFilter										= SHADOWMAP_FILTER;
 		sampler.minFilter										= SHADOWMAP_FILTER;
 		sampler.mipmapMode										= VK_SAMPLER_MIPMAP_MODE_LINEAR;
@@ -281,7 +281,7 @@ public:
 		prepareOffscreenRenderpass();
 
 		// Create frame buffer
-		VkFramebufferCreateInfo										fbufCreateInfo							= vks::initializers::framebufferCreateInfo();
+		VkFramebufferCreateInfo										fbufCreateInfo						= vks::initializers::framebufferCreateInfo();
 		fbufCreateInfo.renderPass								= offscreenPass.renderPass; 
 		fbufCreateInfo.attachmentCount							= 1;
 		fbufCreateInfo.pAttachments								= &offscreenPass.depth.view;
@@ -294,35 +294,35 @@ public:
 
 	void													buildOffscreenCommandBuffer			()											{
 		if (offscreenPass.commandBuffer == VK_NULL_HANDLE)
-			offscreenPass.commandBuffer								= VulkanExampleBase::createCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY, false);
+			offscreenPass.commandBuffer																		= VulkanExampleBase::createCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY, false);
 
 		if (offscreenPass.semaphore == VK_NULL_HANDLE) {
 			// Create a semaphore used to synchronize offscreen rendering and usage
-			VkSemaphoreCreateInfo										semaphoreCreateInfo			= vks::initializers::semaphoreCreateInfo();
+			VkSemaphoreCreateInfo										semaphoreCreateInfo					= vks::initializers::semaphoreCreateInfo();
 			VK_CHECK_RESULT(vkCreateSemaphore(device, &semaphoreCreateInfo, nullptr, &offscreenPass.semaphore));
 		}
 
-		VkCommandBufferBeginInfo									cmdBufInfo						= vks::initializers::commandBufferBeginInfo();
+		VkCommandBufferBeginInfo									cmdBufInfo							= vks::initializers::commandBufferBeginInfo();
 
-		VkClearValue clearValues[1];
-		clearValues[0].depthStencil = { 1.0f, 0 };
+		VkClearValue												clearValues[1];
+		clearValues[0].depthStencil								= { 1.0f, 0 };
 
-		VkRenderPassBeginInfo renderPassBeginInfo = vks::initializers::renderPassBeginInfo();
-		renderPassBeginInfo.renderPass = offscreenPass.renderPass;
-		renderPassBeginInfo.framebuffer = offscreenPass.frameBuffer;
-		renderPassBeginInfo.renderArea.offset.x = 0;
-		renderPassBeginInfo.renderArea.offset.y = 0;
-		renderPassBeginInfo.renderArea.extent.width = offscreenPass.width;
-		renderPassBeginInfo.renderArea.extent.height = offscreenPass.height;
-		renderPassBeginInfo.clearValueCount = 2;
-		renderPassBeginInfo.pClearValues = clearValues;
+		VkRenderPassBeginInfo										renderPassBeginInfo					= vks::initializers::renderPassBeginInfo();
+		renderPassBeginInfo.renderPass							= offscreenPass.renderPass;
+		renderPassBeginInfo.framebuffer							= offscreenPass.frameBuffer;
+		renderPassBeginInfo.renderArea.offset.x					= 0;
+		renderPassBeginInfo.renderArea.offset.y					= 0;
+		renderPassBeginInfo.renderArea.extent.width				= offscreenPass.width;
+		renderPassBeginInfo.renderArea.extent.height			= offscreenPass.height;
+		renderPassBeginInfo.clearValueCount						= 2;
+		renderPassBeginInfo.pClearValues						= clearValues;
 
 		VK_CHECK_RESULT(vkBeginCommandBuffer(offscreenPass.commandBuffer, &cmdBufInfo));
 
-		VkViewport viewport = vks::initializers::viewport((float)offscreenPass.width, (float)offscreenPass.height, 0.0f, 1.0f);
+		VkViewport													viewport							= vks::initializers::viewport((float)offscreenPass.width, (float)offscreenPass.height, 0.0f, 1.0f);
 		vkCmdSetViewport(offscreenPass.commandBuffer, 0, 1, &viewport);
 
-		VkRect2D scissor = vks::initializers::rect2D(offscreenPass.width, offscreenPass.height, 0, 0);
+		VkRect2D													scissor								= vks::initializers::rect2D(offscreenPass.width, offscreenPass.height, 0, 0);
 		vkCmdSetScissor(offscreenPass.commandBuffer, 0, 1, &scissor);
 
 		// Set depth bias (aka "Polygon offset"). Required to avoid shadow mapping artefacts
@@ -333,7 +333,7 @@ public:
 		vkCmdBindPipeline(offscreenPass.commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines.offscreen);
 		vkCmdBindDescriptorSets(offscreenPass.commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayouts.offscreen, 0, 1, &descriptorSets.offscreen, 0, NULL);
 
-		VkDeviceSize offsets[1] = { 0 };
+		VkDeviceSize												offsets	[1]							= { 0 };
 		vkCmdBindVertexBuffers(offscreenPass.commandBuffer, VERTEX_BUFFER_BIND_ID, 1, &models.scene.vertices.buffer, offsets);
 		vkCmdBindIndexBuffer(offscreenPass.commandBuffer, models.scene.indices.buffer, 0, VK_INDEX_TYPE_UINT32);
 		vkCmdDrawIndexed(offscreenPass.commandBuffer, models.scene.indexCount, 1, 0, 0, 0);
@@ -361,20 +361,17 @@ public:
 		for (size_t i = 0; i < drawCmdBuffers.size(); ++i)
 		{
 			// Set target frame buffer
-			renderPassBeginInfo.framebuffer = frameBuffers[i];
-
+			renderPassBeginInfo.framebuffer							= frameBuffers[i];
 			VK_CHECK_RESULT(vkBeginCommandBuffer(drawCmdBuffers[i], &cmdBufInfo));
-
 			vkCmdBeginRenderPass(drawCmdBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 
-			VkViewport viewport = vks::initializers::viewport((float)width, (float)height, 0.0f, 1.0f);
+			VkViewport													viewport							= vks::initializers::viewport((float)width, (float)height, 0.0f, 1.0f);
 			vkCmdSetViewport(drawCmdBuffers[i], 0, 1, &viewport);
 
-			VkRect2D scissor = vks::initializers::rect2D(width, height, 0, 0);
+			VkRect2D													scissor								= vks::initializers::rect2D(width, height, 0, 0);
 			vkCmdSetScissor(drawCmdBuffers[i], 0, 1, &scissor);
 
-			VkDeviceSize offsets[1] = { 0 };
-
+			VkDeviceSize												offsets	[1]							= { 0 };
 			vkCmdBindDescriptorSets(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayouts.quad, 0, 1, &descriptorSet, 0, NULL);
 			vkCmdBindPipeline(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines.quad);
 
