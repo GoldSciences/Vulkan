@@ -123,11 +123,11 @@ public:
 	}														offscreenPass;
 
 															VulkanExample						()											: VulkanExampleBase(ENABLE_VALIDATION)	{
-		zoom				= -20.0f;
-		rotation			= { -15.0f, -390.0f, 0.0f };
-		enableTextOverlay	= true;
-		title				= "Vulkan Example - Projected shadow mapping";
-		timerSpeed			*= 0.5f;
+		zoom													= -20.0f;
+		rotation												= { -15.0f, -390.0f, 0.0f };
+		enableTextOverlay										= true;
+		title													= "Vulkan Example - Projected shadow mapping";
+		timerSpeed												*= 0.5f;
 	}
 
 															~VulkanExample						()											{
