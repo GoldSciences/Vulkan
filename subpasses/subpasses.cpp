@@ -98,8 +98,7 @@ public:
 		FrameBufferAttachment									position, normal, albedo;
 	}														attachments;
 	
-															VulkanExample							() : VulkanExampleBase(ENABLE_VALIDATION)
-	{
+															VulkanExample							()																					: VulkanExampleBase(ENABLE_VALIDATION) {
 		enableTextOverlay										= false;
 		title													= "Vulkan Example - Subpasses";
 		camera.type												= Camera::CameraType::firstperson;
@@ -112,34 +111,33 @@ public:
 		camera.setPerspective(60.0f, (float)width / (float)height, 0.1f, 256.0f);
 	}
 
-															~VulkanExample							()
-	{
+															~VulkanExample							()																					{
 		// Clean up used Vulkan resources 
 		// Note : Inherited destructor cleans up resources stored in base class
 
-		vkDestroyImageView(device, attachments.position.view, nullptr);
-		vkDestroyImage(device, attachments.position.image, nullptr);
-		vkFreeMemory(device, attachments.position.mem, nullptr);
+		vkDestroyImageView				(device, attachments.position.view			, nullptr);
+		vkDestroyImage					(device, attachments.position.image			, nullptr);
+		vkFreeMemory					(device, attachments.position.mem			, nullptr);
 
-		vkDestroyImageView(device, attachments.normal.view, nullptr);
-		vkDestroyImage(device, attachments.normal.image, nullptr);
-		vkFreeMemory(device, attachments.normal.mem, nullptr);
+		vkDestroyImageView				(device, attachments.normal.view			, nullptr);
+		vkDestroyImage					(device, attachments.normal.image			, nullptr);
+		vkFreeMemory					(device, attachments.normal.mem				, nullptr);
 
-		vkDestroyImageView(device, attachments.albedo.view, nullptr);
-		vkDestroyImage(device, attachments.albedo.image, nullptr);
-		vkFreeMemory(device, attachments.albedo.mem, nullptr);
+		vkDestroyImageView				(device, attachments.albedo.view			, nullptr);
+		vkDestroyImage					(device, attachments.albedo.image			, nullptr);
+		vkFreeMemory					(device, attachments.albedo.mem				, nullptr);
 
-		vkDestroyPipeline(device, pipelines.offscreen, nullptr);
-		vkDestroyPipeline(device, pipelines.composition, nullptr);
-		vkDestroyPipeline(device, pipelines.transparent, nullptr);
+		vkDestroyPipeline				(device, pipelines.offscreen				, nullptr);
+		vkDestroyPipeline				(device, pipelines.composition				, nullptr);
+		vkDestroyPipeline				(device, pipelines.transparent				, nullptr);
 
-		vkDestroyPipelineLayout(device, pipelineLayouts.offscreen, nullptr);
-		vkDestroyPipelineLayout(device, pipelineLayouts.composition, nullptr);
-		vkDestroyPipelineLayout(device, pipelineLayouts.transparent, nullptr);
+		vkDestroyPipelineLayout			(device, pipelineLayouts.offscreen			, nullptr);
+		vkDestroyPipelineLayout			(device, pipelineLayouts.composition		, nullptr);
+		vkDestroyPipelineLayout			(device, pipelineLayouts.transparent		, nullptr);
 
-		vkDestroyDescriptorSetLayout(device, descriptorSetLayouts.scene, nullptr);
-		vkDestroyDescriptorSetLayout(device, descriptorSetLayouts.composition, nullptr);
-		vkDestroyDescriptorSetLayout(device, descriptorSetLayouts.transparent, nullptr);
+		vkDestroyDescriptorSetLayout	(device, descriptorSetLayouts.scene			, nullptr);
+		vkDestroyDescriptorSetLayout	(device, descriptorSetLayouts.composition	, nullptr);
+		vkDestroyDescriptorSetLayout	(device, descriptorSetLayouts.transparent	, nullptr);
 
 		textures.glass.destroy();
 		models.scene.destroy();
@@ -149,22 +147,19 @@ public:
 	}
 
 	// Create a frame buffer attachment
-	void													createAttachment						(VkFormat format, VkImageUsageFlags usage, FrameBufferAttachment *attachment)
-	{
+	void													createAttachment						(VkFormat format, VkImageUsageFlags usage, FrameBufferAttachment *attachment)		{
 		VkImageAspectFlags											aspectMask					= 0;
 		VkImageLayout												imageLayout;
 
 		attachment->format										= format;
 
-		if (usage & VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT)
-		{
-			aspectMask		= VK_IMAGE_ASPECT_COLOR_BIT;
-			imageLayout		= VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+		if (usage & VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT) {
+			aspectMask												= VK_IMAGE_ASPECT_COLOR_BIT;
+			imageLayout												= VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 		}
-		if (usage & VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT)
-		{
-			aspectMask		= VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT;
-			imageLayout		= VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+		if (usage & VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT) {
+			aspectMask												= VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT;
+			imageLayout												= VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 		}
 
 		assert(aspectMask > 0);
@@ -187,8 +182,8 @@ public:
 
 		VK_CHECK_RESULT(vkCreateImage(device, &image, nullptr, &attachment->image));
 		vkGetImageMemoryRequirements(device, attachment->image, &memReqs);
-		memAlloc.allocationSize								= memReqs.size;
-		memAlloc.memoryTypeIndex							= vulkanDevice->getMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+		memAlloc.allocationSize									= memReqs.size;
+		memAlloc.memoryTypeIndex								= vulkanDevice->getMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 		VK_CHECK_RESULT(vkAllocateMemory(device, &memAlloc, nullptr, &attachment->mem));
 		VK_CHECK_RESULT(vkBindImageMemory(device, attachment->image, attachment->mem, 0));
 
@@ -206,8 +201,7 @@ public:
 	}
 
 	// Create color attachments for the G-Buffer components
-	void													createGBufferAttachments				()
-	{
+	void													createGBufferAttachments				()																					{
 		createAttachment(VK_FORMAT_R16G16B16A16_SFLOAT	, VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, &attachments.position	);	// (World space) Positions		
 		createAttachment(VK_FORMAT_R16G16B16A16_SFLOAT	, VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, &attachments.normal		);	// (World space) Normals		
 		createAttachment(VK_FORMAT_R8G8B8A8_UNORM		, VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, &attachments.albedo		);	// Albedo (color)
@@ -215,8 +209,7 @@ public:
 
 	// Override framebuffer setup from base class
 	// Deferred components will be used as frame buffer attachments
-	void													setupFrameBuffer						()
-	{
+	void													setupFrameBuffer						()																					{
 		VkImageView													attachments[5];
 		VkFramebufferCreateInfo										frameBufferCreateInfo		= {};
 		frameBufferCreateInfo.sType								= VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
@@ -242,8 +235,7 @@ public:
 	}
 
 	// Override render pass setup from base class
-	void													setupRenderPass							()
-	{
+	void													setupRenderPass							()																					{
 		createGBufferAttachments(); 
 
 		std::array<VkAttachmentDescription, 5>						attachments{};
@@ -397,8 +389,7 @@ public:
 		VK_CHECK_RESULT(vkCreateRenderPass(device, &renderPassInfo, nullptr, &renderPass));
 	}
 
-	void													buildCommandBuffers						()
-	{
+	void													buildCommandBuffers						()																					{
 		VkCommandBufferBeginInfo									cmdBufInfo					= vks::initializers::commandBufferBeginInfo();
 
 		VkClearValue												clearValues[5];
@@ -437,31 +428,31 @@ public:
 
 			VkDeviceSize												offsets[1]					= { 0 };
 
-			vkCmdBindPipeline(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines.offscreen);
+			vkCmdBindPipeline			(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines.offscreen);
 
-			vkCmdBindDescriptorSets(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayouts.offscreen, 0, 1, &descriptorSets.scene, 0, NULL);
-			vkCmdBindVertexBuffers(drawCmdBuffers[i], VERTEX_BUFFER_BIND_ID, 1, &models.scene.vertices.buffer, offsets);
-			vkCmdBindIndexBuffer(drawCmdBuffers[i], models.scene.indices.buffer, 0, VK_INDEX_TYPE_UINT32);
-			vkCmdDrawIndexed(drawCmdBuffers[i], models.scene.indexCount, 1, 0, 0, 0);
+			vkCmdBindDescriptorSets		(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayouts.offscreen, 0, 1, &descriptorSets.scene, 0, NULL);
+			vkCmdBindVertexBuffers		(drawCmdBuffers[i], VERTEX_BUFFER_BIND_ID, 1, &models.scene.vertices.buffer, offsets);
+			vkCmdBindIndexBuffer		(drawCmdBuffers[i], models.scene.indices.buffer, 0, VK_INDEX_TYPE_UINT32);
+			vkCmdDrawIndexed			(drawCmdBuffers[i], models.scene.indexCount, 1, 0, 0, 0);
 
 			// Second sub pass
 			// This subpass will use the G-Buffer components that have been filled in the first subpass as input attachment for the final compositing
 
-			vkCmdNextSubpass(drawCmdBuffers[i], VK_SUBPASS_CONTENTS_INLINE);
+			vkCmdNextSubpass			(drawCmdBuffers[i], VK_SUBPASS_CONTENTS_INLINE);
 
-			vkCmdBindPipeline(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines.composition);
-			vkCmdBindDescriptorSets(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayouts.composition, 0, 1, &descriptorSets.composition, 0, NULL);
-			vkCmdDraw(drawCmdBuffers[i], 3, 1, 0, 0);
+			vkCmdBindPipeline			(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines.composition);
+			vkCmdBindDescriptorSets		(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayouts.composition, 0, 1, &descriptorSets.composition, 0, NULL);
+			vkCmdDraw					(drawCmdBuffers[i], 3, 1, 0, 0);
 
 			// Third subpass
 			// Render transparent geometry using a forward pass that compares against depth generted during G-Buffer fill
-			vkCmdNextSubpass(drawCmdBuffers[i], VK_SUBPASS_CONTENTS_INLINE);
+			vkCmdNextSubpass			(drawCmdBuffers[i], VK_SUBPASS_CONTENTS_INLINE);
 
-			vkCmdBindPipeline(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines.transparent);
-			vkCmdBindDescriptorSets(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayouts.transparent, 0, 1, &descriptorSets.transparent, 0, NULL);
-			vkCmdBindVertexBuffers(drawCmdBuffers[i], VERTEX_BUFFER_BIND_ID, 1, &models.transparent.vertices.buffer, offsets);
-			vkCmdBindIndexBuffer(drawCmdBuffers[i], models.transparent.indices.buffer, 0, VK_INDEX_TYPE_UINT32);
-			vkCmdDrawIndexed(drawCmdBuffers[i], models.transparent.indexCount, 1, 0, 0, 0);
+			vkCmdBindPipeline			(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines.transparent);
+			vkCmdBindDescriptorSets		(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayouts.transparent, 0, 1, &descriptorSets.transparent, 0, NULL);
+			vkCmdBindVertexBuffers		(drawCmdBuffers[i], VERTEX_BUFFER_BIND_ID, 1, &models.transparent.vertices.buffer, offsets);
+			vkCmdBindIndexBuffer		(drawCmdBuffers[i], models.transparent.indices.buffer, 0, VK_INDEX_TYPE_UINT32);
+			vkCmdDrawIndexed			(drawCmdBuffers[i], models.transparent.indexCount, 1, 0, 0, 0);
 
 			vkCmdEndRenderPass(drawCmdBuffers[i]);
 
@@ -469,15 +460,13 @@ public:
 		}
 	}
 
-	void													loadAssets								()
-	{
-		models.scene.loadFromFile(getAssetPath() + "models/samplebuilding.dae", vertexLayout, 1.0f, vulkanDevice, queue);
-		models.transparent.loadFromFile(getAssetPath() + "models/samplebuilding_glass.dae", vertexLayout, 1.0f, vulkanDevice, queue);
-		textures.glass.loadFromFile(getAssetPath() + "textures/colored_glass_bc3.ktx", VK_FORMAT_BC3_UNORM_BLOCK, vulkanDevice, queue);
+	void													loadAssets								()																					{
+		models.scene		.loadFromFile(getAssetPath() + "models/samplebuilding.dae"			, vertexLayout				, 1.0f, vulkanDevice	, queue);
+		models.transparent	.loadFromFile(getAssetPath() + "models/samplebuilding_glass.dae"	, vertexLayout				, 1.0f, vulkanDevice	, queue);
+		textures.glass		.loadFromFile(getAssetPath() + "textures/colored_glass_bc3.ktx"		, VK_FORMAT_BC3_UNORM_BLOCK	, vulkanDevice			, queue);
 	}
 
-	void													setupVertexDescriptions					()
-	{
+	void													setupVertexDescriptions					()																					{
 		// Binding description
 		vertices.bindingDescriptions							= 
 		{	vks::initializers::vertexInputBindingDescription(VERTEX_BUFFER_BIND_ID, vertexLayout.stride(), VK_VERTEX_INPUT_RATE_VERTEX)
@@ -498,8 +487,7 @@ public:
 		vertices.inputState.pVertexAttributeDescriptions		= vertices.attributeDescriptions.data();
 	}
 
-	void													setupDescriptorPool						()
-	{
+	void													setupDescriptorPool						()																					{
 		std::vector<VkDescriptorPoolSize>							poolSizes					=
 		{	vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 9)
 		,	vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 9)
@@ -510,8 +498,7 @@ public:
 		VK_CHECK_RESULT(vkCreateDescriptorPool(device, &descriptorPoolInfo, nullptr, &descriptorPool));
 	}
 
-	void													setupDescriptorSetLayout				()
-	{
+	void													setupDescriptorSetLayout				()																					{
 		// Deferred shading layout
 		std::vector<VkDescriptorSetLayoutBinding>					setLayoutBindings			=
 		{	vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT, 0)	// Binding 0 : Vertex shader uniform buffer
@@ -525,8 +512,7 @@ public:
 		VK_CHECK_RESULT(vkCreatePipelineLayout(device, &pPipelineLayoutCreateInfo, nullptr, &pipelineLayouts.offscreen));	// Offscreen (scene) rendering pipeline layout
 	}
 
-	void													setupDescriptorSet						()
-	{
+	void													setupDescriptorSet						()																					{
 		std::vector<VkWriteDescriptorSet>							writeDescriptorSets;
 		VkDescriptorSetAllocateInfo									allocInfo					= vks::initializers::descriptorSetAllocateInfo(descriptorPool, &descriptorSetLayouts.scene, 1);
 
@@ -537,8 +523,7 @@ public:
 		vkUpdateDescriptorSets(device, static_cast<uint32_t>(writeDescriptorSets.size()), writeDescriptorSets.data(), 0, NULL);
 	}
 
-	void													preparePipelines						()
-	{
+	void													preparePipelines						()																					{
 		VkPipelineInputAssemblyStateCreateInfo						inputAssemblyState			= vks::initializers::pipelineInputAssemblyStateCreateInfo(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, 0, VK_FALSE);
 		VkPipelineRasterizationStateCreateInfo						rasterizationState			= vks::initializers::pipelineRasterizationStateCreateInfo(VK_POLYGON_MODE_FILL, VK_CULL_MODE_BACK_BIT, VK_FRONT_FACE_CLOCKWISE, 0);
 		VkPipelineColorBlendAttachmentState							blendAttachmentState		= vks::initializers::pipelineColorBlendAttachmentState(0xf, VK_FALSE);
@@ -583,8 +568,7 @@ public:
 	}
 
 	// Create the Vulkan objects used in the composition pass (descriptor sets, pipelines, etc.)
-	void													prepareCompositionPass					()
-	{
+	void													prepareCompositionPass					()																					{
 		// Descriptor set layout
 		std::vector<VkDescriptorSetLayoutBinding>					setLayoutBindings			=
 		{	vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT, VK_SHADER_STAGE_FRAGMENT_BIT, 0)								// Binding 0: Position input attachment 
@@ -721,8 +705,7 @@ public:
 	}
 
 	// Prepare and initialize uniform buffer containing shader uniforms
-	void													prepareUniformBuffers					()
-	{
+	void													prepareUniformBuffers					()																					{
 		vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBuffers.GBuffer, sizeof(uboGBuffer));	// Deferred vertex shader
 		vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBuffers.lights, sizeof(uboLights));		// Deferred fragment shader
 
@@ -731,8 +714,7 @@ public:
 		updateUniformBufferDeferredLights();
 	}
 
-	void													updateUniformBufferDeferredMatrices		()
-	{
+	void													updateUniformBufferDeferredMatrices		()																					{
 		uboGBuffer.projection									= camera.matrices.perspective;
 		uboGBuffer.view											= camera.matrices.view;
 		uboGBuffer.model										= glm::mat4();
@@ -742,8 +724,7 @@ public:
 		uniformBuffers.GBuffer.unmap();
 	}
 
-	void													initLights								()
-	{
+	void													initLights								()																					{
 		std::vector<glm::vec3>										colors					=
 		{	glm::vec3(1.0f, 1.0f, 1.0f)
 		,	glm::vec3(1.0f, 0.0f, 0.0f)
@@ -765,8 +746,7 @@ public:
 	}
 
 	// Update fragment shader light position uniform block
-	void													updateUniformBufferDeferredLights		()
-	{
+	void													updateUniformBufferDeferredLights		()																					{
 		// Current view position
 		uboLights.viewPos										= glm::vec4(camera.position, 0.0f) * glm::vec4(-1.0f, 1.0f, -1.0f, 1.0f);
 
@@ -775,8 +755,7 @@ public:
 		uniformBuffers.lights.unmap();
 	}
 
-	void													draw									()
-	{
+	void													draw									()																					{
 		VulkanExampleBase::prepareFrame();
 
 		// Command buffer to be sumitted to the queue	
@@ -789,8 +768,7 @@ public:
 		VulkanExampleBase::submitFrame();
 	}
 
-	void													prepare									()
-	{
+	void													prepare									()																					{
 		VulkanExampleBase::prepare();
 		loadAssets();
 		setupVertexDescriptions();
@@ -805,21 +783,18 @@ public:
 		prepared												= true;
 	}
 
-	virtual void											render									()
-	{
+	virtual void											render									()																					{
 		if (!prepared)
 			return;
 		draw();
 	}
 
-	virtual void											viewChanged								()
-	{
+	virtual void											viewChanged								()																					{
 		updateUniformBufferDeferredMatrices();
 		updateUniformBufferDeferredLights();
 	}
 
-	virtual void											keyPressed								(uint32_t keyCode)
-	{
+	virtual void											keyPressed								(uint32_t keyCode)																	{
 		switch (keyCode)
 		{
 		case KEY_F1:
