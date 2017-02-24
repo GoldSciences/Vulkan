@@ -21,13 +21,13 @@ class VulkanExample : public VulkanExampleBase
 {
 public:
 	struct {
-		VkPipelineVertexInputStateCreateInfo inputState;
-		std::vector<VkVertexInputBindingDescription> bindingDescriptions;
-		std::vector<VkVertexInputAttributeDescription> attributeDescriptions;
-	} vertices;
+		VkPipelineVertexInputStateCreateInfo					inputState;
+		std::vector<VkVertexInputBindingDescription>			bindingDescriptions;
+		std::vector<VkVertexInputAttributeDescription>			attributeDescriptions;
+	}														vertices;
 
 	// Vertex layout for the models
-	vks::VertexLayout vertexLayout = vks::VertexLayout({
+	vks::VertexLayout										vertexLayout							= vks::VertexLayout({
 		vks::VERTEX_COMPONENT_POSITION,
 		vks::VERTEX_COMPONENT_NORMAL,
 		vks::VERTEX_COMPONENT_UV,
@@ -35,40 +35,38 @@ public:
 	});
 
 	struct {
-		vks::Model object;
-	} models;
+		vks::Model												object;
+	}														models;
 
 	struct {
-		vks::Texture2DArray matCapArray;
-	} textures;
+		vks::Texture2DArray										matCapArray;
+	}														textures;
 
-	vks::Buffer uniformBuffer;
+	vks::Buffer												uniformBuffer;
 
 	struct UBOVS {
-		glm::mat4 projection;
-		glm::mat4 model;
-		glm::mat4 normal;
-		glm::mat4 view;
-		int32_t texIndex = 0;
-	} uboVS;
+		glm::mat4												projection;
+		glm::mat4												model;
+		glm::mat4												normal;
+		glm::mat4												view;
+		int32_t													texIndex							= 0;
+	}														uboVS;
 
-	VkPipeline pipeline;
-	VkPipelineLayout pipelineLayout;
-	VkDescriptorSet descriptorSet;
-	VkDescriptorSetLayout descriptorSetLayout;
+	VkPipeline												pipeline;
+	VkPipelineLayout										pipelineLayout;
+	VkDescriptorSet											descriptorSet;
+	VkDescriptorSetLayout									descriptorSetLayout;
 
-	VulkanExample() : VulkanExampleBase(ENABLE_VALIDATION)
-	{
-		zoom = -0.9f;
-		rotationSpeed = 0.75f;
-		zoomSpeed = 0.25f;
-		rotation = glm::vec3(-25.0f, 23.75f, 0.0f);
-		enableTextOverlay = true;
-		title = "Vulkan Example - Spherical Environment Mapping";
+															VulkanExample							()					: VulkanExampleBase(ENABLE_VALIDATION) {
+		zoom													= -0.9f;
+		rotationSpeed											= 0.75f;
+		zoomSpeed												= 0.25f;
+		rotation												= glm::vec3(-25.0f, 23.75f, 0.0f);
+		enableTextOverlay										= true;
+		title													= "Vulkan Example - Spherical Environment Mapping";
 	}
 
-	~VulkanExample()
-	{
+															~VulkanExample							()					{
 		// Clean up used Vulkan resources 
 		// Note : Inherited destructor cleans up resources stored in base class
 		vkDestroyPipeline(device, pipeline, nullptr);
@@ -82,56 +80,51 @@ public:
 		textures.matCapArray.destroy();
 	}
 
-	void loadAssets()
-	{
+	void													loadAssets								()					{
 		models.object.loadFromFile(getAssetPath() + "models/chinesedragon.dae", vertexLayout, 0.05f, vulkanDevice, queue);
 		// Multiple mat caps are stored in a single texture array so they can easily be switched inside the shader  just by updating the index in a uniform buffer
 		textures.matCapArray.loadFromFile(getAssetPath() + "textures/matcap_array_rgba.ktx", VK_FORMAT_R8G8B8A8_UNORM, vulkanDevice, queue);
 	}
 
-	void buildCommandBuffers()
+	void													buildCommandBuffers						()
 	{
-		VkCommandBufferBeginInfo cmdBufInfo = vks::initializers::commandBufferBeginInfo();
+		VkCommandBufferBeginInfo									cmdBufInfo								= vks::initializers::commandBufferBeginInfo();
 
-		VkClearValue clearValues[2];
-		clearValues[0].color = defaultClearColor;
-		clearValues[1].depthStencil = { 1.0f, 0 };
+		VkClearValue												clearValues[2];
+		clearValues[0].color									= defaultClearColor;
+		clearValues[1].depthStencil								= { 1.0f, 0 };
 
-		VkRenderPassBeginInfo renderPassBeginInfo = vks::initializers::renderPassBeginInfo();
-		renderPassBeginInfo.renderPass = renderPass;
-		renderPassBeginInfo.renderArea.offset.x = 0;
-		renderPassBeginInfo.renderArea.offset.y = 0;
-		renderPassBeginInfo.renderArea.extent.width = width;
-		renderPassBeginInfo.renderArea.extent.height = height;
-		renderPassBeginInfo.clearValueCount = 2;
-		renderPassBeginInfo.pClearValues = clearValues;
+		VkRenderPassBeginInfo										renderPassBeginInfo						= vks::initializers::renderPassBeginInfo();
+		renderPassBeginInfo.renderPass							= renderPass;
+		renderPassBeginInfo.renderArea.offset.x					= 0;
+		renderPassBeginInfo.renderArea.offset.y					= 0;
+		renderPassBeginInfo.renderArea.extent.width				= width;
+		renderPassBeginInfo.renderArea.extent.height			= height;
+		renderPassBeginInfo.clearValueCount						= 2;
+		renderPassBeginInfo.pClearValues						= clearValues;
 
 		for (size_t i = 0; i < drawCmdBuffers.size(); ++i)
 		{
 			// Set target frame buffer
-			renderPassBeginInfo.framebuffer = frameBuffers[i];
-
+			renderPassBeginInfo.framebuffer							= frameBuffers[i];
 			VK_CHECK_RESULT(vkBeginCommandBuffer(drawCmdBuffers[i], &cmdBufInfo));
-
 			vkCmdBeginRenderPass(drawCmdBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 
-			VkViewport viewport = vks::initializers::viewport((float)width, (float)height, 0.0f, 1.0f);
+			VkViewport													viewport								= vks::initializers::viewport((float)width, (float)height, 0.0f, 1.0f);
 			vkCmdSetViewport(drawCmdBuffers[i], 0, 1, &viewport);
 
-			VkRect2D scissor = vks::initializers::rect2D(width, height,	0, 0);
+			VkRect2D													scissor									= vks::initializers::rect2D(width, height,	0, 0);
 			vkCmdSetScissor(drawCmdBuffers[i], 0, 1, &scissor);
 
 			vkCmdBindDescriptorSets(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSet, 0, NULL);
 			vkCmdBindPipeline(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
 
-			VkDeviceSize offsets[1] = { 0 };
+			VkDeviceSize												offsets	[1]								= { 0 };
 			vkCmdBindVertexBuffers(drawCmdBuffers[i], VERTEX_BUFFER_BIND_ID, 1, &models.object.vertices.buffer, offsets);
 			vkCmdBindIndexBuffer(drawCmdBuffers[i], models.object.indices.buffer, 0, VK_INDEX_TYPE_UINT32);
 
 			vkCmdDrawIndexed(drawCmdBuffers[i], models.object.indexCount, 1, 0, 0, 0);
-
 			vkCmdEndRenderPass(drawCmdBuffers[i]);
-
 			VK_CHECK_RESULT(vkEndCommandBuffer(drawCmdBuffers[i]));
 		}
 	}
