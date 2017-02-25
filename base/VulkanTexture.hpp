@@ -28,50 +28,50 @@
 namespace vks
 {
 	struct Texture {
-		vks::VulkanDevice		* device			= nullptr;
-		VkImage					image				= VK_NULL_HANDLE;
-		VkImageLayout			imageLayout			= VK_IMAGE_LAYOUT_UNDEFINED;
-		VkDeviceMemory			deviceMemory		= VK_NULL_HANDLE;
-		VkImageView				view				= VK_NULL_HANDLE;
-		uint32_t				width				= 0
-			,					height				= 0
+		vks::VulkanDevice									* device			= nullptr;
+		VkImage												image				= VK_NULL_HANDLE;
+		VkImageLayout										imageLayout			= VK_IMAGE_LAYOUT_UNDEFINED;
+		VkDeviceMemory										deviceMemory		= VK_NULL_HANDLE;
+		VkImageView											view				= VK_NULL_HANDLE;
+		uint32_t											width				= 0
+			,												height				= 0
 			;
-		uint32_t				mipLevels			= 0;
-		uint32_t				layerCount			= 0;
-		VkDescriptorImageInfo	descriptor			= {};
+		uint32_t											mipLevels			= 0;
+		uint32_t											layerCount			= 0;
+		VkDescriptorImageInfo								descriptor			= {};
 
 		
-		VkSampler				sampler;			// Optional sampler to use with this texture
+		VkSampler											sampler;			// Optional sampler to use with this texture
 	
 		// Update image descriptor from current sampler, view and image layout
-		void					updateDescriptor	()										{
-			descriptor.sampler		= sampler;
-			descriptor.imageView	= view;
-			descriptor.imageLayout	= imageLayout;
+		void												updateDescriptor	()										{
+			descriptor.sampler									= sampler;
+			descriptor.imageView								= view;
+			descriptor.imageLayout								= imageLayout;
 		}
 
 		// @brief Release all Vulkan resources held by this texture
-		void					destroy				()										{
+		void												destroy				()										{
 			vkDestroyImageView	(device->logicalDevice, view, nullptr);
 			vkDestroyImage		(device->logicalDevice, image, nullptr);
 			if (sampler)
 				vkDestroySampler	(device->logicalDevice, sampler, nullptr);
 
 			vkFreeMemory		(device->logicalDevice, deviceMemory, nullptr);
-		}
-	};
+		}	
+	};	// struct
 
 	struct Texture2D : public Texture {
 		// Load a 2D texture including all mip levels
-		void					loadFromFile
-		(	std::string				filename																// File to load (supports .ktx and .dds)
-		,	VkFormat				format																	// Vulkan format of the image data stored in the file
-		,	vks::VulkanDevice		* device																// Vulkan device to create the texture on
-		,	VkQueue					copyQueue																// Queue used for the texture staging copy commands (must support transfer)
-		,	VkImageUsageFlags		imageUsageFlags		= VK_IMAGE_USAGE_SAMPLED_BIT						// imageUsageFlags Usage flags for the texture's image (defaults to VK_IMAGE_USAGE_SAMPLED_BIT)
-		,	VkImageLayout			imageLayout			= VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL			// imageLayout Usage layout for the texture (defaults VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
-		,	bool					forceLinear			= false												// forceLinear Force linear tiling (not advised, defaults to false)
-		)
+		void												loadFromFile
+			(	std::string				filename																// File to load (supports .ktx and .dds)
+			,	VkFormat				format																	// Vulkan format of the image data stored in the file
+			,	vks::VulkanDevice		* device																// Vulkan device to create the texture on
+			,	VkQueue					copyQueue																// Queue used for the texture staging copy commands (must support transfer)
+			,	VkImageUsageFlags		imageUsageFlags		= VK_IMAGE_USAGE_SAMPLED_BIT						// imageUsageFlags Usage flags for the texture's image (defaults to VK_IMAGE_USAGE_SAMPLED_BIT)
+			,	VkImageLayout			imageLayout			= VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL			// imageLayout Usage layout for the texture (defaults VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
+			,	bool					forceLinear			= false												// forceLinear Force linear tiling (not advised, defaults to false)
+			)
 		{
 #if defined(__ANDROID__)
 			// Textures are stored inside the apk on Android (compressed)
@@ -303,18 +303,18 @@ namespace vks
 		}
 
 		// Creates a 2D texture from a buffer
-		void					fromBuffer
-		(	void					* buffer													// Buffer containing texture data to upload
-		,	VkDeviceSize			bufferSize													// Size of the buffer in machine units
-		,	VkFormat				format														// Vulkan format of the image data stored in the file
-		,	uint32_t				width														// Width of the texture to create
-		,	uint32_t				height														// Height of the texture to create
-		,	vks::VulkanDevice		* device													// Vulkan device to create the texture on
-		,	VkQueue					copyQueue													// Queue used for the texture staging copy commands (must support transfer)
-		,	VkFilter				filter			= VK_FILTER_LINEAR							// Texture filtering for the sampler (defaults to VK_FILTER_LINEAR)
-		,	VkImageUsageFlags		imageUsageFlags	= VK_IMAGE_USAGE_SAMPLED_BIT				// Usage flags for the texture's image (defaults to VK_IMAGE_USAGE_SAMPLED_BIT)
-		,	VkImageLayout			imageLayout		= VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL	// Usage layout for the texture (defaults VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
-		)
+		void												fromBuffer
+			(	void					* buffer													// Buffer containing texture data to upload
+			,	VkDeviceSize			bufferSize													// Size of the buffer in machine units
+			,	VkFormat				format														// Vulkan format of the image data stored in the file
+			,	uint32_t				width														// Width of the texture to create
+			,	uint32_t				height														// Height of the texture to create
+			,	vks::VulkanDevice		* device													// Vulkan device to create the texture on
+			,	VkQueue					copyQueue													// Queue used for the texture staging copy commands (must support transfer)
+			,	VkFilter				filter			= VK_FILTER_LINEAR							// Texture filtering for the sampler (defaults to VK_FILTER_LINEAR)
+			,	VkImageUsageFlags		imageUsageFlags	= VK_IMAGE_USAGE_SAMPLED_BIT				// Usage flags for the texture's image (defaults to VK_IMAGE_USAGE_SAMPLED_BIT)
+			,	VkImageLayout			imageLayout		= VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL	// Usage layout for the texture (defaults VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
+			)
 		{
 			assert(buffer);
 
@@ -441,18 +441,18 @@ namespace vks
 			updateDescriptor();
 		}
 
-	};
+	};	// struct
 
 	struct Texture2DArray : public Texture {
 		// Load a 2D texture array including all mip levels
-		void					loadFromFile
-		(	std::string				filename														// File to load (supports .ktx and .dds)
-		,	VkFormat				format															// Vulkan format of the image data stored in the file
-		,	vks::VulkanDevice		* device														// Vulkan device to create the texture on
-		,	VkQueue					copyQueue														// Queue used for the texture staging copy commands (must support transfer)
-		,	VkImageUsageFlags		imageUsageFlags		= VK_IMAGE_USAGE_SAMPLED_BIT				// Usage flags for the texture's image (defaults to VK_IMAGE_USAGE_SAMPLED_BIT)
-		,	VkImageLayout			imageLayout			= VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL	// Usage layout for the texture (defaults VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
-		)
+		void												loadFromFile
+			(	std::string				filename															// File to load (supports .ktx and .dds)
+			,	VkFormat				format																// Vulkan format of the image data stored in the file
+			,	vks::VulkanDevice		* device															// Vulkan device to create the texture on
+			,	VkQueue					copyQueue															// Queue used for the texture staging copy commands (must support transfer)
+			,	VkImageUsageFlags		imageUsageFlags			= VK_IMAGE_USAGE_SAMPLED_BIT				// Usage flags for the texture's image (defaults to VK_IMAGE_USAGE_SAMPLED_BIT)
+			,	VkImageLayout			imageLayout				= VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL	// Usage layout for the texture (defaults VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
+			)
 		{
 #if defined(__ANDROID__)
 			// Textures are stored inside the apk on Android (compressed)
@@ -623,7 +623,7 @@ namespace vks
 	struct TextureCubeMap : public Texture {
 	public:
 		// Load a cubemap texture including all mip levels from a single file
-		void loadFromFile
+		void												loadFromFile
 		(	std::string			filename												// File to load (supports .ktx and .dds)
 		,	VkFormat			format													// Vulkan format of the image data stored in the file
 		,	vks::VulkanDevice	* device												// Vulkan device to create the texture on
@@ -782,12 +782,12 @@ namespace vks
 			VK_CHECK_RESULT(vkCreateImageView(device->logicalDevice, &viewCreateInfo, nullptr, &view));
 
 			// Clean up staging resources
-			vkFreeMemory(device->logicalDevice, stagingMemory, nullptr);
-			vkDestroyBuffer(device->logicalDevice, stagingBuffer, nullptr);
+			vkFreeMemory	(device->logicalDevice, stagingMemory, nullptr);
+			vkDestroyBuffer	(device->logicalDevice, stagingBuffer, nullptr);
 
 			// Update descriptor image info member that can be used for setting up descriptor sets
 			updateDescriptor();
-		}
-	};
+		}	// loadFromFile()
+	};	// struct 
 
 }

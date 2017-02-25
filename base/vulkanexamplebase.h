@@ -47,103 +47,103 @@
 class VulkanExampleBase
 {
 private:	
-	float								fpsTimer				= 0.0f;												// fps timer (one second interval)
-	uint32_t							destWidth				= 0													// Destination dimensions for resizing the window
-		,								destHeight				= 0
+	float								fpsTimer					= 0.0f;												// fps timer (one second interval)
+	uint32_t							destWidth					= 0													// Destination dimensions for resizing the window
+		,								destHeight					= 0
 		;
-	bool								viewUpdated				= false;											// Indicates that the view (position, rotation) has changed and... ?
-	bool								resizing				= false;
+	bool								viewUpdated					= false;											// Indicates that the view (position, rotation) has changed and... ?
+	bool								resizing					= false;
 
-	std::string							getWindowTitle			();													// Get window title with example name, device, et.
-	void								windowResize			();													// Called if the window is resized and some resources have to be recreatesd.
+	std::string							getWindowTitle				();													// Get window title with example name, device, et.
+	void								windowResize				();													// Called if the window is resized and some resources have to be recreatesd.
 
 protected:
 	
-	float								frameTimer				= 1.0f;												// Last frame time, measured using a high performance timer (if available).
-	uint32_t							frameCounter			= 0;												// Frame counter to display fps.
-	uint32_t							lastFPS					= 0;												// Vulkan instance, stores all per-application states.
-	VkInstance							instance				= VK_NULL_HANDLE;									// Physical device (GPU) that Vulkan will ise.
-	VkPhysicalDevice					physicalDevice			= VK_NULL_HANDLE;
-	VkPhysicalDeviceProperties			deviceProperties;															// Stores physical device properties (for e.g. checking device limits).
-	VkPhysicalDeviceFeatures			deviceFeatures;																// Stores the features available on the selected physical device (for e.g. checking if a feature is available).
-	VkPhysicalDeviceMemoryProperties	deviceMemoryProperties;														// Stores all available memory (type) properties for the physical device.
-	VkPhysicalDeviceFeatures			enabledFeatures{};															// Set of physical device features to be enabled for this example (must be set in the derived constructor). @note By default no phyiscal device features are enabled.
-	std::vector<const char*>			enabledExtensions;															// Set of device extensions to be enabled for this example (must be set in the derived constructor.
-	VkDevice							device					= VK_NULL_HANDLE;									// Logical device, application's view of the physical device (GPU) todo: getter? should always point to VulkanDevice->device
-	vks::VulkanDevice					* vulkanDevice			= nullptr;											// Encapsulated physical and logical vulkan device
-	VkQueue								queue					= VK_NULL_HANDLE;									// Handle to the device graphics queue that command buffers are submitted to
-	VkFormat							depthFormat;																// Depth buffer format (selected during Vulkan initialization)
-	VkCommandPool						cmdPool					= VK_NULL_HANDLE;									// Command buffer pool
-	VkPipelineStageFlags				submitPipelineStages	= VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;	// Pipeline stages used to wait at for graphics queue submissions
-	VkSubmitInfo						submitInfo;																	// Contains command buffers and semaphores to be presented to the queue
-	std::vector<VkCommandBuffer>		drawCmdBuffers;																// Command buffers used for rendering
-	VkRenderPass						renderPass;																	// Global render pass for frame buffer writes
-	std::vector<VkFramebuffer>			frameBuffers;																// List of available frame buffers (same as number of swap chain images)
-	uint32_t							currentBuffer			= 0;												// Active frame buffer index
-	VkDescriptorPool					descriptorPool			= VK_NULL_HANDLE;									// Descriptor set pool
-	std::vector<VkShaderModule>			shaderModules;																// List of shader modules created (stored for cleanup)
-	VkPipelineCache						pipelineCache;																// Pipeline cache object
-	VulkanSwapChain						swapChain;																	// Wraps the swap chain to present images (framebuffers) to the windowing system
-	
+	float								frameTimer					= 1.0f;												// Last frame time, measured using a high performance timer (if available).
+	uint32_t							frameCounter				= 0;												// Frame counter to display fps.
+	uint32_t							lastFPS						= 0;												// Vulkan instance, stores all per-application states.
+	VkInstance							instance					= VK_NULL_HANDLE;									// Physical device (GPU) that Vulkan will ise.
+	VkPhysicalDevice					physicalDevice				= VK_NULL_HANDLE;
+	VkPhysicalDeviceProperties			deviceProperties;																// Stores physical device properties (for e.g. checking device limits).
+	VkPhysicalDeviceFeatures			deviceFeatures;																	// Stores the features available on the selected physical device (for e.g. checking if a feature is available).
+	VkPhysicalDeviceMemoryProperties	deviceMemoryProperties;															// Stores all available memory (type) properties for the physical device.
+	VkPhysicalDeviceFeatures			enabledFeatures{};																// Set of physical device features to be enabled for this example (must be set in the derived constructor). @note By default no phyiscal device features are enabled.
+	std::vector<const char*>			enabledExtensions;																// Set of device extensions to be enabled for this example (must be set in the derived constructor.
+	VkDevice							device						= VK_NULL_HANDLE;									// Logical device, application's view of the physical device (GPU) todo: getter? should always point to VulkanDevice->device
+	vks::VulkanDevice					* vulkanDevice				= nullptr;											// Encapsulated physical and logical vulkan device
+	VkQueue								queue						= VK_NULL_HANDLE;									// Handle to the device graphics queue that command buffers are submitted to
+	VkFormat							depthFormat;																	// Depth buffer format (selected during Vulkan initialization)
+	VkCommandPool						cmdPool						= VK_NULL_HANDLE;									// Command buffer pool
+	VkPipelineStageFlags				submitPipelineStages		= VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;	// Pipeline stages used to wait at for graphics queue submissions
+	VkSubmitInfo						submitInfo;																		// Contains command buffers and semaphores to be presented to the queue
+	std::vector<VkCommandBuffer>		drawCmdBuffers;																	// Command buffers used for rendering
+	VkRenderPass						renderPass;																		// Global render pass for frame buffer writes
+	std::vector<VkFramebuffer>			frameBuffers;																	// List of available frame buffers (same as number of swap chain images)
+	uint32_t							currentBuffer				= 0;												// Active frame buffer index
+	VkDescriptorPool					descriptorPool				= VK_NULL_HANDLE;									// Descriptor set pool
+	std::vector<VkShaderModule>			shaderModules;																	// List of shader modules created (stored for cleanup)
+	VkPipelineCache						pipelineCache				;													// Pipeline cache object
+	VulkanSwapChain						swapChain					;													// Wraps the swap chain to present images (framebuffers) to the windowing system
+
 	struct {
 		
-		VkSemaphore presentComplete;		// Swap chain image presentation
-		VkSemaphore renderComplete;			// Command buffer submission and execution
-		VkSemaphore textOverlayComplete;	// Text overlay submission and execution
-	}									semaphores;																	// Synchronization semaphores
+		VkSemaphore							presentComplete				= VK_NULL_HANDLE;								// Swap chain image presentation
+		VkSemaphore							renderComplete				= VK_NULL_HANDLE;								// Command buffer submission and execution
+		VkSemaphore							textOverlayComplete			= VK_NULL_HANDLE;								// Text overlay submission and execution
+	}									semaphores;																		// Synchronization semaphores
 	
 	// Simple texture loader
 	//vks::tools::VulkanTextureLoader *textureLoader = nullptr;
 
 	// Returns the base asset path (for shaders, models, textures) depending on the os
-	const std::string					getAssetPath			();
+	const std::string					getAssetPath				();
 public: 
-	bool								prepared				= false;
-	uint32_t							width					= 1280;
-	uint32_t							height					= 720;
+	bool								prepared					= false;
+	uint32_t							width						= 1280;
+	uint32_t							height						= 720;
 
 	// Example settings that can be changed e.g. by command line arguments
 	struct Settings {
-		bool								validation				= false;	// Activates validation layers (and message output) when set to true
-		bool								fullscreen				= false;	// Set to true if fullscreen mode has been requested via command line
-		bool								vsync					= false;	// Set to true if v-sync will be forced for the swapchain
+		bool								validation					= false;	// Activates validation layers (and message output) when set to true
+		bool								fullscreen					= false;	// Set to true if fullscreen mode has been requested via command line
+		bool								vsync						= false;	// Set to true if v-sync will be forced for the swapchain
 	}									settings;
 
-	VkClearColorValue					defaultClearColor		= { { 0.025f, 0.025f, 0.025f, 1.0f } };
-	float								zoom					= 0;
+	VkClearColorValue					defaultClearColor			= { { 0.025f, 0.025f, 0.025f, 1.0f } };
+	float								zoom						= 0;
 	static std::vector<const char*>		args;
 
 	
-	float								timer					= 0.0f;			// Defines a frame rate independent timer value clamped from -1.0...1.0. For use in animations, rotations, etc.
-	float								timerSpeed				= 0.25f;		// Multiplier for speeding up (or slowing down) the global timer
-	bool								paused					= false;
-	bool								enableTextOverlay		= false;
-	VulkanTextOverlay					* textOverlay			= nullptr;
+	float								timer						= 0.0f;			// Defines a frame rate independent timer value clamped from -1.0...1.0. For use in animations, rotations, etc.
+	float								timerSpeed					= 0.25f;		// Multiplier for speeding up (or slowing down) the global timer
+	bool								paused						= false;
+	bool								enableTextOverlay			= false;
+	VulkanTextOverlay					* textOverlay				= nullptr;
 
-	float								rotationSpeed			= 1.0f;			// Use to adjust mouse rotation speed
-	float								zoomSpeed				= 1.0f;			// Use to adjust mouse zoom speed
+	float								rotationSpeed				= 1.0f;			// Use to adjust mouse rotation speed
+	float								zoomSpeed					= 1.0f;			// Use to adjust mouse zoom speed
 	Camera								camera;
 
-	glm::vec3							rotation				= glm::vec3();
-	glm::vec3							cameraPos				= glm::vec3();
+	glm::vec3							rotation					= glm::vec3();
+	glm::vec3							cameraPos					= glm::vec3();
 	glm::vec2							mousePos;
 
-	std::string							title					= "Vulkan Example";
-	std::string							name					= "vulkanExample";
+	std::string							title						= "Vulkan Example";
+	std::string							name						= "vulkanExample";
 
 	struct 
 	{
-		VkImage								image					= VK_NULL_HANDLE;
-		VkDeviceMemory						mem						= VK_NULL_HANDLE;
-		VkImageView							view					= VK_NULL_HANDLE;
-	} depthStencil;
+		VkImage								image						= VK_NULL_HANDLE;
+		VkDeviceMemory						mem							= VK_NULL_HANDLE;
+		VkImageView							view						= VK_NULL_HANDLE;
+	}									depthStencil;
 
 	// Gamepad state (only one pad supported)
 	struct
 	{
-		glm::vec2							axisLeft				= glm::vec2(0.0f);
-		glm::vec2							axisRight				= glm::vec2(0.0f);
-	} gamePadState;
+		glm::vec2							axisLeft					= glm::vec2(0.0f);
+		glm::vec2							axisRight					= glm::vec2(0.0f);
+	}									gamePadState;
 
 	// OS specific 
 #if defined(_WIN32)
@@ -182,8 +182,8 @@ public:
 	xcb_intern_atom_reply_t				* atom_wm_delete_window		= nullptr;
 #endif
 
-										~VulkanExampleBase();
-										VulkanExampleBase(bool enableValidation);
+										~VulkanExampleBase			();
+										VulkanExampleBase			(bool enableValidation);
 
 	// Setup the vulkan instance, enable required extensions and connect to the physical device (GPU)
 	void								initVulkan();
@@ -255,6 +255,7 @@ public:
 	// - Acquires the next image from the swap chain 
 	// - Sets the default wait and signal semaphores
 	void								prepareFrame				();
+
 	void								submitFrame					();																													// Submit the frames' workload. Submits the text overlay (if enabled)
 
 };

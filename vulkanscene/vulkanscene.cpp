@@ -296,13 +296,8 @@ public:
 		prepared = true;
 	}
 
-	virtual void						render						()									{
-		if (!prepared)
-			return;
-		draw();
-	}
-
-	virtual void						viewChanged					()									{ updateUniformBuffers(); }
+	virtual void						render						()									{ if (prepared) draw();		}
+	virtual void						viewChanged					()									{ updateUniformBuffers();	}
 
 };
 

@@ -29,7 +29,7 @@ namespace vks
 
 		// Returns true if the attachment has a depth component
 		bool									hasDepth			()																			{
-			std::vector<VkFormat>			formats = 
+			std::vector<VkFormat>						formats				= 
 			{	VK_FORMAT_D16_UNORM
 			,	VK_FORMAT_X8_D24_UNORM_PACK32
 			,	VK_FORMAT_D32_SFLOAT
@@ -42,7 +42,7 @@ namespace vks
 
 		// Returns true if the attachment has a stencil component
 		bool									hasStencil			()																			{
-			std::vector<VkFormat>			formats = 
+			std::vector<VkFormat>						formats				= 
 			{	VK_FORMAT_S8_UINT			
 			,	VK_FORMAT_D16_UNORM_S8_UINT	
 			,	VK_FORMAT_D24_UNORM_S8_UINT	
@@ -106,8 +106,7 @@ namespace vks
 				aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
 
 			// Depth (and/or stencil) attachment
-			if (createinfo.usage & VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT)
-			{
+			if (createinfo.usage & VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT) {
 				if (attachment.hasDepth())		aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
 				if (attachment.hasStencil())	aspectMask |= VK_IMAGE_ASPECT_STENCIL_BIT;
 			}

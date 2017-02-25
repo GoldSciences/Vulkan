@@ -19,43 +19,43 @@ namespace vks
 	class HeightMap
 	{
 	private:
-		uint16_t					* heightdata			= nullptr;
-		uint32_t					dim;
-		uint32_t					scale;
+		uint16_t								* heightdata			= nullptr;
+		uint32_t								dim;
+		uint32_t								scale;
 
-		vks::VulkanDevice			* device				= nullptr;
-		VkQueue						copyQueue				= VK_NULL_HANDLE;
+		vks::VulkanDevice						* device				= nullptr;
+		VkQueue									copyQueue				= VK_NULL_HANDLE;
 	public:
-		enum						Topology				{ topologyTriangles, topologyQuads };
+		enum									Topology				{ topologyTriangles, topologyQuads };
 
-		float						heightScale				= 1.0f;
-		float						uvScale					= 1.0f;
+		float									heightScale				= 1.0f;
+		float									uvScale					= 1.0f;
 
-		vks::Buffer					vertexBuffer;
-		vks::Buffer					indexBuffer;
+		vks::Buffer								vertexBuffer;
+		vks::Buffer								indexBuffer;
 
 		struct Vertex {
-			glm::vec3					pos;
-			glm::vec3					normal;
-			glm::vec2					uv;
+			glm::vec3								pos;
+			glm::vec3								normal;
+			glm::vec2								uv;
 		};
 
-		size_t						vertexBufferSize		= 0;
-		size_t						indexBufferSize			= 0;
-		uint32_t					indexCount				= 0;
+		size_t									vertexBufferSize		= 0;
+		size_t									indexBufferSize			= 0;
+		uint32_t								indexCount				= 0;
 
-									HeightMap				(vks::VulkanDevice *in_device, VkQueue in_copyQueue) 
+												HeightMap				(vks::VulkanDevice *in_device, VkQueue in_copyQueue) 
 		:	device		(in_device		)
 		,	copyQueue	(in_copyQueue	)
 		{}
 
-									~HeightMap				()							{
+												~HeightMap				()							{
 			vertexBuffer.destroy();
 			indexBuffer.destroy();
 			delete[]	heightdata;
 		}
 
-		float						getHeight				(uint32_t x, uint32_t y)	{
+		float									getHeight				(uint32_t x, uint32_t y)	{
 			glm::ivec2									rpos			= glm::ivec2(x, y) * glm::ivec2(scale);
 			rpos.x									= std::max(0, std::min(rpos.x, (int)dim - 1));
 			rpos.y									= std::max(0, std::min(rpos.y, (int)dim - 1));
@@ -64,9 +64,9 @@ namespace vks
 		}
 
 #if defined(__ANDROID__)
-		void						loadFromFile			(const std::string filename, uint32_t patchsize, glm::vec3 scale, Topology topology, AAssetManager* assetManager)
+		void									loadFromFile			(const std::string filename, uint32_t patchsize, glm::vec3 scale, Topology topology, AAssetManager* assetManager)
 #else
-		void						loadFromFile			(const std::string filename, uint32_t patchsize, glm::vec3 scale, Topology topology)
+		void									loadFromFile			(const std::string filename, uint32_t patchsize, glm::vec3 scale, Topology topology)
 #endif
 		{
 			assert(device);
@@ -137,8 +137,7 @@ namespace vks
 
 			switch (topology)
 			{
-				// Indices for triangles
-			case topologyTriangles:
+			case topologyTriangles	:	// Indices for triangles
 			{
 				indices									= new uint32_t[w * w * 6];
 				for (uint32_t x = 0; x < w; x++)
@@ -154,35 +153,33 @@ namespace vks
 						indices[index + 5]						= indices[index];
 					}
 
-				indexCount			= (patchsize - 1) * (patchsize - 1) * 6;
-				indexBufferSize		= (w * w * 6) * sizeof(uint32_t);
+				indexCount								= (patchsize - 1) * (patchsize - 1) * 6;
+				indexBufferSize							= (w * w * 6) * sizeof(uint32_t);
 				break;
 			}
-			// Indices for quad patches (tessellation)
-			case topologyQuads:
+			
+			case topologyQuads		:	// Indices for quad patches (tessellation)
 			{
-
-				indices				= new uint32_t[w * w * 4];
+				indices									= new uint32_t[w * w * 4];
 				for (uint32_t x = 0; x < w; x++)
 					for (uint32_t y = 0; y < w; y++)
 					{
-						uint32_t				index = (x + y * w) * 4;
-						indices[index]		= (x + y * patchsize);
-						indices[index + 1]	= indices[index] + patchsize;
-						indices[index + 2]	= indices[index + 1] + 1;
-						indices[index + 3]	= indices[index] + 1;
+						uint32_t									index = (x + y * w) * 4;
+						indices[index]							= (x + y * patchsize);
+						indices[index + 1]						= indices[index] + patchsize;
+						indices[index + 2]						= indices[index + 1] + 1;
+						indices[index + 3]						= indices[index] + 1;
 					}
 
-				indexCount = (patchsize - 1) * (patchsize - 1) * 4;
-				indexBufferSize = (w * w * 4) * sizeof(uint32_t);
+				indexCount								= (patchsize - 1) * (patchsize - 1) * 4;
+				indexBufferSize							= (w * w * 4) * sizeof(uint32_t);
 				break;
 			}
-
 			}
 
 			assert(indexBufferSize > 0);
 
-			vertexBufferSize	= (patchsize * patchsize * 4) * sizeof(Vertex);
+			vertexBufferSize						= (patchsize * patchsize * 4) * sizeof(Vertex);
 
 			// Generate Vulkan buffers
 
@@ -203,7 +200,7 @@ namespace vks
 			copyRegion.size							= vertexBufferSize	;	vkCmdCopyBuffer(copyCmd, vertexStaging	.buffer, vertexBuffer	.buffer, 1, &copyRegion);
 			copyRegion.size							= indexBufferSize	;	vkCmdCopyBuffer(copyCmd, indexStaging	.buffer, indexBuffer	.buffer, 1, &copyRegion);
 
-			device->flushCommandBuffer(copyCmd, copyQueue, true);
+			device->flushCommandBuffer	(copyCmd, copyQueue, true);
 
 			vkDestroyBuffer	(device->logicalDevice, vertexStaging.buffer	, nullptr);
 			vkFreeMemory	(device->logicalDevice, vertexStaging.memory	, nullptr);

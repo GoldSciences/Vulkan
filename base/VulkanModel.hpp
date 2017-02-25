@@ -46,11 +46,9 @@ namespace vks
 	,	VERTEX_COMPONENT_DUMMY_VEC4		= 0x7
 	} Component;
 
-	/** @brief Stores vertex layout components for model loading and Vulkan vertex input and atribute bindings  */
+	// Stores vertex layout components for model loading and Vulkan vertex input and atribute bindings 
 	struct VertexLayout {
-	public:
-		/** @brief Components used to generate vertices from */
-		std::vector<Component>			components;
+		std::vector<Component>			components;		// Components used to generate vertices from
 
 										VertexLayout	(std::vector<Component> components)		{ this->components = std::move(components); }
 		uint32_t						stride			()
@@ -70,13 +68,13 @@ namespace vks
 		}
 	};
 
-	/** @brief Used to parametrize model loading */
+	// Used to parametrize model loading
 	struct ModelCreateInfo {
 		glm::vec3						center;
 		glm::vec3						scale;
 		glm::vec2						uvscale;
 
-										ModelCreateInfo			()														{}
+										ModelCreateInfo			()																							{}
 										ModelCreateInfo			(const glm::vec3& scaleToSet, const glm::vec2& uvscaleToSet, const glm::vec3& centerToSet)	: center(centerToSet), scale(scaleToSet), uvscale(uvscaleToSet)	{}
 										ModelCreateInfo			(float scaleToSet, float uvscaleToSet, float centerToSet)									: center(centerToSet), scale(scaleToSet), uvscale(uvscaleToSet)	{}
 	};
@@ -107,8 +105,7 @@ namespace vks
 		} dim;
 
 		/** @brief Release all Vulkan resources of this model */
-		void							destroy					()
-		{		
+		void							destroy					()																							{
 			assert(device);
 			vkDestroyBuffer	(device, vertices.buffer, nullptr);
 			vkFreeMemory	(device, vertices.memory, nullptr);
@@ -128,31 +125,31 @@ namespace vks
 		// @param (Optional) flags ASSIMP model loading flags
 		bool							loadFromFile			(const std::string& filename, vks::VertexLayout layout, vks::ModelCreateInfo *createInfo, vks::VulkanDevice *device, VkQueue copyQueue, const int flags = defaultFlags)
 		{
-			this->device		= device->logicalDevice;
+			this->device					= device->logicalDevice;
 
-			Assimp::Importer		Importer;
-			const aiScene			* pScene;
+			Assimp::Importer					Importer;
+			const aiScene						* pScene;
 
 			// Load file
 #if defined(__ANDROID__)
 			// Meshes are stored inside the apk on Android (compressed)
 			// So they need to be loaded via the asset manager
 
-			AAsset* asset		= AAssetManager_open(androidApp->activity->assetManager, filename.c_str(), AASSET_MODE_STREAMING);
+			AAsset* asset					= AAssetManager_open(androidApp->activity->assetManager, filename.c_str(), AASSET_MODE_STREAMING);
 			assert(asset);
-			size_t					size = AAsset_getLength(asset);
+			size_t								size					= AAsset_getLength(asset);
 
 			assert(size > 0);
 
-			void					* meshData = malloc(size);
+			void								* meshData				= malloc(size);
 			AAsset_read(asset, meshData, size);
 			AAsset_close(asset);
 
-			pScene				= Importer.ReadFileFromMemory(meshData, size, flags);
+			pScene							= Importer.ReadFileFromMemory(meshData, size, flags);
 
 			free(meshData);
 #else
-			pScene				= Importer.ReadFile(filename.c_str(), flags);
+			pScene							= Importer.ReadFile(filename.c_str(), flags);
 #endif
 
 			if (pScene)
@@ -160,58 +157,54 @@ namespace vks
 				parts.clear();
 				parts.resize(pScene->mNumMeshes);
 
-				glm::vec3				scale	(1.0f);
-				glm::vec2				uvscale	(1.0f);
-				glm::vec3				center	(0.0f);
-				if (createInfo)
-				{
-					scale	= createInfo->scale;
-					uvscale	= createInfo->uvscale;
-					center	= createInfo->center;
+				glm::vec3							scale					(1.0f);
+				glm::vec2							uvscale					(1.0f);
+				glm::vec3							center					(0.0f);
+				if (createInfo) {
+					scale							= createInfo->scale;
+					uvscale							= createInfo->uvscale;
+					center							= createInfo->center;
 				}
 
-				std::vector<float>		vertexBuffer;
-				std::vector<uint32_t>	indexBuffer;
+				std::vector<float>					vertexBuffer;
+				std::vector<uint32_t>				indexBuffer;
 
-				vertexCount	= 0;
-				indexCount	= 0;
+				vertexCount						= 0;
+				indexCount						= 0;
 
 				// Load meshes
-				for (unsigned int i = 0; i < pScene->mNumMeshes; i++)
-				{
-					const aiMesh*			paiMesh = pScene->mMeshes[i];
+				for (unsigned int i = 0; i < pScene->mNumMeshes; i++) {
+					const aiMesh*						paiMesh					= pScene->mMeshes[i];
 
-					parts[i]			= {};
-					parts[i].vertexBase	= vertexCount;
-					parts[i].indexBase	= indexCount;
+					parts[i]						= {};
+					parts[i].vertexBase				= vertexCount;
+					parts[i].indexBase				= indexCount;
 
-					vertexCount			+= pScene->mMeshes[i]->mNumVertices;
+					vertexCount						+= pScene->mMeshes[i]->mNumVertices;
 
-					aiColor3D				pColor(0.f, 0.f, 0.f);
+					aiColor3D							pColor					(0.f, 0.f, 0.f);
 					pScene->mMaterials[paiMesh->mMaterialIndex]->Get(AI_MATKEY_COLOR_DIFFUSE, pColor);
 
-					const aiVector3D		Zero3D(0.0f, 0.0f, 0.0f);
+					const aiVector3D					Zero3D(0.0f, 0.0f, 0.0f);
 
-					for (unsigned int j = 0; j < paiMesh->mNumVertices; j++)
-					{
-						const aiVector3D*		pPos		= &(paiMesh->mVertices[j]);
-						const aiVector3D*		pNormal		= &(paiMesh->mNormals[j]);
-						const aiVector3D*		pTexCoord	= (paiMesh->HasTextureCoords(0)) ? &(paiMesh->mTextureCoords[0][j]) : &Zero3D;
-						const aiVector3D*		pTangent	= (paiMesh->HasTangentsAndBitangents()) ? &(paiMesh->mTangents[j]) : &Zero3D;
-						const aiVector3D*		pBiTangent	= (paiMesh->HasTangentsAndBitangents()) ? &(paiMesh->mBitangents[j]) : &Zero3D;
+					for (unsigned int j = 0; j < paiMesh->mNumVertices; j++) {
+						const aiVector3D*					pPos					= &(paiMesh->mVertices[j]);
+						const aiVector3D*					pNormal					= &(paiMesh->mNormals[j]);
+						const aiVector3D*					pTexCoord				= (paiMesh->HasTextureCoords(0)) ? &(paiMesh->mTextureCoords[0][j]) : &Zero3D;
+						const aiVector3D*					pTangent				= (paiMesh->HasTangentsAndBitangents()) ? &(paiMesh->mTangents[j]) : &Zero3D;
+						const aiVector3D*					pBiTangent				= (paiMesh->HasTangentsAndBitangents()) ? &(paiMesh->mBitangents[j]) : &Zero3D;
 
-						for (auto& component : layout.components)
-						{
+						for (auto& component : layout.components) {
 							switch (component) {
 							case VERTEX_COMPONENT_POSITION:
-								vertexBuffer.push_back(pPos->x * scale.x + center.x);
+								vertexBuffer.push_back( pPos->x * scale.x + center.x);
 								vertexBuffer.push_back(-pPos->y * scale.y + center.y);
-								vertexBuffer.push_back(pPos->z * scale.z + center.z);
+								vertexBuffer.push_back( pPos->z * scale.z + center.z);
 								break;
 							case VERTEX_COMPONENT_NORMAL:
-								vertexBuffer.push_back(pNormal->x);
+								vertexBuffer.push_back( pNormal->x);
 								vertexBuffer.push_back(-pNormal->y);
-								vertexBuffer.push_back(pNormal->z);
+								vertexBuffer.push_back( pNormal->z);
 								break;
 							case VERTEX_COMPONENT_UV:
 								vertexBuffer.push_back(pTexCoord->x * uvscale.s);
@@ -242,43 +235,43 @@ namespace vks
 								vertexBuffer.push_back(0.0f);
 								vertexBuffer.push_back(0.0f);
 								break;
-							};
-						}
+							}	// switch component
+						}	// for components
 
-						dim.max.x = fmax(pPos->x, dim.max.x);
-						dim.max.y = fmax(pPos->y, dim.max.y);
-						dim.max.z = fmax(pPos->z, dim.max.z);
+						dim.max.x					= fmax(pPos->x, dim.max.x);
+						dim.max.y					= fmax(pPos->y, dim.max.y);
+						dim.max.z					= fmax(pPos->z, dim.max.z);
 
-						dim.min.x = fmin(pPos->x, dim.min.x);
-						dim.min.y = fmin(pPos->y, dim.min.y);
-						dim.min.z = fmin(pPos->z, dim.min.z);
-					}
+						dim.min.x					= fmin(pPos->x, dim.min.x);
+						dim.min.y					= fmin(pPos->y, dim.min.y);
+						dim.min.z					= fmin(pPos->z, dim.min.z);
+					}	// for vertices
 
-					dim.size = dim.max - dim.min;
+					dim.size						= dim.max - dim.min;
 
-					parts[i].vertexCount = paiMesh->mNumVertices;
+					parts[i].vertexCount			= paiMesh->mNumVertices;
 
-					uint32_t					indexBase	= static_cast<uint32_t>(indexBuffer.size());
+					uint32_t							indexBase						= static_cast<uint32_t>(indexBuffer.size());
 					for (unsigned int j = 0; j < paiMesh->mNumFaces; j++)
 					{
-						const aiFace&				Face		= paiMesh->mFaces[j];
+						const aiFace&						Face							= paiMesh->mFaces[j];
 						if (Face.mNumIndices != 3)
 							continue;
 						indexBuffer.push_back(indexBase + Face.mIndices[0]);
 						indexBuffer.push_back(indexBase + Face.mIndices[1]);
 						indexBuffer.push_back(indexBase + Face.mIndices[2]);
-						parts[i].indexCount += 3;
-						indexCount += 3;
-					}
-				}
+						parts[i].indexCount				+= 3;
+						indexCount						+= 3;
+					}	// for faces
+				}	// for meshes
 
 
-				uint32_t				vBufferSize		= static_cast<uint32_t>(vertexBuffer.size()) * sizeof(float);
-				uint32_t				iBufferSize		= static_cast<uint32_t>(indexBuffer.size()) * sizeof(uint32_t);
+				uint32_t							vBufferSize					= static_cast<uint32_t>(vertexBuffer.size()) * sizeof(float);
+				uint32_t							iBufferSize					= static_cast<uint32_t>(indexBuffer.size()) * sizeof(uint32_t);
 
 				// Use staging buffer to move vertex and index buffer to device local memory
 				// Create staging buffers
-				vks::Buffer				vertexStaging, indexStaging;
+				vks::Buffer							vertexStaging, indexStaging;
 
 				VK_CHECK_RESULT(device->createBuffer(VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, &vertexStaging	, vBufferSize, vertexBuffer	.data()));				// Vertex buffer
 				VK_CHECK_RESULT(device->createBuffer(VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, &indexStaging	, iBufferSize, indexBuffer	.data()));				// Index buffer
@@ -287,15 +280,11 @@ namespace vks
 				VK_CHECK_RESULT(device->createBuffer(VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT	, &indices	, iBufferSize));		// Index buffer
 
 				// Copy from staging buffers
-				VkCommandBuffer			copyCmd = device->createCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY, true);
+				VkCommandBuffer						copyCmd						= device->createCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY, true);
 
-				VkBufferCopy			copyRegion{};
-
-				copyRegion.size		= vertices.size;
-				vkCmdCopyBuffer(copyCmd, vertexStaging.buffer, vertices.buffer, 1, &copyRegion);
-
-				copyRegion.size		= indices.size;
-				vkCmdCopyBuffer(copyCmd, indexStaging.buffer, indices.buffer, 1, &copyRegion);
+				VkBufferCopy						copyRegion{};
+				copyRegion.size					= vertices.size;	vkCmdCopyBuffer(copyCmd, vertexStaging	.buffer, vertices	.buffer, 1, &copyRegion);
+				copyRegion.size					= indices.size;		vkCmdCopyBuffer(copyCmd, indexStaging	.buffer, indices	.buffer, 1, &copyRegion);
 
 				device->flushCommandBuffer(copyCmd, copyQueue);
 
@@ -307,8 +296,7 @@ namespace vks
 
 				return true;
 			}
-			else
-			{
+			else {
 				printf("Error parsing '%s': '%s'\n", filename.c_str(), Importer.GetErrorString());
 #if defined(__ANDROID__)
 				LOGE("Error parsing '%s': '%s'", filename.c_str(), Importer.GetErrorString());
@@ -327,7 +315,7 @@ namespace vks
 		// @param (Optional) flags ASSIMP model loading flags
 		bool							loadFromFile			(const std::string& filename, vks::VertexLayout layout, float scale, vks::VulkanDevice *device, VkQueue copyQueue, const int flags = defaultFlags)
 		{
-			vks::ModelCreateInfo	modelCreateInfo(scale, 1.0f, 0.0f);
+			vks::ModelCreateInfo				modelCreateInfo			(scale, 1.0f, 0.0f);
 			return loadFromFile(filename, layout, &modelCreateInfo, device, copyQueue, flags);
 		}
 	};
