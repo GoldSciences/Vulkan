@@ -797,14 +797,10 @@ HWND										VulkanExampleBase::setupWindow						(HINSTANCE hinstance, WNDPROC 
 		name.c_str(),
 		windowTitle.c_str(),
 		dwStyle | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,
-		0,
-		0,
+		0, 0,
 		windowRect.right - windowRect.left,
 		windowRect.bottom - windowRect.top,
-		NULL,
-		NULL,
-		hinstance,
-		NULL);
+		NULL, NULL, hinstance, NULL);
 
 	if (!settings.fullscreen)	{ 
 		// Center on screen
@@ -990,11 +986,11 @@ void										VulkanExampleBase::handleAppCommand					(android_app * app, int32_
 		break;
 	case APP_CMD_LOST_FOCUS:
 		LOGD("APP_CMD_LOST_FOCUS");
-		vulkanExample->focused = false;
+		vulkanExample->focused									= false;
 		break;
 	case APP_CMD_GAINED_FOCUS:
 		LOGD("APP_CMD_GAINED_FOCUS");
-		vulkanExample->focused = true;
+		vulkanExample->focused									= true;
 		break;
 	case APP_CMD_TERM_WINDOW:
 		// Window is hidden or closed, clean up resources
@@ -1096,18 +1092,18 @@ void										VulkanExampleBase::pointerAxis						(wl_pointer *pointer, uint32_t
 void										VulkanExampleBase::keyboardKey						(struct wl_keyboard *keyboard, uint32_t serial, uint32_t time, uint32_t key, uint32_t state)					{
 	switch (key)
 	{
-	case KEY_W		: camera.keys.up	= !!state;	break;
-	case KEY_S		: camera.keys.down	= !!state;	break;
-	case KEY_A		: camera.keys.left	= !!state;	break;
-	case KEY_D		: camera.keys.right	= !!state;	break;
-	case KEY_ESC	: quit				= true;		break;
+	case KEY_W		: camera.keys.up		= !!state;	break;
+	case KEY_S		: camera.keys.down		= !!state;	break;
+	case KEY_A		: camera.keys.left		= !!state;	break;
+	case KEY_D		: camera.keys.right		= !!state;	break;
+	case KEY_ESC	: quit					= true;		break;
 	case KEY_P		:
 		if (state)
-			paused = !paused;
+			paused								= !paused;
 		break;
 	case KEY_F1		:
 		if (state && enableTextOverlay)
-			textOverlay->visible = !textOverlay->visible;
+			textOverlay->visible				= !textOverlay->visible;
 		break;
 	}
 
@@ -1231,9 +1227,7 @@ xcb_window_t								VulkanExampleBase::setupWindow						()																						
 	xcb_intern_atom_reply_t											* reply								= intern_atom_helper(connection, true, "WM_PROTOCOLS");
 	atom_wm_delete_window										= intern_atom_helper(connection, false, "WM_DELETE_WINDOW");
 
-	xcb_change_property(connection, XCB_PROP_MODE_REPLACE,
-		window, (*reply).atom, 4, 32, 1,
-		&(*atom_wm_delete_window).atom);
+	xcb_change_property(connection, XCB_PROP_MODE_REPLACE, window, (*reply).atom, 4, 32, 1, &(*atom_wm_delete_window).atom);
 
 	std::string														windowTitle							= getWindowTitle();
 	xcb_change_property(connection, XCB_PROP_MODE_REPLACE,
@@ -1246,11 +1240,7 @@ xcb_window_t								VulkanExampleBase::setupWindow						()																						
 	{
 		xcb_intern_atom_reply_t		* atom_wm_state					= intern_atom_helper(connection, false, "_NET_WM_STATE");
 		xcb_intern_atom_reply_t		* atom_wm_fullscreen			= intern_atom_helper(connection, false, "_NET_WM_STATE_FULLSCREEN");
-		xcb_change_property(connection,
-				XCB_PROP_MODE_REPLACE,
-				window, atom_wm_state->atom,
-				XCB_ATOM_ATOM, 32, 1,
-				&(atom_wm_fullscreen->atom));
+		xcb_change_property(connection, XCB_PROP_MODE_REPLACE, window, atom_wm_state->atom, XCB_ATOM_ATOM, 32, 1, &(atom_wm_fullscreen->atom));
 		free(atom_wm_fullscreen);
 		free(atom_wm_state);
 	}	

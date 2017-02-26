@@ -81,8 +81,7 @@ public:
 	VkDescriptorSet descriptorSet;
 	VkDescriptorSetLayout descriptorSetLayout;
 
-	VulkanExample() : VulkanExampleBase(ENABLE_VALIDATION)
-	{
+	VulkanExample() : VulkanExampleBase(ENABLE_VALIDATION)	{
 		zoom = -2.7f;
 		rotation = glm::vec3(56.0f, 0.0f, 0.0f);
 		rotationSpeed = 0.25f;
@@ -92,8 +91,7 @@ public:
 		title = "Vulkan Example - Parallax Mapping";
 	}
 
-	~VulkanExample()
-	{
+	~VulkanExample()										{
 		// Clean up used Vulkan resources 
 		// Note : Inherited destructor cleans up resources stored in base class
 		vkDestroyPipeline(device, pipelines.parallaxMapping, nullptr);
@@ -111,25 +109,21 @@ public:
 		textures.normalHeightMap.destroy();
 	}
 
-	void loadAssets()
-	{
+	void loadAssets()	{
 		models.quad.loadFromFile(getAssetPath() + "models/plane_z.obj", vertexLayout, 0.1f, vulkanDevice, queue);
 		textures.colorMap.loadFromFile(getAssetPath() + "textures/rocks_color_bc3.dds", VK_FORMAT_BC3_UNORM_BLOCK, vulkanDevice, queue);
 		textures.normalHeightMap.loadFromFile(getAssetPath() + "textures/rocks_normal_height_rgba.dds", VK_FORMAT_R8G8B8A8_UNORM, vulkanDevice, queue);
 	}
 
-	void reBuildCommandBuffers()
-	{
-		if (!checkCommandBuffers())
-		{
+	void reBuildCommandBuffers()	{
+		if (!checkCommandBuffers()) {
 			destroyCommandBuffers();
 			createCommandBuffers();
 		}
 		buildCommandBuffers();
 	}
 
-	void buildCommandBuffers()
-	{
+	void buildCommandBuffers()	{
 		VkCommandBufferBeginInfo cmdBufInfo = vks::initializers::commandBufferBeginInfo();
 
 		VkClearValue clearValues[2];
@@ -145,8 +139,7 @@ public:
 		renderPassBeginInfo.clearValueCount = 2;
 		renderPassBeginInfo.pClearValues = clearValues;
 
-		for (size_t i = 0; i < drawCmdBuffers.size(); ++i)
-		{
+		for (size_t i = 0; i < drawCmdBuffers.size(); ++i) {
 			// Set target frame buffer
 			renderPassBeginInfo.framebuffer = frameBuffers[i];
 
@@ -172,8 +165,7 @@ public:
 			vkCmdDrawIndexed(drawCmdBuffers[i], models.quad.indexCount, 1, 0, 0, 1);
 
 			// Normal mapping
-			if (splitScreen)
-			{
+			if (splitScreen) {
 				viewport.x = (float)width / 2.0f;
 				vkCmdSetViewport(drawCmdBuffers[i], 0, 1, &viewport);
 				vkCmdBindPipeline(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines.normalMapping);
@@ -186,43 +178,18 @@ public:
 		}
 	}
 
-	void setupVertexDescriptions()
-	{
+	void setupVertexDescriptions()	{
 		// Binding description
 		vertices.bindingDescriptions.resize(1);
 		vertices.bindingDescriptions[0] = vks::initializers::vertexInputBindingDescription(VERTEX_BUFFER_BIND_ID, vertexLayout.stride(), VK_VERTEX_INPUT_RATE_VERTEX);
 		// Attribute descriptions
 		// Describes memory layout and shader positions
 		vertices.attributeDescriptions.resize(5);
-		// Location 0 : Position
-		vertices.attributeDescriptions[0] = vks::initializers::vertexInputAttributeDescription(VERTEX_BUFFER_BIND_ID, 0, VK_FORMAT_R32G32B32_SFLOAT, 0);		// Location 1 : Texture coordinates
-		vertices.attributeDescriptions[1] =
-			vks::initializers::vertexInputAttributeDescription(
-				VERTEX_BUFFER_BIND_ID,
-				1,
-				VK_FORMAT_R32G32_SFLOAT,
-				sizeof(float) * 3);
-		// Location 2 : Normal
-		vertices.attributeDescriptions[2] =
-			vks::initializers::vertexInputAttributeDescription(
-				VERTEX_BUFFER_BIND_ID,
-				2,
-				VK_FORMAT_R32G32B32_SFLOAT,
-				sizeof(float) * 5);
-		// Location 3 : Tangent
-		vertices.attributeDescriptions[3] =
-			vks::initializers::vertexInputAttributeDescription(
-				VERTEX_BUFFER_BIND_ID,
-				3,
-				VK_FORMAT_R32G32B32_SFLOAT,
-				sizeof(float) * 8);
-		// Location 4 : Bitangent
-		vertices.attributeDescriptions[4] =
-			vks::initializers::vertexInputAttributeDescription(
-				VERTEX_BUFFER_BIND_ID,
-				4,
-				VK_FORMAT_R32G32B32_SFLOAT,
-				sizeof(float) * 11);
+		vertices.attributeDescriptions[0] = vks::initializers::vertexInputAttributeDescription(VERTEX_BUFFER_BIND_ID, 0, VK_FORMAT_R32G32B32_SFLOAT	, 0);					// Location 0 : Position
+		vertices.attributeDescriptions[1] = vks::initializers::vertexInputAttributeDescription(VERTEX_BUFFER_BIND_ID, 1, VK_FORMAT_R32G32_SFLOAT	, sizeof(float) * 3);	// Location 1 : Texture coordinates
+		vertices.attributeDescriptions[2] = vks::initializers::vertexInputAttributeDescription(VERTEX_BUFFER_BIND_ID, 2, VK_FORMAT_R32G32B32_SFLOAT	, sizeof(float) * 5);	// Location 2 : Normal
+		vertices.attributeDescriptions[3] = vks::initializers::vertexInputAttributeDescription(VERTEX_BUFFER_BIND_ID, 3, VK_FORMAT_R32G32B32_SFLOAT	, sizeof(float) * 8);	// Location 3 : Tangent
+		vertices.attributeDescriptions[4] = vks::initializers::vertexInputAttributeDescription(VERTEX_BUFFER_BIND_ID, 4, VK_FORMAT_R32G32B32_SFLOAT	, sizeof(float) * 11);	// Location 4 : Bitangent
 
 		vertices.inputState										= vks::initializers::pipelineVertexInputStateCreateInfo();
 		vertices.inputState.vertexBindingDescriptionCount		= static_cast<uint32_t>(vertices.bindingDescriptions.size());
@@ -231,119 +198,61 @@ public:
 		vertices.inputState.pVertexAttributeDescriptions		= vertices.attributeDescriptions.data();
 	}
 
-	void setupDescriptorPool()
-	{
+	void setupDescriptorPool()	{
 		// Example uses two ubos and two image sampler
 		std::vector<VkDescriptorPoolSize> poolSizes =
-		{
-			vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 2),
-			vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 2)
-		};
+			{	vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 2)
+			,	vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 2)
+			};
 
-		VkDescriptorPoolCreateInfo descriptorPoolInfo =
-			vks::initializers::descriptorPoolCreateInfo(
-				static_cast<uint32_t>(poolSizes.size()),
-				poolSizes.data(),
-				4);
-
+		VkDescriptorPoolCreateInfo descriptorPoolInfo = vks::initializers::descriptorPoolCreateInfo(static_cast<uint32_t>(poolSizes.size()), poolSizes.data(), 4);
 		VK_CHECK_RESULT(vkCreateDescriptorPool(device, &descriptorPoolInfo, nullptr, &descriptorPool));
 	}
 
-	void setupDescriptorSetLayout()
-	{
+	void setupDescriptorSetLayout()	{
 		std::vector<VkDescriptorSetLayoutBinding> setLayoutBindings =
-		{
-			// Binding 0 : Vertex shader uniform buffer
-			vks::initializers::descriptorSetLayoutBinding(
-				VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-				VK_SHADER_STAGE_VERTEX_BIT,
-				0),
-			// Binding 1 : Fragment shader color map image sampler
-			vks::initializers::descriptorSetLayoutBinding(
-				VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-				VK_SHADER_STAGE_FRAGMENT_BIT,
-				1),
-			// Binding 2 : Fragment combined normal and heightmap
-			vks::initializers::descriptorSetLayoutBinding(
-				VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-				VK_SHADER_STAGE_FRAGMENT_BIT,
-				2),
-			// Binding 3 : Fragment shader uniform buffer
-			vks::initializers::descriptorSetLayoutBinding(
-				VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-				VK_SHADER_STAGE_FRAGMENT_BIT,
-				3)
-		};
+			{	vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER			, VK_SHADER_STAGE_VERTEX_BIT	, 0)	// Binding 0 : Vertex shader uniform buffer
+			,	vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER	, VK_SHADER_STAGE_FRAGMENT_BIT	, 1)	// Binding 1 : Fragment shader color map image sampler
+			,	vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER	, VK_SHADER_STAGE_FRAGMENT_BIT	, 2)	// Binding 2 : Fragment combined normal and heightmap
+			,	vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER			, VK_SHADER_STAGE_FRAGMENT_BIT	, 3)	// Binding 3 : Fragment shader uniform buffer
+			};
 
 		VkDescriptorSetLayoutCreateInfo						descriptorLayout			= vks::initializers::descriptorSetLayoutCreateInfo(setLayoutBindings.data(), static_cast<uint32_t>(setLayoutBindings.size()));
-
 		VK_CHECK_RESULT(vkCreateDescriptorSetLayout(device, &descriptorLayout, nullptr, &descriptorSetLayout));
 
 		VkPipelineLayoutCreateInfo							pPipelineLayoutCreateInfo	= vks::initializers::pipelineLayoutCreateInfo(&descriptorSetLayout, 1);
-
 		VK_CHECK_RESULT(vkCreatePipelineLayout(device, &pPipelineLayoutCreateInfo, nullptr, &pipelineLayout));
 	}
 
-	void setupDescriptorSet()
-	{
-		VkDescriptorSetAllocateInfo							allocInfo = vks::initializers::descriptorSetAllocateInfo(descriptorPool, &descriptorSetLayout, 1);
-
+	void setupDescriptorSet()	{
+		VkDescriptorSetAllocateInfo							allocInfo					= vks::initializers::descriptorSetAllocateInfo(descriptorPool, &descriptorSetLayout, 1);
 		VK_CHECK_RESULT(vkAllocateDescriptorSets(device, &allocInfo, &descriptorSet));
 
-		std::vector<VkWriteDescriptorSet> writeDescriptorSets =
-		{
-			// Binding 0 : Vertex shader uniform buffer
-			vks::initializers::writeDescriptorSet(
-				descriptorSet,
-				VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-				0,
-				&uniformBuffers.vertexShader.descriptor),
-			// Binding 1 : Fragment shader image sampler
-			vks::initializers::writeDescriptorSet(
-				descriptorSet,
-				VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-				1,
-				&textures.colorMap.descriptor),
-			// Binding 2 : Combined normal and heightmap
-			vks::initializers::writeDescriptorSet(
-				descriptorSet,
-				VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-				2,
-				&textures.normalHeightMap.descriptor),
-			// Binding 3 : Fragment shader uniform buffer
-			vks::initializers::writeDescriptorSet(
-				descriptorSet,
-				VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-				3,
-				&uniformBuffers.fragmentShader.descriptor)
-		};
+		std::vector<VkWriteDescriptorSet>					writeDescriptorSets			=
+			{	vks::initializers::writeDescriptorSet(descriptorSet, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER			, 0, &uniformBuffers.vertexShader.descriptor)	// Binding 0 : Vertex shader uniform buffer
+			,	vks::initializers::writeDescriptorSet(descriptorSet, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER	, 1, &textures.colorMap.descriptor)				// Binding 1 : Fragment shader image sampler
+			,	vks::initializers::writeDescriptorSet(descriptorSet, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER	, 2, &textures.normalHeightMap.descriptor)		// Binding 2 : Combined normal and heightmap
+			,	vks::initializers::writeDescriptorSet(descriptorSet, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER			, 3, &uniformBuffers.fragmentShader.descriptor)	// Binding 3 : Fragment shader uniform buffer
+			};
 
 		vkUpdateDescriptorSets(device, static_cast<uint32_t>(writeDescriptorSets.size()), writeDescriptorSets.data(), 0, NULL);
 	}
 
-	void preparePipelines()
-	{
-		VkPipelineInputAssemblyStateCreateInfo inputAssemblyState = vks::initializers::pipelineInputAssemblyStateCreateInfo(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, 0, VK_FALSE);
+	void preparePipelines()	{
+		VkPipelineInputAssemblyStateCreateInfo				inputAssemblyState			= vks::initializers::pipelineInputAssemblyStateCreateInfo(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, 0, VK_FALSE);
+		VkPipelineRasterizationStateCreateInfo				rasterizationState			= vks::initializers::pipelineRasterizationStateCreateInfo(VK_POLYGON_MODE_FILL, VK_CULL_MODE_NONE, VK_FRONT_FACE_COUNTER_CLOCKWISE, 0);
+		VkPipelineColorBlendAttachmentState					blendAttachmentState		= vks::initializers::pipelineColorBlendAttachmentState(0xf, VK_FALSE);
+		VkPipelineColorBlendStateCreateInfo					colorBlendState				= vks::initializers::pipelineColorBlendStateCreateInfo(1, &blendAttachmentState);
+		VkPipelineDepthStencilStateCreateInfo				depthStencilState			= vks::initializers::pipelineDepthStencilStateCreateInfo(VK_TRUE, VK_TRUE, VK_COMPARE_OP_LESS_OR_EQUAL);
+		VkPipelineViewportStateCreateInfo					viewportState				= vks::initializers::pipelineViewportStateCreateInfo(1, 1, 0);
+		VkPipelineMultisampleStateCreateInfo				multisampleState			= vks::initializers::pipelineMultisampleStateCreateInfo(VK_SAMPLE_COUNT_1_BIT, 0);
 
-		VkPipelineRasterizationStateCreateInfo rasterizationState =
-			vks::initializers::pipelineRasterizationStateCreateInfo(
-				VK_POLYGON_MODE_FILL,
-				VK_CULL_MODE_NONE,
-				VK_FRONT_FACE_COUNTER_CLOCKWISE,
-				0);
-
-		VkPipelineColorBlendAttachmentState					blendAttachmentState	= vks::initializers::pipelineColorBlendAttachmentState(0xf, VK_FALSE);
-		VkPipelineColorBlendStateCreateInfo					colorBlendState			= vks::initializers::pipelineColorBlendStateCreateInfo(1, &blendAttachmentState);
-		VkPipelineDepthStencilStateCreateInfo				depthStencilState		= vks::initializers::pipelineDepthStencilStateCreateInfo(VK_TRUE, VK_TRUE, VK_COMPARE_OP_LESS_OR_EQUAL);
-		VkPipelineViewportStateCreateInfo					viewportState			= vks::initializers::pipelineViewportStateCreateInfo(1, 1, 0);
-		VkPipelineMultisampleStateCreateInfo				multisampleState		= vks::initializers::pipelineMultisampleStateCreateInfo(VK_SAMPLE_COUNT_1_BIT, 0);
-
-		std::vector<VkDynamicState> dynamicStateEnables = {VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR};
-		VkPipelineDynamicStateCreateInfo dynamicState = vks::initializers::pipelineDynamicStateCreateInfo(dynamicStateEnables.data(), static_cast<uint32_t>(dynamicStateEnables.size()), 0);
+		std::vector<VkDynamicState>							dynamicStateEnables			= {VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR};
+		VkPipelineDynamicStateCreateInfo					dynamicState				= vks::initializers::pipelineDynamicStateCreateInfo(dynamicStateEnables.data(), static_cast<uint32_t>(dynamicStateEnables.size()), 0);
 
 		// Parallax mapping pipeline
 		// Load shaders
-		std::array<VkPipelineShaderStageCreateInfo, 2> shaderStages = {};
+		std::array<VkPipelineShaderStageCreateInfo, 2>		shaderStages				= {};
 		shaderStages[0] = loadShader(getAssetPath() + "shaders/parallax/parallax.vert.spv", VK_SHADER_STAGE_VERTEX_BIT);
 		shaderStages[1] = loadShader(getAssetPath() + "shaders/parallax/parallax.frag.spv", VK_SHADER_STAGE_FRAGMENT_BIT);
 
@@ -368,31 +277,18 @@ public:
 		VK_CHECK_RESULT(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipelines.normalMapping));
 	}
 
-	void prepareUniformBuffers()
-	{
-		// Vertex shader uniform buffer
-		VK_CHECK_RESULT(vulkanDevice->createBuffer(
-			VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-			&uniformBuffers.vertexShader,
-			sizeof(ubos.vertexShader)));
-
-		// Fragment shader uniform buffer
-		VK_CHECK_RESULT(vulkanDevice->createBuffer(
-			VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-			&uniformBuffers.fragmentShader,
-			sizeof(ubos.fragmentShader)));
+	void prepareUniformBuffers()	{
+		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBuffers.vertexShader		, sizeof(ubos.vertexShader	)));	// Vertex shader uniform buffer
+		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBuffers.fragmentShader	, sizeof(ubos.fragmentShader)));	// Fragment shader uniform buffer
 
 		// Map persistent
-		VK_CHECK_RESULT(uniformBuffers.vertexShader.map());
-		VK_CHECK_RESULT(uniformBuffers.fragmentShader.map());
+		VK_CHECK_RESULT(uniformBuffers.vertexShader		.map());
+		VK_CHECK_RESULT(uniformBuffers.fragmentShader	.map());
 
 		updateUniformBuffers();
 	}
 
-	void updateUniformBuffers()
-	{
+	void updateUniformBuffers()	{
 		// Vertex shader
 		glm::mat4 viewMatrix = glm::mat4();
 		ubos.vertexShader.projection = glm::perspective(glm::radians(45.0f), (float)(width* ((splitScreen) ? 0.5f : 1.0f)) / (float)height, 0.001f, 256.0f);
@@ -406,8 +302,7 @@ public:
 
 		ubos.vertexShader.normal = glm::inverseTranspose(ubos.vertexShader.model);
 
-		if (!paused)
-		{
+		if (!paused) {
 			ubos.vertexShader.lightPos.x = sin(glm::radians(timer * 360.0f)) * 0.5f;
 			ubos.vertexShader.lightPos.y = cos(glm::radians(timer * 360.0f)) * 0.5f;
 		}
@@ -420,8 +315,7 @@ public:
 		memcpy(uniformBuffers.fragmentShader.mapped, &ubos.fragmentShader, sizeof(ubos.fragmentShader));
 	}
 
-	void draw()
-	{
+	void			draw					()									{
 		VulkanExampleBase::prepareFrame();
 
 		// Command buffer to be sumitted to the queue
@@ -434,8 +328,7 @@ public:
 		VulkanExampleBase::submitFrame();
 	}
 
-	void prepare()
-	{
+	void			prepare					()									{
 		VulkanExampleBase::prepare();
 		loadAssets();
 		setupVertexDescriptions();
@@ -448,62 +341,35 @@ public:
 		prepared = true;
 	}
 
-	virtual void render()
-	{
+	virtual void	render					()									{
 		if (!prepared)
 			return;
 		draw();
 		if (!paused)
-		{
 			updateUniformBuffers();
-		}
 	}
 
-	virtual void viewChanged()
-	{
-		updateUniformBuffers();
-	}
-
-	void toggleParallaxOffset()
-	{
-		ubos.fragmentShader.usePom = !ubos.fragmentShader.usePom;
-		updateUniformBuffers();
-	}
-
-	void toggleNormalMapDisplay()
-	{
-		ubos.fragmentShader.displayNormalMap = !ubos.fragmentShader.displayNormalMap;
-		updateUniformBuffers();
-	}
-
-	void toggleSplitScreen()
-	{
-		splitScreen = !splitScreen;
+	virtual void	viewChanged				()									{ updateUniformBuffers(); }
+	void			toggleParallaxOffset	()									{ ubos.fragmentShader.usePom			= !ubos.fragmentShader.usePom;				updateUniformBuffers(); }
+	void			toggleNormalMapDisplay	()									{ ubos.fragmentShader.displayNormalMap	= !ubos.fragmentShader.displayNormalMap;	updateUniformBuffers(); }
+	void			toggleSplitScreen		()									{
+		splitScreen		= !splitScreen;
 		updateUniformBuffers();
 		reBuildCommandBuffers();
 	}
 
-	virtual void keyPressed(uint32_t keyCode)
-	{
-		switch (keyCode)
-		{
-		case KEY_O:
-		case GAMEPAD_BUTTON_A:
-			toggleParallaxOffset();
-			break;
-		case KEY_N:
-		case GAMEPAD_BUTTON_X:
-			toggleNormalMapDisplay();
-			break;
-		case KEY_S:
-		case GAMEPAD_BUTTON_Y:
-			toggleSplitScreen();
-			break;
+	virtual void	keyPressed				(uint32_t keyCode)					{
+		switch (keyCode)	{
+		case KEY_O				:
+		case GAMEPAD_BUTTON_A	: toggleParallaxOffset	(); break;
+		case KEY_N				:
+		case GAMEPAD_BUTTON_X	: toggleNormalMapDisplay(); break;
+		case KEY_S				:
+		case GAMEPAD_BUTTON_Y	: toggleSplitScreen		(); break;
 		}
 	}
 
-	virtual void getOverlayText(VulkanTextOverlay *textOverlay)
-	{
+	virtual void	getOverlayText			(VulkanTextOverlay *textOverlay)	{
 #if defined(__ANDROID__)
 		textOverlay->addText("Press \"Button A\" to toggle parallax", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
 		textOverlay->addText("Press \"Button X\" to toggle normals", 5.0f, 100.0f, VulkanTextOverlay::alignLeft);
