@@ -93,15 +93,13 @@ public:
 	VkPipelineLayout pipelineLayout;
 	VkDescriptorSetLayout descriptorSetLayout;
 
-	VulkanExample() : VulkanExampleBase(ENABLE_VALIDATION)
-	{
+	VulkanExample() : VulkanExampleBase(ENABLE_VALIDATION)	{
 		zoom = -2.0f;
 		enableTextOverlay = true;
 		title = "Vulkan Example - Distance field fonts";
 	}
 
-	~VulkanExample()
-	{
+	~VulkanExample()	{
 		// Clean up used Vulkan resources 
 		// Note : Inherited destructor cleans up resources stored in base class
 
@@ -124,8 +122,7 @@ public:
 
 	// Basic parser fpr AngelCode bitmap font format files
 	// See http://www.angelcode.com/products/bmfont/doc/file_format.html for details
-	void parsebmFont()
-	{
+	void parsebmFont()	{
 		std::string fileName = getAssetPath() + "font.fnt";
 
 #if defined(__ANDROID__)
@@ -181,24 +178,20 @@ public:
 
 	}
 
-	void loadAssets()
-	{
-		textures.fontSDF.loadFromFile(getAssetPath() + "textures/font_sdf_rgba.ktx", VK_FORMAT_R8G8B8A8_UNORM, vulkanDevice, queue);
-		textures.fontBitmap.loadFromFile(getAssetPath() + "textures/font_bitmap_rgba.ktx", VK_FORMAT_R8G8B8A8_UNORM, vulkanDevice, queue);
+	void loadAssets()	{
+		textures.fontSDF	.loadFromFile(getAssetPath() + "textures/font_sdf_rgba.ktx"		, VK_FORMAT_R8G8B8A8_UNORM, vulkanDevice, queue);
+		textures.fontBitmap	.loadFromFile(getAssetPath() + "textures/font_bitmap_rgba.ktx"	, VK_FORMAT_R8G8B8A8_UNORM, vulkanDevice, queue);
 	}
 
-	void reBuildCommandBuffers()
-	{
-		if (!checkCommandBuffers())
-		{
+	void reBuildCommandBuffers()	{
+		if (!checkCommandBuffers()) {
 			destroyCommandBuffers();
 			createCommandBuffers();
 		}
 		buildCommandBuffers();
 	}
 
-	void buildCommandBuffers()
-	{
+	void buildCommandBuffers()	{
 		VkCommandBufferBeginInfo cmdBufInfo = vks::initializers::commandBufferBeginInfo();
 
 		VkClearValue clearValues[2];
@@ -238,8 +231,7 @@ public:
 			vkCmdDrawIndexed(drawCmdBuffers[i], indexCount, 1, 0, 0, 0);
 
 			// Linear filtered bitmap font
-			if (splitScreen)
-			{
+			if (splitScreen) {
 				viewport.y = (float)height / 2.0f;
 				vkCmdSetViewport(drawCmdBuffers[i], 0, 1, &viewport);
 				vkCmdBindDescriptorSets(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSets.bitmap, 0, NULL);
@@ -254,8 +246,7 @@ public:
 	}
 
 	// Creates a vertex buffer containing quads for the passed text
-	void generateText(std:: string text)
-	{
+	void generateText(std:: string text)	{
 		std::vector<Vertex> vertices;
 		std::vector<uint32_t> indices;
 		uint32_t indexOffset = 0;
@@ -265,8 +256,7 @@ public:
 		float posx = 0.0f;
 		float posy = 0.0f;
 
-		for (uint32_t i = 0; i < text.size(); i++)
-		{
+		for (uint32_t i = 0; i < text.size(); i++) {
 			bmchar *charInfo = &fontChars[(int)text[i]];
 
 			if (charInfo->width == 0)
@@ -293,9 +283,8 @@ public:
 
 			std::array<uint32_t, 6> letterIndices = { 0,1,2, 2,3,0 };
 			for (auto& index : letterIndices)
-			{
 				indices.push_back(indexOffset + index);
-			}
+
 			indexOffset += 4;
 
 			float advance = ((float)(charInfo->xadvance) / 36.0f);
@@ -304,56 +293,26 @@ public:
 		indexCount = static_cast<uint32_t>(indices.size());
 
 		// Center
-		for (auto& v : vertices)
-		{
+		for (auto& v : vertices)	{
 			v.pos[0] -= posx / 2.0f;
 			v.pos[1] -= 0.5f;
 		}
 
 		// Generate host accesible buffers for the text vertices and indices and upload the data
-
-		VK_CHECK_RESULT(vulkanDevice->createBuffer(
-			VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-			&vertexBuffer,
-			vertices.size() * sizeof(Vertex),
-			vertices.data()));
-
-		VK_CHECK_RESULT(vulkanDevice->createBuffer(
-			VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
-			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-			&indexBuffer,
-			indices.size() * sizeof(uint32_t),
-			indices.data()));
+		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &vertexBuffer, vertices.size() * sizeof(Vertex), vertices.data()));
+		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &indexBuffer, indices.size() * sizeof(uint32_t), indices.data()));
 	}
 
-	void setupVertexDescriptions()
-	{
+	void setupVertexDescriptions()	{
 		// Binding description
 		vertices.bindingDescriptions.resize(1);
-		vertices.bindingDescriptions[0] =
-			vks::initializers::vertexInputBindingDescription(
-				VERTEX_BUFFER_BIND_ID, 
-				sizeof(Vertex), 
-				VK_VERTEX_INPUT_RATE_VERTEX);
+		vertices.bindingDescriptions[0] = vks::initializers::vertexInputBindingDescription(VERTEX_BUFFER_BIND_ID, sizeof(Vertex), VK_VERTEX_INPUT_RATE_VERTEX);
 
 		// Attribute descriptions
 		// Describes memory layout and shader positions
 		vertices.attributeDescriptions.resize(2);
-		// Location 0 : Position
-		vertices.attributeDescriptions[0] =
-			vks::initializers::vertexInputAttributeDescription(
-				VERTEX_BUFFER_BIND_ID,
-				0,
-				VK_FORMAT_R32G32B32_SFLOAT,
-				0);			
-		// Location 1 : Texture coordinates
-		vertices.attributeDescriptions[1] =
-			vks::initializers::vertexInputAttributeDescription(
-				VERTEX_BUFFER_BIND_ID,
-				1,
-				VK_FORMAT_R32G32_SFLOAT,
-				sizeof(float) * 3);
+		vertices.attributeDescriptions[0] = vks::initializers::vertexInputAttributeDescription(VERTEX_BUFFER_BIND_ID, 0, VK_FORMAT_R32G32B32_SFLOAT, 0);				// Location 0 : Position
+		vertices.attributeDescriptions[1] = vks::initializers::vertexInputAttributeDescription(VERTEX_BUFFER_BIND_ID, 1, VK_FORMAT_R32G32_SFLOAT, sizeof(float) * 3);	// Location 1 : Texture coordinates
 
 		vertices.inputState										= vks::initializers::pipelineVertexInputStateCreateInfo();
 		vertices.inputState.vertexBindingDescriptionCount		= static_cast<uint32_t>(vertices.bindingDescriptions.size());
@@ -362,96 +321,44 @@ public:
 		vertices.inputState.pVertexAttributeDescriptions		= vertices.attributeDescriptions.data();
 	}
 
-	void setupDescriptorPool()
-	{
+	void setupDescriptorPool()	{
 		std::vector<VkDescriptorPoolSize> poolSizes =
-		{
-			vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 4),
-			vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 2)
-		};
+			{	vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 4)
+			,	vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 2)
+			};
 
-		VkDescriptorPoolCreateInfo descriptorPoolInfo = 
-			vks::initializers::descriptorPoolCreateInfo(
-				static_cast<uint32_t>(poolSizes.size()),
-				poolSizes.data(),
-				2);
-
+		VkDescriptorPoolCreateInfo descriptorPoolInfo = vks::initializers::descriptorPoolCreateInfo(static_cast<uint32_t>(poolSizes.size()), poolSizes.data(), 2);
 		VkResult vkRes = vkCreateDescriptorPool(device, &descriptorPoolInfo, nullptr, &descriptorPool);
 		assert(!vkRes);
 	}
 
-	void setupDescriptorSetLayout()
-	{
+	void setupDescriptorSetLayout()	{
 		std::vector<VkDescriptorSetLayoutBinding> setLayoutBindings = 
-		{
-			// Binding 0 : Vertex shader uniform buffer
-			vks::initializers::descriptorSetLayoutBinding(
-				VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 
-				VK_SHADER_STAGE_VERTEX_BIT, 
-				0),
-			// Binding 1 : Fragment shader image sampler
-			vks::initializers::descriptorSetLayoutBinding(
-				VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 
-				VK_SHADER_STAGE_FRAGMENT_BIT, 
-				1),
-			// Binding 2 : Fragment shader uniform buffer
-			vks::initializers::descriptorSetLayoutBinding(
-				VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-				VK_SHADER_STAGE_FRAGMENT_BIT,
-				2)
-		};
+			{	vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT, 0)				// Binding 0 : Vertex shader uniform buffer
+			,	vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, 1)	// Binding 1 : Fragment shader image sampler
+			,	vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT, 2)			// Binding 2 : Fragment shader uniform buffer
+			};
 
-		VkDescriptorSetLayoutCreateInfo descriptorLayout = 
-			vks::initializers::descriptorSetLayoutCreateInfo(
-				setLayoutBindings.data(),
-				static_cast<uint32_t>(setLayoutBindings.size()));
-
+		VkDescriptorSetLayoutCreateInfo descriptorLayout = vks::initializers::descriptorSetLayoutCreateInfo(setLayoutBindings.data(), static_cast<uint32_t>(setLayoutBindings.size()));
 		VK_CHECK_RESULT(vkCreateDescriptorSetLayout(device, &descriptorLayout, nullptr, &descriptorSetLayout));
 
 		VkPipelineLayoutCreateInfo							pPipelineLayoutCreateInfo	= vks::initializers::pipelineLayoutCreateInfo(&descriptorSetLayout, 1);
-
 		VK_CHECK_RESULT(vkCreatePipelineLayout(device, &pPipelineLayoutCreateInfo, nullptr, &pipelineLayout));
 	}
 
-	void setupDescriptorSet()
-	{
-		VkDescriptorSetAllocateInfo allocInfo = 
-			vks::initializers::descriptorSetAllocateInfo(
-				descriptorPool,
-				&descriptorSetLayout,
-				1);
+	void setupDescriptorSet()	{
+		VkDescriptorSetAllocateInfo allocInfo = vks::initializers::descriptorSetAllocateInfo(descriptorPool, &descriptorSetLayout, 1);
 
 		// Signed distance front descriptor set
 		VK_CHECK_RESULT(vkAllocateDescriptorSets(device, &allocInfo, &descriptorSets.sdf));
 
 		// Image descriptor for the color map texture
-		VkDescriptorImageInfo texDescriptor =
-			vks::initializers::descriptorImageInfo(
-				textures.fontSDF.sampler,
-				textures.fontSDF.view,
-				VK_IMAGE_LAYOUT_GENERAL);
-
+		VkDescriptorImageInfo texDescriptor = vks::initializers::descriptorImageInfo(textures.fontSDF.sampler, textures.fontSDF.view, VK_IMAGE_LAYOUT_GENERAL);
 		std::vector<VkWriteDescriptorSet> writeDescriptorSets =
-		{
-			// Binding 0 : Vertex shader uniform buffer
-			vks::initializers::writeDescriptorSet(
-			descriptorSets.sdf,
-				VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 
-				0, 
-				&uniformBuffers.vs.descriptor),
-			// Binding 1 : Fragment shader texture sampler
-			vks::initializers::writeDescriptorSet(
-				descriptorSets.sdf,
-				VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 
-				1, 
-				&texDescriptor),
-			// Binding 2 : Fragment shader uniform buffer
-			vks::initializers::writeDescriptorSet(
-				descriptorSets.sdf,
-				VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-				2,
-				&uniformBuffers.fs.descriptor)
-		};
+			{	vks::initializers::writeDescriptorSet(descriptorSets.sdf, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER			, 0, &uniformBuffers.vs.descriptor)		// Binding 0 : Vertex shader uniform buffer
+			,	vks::initializers::writeDescriptorSet(descriptorSets.sdf, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER	, 1, &texDescriptor)					// Binding 1 : Fragment shader texture sampler
+			,	vks::initializers::writeDescriptorSet(descriptorSets.sdf, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER			, 2, &uniformBuffers.fs.descriptor)		// Binding 2 : Fragment shader uniform buffer
+			};
 
 		vkUpdateDescriptorSets(device, static_cast<uint32_t>(writeDescriptorSets.size()), writeDescriptorSets.data(), 0, NULL);
 
@@ -463,74 +370,41 @@ public:
 		texDescriptor.imageView = textures.fontBitmap.view;
 
 		writeDescriptorSets =
-		{
-			// Binding 0 : Vertex shader uniform buffer
-			vks::initializers::writeDescriptorSet(
-				descriptorSets.bitmap,
-				VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-				0,
-				&uniformBuffers.vs.descriptor),
-			// Binding 1 : Fragment shader texture sampler
-			vks::initializers::writeDescriptorSet(
-				descriptorSets.bitmap,
-				VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-				1,
-				&texDescriptor)
-		};
+			{	vks::initializers::writeDescriptorSet(descriptorSets.bitmap, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 0, &uniformBuffers.vs.descriptor)	// Binding 0 : Vertex shader uniform buffer
+			,	vks::initializers::writeDescriptorSet(descriptorSets.bitmap, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, &texDescriptor)			// Binding 1 : Fragment shader texture sampler
+			};
 
 		vkUpdateDescriptorSets(device, static_cast<uint32_t>(writeDescriptorSets.size()), writeDescriptorSets.data(), 0, NULL);
 	}
 
-	void preparePipelines()
-	{
-		VkPipelineInputAssemblyStateCreateInfo inputAssemblyState = vks::initializers::pipelineInputAssemblyStateCreateInfo(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, 0, VK_FALSE);
+	void preparePipelines()	{
+		VkPipelineInputAssemblyStateCreateInfo			inputAssemblyState		= vks::initializers::pipelineInputAssemblyStateCreateInfo(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, 0, VK_FALSE);
+		VkPipelineRasterizationStateCreateInfo			rasterizationState		= vks::initializers::pipelineRasterizationStateCreateInfo(VK_POLYGON_MODE_FILL, VK_CULL_MODE_NONE, VK_FRONT_FACE_COUNTER_CLOCKWISE, 0);
+		VkPipelineColorBlendAttachmentState				blendAttachmentState	= vks::initializers::pipelineColorBlendAttachmentState(0xf, VK_TRUE);
+		blendAttachmentState.blendEnable			= VK_TRUE;
+		blendAttachmentState.srcColorBlendFactor	= VK_BLEND_FACTOR_ONE;
+		blendAttachmentState.dstColorBlendFactor	= VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+		blendAttachmentState.colorBlendOp			= VK_BLEND_OP_ADD;
+		blendAttachmentState.srcAlphaBlendFactor	= VK_BLEND_FACTOR_ONE;
+		blendAttachmentState.dstAlphaBlendFactor	= VK_BLEND_FACTOR_ZERO;
+		blendAttachmentState.alphaBlendOp			= VK_BLEND_OP_ADD;
+		blendAttachmentState.colorWriteMask			= VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
 
-		VkPipelineRasterizationStateCreateInfo rasterizationState =
-			vks::initializers::pipelineRasterizationStateCreateInfo(
-				VK_POLYGON_MODE_FILL,
-				VK_CULL_MODE_NONE,
-				VK_FRONT_FACE_COUNTER_CLOCKWISE,
-				0);
+		VkPipelineColorBlendStateCreateInfo				colorBlendState			= vks::initializers::pipelineColorBlendStateCreateInfo(1, &blendAttachmentState);
+		VkPipelineDepthStencilStateCreateInfo			depthStencilState		= vks::initializers::pipelineDepthStencilStateCreateInfo(VK_FALSE, VK_TRUE, VK_COMPARE_OP_LESS_OR_EQUAL);
+		VkPipelineViewportStateCreateInfo				viewportState			= vks::initializers::pipelineViewportStateCreateInfo(1, 1, 0);
+		VkPipelineMultisampleStateCreateInfo			multisampleState		= vks::initializers::pipelineMultisampleStateCreateInfo(VK_SAMPLE_COUNT_1_BIT, 0);
 
-		VkPipelineColorBlendAttachmentState blendAttachmentState =
-			vks::initializers::pipelineColorBlendAttachmentState(
-				0xf,
-				VK_TRUE);
-
-		blendAttachmentState.blendEnable = VK_TRUE;
-		blendAttachmentState.srcColorBlendFactor = VK_BLEND_FACTOR_ONE;
-		blendAttachmentState.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
-		blendAttachmentState.colorBlendOp = VK_BLEND_OP_ADD;
-		blendAttachmentState.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
-		blendAttachmentState.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
-		blendAttachmentState.alphaBlendOp = VK_BLEND_OP_ADD;
-		blendAttachmentState.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
-
-		VkPipelineColorBlendStateCreateInfo colorBlendState =
-			vks::initializers::pipelineColorBlendStateCreateInfo(
-				1, 
-				&blendAttachmentState);
-
-		VkPipelineDepthStencilStateCreateInfo depthStencilState =
-			vks::initializers::pipelineDepthStencilStateCreateInfo(
-				VK_FALSE,
-				VK_TRUE,
-				VK_COMPARE_OP_LESS_OR_EQUAL);
-
-		VkPipelineViewportStateCreateInfo viewportState = vks::initializers::pipelineViewportStateCreateInfo(1, 1, 0);
-
-		VkPipelineMultisampleStateCreateInfo multisampleState = vks::initializers::pipelineMultisampleStateCreateInfo(VK_SAMPLE_COUNT_1_BIT, 0);
-
-		std::vector<VkDynamicState> dynamicStateEnables = {VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR};
-		VkPipelineDynamicStateCreateInfo dynamicState = vks::initializers::pipelineDynamicStateCreateInfo(dynamicStateEnables.data(), static_cast<uint32_t>(dynamicStateEnables.size()), 0);
+		std::vector<VkDynamicState>						dynamicStateEnables		= {VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR};
+		VkPipelineDynamicStateCreateInfo				dynamicState			= vks::initializers::pipelineDynamicStateCreateInfo(dynamicStateEnables.data(), static_cast<uint32_t>(dynamicStateEnables.size()), 0);
 
 		// Load shaders
-		std::array<VkPipelineShaderStageCreateInfo,2> shaderStages;
+		std::array<VkPipelineShaderStageCreateInfo,2>	shaderStages;
 
 		shaderStages[0] = loadShader(getAssetPath() + "shaders/distancefieldfonts/sdf.vert.spv", VK_SHADER_STAGE_VERTEX_BIT);
 		shaderStages[1] = loadShader(getAssetPath() + "shaders/distancefieldfonts/sdf.frag.spv", VK_SHADER_STAGE_FRAGMENT_BIT);
 
-		VkGraphicsPipelineCreateInfo pipelineCreateInfo = vks::initializers::pipelineCreateInfo(pipelineLayout, renderPass, 0);
+		VkGraphicsPipelineCreateInfo					pipelineCreateInfo		= vks::initializers::pipelineCreateInfo(pipelineLayout, renderPass, 0);
 
 		pipelineCreateInfo.pVertexInputState = &vertices.inputState;
 		pipelineCreateInfo.pInputAssemblyState = &inputAssemblyState;
@@ -552,21 +426,9 @@ public:
 	}
 
 	// Prepare and initialize uniform buffer containing shader uniforms
-	void prepareUniformBuffers()
-	{
-		// Vertex shader uniform buffer block
-		VK_CHECK_RESULT(vulkanDevice->createBuffer(
-			VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-			&uniformBuffers.vs,
-			sizeof(uboVS)));
-
-		// Fragment sahder uniform buffer block (Contains font rendering parameters)
-		VK_CHECK_RESULT(vulkanDevice->createBuffer(
-			VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-			&uniformBuffers.fs,
-			sizeof(uboFS)));
+	void prepareUniformBuffers()	{
+		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBuffers.vs, sizeof(uboVS)));	// Vertex shader uniform buffer block
+		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBuffers.fs, sizeof(uboFS)));	// Fragment sahder uniform buffer block (Contains font rendering parameters)
 
 		// Map persistent
 		VK_CHECK_RESULT(uniformBuffers.vs.map());
@@ -576,8 +438,7 @@ public:
 		updateFontSettings();
 	}
 
-	void updateUniformBuffers()
-	{
+	void updateUniformBuffers()	{
 		// Vertex shader
 		glm::mat4 viewMatrix = glm::mat4();
 		uboVS.projection = glm::perspective(glm::radians(splitScreen ? 30.0f : 45.0f), (float)width / (float)(height * ((splitScreen) ? 0.5f : 1.0f)), 0.001f, 256.0f);
@@ -592,14 +453,8 @@ public:
 		memcpy(uniformBuffers.vs.mapped, &uboVS, sizeof(uboVS));
 	}
 
-	void updateFontSettings()
-	{
-		// Fragment shader
-		memcpy(uniformBuffers.fs.mapped, &uboFS, sizeof(uboFS));
-	}
-
-	void draw()
-	{
+	void updateFontSettings	()	{ memcpy(uniformBuffers.fs.mapped, &uboFS, sizeof(uboFS));	}	// Fragment shader
+	void draw				()	{
 		VulkanExampleBase::prepareFrame();
 
 		// Command buffer to be sumitted to the queue
@@ -612,8 +467,7 @@ public:
 		VulkanExampleBase::submitFrame();
 	}
 
-	void prepare()
-	{
+	void prepare			()	{
 		VulkanExampleBase::prepare();
 		parsebmFont();
 		loadAssets();
@@ -628,8 +482,7 @@ public:
 		prepared = true;
 	}
 
-	virtual void render()
-	{
+	virtual void render		()	{
 		if (!prepared)
 			return;
 		vkDeviceWaitIdle(device);
@@ -637,37 +490,21 @@ public:
 		vkDeviceWaitIdle(device);
 	}
 
-	virtual void viewChanged()
-	{
-		updateUniformBuffers();
-	}
-
-	void toggleSplitScreen()
-	{
+	virtual void	viewChanged			()	{ updateUniformBuffers(); }
+	void			toggleFontOutline	()	{ uboFS.outline = !uboFS.outline; updateFontSettings(); }
+	void			toggleSplitScreen	()	{
 		splitScreen = !splitScreen;
 		reBuildCommandBuffers();
 		updateUniformBuffers();
 	}
 
-	void toggleFontOutline()
-	{
-		uboFS.outline = !uboFS.outline;
-		updateFontSettings();
-	}
 
-	virtual void keyPressed(uint32_t keyCode)
-	{
-		switch (keyCode)
-		{
-		case KEY_S:
-		case GAMEPAD_BUTTON_X:
-			toggleSplitScreen();
-			break;
-		case KEY_O:
-		case GAMEPAD_BUTTON_A:
-			toggleFontOutline();
-			break;
-
+	virtual void keyPressed(uint32_t keyCode)	{
+		switch (keyCode) {
+		case KEY_S				:
+		case GAMEPAD_BUTTON_X	:	toggleSplitScreen(); break;
+		case KEY_O				:
+		case GAMEPAD_BUTTON_A	:	toggleFontOutline(); break;
 		}
 	}
 

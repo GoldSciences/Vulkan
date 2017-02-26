@@ -63,8 +63,7 @@ namespace DebugMarker
 	// Sets the debug name of an object
 	// All Objects in Vulkan are represented by their 64-bit handles which are passed into this function
 	// along with the object type
-	void setObjectName(VkDevice device, uint64_t object, VkDebugReportObjectTypeEXT objectType, const char *name)
-	{
+	void setObjectName(VkDevice device, uint64_t object, VkDebugReportObjectTypeEXT objectType, const char *name)	{
 		// Check for valid function pointer (may not be present if not running in a debugging application)
 		if (active)
 		{
@@ -78,8 +77,7 @@ namespace DebugMarker
 	}
 
 	// Set the tag for an object
-	void setObjectTag(VkDevice device, uint64_t object, VkDebugReportObjectTypeEXT objectType, uint64_t name, size_t tagSize, const void* tag)
-	{
+	void setObjectTag(VkDevice device, uint64_t object, VkDebugReportObjectTypeEXT objectType, uint64_t name, size_t tagSize, const void* tag)	{
 		// Check for valid function pointer (may not be present if not running in a debugging application)
 		if (active)
 		{
@@ -95,8 +93,7 @@ namespace DebugMarker
 	}
 
 	// Start a new debug marker region
-	void beginRegion(VkCommandBuffer cmdbuffer, const char* pMarkerName, glm::vec4 color)
-	{
+	void beginRegion(VkCommandBuffer cmdbuffer, const char* pMarkerName, glm::vec4 color)	{
 		// Check for valid function pointer (may not be present if not running in a debugging application)
 		if (active)
 		{
@@ -109,8 +106,7 @@ namespace DebugMarker
 	}
 
 	// Insert a new debug marker into the command buffer
-	void insert(VkCommandBuffer cmdbuffer, std::string markerName, glm::vec4 color)
-	{
+	void insert(VkCommandBuffer cmdbuffer, std::string markerName, glm::vec4 color)	{
 		// Check for valid function pointer (may not be present if not running in a debugging application)
 		if (active)
 		{
@@ -123,13 +119,10 @@ namespace DebugMarker
 	}
 
 	// End the current debug marker region
-	void endRegion(VkCommandBuffer cmdBuffer)
-	{
+	void endRegion(VkCommandBuffer cmdBuffer)	{
 		// Check for valid function (may not be present if not runnin in a debugging application)
 		if (vkCmdDebugMarkerEnd)
-		{
 			vkCmdDebugMarkerEnd(cmdBuffer);
-		}
 	}
 };
 
@@ -151,16 +144,14 @@ struct Scene {
 		VkDeviceSize offsets[1] = { 0 };
 		vkCmdBindVertexBuffers(cmdBuffer, VERTEX_BUFFER_BIND_ID, 1, &model.vertices.buffer, offsets);
 		vkCmdBindIndexBuffer(cmdBuffer, model.indices.buffer, 0, VK_INDEX_TYPE_UINT32);
-		for (size_t i = 0; i < model.parts.size(); i++)
-		{
+		for (size_t i = 0; i < model.parts.size(); i++)	{
 			// Add debug marker for mesh name
 			DebugMarker::insert(cmdBuffer, "Draw \"" + modelPartNames[i] + "\"", glm::vec4(0.0f));
 			vkCmdDrawIndexed(cmdBuffer, model.parts[i].indexCount, 1, model.parts[i].indexBase, 0, 0);
 		}
 	}
 
-	void loadFromFile(std::string filename, vks::VulkanDevice* vulkanDevice, VkQueue queue)
-	{
+	void loadFromFile(std::string filename, vks::VulkanDevice* vulkanDevice, VkQueue queue)	{
 		model.loadFromFile(filename, vertexLayout, 1.0f, vulkanDevice, queue);
 	}
 };
@@ -447,9 +438,8 @@ public:
 	void buildOffscreenCommandBuffer()
 	{
 		if (offscreenPass.commandBuffer == VK_NULL_HANDLE)
-		{
 			offscreenPass.commandBuffer = VulkanExampleBase::createCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY, false);
-		}
+
 		if (offscreenPass.semaphore == VK_NULL_HANDLE)
 		{
 			// Create a semaphore used to synchronize offscreen rendering and usage
@@ -520,18 +510,15 @@ public:
 		DebugMarker::setObjectName(device, (uint64_t)sceneGlow.model.indices.buffer, VK_DEBUG_REPORT_OBJECT_TYPE_BUFFER_EXT, "Glow index buffer");
 	}
 
-	void reBuildCommandBuffers()
-	{
-		if (!checkCommandBuffers())
-		{
+	void reBuildCommandBuffers()	{
+		if (!checkCommandBuffers()) {
 			destroyCommandBuffers();
 			createCommandBuffers();
 		}
 		buildCommandBuffers();
 	}
 
-	void buildCommandBuffers()
-	{
+	void buildCommandBuffers()	{
 		VkCommandBufferBeginInfo cmdBufInfo = vks::initializers::commandBufferBeginInfo();
 
 		VkClearValue clearValues[2];
@@ -547,8 +534,7 @@ public:
 		renderPassBeginInfo.clearValueCount = 2;
 		renderPassBeginInfo.pClearValues = clearValues;
 
-		for (size_t i = 0; i < drawCmdBuffers.size(); ++i)
-		{
+		for (size_t i = 0; i < drawCmdBuffers.size(); ++i) {
 			// Set target frame buffer
 			renderPassBeginInfo.framebuffer = frameBuffers[i];
 
@@ -578,8 +564,7 @@ public:
 			DebugMarker::endRegion(drawCmdBuffers[i]);
 
 			// Wireframe rendering
-			if (wireframe)
-			{
+			if (wireframe) {
 				// Insert debug marker
 				DebugMarker::beginRegion(drawCmdBuffers[i], "Wireframe draw", glm::vec4(0.53f, 0.78f, 0.91f, 1.0f));
 
@@ -597,8 +582,7 @@ public:
 			}
 
 			// Post processing
-			if (glow)
-			{
+			if (glow) {
 				DebugMarker::beginRegion(drawCmdBuffers[i], "Apply post processing", glm::vec4(0.93f, 0.89f, 0.69f, 1.0f));
 
 				vkCmdBindPipeline(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines.postprocess);
@@ -619,42 +603,28 @@ public:
 	}
 
 
-	void setupDescriptorPool()
-	{
+	void setupDescriptorPool()	{
 		// Example uses one ubo and one combined image sampler
 		std::vector<VkDescriptorPoolSize> poolSizes =
-		{
-			vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1),
-			vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1),
-		};
+			{	vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1)
+			,	vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1)
+			};
 
 		VkDescriptorPoolCreateInfo							descriptorPoolInfo			= vks::initializers::descriptorPoolCreateInfo(static_cast<uint32_t>(poolSizes.size()), poolSizes.data(), 1);
 
 		VK_CHECK_RESULT(vkCreateDescriptorPool(device, &descriptorPoolInfo, nullptr, &descriptorPool));
 	}
 
-	void setupDescriptorSetLayout()
-	{
+	void setupDescriptorSetLayout()	{
 		std::vector<VkDescriptorSetLayoutBinding> setLayoutBindings =
-		{
-			// Binding 0 : Vertex shader uniform buffer
-			vks::initializers::descriptorSetLayoutBinding(
-			VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-				VK_SHADER_STAGE_VERTEX_BIT,
-				0),
-			// Binding 1 : Fragment shader combined sampler
-			vks::initializers::descriptorSetLayoutBinding(
-				VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-				VK_SHADER_STAGE_FRAGMENT_BIT,
-				1),
-		};
+			{	vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER			, VK_SHADER_STAGE_VERTEX_BIT	, 0)	// Binding 0 : Vertex shader uniform buffer
+			,	vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER	, VK_SHADER_STAGE_FRAGMENT_BIT	, 1)	// Binding 1 : Fragment shader combined sampler
+			};
 
 		VkDescriptorSetLayoutCreateInfo						descriptorLayout			= vks::initializers::descriptorSetLayoutCreateInfo(setLayoutBindings.data(), static_cast<uint32_t>(setLayoutBindings.size()));
-
 		VK_CHECK_RESULT(vkCreateDescriptorSetLayout(device, &descriptorLayout, nullptr, &descriptorSetLayout));
 
 		VkPipelineLayoutCreateInfo							pPipelineLayoutCreateInfo	= vks::initializers::pipelineLayoutCreateInfo(&descriptorSetLayout, 1);
-
 		VK_CHECK_RESULT(vkCreatePipelineLayout(device, &pPipelineLayoutCreateInfo, nullptr, &pipelineLayout));
 
 		// Name for debugging
@@ -662,33 +632,20 @@ public:
 		DebugMarker::setObjectName(device, (uint64_t)descriptorSetLayout, VK_DEBUG_REPORT_OBJECT_TYPE_DESCRIPTOR_SET_LAYOUT_EXT, "Shared descriptor set layout");
 	}
 
-	void setupDescriptorSet()
-	{
+	void setupDescriptorSet()	{
 		VkDescriptorSetAllocateInfo							allocInfo = vks::initializers::descriptorSetAllocateInfo(descriptorPool, &descriptorSetLayout, 1);
 
 		VK_CHECK_RESULT(vkAllocateDescriptorSets(device, &allocInfo, &descriptorSets.scene));
 
 		std::vector<VkWriteDescriptorSet> writeDescriptorSets =
-		{
-			// Binding 0 : Vertex shader uniform buffer
-			vks::initializers::writeDescriptorSet(
-				descriptorSets.scene,
-				VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-				0,
-				&uniformBuffer.descriptor),
-			// Binding 1 : Color map 
-			vks::initializers::writeDescriptorSet(
-				descriptorSets.scene,
-				VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-				1,
-				&offscreenPass.descriptor)
-		};
+			{	vks::initializers::writeDescriptorSet(descriptorSets.scene, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER			, 0, &uniformBuffer.descriptor)	// Binding 0 : Vertex shader uniform buffer
+			,	vks::initializers::writeDescriptorSet(descriptorSets.scene, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER	, 1, &offscreenPass.descriptor)	// Binding 1 : Color map 
+			};
 
 		vkUpdateDescriptorSets(device, static_cast<uint32_t>(writeDescriptorSets.size()), writeDescriptorSets.data(), 0, NULL);
 	}
 
-	void preparePipelines()
-	{
+	void preparePipelines()	{
 		VkPipelineInputAssemblyStateCreateInfo				inputAssemblyState		= vks::initializers::pipelineInputAssemblyStateCreateInfo(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, 0, VK_FALSE);
 		VkPipelineRasterizationStateCreateInfo				rasterizationState		= vks::initializers::pipelineRasterizationStateCreateInfo(VK_POLYGON_MODE_FILL, VK_CULL_MODE_BACK_BIT, VK_FRONT_FACE_CLOCKWISE, 0);
 		VkPipelineColorBlendAttachmentState					blendAttachmentState	= vks::initializers::pipelineColorBlendAttachmentState(0xf, VK_FALSE);
@@ -699,9 +656,9 @@ public:
 		std::vector<VkDynamicState>							dynamicStateEnables		= {VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR};
 		VkPipelineDynamicStateCreateInfo					dynamicState			= vks::initializers::pipelineDynamicStateCreateInfo(dynamicStateEnables.data(), static_cast<uint32_t>(dynamicStateEnables.size()), 0);
 
-		std::array<VkPipelineShaderStageCreateInfo, 2> shaderStages = {};
+		std::array<VkPipelineShaderStageCreateInfo, 2>		shaderStages			= {};
 
-		VkGraphicsPipelineCreateInfo pipelineCreateInfo = vks::initializers::pipelineCreateInfo(pipelineLayout, renderPass, 0);
+		VkGraphicsPipelineCreateInfo						pipelineCreateInfo		= vks::initializers::pipelineCreateInfo(pipelineLayout, renderPass, 0);
 
 		pipelineCreateInfo.pInputAssemblyState = &inputAssemblyState;
 		pipelineCreateInfo.pRasterizationState = &rasterizationState;
@@ -716,8 +673,7 @@ public:
 		// Shared vertex inputs
 
 		// Binding description
-		VkVertexInputBindingDescription vertexInputBinding =
-			vks::initializers::vertexInputBindingDescription(VERTEX_BUFFER_BIND_ID, vertexLayout.stride(), VK_VERTEX_INPUT_RATE_VERTEX);
+		VkVertexInputBindingDescription vertexInputBinding = vks::initializers::vertexInputBindingDescription(VERTEX_BUFFER_BIND_ID, vertexLayout.stride(), VK_VERTEX_INPUT_RATE_VERTEX);
 
 		// Attribute descriptions
 		// Describes memory layout and shader positions
@@ -788,29 +744,18 @@ public:
 	}
 
 	// Prepare and initialize uniform buffer containing shader uniforms
-	void prepareUniformBuffers()
-	{
-		// Vertex shader uniform buffer block
-		VK_CHECK_RESULT(vulkanDevice->createBuffer(
-			VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-			&uniformBuffer,
-			sizeof(uboVS)));
+	void prepareUniformBuffers()	{
+		
+		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBuffer, sizeof(uboVS)));	// Vertex shader uniform buffer block
+		VK_CHECK_RESULT(uniformBuffer.map());	// Map persistent
 
-		// Map persistent
-		VK_CHECK_RESULT(uniformBuffer.map());
-
-
-		// Name uniform buffer for debugging
-		DebugMarker::setObjectName(device, (uint64_t)uniformBuffer.buffer, VK_DEBUG_REPORT_OBJECT_TYPE_BUFFER_EXT, "Scene uniform buffer block");
-		// Add some random tag
-		DebugMarker::setObjectTag(device, (uint64_t)uniformBuffer.buffer, VK_DEBUG_REPORT_OBJECT_TYPE_BUFFER_EXT, 0, sizeof(demoTag), &demoTag);
+		DebugMarker::setObjectName(device, (uint64_t)uniformBuffer.buffer, VK_DEBUG_REPORT_OBJECT_TYPE_BUFFER_EXT, "Scene uniform buffer block");	// Name uniform buffer for debugging
+		DebugMarker::setObjectTag(device, (uint64_t)uniformBuffer.buffer, VK_DEBUG_REPORT_OBJECT_TYPE_BUFFER_EXT, 0, sizeof(demoTag), &demoTag);	// Add some random tag
 
 		updateUniformBuffers();
 	}
 
-	void updateUniformBuffers()
-	{
+	void updateUniformBuffers()	{
 		uboVS.projection = glm::perspective(glm::radians(60.0f), (float)width / (float)height, 0.1f, 256.0f);
 		glm::mat4 viewMatrix = glm::translate(glm::mat4(), glm::vec3(0.0f, 0.0f, zoom));
 
@@ -822,17 +767,15 @@ public:
 		memcpy(uniformBuffer.mapped, &uboVS, sizeof(uboVS));
 	}
 
-	void draw()
-	{
+	void draw()	{
 		VulkanExampleBase::prepareFrame();
 
 		// Offscreen rendering
 		if (glow)
 		{
-			// Wait for swap chain presentation to finish
-			submitInfo.pWaitSemaphores = &semaphores.presentComplete;
-			// Signal ready with offscreen semaphore
-			submitInfo.pSignalSemaphores = &offscreenPass.semaphore;
+			
+			submitInfo.pWaitSemaphores		= &semaphores.presentComplete;	// Wait for swap chain presentation to finish
+			submitInfo.pSignalSemaphores	= &offscreenPass.semaphore;		// Signal ready with offscreen semaphore
 
 			// Submit work
 			submitInfo.commandBufferCount = 1;
@@ -841,10 +784,8 @@ public:
 		}
 
 		// Scene rendering
-		// Wait for offscreen semaphore
-		submitInfo.pWaitSemaphores = &offscreenPass.semaphore;
-		// Signal ready with render complete semaphpre
-		submitInfo.pSignalSemaphores = &semaphores.renderComplete;
+		submitInfo.pWaitSemaphores			= &offscreenPass.semaphore;		// Wait for offscreen semaphore
+		submitInfo.pSignalSemaphores		= &semaphores.renderComplete;	// Signal ready with render complete semaphpre
 
 		// Submit work
 		submitInfo.pCommandBuffers = &drawCmdBuffers[currentBuffer];
@@ -853,8 +794,7 @@ public:
 		VulkanExampleBase::submitFrame();
 	}
 
-	void prepare()
-	{
+	void prepare()	{
 		VulkanExampleBase::prepare();
 		DebugMarker::setup(device, physicalDevice);
 		loadScene();
@@ -870,20 +810,9 @@ public:
 		prepared = true;
 	}
 
-	virtual void render()
-	{
-		if (!prepared)
-			return;
-		draw();
-	}
-
-	virtual void viewChanged()
-	{
-		updateUniformBuffers();
-	}
-
-	virtual void keyPressed(uint32_t keyCode)
-	{
+	virtual void	render			()									{ if (prepared) draw(); }
+	virtual void	viewChanged		()									{ updateUniformBuffers(); }
+	virtual void	keyPressed		(uint32_t keyCode)					{
 		switch (keyCode)
 		{
 		case 0x57:
@@ -899,16 +828,11 @@ public:
 		}
 	}
 
-	virtual void getOverlayText(VulkanTextOverlay *textOverlay)
-	{
+	virtual void	getOverlayText	(VulkanTextOverlay *textOverlay)	{
 		if (DebugMarker::active)
-		{
 			textOverlay->addText("VK_EXT_debug_marker active", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
-		}
 		else
-		{
 			textOverlay->addText("VK_EXT_debug_marker not present", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
-		}
 	}
 };
 

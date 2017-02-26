@@ -486,15 +486,13 @@ public:
 	}
 
 	// Prepare and initialize uniform buffer containing shader uniforms
-	void													prepareUniformBuffers		()
-	{
+	void													prepareUniformBuffers		()									{
 		// Vertex shader uniform buffer block
 		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBufferVS, sizeof(uboVS), &uboVS));
 		updateUniformBuffers();
 	}
 
-	void													updateUniformBuffers		()
-	{
+	void													updateUniformBuffers		()									{
 		uboVS.projection										= camera.matrices.perspective;
 		uboVS.view												= camera.matrices.view;
 		uboVS.model												= glm::rotate(glm::mat4(), glm::radians(timer * 360.0f), glm::vec3(1.0f, 0.0f, 0.0f));
@@ -504,8 +502,7 @@ public:
 		uniformBufferVS.unmap();
 	}
 
-	void													prepare						()
-	{
+	void													prepare						()									{
 		VulkanExampleBase::prepare();
 		loadAssets();
 		setupVertexDescriptions();
@@ -518,8 +515,8 @@ public:
 		prepared = true;
 	}
 
-	virtual void											render						()
-	{
+	virtual void											viewChanged					()									{ updateUniformBuffers(); }
+	virtual void											render						()									{
 		if (!prepared)
 			return;
 
@@ -529,13 +526,7 @@ public:
 			updateUniformBuffers();
 	}
 
-	virtual void											viewChanged					()
-	{
-		updateUniformBuffers();
-	}
-
-	void													changeLodBias				(float delta)
-	{
+	void													changeLodBias				(float delta)						{
 		uboVS.lodBias											+= delta;
 		if (uboVS.lodBias < 0.0f)				uboVS.lodBias	= 0.0f;
 		if (uboVS.lodBias > texture.mipLevels)	uboVS.lodBias	= (float)texture.mipLevels;
@@ -543,15 +534,13 @@ public:
 		updateTextOverlay();
 	}
 
-	void													toggleSampler				()
-	{
+	void													toggleSampler				()									{
 		uboVS.samplerIndex										= (uboVS.samplerIndex < static_cast<uint32_t>(samplers.size()) - 1) ? uboVS.samplerIndex + 1 : 0;
 		updateUniformBuffers();
 		updateTextOverlay();
 	}
 	
-	virtual void											keyPressed					(uint32_t keyCode)
-	{
+	virtual void											keyPressed					(uint32_t keyCode)					{
 		switch (keyCode)
 		{
 		case KEY_KPADD:
@@ -569,8 +558,7 @@ public:
 		}
 	}
 
-	virtual void											getOverlayText				(VulkanTextOverlay *textOverlay)
-	{
+	virtual void											getOverlayText				(VulkanTextOverlay *textOverlay)	{
 		std::stringstream											ss;
 		ss << std::setprecision(2) << std::fixed << uboVS.lodBias;
 #if defined(__ANDROID__)

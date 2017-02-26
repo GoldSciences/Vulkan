@@ -12,7 +12,6 @@
 #include "vulkanexamplebase.h"
 #include "VulkanTexture.hpp"
 #include "VulkanDevice.hpp"
-#include "VulkanBuffer.hpp"
 #include "VulkanHeightmap.hpp"
 
 #include <algorithm>

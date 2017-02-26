@@ -64,8 +64,7 @@ public:
 	VkPipelineLayout pipelineLayout;
 	VkDescriptorSetLayout descriptorSetLayout;
 
-	VulkanExample() : VulkanExampleBase(ENABLE_VALIDATION)
-	{
+	VulkanExample() : VulkanExampleBase(ENABLE_VALIDATION)	{
 		zoom = -4.0f;
 		rotationSpeed = 0.25f;
 		rotation = { -7.25f, -120.0f, 0.0f };
@@ -73,8 +72,7 @@ public:
 		title = "Vulkan Example - Cube map";
 	}
 
-	~VulkanExample()
-	{
+	~VulkanExample()	{
 		// Clean up used Vulkan resources 
 		// Note : Inherited destructor cleans up resources stored in base class
 
@@ -99,8 +97,7 @@ public:
 		uniformBuffers.skybox.destroy();
 	}
 
-	void loadCubemap(std::string filename, VkFormat format, bool forceLinearTiling)
-	{
+	void loadCubemap(std::string filename, VkFormat format, bool forceLinearTiling)	{
 #if defined(__ANDROID__)
 		// Textures are stored inside the apk on Android (compressed)
 		// So they need to be loaded via the asset manager
@@ -187,7 +184,6 @@ public:
 		uint32_t offset = 0;
 
 		for (uint32_t face = 0; face < 6; face++)
-		{
 			for (uint32_t level = 0; level < cubeMap.mipLevels; level++)
 			{
 				VkBufferImageCopy bufferCopyRegion = {};
@@ -205,7 +201,6 @@ public:
 				// Increase offset into staging buffer for next level / face
 				offset += static_cast<uint32_t>(texCube[face][level].size());
 			}
-		}
 
 		// Image barrier for optimal image (target)
 		// Set initial layout for all array layers (faces) of the optimal (target) tiled texture
@@ -215,33 +210,14 @@ public:
 		subresourceRange.levelCount = cubeMap.mipLevels;
 		subresourceRange.layerCount = 6;
 
-		vks::tools::setImageLayout(
-			copyCmd,
-			cubeMap.image,
-			VK_IMAGE_ASPECT_COLOR_BIT,
-			VK_IMAGE_LAYOUT_UNDEFINED,
-			VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-			subresourceRange);
+		vks::tools::setImageLayout(copyCmd, cubeMap.image, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, subresourceRange);
 
 		// Copy the cube map faces from the staging buffer to the optimal tiled image
-		vkCmdCopyBufferToImage(
-			copyCmd,
-			stagingBuffer,
-			cubeMap.image,
-			VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-			static_cast<uint32_t>(bufferCopyRegions.size()),
-			bufferCopyRegions.data()
-			);
+		vkCmdCopyBufferToImage(copyCmd, stagingBuffer, cubeMap.image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, static_cast<uint32_t>(bufferCopyRegions.size()), bufferCopyRegions.data());
 
 		// Change texture image layout to shader read after all faces have been copied
 		cubeMap.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-		vks::tools::setImageLayout(
-			copyCmd,
-			cubeMap.image,
-			VK_IMAGE_ASPECT_COLOR_BIT,
-			VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-			cubeMap.imageLayout,
-			subresourceRange);
+		vks::tools::setImageLayout(copyCmd, cubeMap.image, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, cubeMap.imageLayout, subresourceRange);
 
 		VulkanExampleBase::flushCommandBuffer(copyCmd, queue, true);
 
@@ -259,8 +235,7 @@ public:
 		sampler.maxLod = (float)cubeMap.mipLevels;
 		sampler.borderColor = VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
 		sampler.maxAnisotropy = 1.0f;
-		if (vulkanDevice->features.samplerAnisotropy)
-		{
+		if (vulkanDevice->features.samplerAnisotropy) {
 			sampler.maxAnisotropy = vulkanDevice->properties.limits.maxSamplerAnisotropy;
 			sampler.anisotropyEnable = VK_TRUE;
 		}
@@ -285,10 +260,8 @@ public:
 		vkDestroyBuffer(device, stagingBuffer, nullptr);
 	}
 
-	void reBuildCommandBuffers()
-	{
-		if (!checkCommandBuffers())
-		{
+	void reBuildCommandBuffers()	{
+		if (!checkCommandBuffers()) {
 			destroyCommandBuffers();
 			createCommandBuffers();
 		}
@@ -330,21 +303,20 @@ public:
 			VkDeviceSize offsets[1] = { 0 };
 
 			// Skybox
-			if (displaySkybox)
-			{
-				vkCmdBindDescriptorSets(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSets.skybox, 0, NULL);
-				vkCmdBindVertexBuffers(drawCmdBuffers[i], VERTEX_BUFFER_BIND_ID, 1, &models.skybox.vertices.buffer, offsets);
-				vkCmdBindIndexBuffer(drawCmdBuffers[i], models.skybox.indices.buffer, 0, VK_INDEX_TYPE_UINT32);
-				vkCmdBindPipeline(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines.skybox);
-				vkCmdDrawIndexed(drawCmdBuffers[i], models.skybox.indexCount, 1, 0, 0, 0);
+			if (displaySkybox)	{
+				vkCmdBindDescriptorSets	(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSets.skybox, 0, NULL);
+				vkCmdBindVertexBuffers	(drawCmdBuffers[i], VERTEX_BUFFER_BIND_ID, 1, &models.skybox.vertices.buffer, offsets);
+				vkCmdBindIndexBuffer	(drawCmdBuffers[i], models.skybox.indices.buffer, 0, VK_INDEX_TYPE_UINT32);
+				vkCmdBindPipeline		(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines.skybox);
+				vkCmdDrawIndexed		(drawCmdBuffers[i], models.skybox.indexCount, 1, 0, 0, 0);
 			}
 
 			// 3D object
-			vkCmdBindDescriptorSets(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSets.object, 0, NULL);
-			vkCmdBindVertexBuffers(drawCmdBuffers[i], VERTEX_BUFFER_BIND_ID, 1, &models.objects[models.objectIndex].vertices.buffer, offsets);
-			vkCmdBindIndexBuffer(drawCmdBuffers[i], models.objects[models.objectIndex].indices.buffer, 0, VK_INDEX_TYPE_UINT32);
-			vkCmdBindPipeline(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines.reflect);
-			vkCmdDrawIndexed(drawCmdBuffers[i], models.objects[models.objectIndex].indexCount, 1, 0, 0, 0);
+			vkCmdBindDescriptorSets	(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSets.object, 0, NULL);
+			vkCmdBindVertexBuffers	(drawCmdBuffers[i], VERTEX_BUFFER_BIND_ID, 1, &models.objects[models.objectIndex].vertices.buffer, offsets);
+			vkCmdBindIndexBuffer	(drawCmdBuffers[i], models.objects[models.objectIndex].indices.buffer, 0, VK_INDEX_TYPE_UINT32);
+			vkCmdBindPipeline		(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines.reflect);
+			vkCmdDrawIndexed		(drawCmdBuffers[i], models.objects[models.objectIndex].indexCount, 1, 0, 0, 0);
 
 			vkCmdEndRenderPass(drawCmdBuffers[i]);
 
@@ -352,8 +324,7 @@ public:
 		}
 	}
 
-	void loadMeshes()
-	{
+	void loadMeshes()	{
 		// Skybox
 		models.skybox.loadFromFile(getAssetPath() + "models/cube.obj", vertexLayout, 0.05f, vulkanDevice, queue);
 		// Objects
@@ -365,23 +336,17 @@ public:
 		}
 	}
 
-	void setupVertexDescriptions()
-	{
+	void setupVertexDescriptions()	{
 		// Binding description
 		vertices.bindingDescriptions.resize(1);
 		vertices.bindingDescriptions[0] = vks::initializers::vertexInputBindingDescription(VERTEX_BUFFER_BIND_ID, vertexLayout.stride(), VK_VERTEX_INPUT_RATE_VERTEX);
 		// Attribute descriptions
 		// Describes memory layout and shader positions
 		vertices.attributeDescriptions.resize(3);
-		// Location 0 : Position
-		vertices.attributeDescriptions[0] = vks::initializers::vertexInputAttributeDescription(VERTEX_BUFFER_BIND_ID, 0, VK_FORMAT_R32G32B32_SFLOAT, 0);		// Location 1 : Normal
-		vertices.attributeDescriptions[1] = vks::initializers::vertexInputAttributeDescription(VERTEX_BUFFER_BIND_ID, 1, VK_FORMAT_R32G32B32_SFLOAT, sizeof(float) * 3);		// Location 2 : Texture coordinates
-		vertices.attributeDescriptions[2] =
-			vks::initializers::vertexInputAttributeDescription(
-				VERTEX_BUFFER_BIND_ID,
-				2,
-				VK_FORMAT_R32G32_SFLOAT,
-				sizeof(float) * 5);
+		
+		vertices.attributeDescriptions[0] = vks::initializers::vertexInputAttributeDescription(VERTEX_BUFFER_BIND_ID, 0, VK_FORMAT_R32G32B32_SFLOAT	, 0);						// Location 0 : Position
+		vertices.attributeDescriptions[1] = vks::initializers::vertexInputAttributeDescription(VERTEX_BUFFER_BIND_ID, 1, VK_FORMAT_R32G32B32_SFLOAT	, sizeof(float) * 3);		// Location 1 : Normal	
+		vertices.attributeDescriptions[2] = vks::initializers::vertexInputAttributeDescription(VERTEX_BUFFER_BIND_ID, 2, VK_FORMAT_R32G32_SFLOAT	, sizeof(float) * 5);		// Location 2 : Texture coordinates
 
 		vertices.inputState										= vks::initializers::pipelineVertexInputStateCreateInfo();
 		vertices.inputState.vertexBindingDescriptionCount		= static_cast<uint32_t>(vertices.bindingDescriptions.size());
@@ -393,16 +358,11 @@ public:
 	void setupDescriptorPool()
 	{
 		std::vector<VkDescriptorPoolSize> poolSizes =
-		{
-			vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 2),
-			vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 2)
-		};
+			{	vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 2)
+			,	vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 2)
+			};
 
-		VkDescriptorPoolCreateInfo descriptorPoolInfo = 
-			vks::initializers::descriptorPoolCreateInfo(
-				static_cast<uint32_t>(poolSizes.size()),
-				poolSizes.data(),
-				2);
+		VkDescriptorPoolCreateInfo descriptorPoolInfo = vks::initializers::descriptorPoolCreateInfo(static_cast<uint32_t>(poolSizes.size()), poolSizes.data(), 2);
 
 		VK_CHECK_RESULT(vkCreateDescriptorPool(device, &descriptorPoolInfo, nullptr, &descriptorPool));
 	}
@@ -410,110 +370,57 @@ public:
 	void setupDescriptorSetLayout()
 	{
 		std::vector<VkDescriptorSetLayoutBinding> setLayoutBindings = 
-		{
-			// Binding 0 : Vertex shader uniform buffer
-			vks::initializers::descriptorSetLayoutBinding(
-				VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 
-				VK_SHADER_STAGE_VERTEX_BIT, 
-				0),
-			// Binding 1 : Fragment shader image sampler
-			vks::initializers::descriptorSetLayoutBinding(
-				VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 
-				VK_SHADER_STAGE_FRAGMENT_BIT, 
-				1)
-		};
+			{	vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT, 0)					// Binding 0 : Vertex shader uniform buffer
+			,	vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, 1)		// Binding 1 : Fragment shader image sampler
+			};
 
-		VkDescriptorSetLayoutCreateInfo descriptorLayout = 
-			vks::initializers::descriptorSetLayoutCreateInfo(
-				setLayoutBindings.data(),
-				static_cast<uint32_t>(setLayoutBindings.size()));
-
+		VkDescriptorSetLayoutCreateInfo descriptorLayout = vks::initializers::descriptorSetLayoutCreateInfo(setLayoutBindings.data(), static_cast<uint32_t>(setLayoutBindings.size())); 
 		VK_CHECK_RESULT(vkCreateDescriptorSetLayout(device, &descriptorLayout, nullptr, &descriptorSetLayout));
 
 		VkPipelineLayoutCreateInfo							pPipelineLayoutCreateInfo	= vks::initializers::pipelineLayoutCreateInfo(&descriptorSetLayout, 1);
-
 		VK_CHECK_RESULT(vkCreatePipelineLayout(device, &pPipelineLayoutCreateInfo, nullptr, &pipelineLayout));
 	}
 
 	void setupDescriptorSets()
 	{
 		// Image descriptor for the cube map texture
-		VkDescriptorImageInfo textureDescriptor =
-			vks::initializers::descriptorImageInfo(
-				cubeMap.sampler,
-				cubeMap.view,
-				cubeMap.imageLayout);
-
+		VkDescriptorImageInfo textureDescriptor = vks::initializers::descriptorImageInfo(cubeMap.sampler, cubeMap.view, cubeMap.imageLayout);
 		VkDescriptorSetAllocateInfo							allocInfo = vks::initializers::descriptorSetAllocateInfo(descriptorPool, &descriptorSetLayout, 1);
 
 		// 3D object descriptor set
 		VK_CHECK_RESULT(vkAllocateDescriptorSets(device, &allocInfo, &descriptorSets.object));
 
 		std::vector<VkWriteDescriptorSet> writeDescriptorSets =
-		{
-			// Binding 0 : Vertex shader uniform buffer
-			vks::initializers::writeDescriptorSet(
-				descriptorSets.object, 
-				VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 
-				0, 
-				&uniformBuffers.object.descriptor),
-			// Binding 1 : Fragment shader cubemap sampler
-			vks::initializers::writeDescriptorSet(
-				descriptorSets.object, 
-				VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 
-				1, 
-				&textureDescriptor)
-		};
+			{	vks::initializers::writeDescriptorSet(descriptorSets.object, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER			, 0, &uniformBuffers.object.descriptor)	// Binding 0 : Vertex shader uniform buffer
+			,	vks::initializers::writeDescriptorSet(descriptorSets.object, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER	, 1, &textureDescriptor)				// Binding 1 : Fragment shader cubemap sampler
+			};
 		vkUpdateDescriptorSets(device, static_cast<uint32_t>(writeDescriptorSets.size()), writeDescriptorSets.data(), 0, NULL);
 
 		// Sky box descriptor set
 		VK_CHECK_RESULT(vkAllocateDescriptorSets(device, &allocInfo, &descriptorSets.skybox));
 
 		writeDescriptorSets =
-		{
-			// Binding 0 : Vertex shader uniform buffer
-			vks::initializers::writeDescriptorSet(
-				descriptorSets.skybox,
-				VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-				0,
-				&uniformBuffers.skybox.descriptor),
-			// Binding 1 : Fragment shader cubemap sampler
-			vks::initializers::writeDescriptorSet(
-				descriptorSets.skybox,
-				VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-				1,
-				&textureDescriptor)
-		};
+			{	vks::initializers::writeDescriptorSet(descriptorSets.skybox, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER			, 0, &uniformBuffers.skybox.descriptor)	// Binding 0 : Vertex shader uniform buffer
+			,	vks::initializers::writeDescriptorSet(descriptorSets.skybox, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER	, 1,&textureDescriptor)					// Binding 1 : Fragment shader cubemap sampler
+			};
 		vkUpdateDescriptorSets(device, static_cast<uint32_t>(writeDescriptorSets.size()), writeDescriptorSets.data(), 0, NULL);
 	}
 
 	void preparePipelines()
 	{
-		VkPipelineInputAssemblyStateCreateInfo inputAssemblyState = vks::initializers::pipelineInputAssemblyStateCreateInfo(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, 0, VK_FALSE);
-
+		VkPipelineInputAssemblyStateCreateInfo				inputAssemblyState		= vks::initializers::pipelineInputAssemblyStateCreateInfo(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, 0, VK_FALSE);
 		VkPipelineRasterizationStateCreateInfo				rasterizationState		= vks::initializers::pipelineRasterizationStateCreateInfo(VK_POLYGON_MODE_FILL, VK_CULL_MODE_BACK_BIT, VK_FRONT_FACE_COUNTER_CLOCKWISE, 0);
-		VkPipelineColorBlendAttachmentState blendAttachmentState = vks::initializers::pipelineColorBlendAttachmentState(0xf, VK_FALSE);
+		VkPipelineColorBlendAttachmentState					blendAttachmentState	= vks::initializers::pipelineColorBlendAttachmentState(0xf, VK_FALSE);
+		VkPipelineColorBlendStateCreateInfo					colorBlendState			= vks::initializers::pipelineColorBlendStateCreateInfo(1, &blendAttachmentState);
+		VkPipelineDepthStencilStateCreateInfo				depthStencilState		= vks::initializers::pipelineDepthStencilStateCreateInfo(VK_FALSE, VK_FALSE, VK_COMPARE_OP_LESS_OR_EQUAL);
+		VkPipelineViewportStateCreateInfo					viewportState			= vks::initializers::pipelineViewportStateCreateInfo(1, 1, 0);
+		VkPipelineMultisampleStateCreateInfo				multisampleState		= vks::initializers::pipelineMultisampleStateCreateInfo(VK_SAMPLE_COUNT_1_BIT, 0);
 
-		VkPipelineColorBlendStateCreateInfo colorBlendState =
-			vks::initializers::pipelineColorBlendStateCreateInfo(
-				1, 
-				&blendAttachmentState);
-
-		VkPipelineDepthStencilStateCreateInfo depthStencilState =
-			vks::initializers::pipelineDepthStencilStateCreateInfo(
-				VK_FALSE,
-				VK_FALSE,
-				VK_COMPARE_OP_LESS_OR_EQUAL);
-
-		VkPipelineViewportStateCreateInfo viewportState = vks::initializers::pipelineViewportStateCreateInfo(1, 1, 0);
-
-		VkPipelineMultisampleStateCreateInfo multisampleState = vks::initializers::pipelineMultisampleStateCreateInfo(VK_SAMPLE_COUNT_1_BIT, 0);
-
-		std::vector<VkDynamicState> dynamicStateEnables = {VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR};
-		VkPipelineDynamicStateCreateInfo dynamicState = vks::initializers::pipelineDynamicStateCreateInfo(dynamicStateEnables.data(), static_cast<uint32_t>(dynamicStateEnables.size()), 0);
+		std::vector<VkDynamicState>							dynamicStateEnables		= {VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR};
+		VkPipelineDynamicStateCreateInfo					dynamicState			= vks::initializers::pipelineDynamicStateCreateInfo(dynamicStateEnables.data(), static_cast<uint32_t>(dynamicStateEnables.size()), 0);
 
 		// Skybox pipeline (background cube)
-		std::array<VkPipelineShaderStageCreateInfo,2> shaderStages;
+		std::array<VkPipelineShaderStageCreateInfo,2>		shaderStages;
 
 		shaderStages[0] = loadShader(getAssetPath() + "shaders/cubemap/skybox.vert.spv", VK_SHADER_STAGE_VERTEX_BIT);
 		shaderStages[1] = loadShader(getAssetPath() + "shaders/cubemap/skybox.frag.spv", VK_SHADER_STAGE_FRAGMENT_BIT);
@@ -547,19 +454,9 @@ public:
 	// Prepare and initialize uniform buffer containing shader uniforms
 	void prepareUniformBuffers()
 	{
-		// Objact vertex shader uniform buffer
-		VK_CHECK_RESULT(vulkanDevice->createBuffer(
-			VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-			&uniformBuffers.object,
-			sizeof(uboVS)));
-
-		// Skybox vertex shader uniform buffer
-		VK_CHECK_RESULT(vulkanDevice->createBuffer(
-			VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-			&uniformBuffers.skybox,
-			sizeof(uboVS)));
+		
+		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBuffers.object, sizeof(uboVS)));		// Objact vertex shader uniform buffer
+		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBuffers.skybox, sizeof(uboVS)));		// Skybox vertex shader uniform buffer
 
 		// Map persistent
 		VK_CHECK_RESULT(uniformBuffers.object.map());
@@ -625,31 +522,14 @@ public:
 		prepared = true;
 	}
 
-	virtual void render()
-	{
-		if (!prepared)
-			return;
-		draw();
-	}
-
-	virtual void viewChanged()
-	{
-		updateUniformBuffers();
-	}
-
-	void toggleSkyBox()
-	{
-		displaySkybox = !displaySkybox;
-		reBuildCommandBuffers();
-	}
-
-	void toggleObject()
-	{
+	virtual void	render			()	{ if (prepared) draw(); }
+	virtual void	viewChanged		()	{ updateUniformBuffers(); }
+	void			toggleSkyBox	()	{ displaySkybox = !displaySkybox; reBuildCommandBuffers(); }
+	void			toggleObject	()	{
 		models.objectIndex++;
 		if (models.objectIndex >= static_cast<uint32_t>(models.objects.size()))
-		{
 			models.objectIndex = 0;
-		}
+
 		reBuildCommandBuffers();
 	}
 
@@ -657,13 +537,11 @@ public:
 	{
 		uboVS.lodBias += delta;
 		if (uboVS.lodBias < 0.0f)
-		{
 			uboVS.lodBias = 0.0f;
-		}
+
 		if (uboVS.lodBias > cubeMap.mipLevels)
-		{
 			uboVS.lodBias = (float)cubeMap.mipLevels;
-		}
+
 		updateUniformBuffers();
 		updateTextOverlay();
 	}

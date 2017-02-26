@@ -1,17 +1,12 @@
-/*
-* Vulkan Example - Animated gears using multiple uniform buffers
-*
-* See readme.md for details
-*
-* Copyright (C) 2015 by Sascha Willems - www.saschawillems.de
-*
-* This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
-*/
-
+// Vulkan Example - Animated gears using multiple uniform buffers
+// 
+// See readme.md for details
+// 
+// Copyright (C) 2015 by Sascha Willems - www.saschawillems.de
+// 
+// This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 #pragma once
-
-#include <math.h>
-#include <vector>
+#include "VulkanDevice.hpp"
 
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
@@ -19,29 +14,16 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/matrix_inverse.hpp>
 
-#include "vulkan/vulkan.h"
-
-#include "VulkanTools.h"
-#include "VulkanDevice.hpp"
-#include "VulkanBuffer.hpp"
-
 struct Vertex
 {
-	float pos[3];
-	float normal[3];
-	float color[3];
+	float	pos			[3];
+	float	normal		[3];
+	float	color		[3];
 
-	Vertex(const glm::vec3& p, const glm::vec3& n, const glm::vec3& c)
-	{
-		pos[0] = p.x;
-		pos[1] = p.y;
-		pos[2] = p.z;
-		color[0] = c.x;
-		color[1] = c.y;
-		color[2] = c.z;
-		normal[0] = n.x;
-		normal[1] = n.y;
-		normal[2] = n.z;
+			Vertex(const glm::vec3& p, const glm::vec3& n, const glm::vec3& c)	{
+		pos		[0] = p.x;	pos		[1] = p.y;	pos		[2] = p.z;
+		color	[0] = c.x;	color	[1] = c.y;	color	[2] = c.z;
+		normal	[0] = n.x;	normal	[1] = n.y;	normal	[2] = n.z;
 	}
 };
 

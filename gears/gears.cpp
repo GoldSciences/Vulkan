@@ -27,8 +27,7 @@ public:
 	VkPipelineLayout pipelineLayout;
 	VkDescriptorSetLayout descriptorSetLayout;
 
-	VulkanExample() : VulkanExampleBase(ENABLE_VALIDATION)
-	{
+	VulkanExample() : VulkanExampleBase(ENABLE_VALIDATION)	{
 		zoom = -16.0f;
 		rotation = glm::vec3(-23.75, 41.25, 21.0);
 		timerSpeed *= 0.25f;
@@ -36,8 +35,7 @@ public:
 		title = "Vulkan Example - Gears";
 	}
 
-	~VulkanExample()
-	{
+	~VulkanExample()	{
 		// Clean up used Vulkan resources 
 		// Note : Inherited destructor cleans up resources stored in base class
 		vkDestroyPipeline(device, pipelines.solid, nullptr);
@@ -46,13 +44,10 @@ public:
 		vkDestroyDescriptorSetLayout(device, descriptorSetLayout, nullptr);
 
 		for (auto& gear : gears)
-		{
 			delete(gear);
-		}
 	}
 
-	void buildCommandBuffers()
-	{
+	void buildCommandBuffers()	{
 		VkCommandBufferBeginInfo cmdBufInfo = vks::initializers::commandBufferBeginInfo();
 
 		VkClearValue clearValues[2];
@@ -85,9 +80,7 @@ public:
 			vkCmdBindPipeline(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines.solid);
 
 			for (auto& gear : gears)
-			{
 				gear->draw(drawCmdBuffers[i], pipelineLayout);
-			}
 
 			vkCmdEndRenderPass(drawCmdBuffers[i]);
 
@@ -95,8 +88,7 @@ public:
 		}
 	}
 
-	void prepareVertices()
-	{
+	void prepareVertices()	{
 		// Gear definitions
 		std::vector<float> innerRadiuses = { 1.0f, 0.5f, 1.3f };
 		std::vector<float> outerRadiuses = { 4.0f, 2.0f, 2.0f };
@@ -156,54 +148,34 @@ public:
 		vertices.inputState.pVertexAttributeDescriptions		= vertices.attributeDescriptions.data();
 	}
 
-	void setupDescriptorPool()
-	{
+	void setupDescriptorPool()	{
 		// One UBO for each gear
 		std::vector<VkDescriptorPoolSize> poolSizes =
-		{
-			vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 3),
-		};
+			{	vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 3),
+			};
 
-		VkDescriptorPoolCreateInfo descriptorPoolInfo =
-			vks::initializers::descriptorPoolCreateInfo(
-				static_cast<uint32_t>(poolSizes.size()),
-				poolSizes.data(),
-				// Three descriptor sets (for each gear)
-				3);
-
+		VkDescriptorPoolCreateInfo descriptorPoolInfo = vks::initializers::descriptorPoolCreateInfo(static_cast<uint32_t>(poolSizes.size()), poolSizes.data(), 3);	// Three descriptor sets (for each gear)
 		VK_CHECK_RESULT(vkCreateDescriptorPool(device, &descriptorPoolInfo, nullptr, &descriptorPool));
 	}
 
-	void setupDescriptorSetLayout()
-	{
+	void setupDescriptorSetLayout()	{
 		std::vector<VkDescriptorSetLayoutBinding> setLayoutBindings =
-		{
-			// Binding 0 : Vertex shader uniform buffer
-			vks::initializers::descriptorSetLayoutBinding(
-				VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-				VK_SHADER_STAGE_VERTEX_BIT,
-				0)
-		};
+			{	vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT, 0)	// Binding 0 : Vertex shader uniform buffer
+			};
 
 		VkDescriptorSetLayoutCreateInfo						descriptorLayout			= vks::initializers::descriptorSetLayoutCreateInfo(setLayoutBindings.data(), static_cast<uint32_t>(setLayoutBindings.size()));
-
 		VK_CHECK_RESULT(vkCreateDescriptorSetLayout(device, &descriptorLayout, nullptr, &descriptorSetLayout));
 
 		VkPipelineLayoutCreateInfo							pPipelineLayoutCreateInfo	= vks::initializers::pipelineLayoutCreateInfo(&descriptorSetLayout, 1);
-
 		VK_CHECK_RESULT(vkCreatePipelineLayout(device, &pPipelineLayoutCreateInfo, nullptr, &pipelineLayout));
 	}
 
-	void setupDescriptorSets()
-	{
+	void setupDescriptorSets()	{
 		for (auto& gear : gears)
-		{
 			gear->setupDescriptorSet(descriptorPool, descriptorSetLayout);
-		}
 	}
 
-	void preparePipelines()
-	{
+	void preparePipelines()	{
 		VkPipelineInputAssemblyStateCreateInfo				inputAssemblyState		= vks::initializers::pipelineInputAssemblyStateCreateInfo(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, 0, VK_FALSE);
 		VkPipelineRasterizationStateCreateInfo				rasterizationState		= vks::initializers::pipelineRasterizationStateCreateInfo(VK_POLYGON_MODE_FILL, VK_CULL_MODE_BACK_BIT, VK_FRONT_FACE_CLOCKWISE, 0);
 		VkPipelineColorBlendAttachmentState					blendAttachmentState	= vks::initializers::pipelineColorBlendAttachmentState(0xf, VK_FALSE);
@@ -237,17 +209,13 @@ public:
 		VK_CHECK_RESULT(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipelines.solid));
 	}
 
-	void updateUniformBuffers()
-	{
+	void updateUniformBuffers()	{
 		glm::mat4 perspective = glm::perspective(glm::radians(60.0f), (float)width / (float)height, 0.001f, 256.0f);
 		for (auto& gear : gears)
-		{
 			gear->updateUniformBuffer(perspective, rotation, zoom, timer * 360.0f);
-		}
 	}
 
-	void draw()
-	{
+	void draw()	{
 		VulkanExampleBase::prepareFrame();
 
 		// Command buffer to be sumitted to the queue
@@ -260,8 +228,7 @@ public:
 		VulkanExampleBase::submitFrame();
 	}
 
-	void prepare()
-	{
+	void prepare()	{
 		VulkanExampleBase::prepare();
 		prepareVertices();
 		setupDescriptorSetLayout();
@@ -281,15 +248,10 @@ public:
 		draw();
 		vkDeviceWaitIdle(device);
 		if (!paused)
-		{
 			updateUniformBuffers();
-		}
 	}
 
-	virtual void viewChanged()
-	{
-		updateUniformBuffers();
-	}
+	virtual void	viewChanged()	{ updateUniformBuffers();	}
 };
 
 VULKAN_EXAMPLE_EXPORT_FUNCTIONS()

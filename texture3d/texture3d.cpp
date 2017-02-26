@@ -215,8 +215,7 @@ public:
 		VkFormatProperties										formatProperties;
 		vkGetPhysicalDeviceFormatProperties(physicalDevice, texture.format, &formatProperties);
 		// Check if format supports transfer
-		if (VK_IMAGE_USAGE_TRANSFER_DST_BIT != (formatProperties.optimalTilingFeatures & VK_IMAGE_USAGE_TRANSFER_DST_BIT))
-		{
+		if (VK_IMAGE_USAGE_TRANSFER_DST_BIT != (formatProperties.optimalTilingFeatures & VK_IMAGE_USAGE_TRANSFER_DST_BIT)) {
 			std::cout << "Error: Device does not support flag TRANSFER_DST for selected texture format!" << std::endl;
 			return;
 		}
@@ -479,11 +478,11 @@ public:
 	{
 		// Setup vertices for a single uv-mapped quad made from two triangles
 		std::vector<Vertex>										vertices					 =
-		{	{ {  1.0f,  1.0f, 0.0f }, { 1.0f, 1.0f },{ 0.0f, 0.0f, 1.0f } }
-		,	{ { -1.0f,  1.0f, 0.0f }, { 0.0f, 1.0f },{ 0.0f, 0.0f, 1.0f } }
-		,	{ { -1.0f, -1.0f, 0.0f }, { 0.0f, 0.0f },{ 0.0f, 0.0f, 1.0f } }
-		,	{ {  1.0f, -1.0f, 0.0f }, { 1.0f, 0.0f },{ 0.0f, 0.0f, 1.0f } }
-		};
+			{	{ {  1.0f,  1.0f, 0.0f }, { 1.0f, 1.0f },{ 0.0f, 0.0f, 1.0f } }
+			,	{ { -1.0f,  1.0f, 0.0f }, { 0.0f, 1.0f },{ 0.0f, 0.0f, 1.0f } }
+			,	{ { -1.0f, -1.0f, 0.0f }, { 0.0f, 0.0f },{ 0.0f, 0.0f, 1.0f } }
+			,	{ {  1.0f, -1.0f, 0.0f }, { 1.0f, 0.0f },{ 0.0f, 0.0f, 1.0f } }
+			};
 
 		// Setup indices
 		std::vector<uint32_t>									indices						= { 0,1,2, 2,3,0 };
@@ -518,21 +517,20 @@ public:
 	{
 		// Example uses one ubo and one image sampler
 		std::vector<VkDescriptorPoolSize>						poolSizes					=
-		{	vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1)
-		,	vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1)
-		};
+			{	vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1)
+			,	vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1)
+			};
 
 		VkDescriptorPoolCreateInfo descriptorPoolInfo		= vks::initializers::descriptorPoolCreateInfo(static_cast<uint32_t>(poolSizes.size()), poolSizes.data(), 2);
-
 		VK_CHECK_RESULT(vkCreateDescriptorPool(device, &descriptorPoolInfo, nullptr, &descriptorPool));
 	}
 
 	void											setupDescriptorSetLayout	()
 	{
 		std::vector<VkDescriptorSetLayoutBinding>				setLayoutBindings			= 
-		{	vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT, 0)				// Binding 0 : Vertex shader uniform buffer	
-		,	vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, 1)	// Binding 1 : Fragment shader image sampler
-		};
+			{	vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT, 0)				// Binding 0 : Vertex shader uniform buffer	
+			,	vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, 1)	// Binding 1 : Fragment shader image sampler
+			};
 
 		VkDescriptorSetLayoutCreateInfo							descriptorLayout			= vks::initializers::descriptorSetLayoutCreateInfo(setLayoutBindings.data(), static_cast<uint32_t>(setLayoutBindings.size()));
 		VK_CHECK_RESULT(vkCreateDescriptorSetLayout(device, &descriptorLayout, nullptr, &descriptorSetLayout));
@@ -547,9 +545,9 @@ public:
 
 		VK_CHECK_RESULT(vkAllocateDescriptorSets(device, &allocInfo, &descriptorSet));
 		std::vector<VkWriteDescriptorSet>						writeDescriptorSets			=
-		{	vks::initializers::writeDescriptorSet(descriptorSet, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 0, &uniformBufferVS.descriptor)		// Binding 0 : Vertex shader uniform buffer
-		,	vks::initializers::writeDescriptorSet(descriptorSet, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, &texture.descriptor)		// Binding 1 : Fragment shader texture sampler
-		};
+			{	vks::initializers::writeDescriptorSet(descriptorSet, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 0, &uniformBufferVS.descriptor)		// Binding 0 : Vertex shader uniform buffer
+			,	vks::initializers::writeDescriptorSet(descriptorSet, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, &texture.descriptor)		// Binding 1 : Fragment shader texture sampler
+			};
 
 		vkUpdateDescriptorSets(device, static_cast<uint32_t>(writeDescriptorSets.size()), writeDescriptorSets.data(), 0, NULL);
 	}

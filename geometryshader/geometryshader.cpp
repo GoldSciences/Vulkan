@@ -55,8 +55,7 @@ public:
 	VkDescriptorSet descriptorSet;
 	VkDescriptorSetLayout descriptorSetLayout;
 
-	VulkanExample() : VulkanExampleBase(ENABLE_VALIDATION)
-	{
+	VulkanExample() : VulkanExampleBase(ENABLE_VALIDATION)	{
 		zoom = -8.0f;
 		rotation = glm::vec3(0.0f, -25.0f, 0.0f);
 		enableTextOverlay = true;
@@ -66,8 +65,7 @@ public:
 		enabledFeatures.geometryShader = VK_TRUE;
 	}
 
-	~VulkanExample()
-	{
+	~VulkanExample()	{
 		// Clean up used Vulkan resources 
 		// Note : Inherited destructor cleans up resources stored in base class
 		vkDestroyPipeline(device, pipelines.solid, nullptr);
@@ -82,18 +80,15 @@ public:
 		uniformBuffers.VS.destroy();
 	}
 
-	void reBuildCommandBuffers()
-	{
-		if (!checkCommandBuffers())
-		{
+	void reBuildCommandBuffers()	{
+		if (!checkCommandBuffers()) {
 			destroyCommandBuffers();
 			createCommandBuffers();
 		}
 		buildCommandBuffers();
 	}
 
-	void buildCommandBuffers()
-	{
+	void buildCommandBuffers()	{
 		VkCommandBufferBeginInfo cmdBufInfo = vks::initializers::commandBufferBeginInfo();
 
 		VkClearValue clearValues[2];
@@ -109,8 +104,7 @@ public:
 		renderPassBeginInfo.clearValueCount = 2;
 		renderPassBeginInfo.pClearValues = clearValues;
 
-		for (size_t i = 0; i < drawCmdBuffers.size(); ++i)
-		{
+		for (size_t i = 0; i < drawCmdBuffers.size(); ++i) {
 			// Set target frame buffer
 			renderPassBeginInfo.framebuffer = frameBuffers[i];
 
@@ -138,8 +132,7 @@ public:
 			vkCmdDrawIndexed(drawCmdBuffers[i], models.object.indexCount, 1, 0, 0, 0);
 
 			// Normal debugging
-			if (displayNormals)
-			{
+			if (displayNormals) {
 				vkCmdBindPipeline(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines.normals);
 				vkCmdDrawIndexed(drawCmdBuffers[i], models.object.indexCount, 1, 0, 0, 0);
 			}
@@ -150,13 +143,11 @@ public:
 		}
 	}
 
-	void loadAssets()
-	{
+	void loadAssets()	{
 		models.object.loadFromFile(getAssetPath() + "models/suzanne.obj", vertexLayout, 0.25f, vulkanDevice, queue);
 	}
 
-	void setupVertexDescriptions()
-	{
+	void setupVertexDescriptions()	{
 		// Binding description
 		vertices.bindingDescriptions.resize(1);
 		vertices.bindingDescriptions[0] = vks::initializers::vertexInputBindingDescription(VERTEX_BUFFER_BIND_ID, vertexLayout.stride(), VK_VERTEX_INPUT_RATE_VERTEX);
@@ -175,8 +166,7 @@ public:
 		vertices.inputState.pVertexAttributeDescriptions		= vertices.attributeDescriptions.data();
 	}
 
-	void setupDescriptorPool()
-	{
+	void setupDescriptorPool()	{
 		// Example uses two ubos
 		std::vector<VkDescriptorPoolSize>							poolSizes					=
 			{	vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 2),
@@ -186,66 +176,46 @@ public:
 		VK_CHECK_RESULT(vkCreateDescriptorPool(device, &descriptorPoolInfo, nullptr, &descriptorPool));
 	}
 
-	void setupDescriptorSetLayout()
-	{
+	void setupDescriptorSetLayout()	{
 		std::vector<VkDescriptorSetLayoutBinding>					setLayoutBindings =
 			{	vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT, 0)	// Binding 0 : Vertex shader ubo
 			,	vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_GEOMETRY_BIT, 1)	// Binding 1 : Geometry shader ubo
 			};
 
 		VkDescriptorSetLayoutCreateInfo								descriptorLayout			= vks::initializers::descriptorSetLayoutCreateInfo(setLayoutBindings.data(), static_cast<uint32_t>(setLayoutBindings.size()));
-
 		VK_CHECK_RESULT(vkCreateDescriptorSetLayout(device, &descriptorLayout, nullptr, &descriptorSetLayout));
 
 		VkPipelineLayoutCreateInfo									pPipelineLayoutCreateInfo	= vks::initializers::pipelineLayoutCreateInfo(&descriptorSetLayout, 1);
-
 		VK_CHECK_RESULT(vkCreatePipelineLayout(device, &pPipelineLayoutCreateInfo, nullptr, &pipelineLayout));
 	}
 
-	void setupDescriptorSet()
-	{
+	void setupDescriptorSet()	{
 		VkDescriptorSetAllocateInfo									allocInfo					= vks::initializers::descriptorSetAllocateInfo(descriptorPool, &descriptorSetLayout, 1);
-
 		VK_CHECK_RESULT(vkAllocateDescriptorSets(device, &allocInfo, &descriptorSet));
 
 		std::vector<VkWriteDescriptorSet> writeDescriptorSets =
-		{
-			// Binding 0 : Vertex shader shader ubo
-			vks::initializers::writeDescriptorSet(
-				descriptorSet,
-				VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-				0,
-				&uniformBuffers.VS.descriptor),
-			// Binding 1 : Geometry shader ubo
-			vks::initializers::writeDescriptorSet(
-				descriptorSet,
-				VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-				1,
-				&uniformBuffers.GS.descriptor)
-		};
+			{	vks::initializers::writeDescriptorSet(descriptorSet, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 0, &uniformBuffers.VS.descriptor)	// Binding 0 : Vertex shader shader ubo
+			,	vks::initializers::writeDescriptorSet(descriptorSet, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, &uniformBuffers.GS.descriptor)	// Binding 1 : Geometry shader ubo
+			};
 
 		vkUpdateDescriptorSets(device, static_cast<uint32_t>(writeDescriptorSets.size()), writeDescriptorSets.data(), 0, NULL);
 	}
 
-	void preparePipelines()
-	{
-		VkPipelineInputAssemblyStateCreateInfo inputAssemblyState = vks::initializers::pipelineInputAssemblyStateCreateInfo(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, 0, VK_FALSE);
-
-		VkPipelineRasterizationStateCreateInfo rasterizationState = vks::initializers::pipelineRasterizationStateCreateInfo(VK_POLYGON_MODE_FILL, VK_CULL_MODE_BACK_BIT, VK_FRONT_FACE_CLOCKWISE, 0);
-
+	void preparePipelines()	{
+		VkPipelineInputAssemblyStateCreateInfo				inputAssemblyState		= vks::initializers::pipelineInputAssemblyStateCreateInfo(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, 0, VK_FALSE);
+		VkPipelineRasterizationStateCreateInfo				rasterizationState		= vks::initializers::pipelineRasterizationStateCreateInfo(VK_POLYGON_MODE_FILL, VK_CULL_MODE_BACK_BIT, VK_FRONT_FACE_CLOCKWISE, 0);
 		VkPipelineColorBlendAttachmentState					blendAttachmentState	= vks::initializers::pipelineColorBlendAttachmentState(0xf, VK_FALSE);
 		VkPipelineColorBlendStateCreateInfo					colorBlendState			= vks::initializers::pipelineColorBlendStateCreateInfo(1, &blendAttachmentState);
 		VkPipelineDepthStencilStateCreateInfo				depthStencilState		= vks::initializers::pipelineDepthStencilStateCreateInfo(VK_TRUE, VK_TRUE, VK_COMPARE_OP_LESS_OR_EQUAL);
 		VkPipelineViewportStateCreateInfo					viewportState			= vks::initializers::pipelineViewportStateCreateInfo(1, 1, 0);
 		VkPipelineMultisampleStateCreateInfo				multisampleState		= vks::initializers::pipelineMultisampleStateCreateInfo(VK_SAMPLE_COUNT_1_BIT, 0);
 
-		std::vector<VkDynamicState> dynamicStateEnables = {
-			VK_DYNAMIC_STATE_VIEWPORT,
-			VK_DYNAMIC_STATE_SCISSOR,
-			VK_DYNAMIC_STATE_LINE_WIDTH
-		};
-		VkPipelineDynamicStateCreateInfo dynamicState = vks::initializers::pipelineDynamicStateCreateInfo(dynamicStateEnables.data(), static_cast<uint32_t>(dynamicStateEnables.size()), 0);
-
+		std::vector<VkDynamicState>							dynamicStateEnables		= 
+			{	VK_DYNAMIC_STATE_VIEWPORT
+			,	VK_DYNAMIC_STATE_SCISSOR
+			,	VK_DYNAMIC_STATE_LINE_WIDTH
+			};
+		VkPipelineDynamicStateCreateInfo					dynamicState			= vks::initializers::pipelineDynamicStateCreateInfo(dynamicStateEnables.data(), static_cast<uint32_t>(dynamicStateEnables.size()), 0);
 
 		// Tessellation pipeline
 		// Load shaders
@@ -280,9 +250,7 @@ public:
 	}
 
 	// Prepare and initialize uniform buffer containing shader uniforms
-	void prepareUniformBuffers()
-	{
-		
+	void prepareUniformBuffers()	{
 		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBuffers.VS, sizeof(uboVS)));	// Vertex shader uniform buffer block
 		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBuffers.GS, sizeof(uboGS)));	// Geometry shader uniform buffer block
 
@@ -293,8 +261,7 @@ public:
 		updateUniformBuffers();
 	}
 
-	void updateUniformBuffers()
-	{
+	void updateUniformBuffers()	{
 		// Vertex shader
 		uboVS.projection = glm::perspective(glm::radians(60.0f), (float)width / (float)height, 0.001f, 256.0f);
 		glm::mat4 viewMatrix = glm::translate(glm::mat4(), glm::vec3(0.0f, 0.0f, zoom));
@@ -310,8 +277,7 @@ public:
 		memcpy(uniformBuffers.GS.mapped, &uboGS, sizeof(uboGS));
 	}
 
-	void draw()
-	{
+	void draw()		{
 		VulkanExampleBase::prepareFrame();
 
 		// Command buffer to be sumitted to the queue
@@ -324,8 +290,7 @@ public:
 		VulkanExampleBase::submitFrame();
 	}
 
-	void prepare()
-	{
+	void prepare()	{
 		VulkanExampleBase::prepare();
 		loadAssets();
 		setupVertexDescriptions();
@@ -338,27 +303,10 @@ public:
 		prepared = true;
 	}
 
-	virtual void render()
-	{
-		if (!prepared)
-			return;
-		draw();
-	}
-
-	virtual void viewChanged()
-	{
-		updateUniformBuffers();
-	}
-
-	void toggleNormals()
-	{
-		displayNormals = !displayNormals;
-		reBuildCommandBuffers();
-	}
-
-
-	virtual void keyPressed(uint32_t keyCode)
-	{
+	virtual void	render			()									{ if (prepared) draw();											}
+	virtual void	viewChanged		()									{ updateUniformBuffers();										}
+	void			toggleNormals	()									{ displayNormals = !displayNormals; reBuildCommandBuffers();	}
+	virtual void	keyPressed		(uint32_t keyCode)					{
 		switch (keyCode)
 		{
 		case KEY_N:
@@ -368,8 +316,7 @@ public:
 		}
 	}
 
-	virtual void getOverlayText(VulkanTextOverlay *textOverlay)
-	{
+	virtual void	getOverlayText	(VulkanTextOverlay *textOverlay)	{
 #if defined(__ANDROID__)
 		textOverlay->addText("Press \"Button A\" to toggle normals", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
 #else

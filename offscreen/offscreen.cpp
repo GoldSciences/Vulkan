@@ -1,4 +1,3 @@
-// 
 // Vulkan Example - Offscreen rendering using a separate framebuffer
 // 
 // Copyright (C) 2016 by Sascha Willems - www.saschawillems.de

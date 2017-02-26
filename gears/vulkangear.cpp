@@ -7,30 +7,26 @@
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 #include "vulkangear.h"
 
-int32_t VulkanGear::newVertex(std::vector<Vertex> *vBuffer, float x, float y, float z, const glm::vec3& normal)
-{
+int32_t VulkanGear::newVertex(std::vector<Vertex> *vBuffer, float x, float y, float z, const glm::vec3& normal)	{
 	Vertex v(glm::vec3(x, y, z), normal, color);
 	vBuffer->push_back(v);
 	return static_cast<int32_t>(vBuffer->size()) - 1;
 }
 
-void VulkanGear::newFace(std::vector<uint32_t> *iBuffer, int a, int b, int c)
-{
+void VulkanGear::newFace(std::vector<uint32_t> *iBuffer, int a, int b, int c)	{
 	iBuffer->push_back(a);
 	iBuffer->push_back(b);
 	iBuffer->push_back(c);
 }
 
-VulkanGear::~VulkanGear()
-{
+VulkanGear::~VulkanGear()	{
 	// Clean up vulkan resources
 	uniformBuffer.destroy();
 	vertexBuffer.destroy();
 	indexBuffer.destroy();
 }
 
-void VulkanGear::generate(GearInfo *gearinfo, VkQueue queue)
-{
+void VulkanGear::generate(GearInfo *gearinfo, VkQueue queue)	{
 	this->color = gearinfo->color;
 	this->pos = gearinfo->pos;
 	this->rotOffset = gearinfo->rotOffset;
@@ -173,55 +169,19 @@ void VulkanGear::generate(GearInfo *gearinfo, VkQueue queue)
 		vks::Buffer vertexStaging, indexStaging;
 
 		// Create staging buffers
-		// Vertex data
-		vulkanDevice->createBuffer(
-			VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT,
-			&vertexStaging,
-			vertexBufferSize,
-			vBuffer.data());
-		// Index data
-		vulkanDevice->createBuffer(
-			VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT,
-			&indexStaging,
-			indexBufferSize,
-			iBuffer.data());
+		vulkanDevice->createBuffer(VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, &vertexStaging, vertexBufferSize, vBuffer.data());						// Vertex data
+		vulkanDevice->createBuffer(VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, &indexStaging, indexBufferSize, iBuffer.data());							// Index data
 
 		// Create device local buffers
-		// Vertex buffer
-		vulkanDevice->createBuffer(
-			VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
-			VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-			&vertexBuffer,
-			vertexBufferSize);
-		// Index buffer
-		vulkanDevice->createBuffer(
-			VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
-			VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-			&indexBuffer,
-			indexBufferSize);
+		vulkanDevice->createBuffer(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, &vertexBuffer, vertexBufferSize);		// Vertex buffer
+		vulkanDevice->createBuffer(VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, &indexBuffer, indexBufferSize);		// Index buffer
 
 		// Copy from staging buffers
 		VkCommandBuffer copyCmd = vulkanDevice->createCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY, true);
 
 		VkBufferCopy copyRegion = {};
-
-		copyRegion.size = vertexBufferSize;
-		vkCmdCopyBuffer(
-			copyCmd,
-			vertexStaging.buffer,
-			vertexBuffer.buffer,
-			1,
-			&copyRegion);
-
-		copyRegion.size = indexBufferSize;
-		vkCmdCopyBuffer(
-			copyCmd,
-			indexStaging.buffer,
-			indexBuffer.buffer,
-			1,
-			&copyRegion);
+		copyRegion.size = vertexBufferSize	;	vkCmdCopyBuffer(copyCmd, vertexStaging.buffer, vertexBuffer.buffer, 1, &copyRegion);
+		copyRegion.size = indexBufferSize	;	vkCmdCopyBuffer(copyCmd, indexStaging.buffer, indexBuffer.buffer, 1, &copyRegion);
 
 		vulkanDevice->flushCommandBuffer(copyCmd, queue, true);
 
@@ -230,22 +190,9 @@ void VulkanGear::generate(GearInfo *gearinfo, VkQueue queue)
 		vkDestroyBuffer(vulkanDevice->logicalDevice, indexStaging.buffer, nullptr);
 		vkFreeMemory(vulkanDevice->logicalDevice, indexStaging.memory, nullptr);
 	}
-	else
-	{
-		// Vertex buffer
-		vulkanDevice->createBuffer(
-			VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT,
-			&vertexBuffer,
-			vertexBufferSize,
-			vBuffer.data());
-		// Index buffer
-		vulkanDevice->createBuffer(
-			VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
-			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT,
-			&indexBuffer,
-			indexBufferSize,
-			iBuffer.data());
+	else {
+		vulkanDevice->createBuffer(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, &vertexBuffer, vertexBufferSize, vBuffer.data());	// Vertex buffer
+		vulkanDevice->createBuffer(VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, &indexBuffer, indexBufferSize, iBuffer.data());		// Index buffer
 	}
 
 	indexCount = static_cast<uint32_t>(iBuffer.size());
@@ -253,8 +200,7 @@ void VulkanGear::generate(GearInfo *gearinfo, VkQueue queue)
 	prepareUniformBuffer();
 }
 
-void VulkanGear::draw(VkCommandBuffer cmdbuffer, VkPipelineLayout pipelineLayout)
-{
+void VulkanGear::draw(VkCommandBuffer cmdbuffer, VkPipelineLayout pipelineLayout)	{
 	VkDeviceSize offsets[1] = { 0 };
 	vkCmdBindDescriptorSets(cmdbuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSet, 0, NULL);
 	vkCmdBindVertexBuffers(cmdbuffer, 0, 1, &vertexBuffer.buffer, offsets);
@@ -262,8 +208,7 @@ void VulkanGear::draw(VkCommandBuffer cmdbuffer, VkPipelineLayout pipelineLayout
 	vkCmdDrawIndexed(cmdbuffer, indexCount, 1, 0, 0, 1);
 }
 
-void VulkanGear::updateUniformBuffer(glm::mat4 perspective, glm::vec3 rotation, float zoom, float timer)
-{
+void VulkanGear::updateUniformBuffer(glm::mat4 perspective, glm::vec3 rotation, float zoom, float timer)	{
 	ubo.projection = perspective;
 
 	ubo.view = glm::lookAt(
@@ -288,34 +233,16 @@ void VulkanGear::updateUniformBuffer(glm::mat4 perspective, glm::vec3 rotation, 
 	memcpy(uniformBuffer.mapped, &ubo, sizeof(ubo));
 }
 
-void VulkanGear::setupDescriptorSet(VkDescriptorPool pool, VkDescriptorSetLayout descriptorSetLayout)
-{
-	VkDescriptorSetAllocateInfo allocInfo =
-		vks::initializers::descriptorSetAllocateInfo(
-			pool,
-			&descriptorSetLayout,
-			1);
-
+void VulkanGear::setupDescriptorSet(VkDescriptorPool pool, VkDescriptorSetLayout descriptorSetLayout)	{
+	VkDescriptorSetAllocateInfo allocInfo = vks::initializers::descriptorSetAllocateInfo(pool, &descriptorSetLayout, 1);
 	VK_CHECK_RESULT(vkAllocateDescriptorSets(vulkanDevice->logicalDevice, &allocInfo, &descriptorSet));
-
-	// Binding 0 : Vertex shader uniform buffer
-	VkWriteDescriptorSet writeDescriptorSet =
-		vks::initializers::writeDescriptorSet(
-			descriptorSet,
-			VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-			0,
-			&uniformBuffer.descriptor);
-
+	
+	VkWriteDescriptorSet writeDescriptorSet = vks::initializers::writeDescriptorSet(descriptorSet, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 0, &uniformBuffer.descriptor);	// Binding 0 : Vertex shader uniform buffer
 	vkUpdateDescriptorSets(vulkanDevice->logicalDevice, 1, &writeDescriptorSet, 0, NULL);
 }
 
 void VulkanGear::prepareUniformBuffer()
 {
-	VK_CHECK_RESULT(vulkanDevice->createBuffer(
-		VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-		VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-		&uniformBuffer,
-		sizeof(ubo)));
-	// Map persistent
-	VK_CHECK_RESULT(uniformBuffer.map());
+	VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBuffer, sizeof(ubo)));
+	VK_CHECK_RESULT(uniformBuffer.map());	// Map persistent
 }

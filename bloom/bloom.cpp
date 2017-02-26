@@ -4,7 +4,6 @@
 // Copyright (C) 2016 by Sascha Willems - www.saschawillems.de
 // 
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
-// 
 #include "vulkanexamplebase.h"
 #include "VulkanTexture.hpp"
 #include "VulkanModel.hpp"
@@ -114,8 +113,7 @@ public:
 		std::array<FrameBuffer, 2> framebuffers;
 	} offscreenPass;
 
-	VulkanExample() : VulkanExampleBase(ENABLE_VALIDATION)
-	{
+	VulkanExample() : VulkanExampleBase(ENABLE_VALIDATION)	{
 		title = "Vulkan Example - Bloom";
 		timerSpeed *= 0.5f;
 		enableTextOverlay = true;
@@ -125,16 +123,14 @@ public:
 		camera.setPerspective(45.0f, (float)width / (float)height, 0.1f, 256.0f);
 	}
 
-	~VulkanExample()
-	{
+	~VulkanExample()	{
 		// Clean up used Vulkan resources 
 		// Note : Inherited destructor cleans up resources stored in base class
 
 		vkDestroySampler(device, offscreenPass.sampler, nullptr);
 
 		// Frame buffer
-		for (auto& framebuffer : offscreenPass.framebuffers)
-		{
+		for (auto& framebuffer : offscreenPass.framebuffers)	{
 			// Attachments
 			vkDestroyImageView(device, framebuffer.color.view, nullptr);
 			vkDestroyImage(device, framebuffer.color.image, nullptr);
@@ -176,8 +172,7 @@ public:
 
 	// Setup the offscreen framebuffer for rendering the mirrored scene
 	// The color attachment of this framebuffer will then be sampled from
-	void prepareOffscreenFramebuffer(FrameBuffer *frameBuf, VkFormat colorFormat, VkFormat depthFormat)
-	{
+	void prepareOffscreenFramebuffer(FrameBuffer *frameBuf, VkFormat colorFormat, VkFormat depthFormat)	{
 		// Color attachment
 		VkImageCreateInfo image = vks::initializers::imageCreateInfo();
 		image.imageType = VK_IMAGE_TYPE_2D;
@@ -262,8 +257,7 @@ public:
 	}
 
 	// Prepare the offscreen framebuffers used for the vertical- and horizontal blur 
-	void prepareOffscreen()
-	{
+	void prepareOffscreen()	{
 		offscreenPass.width = FB_DIM;
 		offscreenPass.height = FB_DIM;
 
@@ -359,15 +353,11 @@ public:
 	// blur first and then the horizontal one.
 	// While it's possible to blur in one pass, this method is widely used as it
 	// requires far less samples to generate the blur
-	void buildOffscreenCommandBuffer()
-	{
+	void buildOffscreenCommandBuffer()	{
 		if (offscreenPass.commandBuffer == VK_NULL_HANDLE)
-		{
 			offscreenPass.commandBuffer = VulkanExampleBase::createCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY, false);
-		}
 
-		if (offscreenPass.semaphore == VK_NULL_HANDLE)
-		{
+		if (offscreenPass.semaphore == VK_NULL_HANDLE) {
 			VkSemaphoreCreateInfo semaphoreCreateInfo = vks::initializers::semaphoreCreateInfo();
 			VK_CHECK_RESULT(vkCreateSemaphore(device, &semaphoreCreateInfo, nullptr, &offscreenPass.semaphore));
 		}
@@ -426,18 +416,15 @@ public:
 		VK_CHECK_RESULT(vkEndCommandBuffer(offscreenPass.commandBuffer));
 	}
 
-	void reBuildCommandBuffers()
-	{
-		if (!checkCommandBuffers())
-		{
+	void reBuildCommandBuffers()	{
+		if (!checkCommandBuffers()) {
 			destroyCommandBuffers();
 			createCommandBuffers();
 		}
 		buildCommandBuffers();
 	}
 
-	void buildCommandBuffers()
-	{
+	void buildCommandBuffers()	{
 		VkCommandBufferBeginInfo cmdBufInfo = vks::initializers::commandBufferBeginInfo();
 
 		VkClearValue clearValues[2];
@@ -453,8 +440,7 @@ public:
 		renderPassBeginInfo.clearValueCount = 2;
 		renderPassBeginInfo.pClearValues = clearValues;
 
-		for (size_t i = 0; i < drawCmdBuffers.size(); ++i)
-		{
+		for (size_t i = 0; i < drawCmdBuffers.size(); ++i) {
 			// Set target frame buffer
 			renderPassBeginInfo.framebuffer = frameBuffers[i];
 
@@ -489,8 +475,7 @@ public:
 			// Render vertical blurred scene applying a horizontal blur
 			// Render the (vertically blurred) contents of the second framebuffer and apply a horizontal blur
 			// -------------------------------------------------------------------------------------------------------
-			if (bloom)
-			{
+			if (bloom) {
 				vkCmdBindDescriptorSets(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayouts.blur, 0, 1, &descriptorSets.blurHorz, 0, NULL);
 				vkCmdBindPipeline(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines.blurHorz);
 				vkCmdDraw(drawCmdBuffers[i], 3, 1, 0, 0);
@@ -502,9 +487,7 @@ public:
 		}
 
 		if (bloom) 
-		{
 			buildOffscreenCommandBuffer();
-		}
 	}
 
 	void loadAssets()
@@ -523,28 +506,11 @@ public:
 		vertices.bindingDescriptions[0] = vks::initializers::vertexInputBindingDescription(VERTEX_BUFFER_BIND_ID, vertexLayout.stride(), VK_VERTEX_INPUT_RATE_VERTEX);
 		// Attribute descriptions
 		vertices.attributeDescriptions.resize(4);
-		// Location 0 : Position
-		vertices.attributeDescriptions[0] = vks::initializers::vertexInputAttributeDescription(VERTEX_BUFFER_BIND_ID, 0, VK_FORMAT_R32G32B32_SFLOAT, 0);		// Location 1 : Texture coordinates
-		vertices.attributeDescriptions[1] =
-			vks::initializers::vertexInputAttributeDescription(
-				VERTEX_BUFFER_BIND_ID,
-				1,
-				VK_FORMAT_R32G32_SFLOAT,
-				sizeof(float) * 3);
-		// Location 2 : Color
-		vertices.attributeDescriptions[2] =
-			vks::initializers::vertexInputAttributeDescription(
-				VERTEX_BUFFER_BIND_ID,
-				2,
-				VK_FORMAT_R32G32B32_SFLOAT,
-				sizeof(float) * 5);
-		// Location 3 : Normal
-		vertices.attributeDescriptions[3] =
-			vks::initializers::vertexInputAttributeDescription(
-				VERTEX_BUFFER_BIND_ID,
-				3,
-				VK_FORMAT_R32G32B32_SFLOAT,
-				sizeof(float) * 8);
+		
+		vertices.attributeDescriptions[0] = vks::initializers::vertexInputAttributeDescription(VERTEX_BUFFER_BIND_ID, 0, VK_FORMAT_R32G32B32_SFLOAT	, 0);					// Location 0 : Position
+		vertices.attributeDescriptions[1] = vks::initializers::vertexInputAttributeDescription(VERTEX_BUFFER_BIND_ID, 1, VK_FORMAT_R32G32_SFLOAT	, sizeof(float) * 3);	// Location 1 : Texture coordinates
+		vertices.attributeDescriptions[2] = vks::initializers::vertexInputAttributeDescription(VERTEX_BUFFER_BIND_ID, 2, VK_FORMAT_R32G32B32_SFLOAT	, sizeof(float) * 5);	// Location 2 : Color
+		vertices.attributeDescriptions[3] = vks::initializers::vertexInputAttributeDescription(VERTEX_BUFFER_BIND_ID, 3, VK_FORMAT_R32G32B32_SFLOAT	, sizeof(float) * 8);	// Location 3 : Normal
 
 		vertices.inputState										= vks::initializers::pipelineVertexInputStateCreateInfo();
 		vertices.inputState.vertexBindingDescriptionCount		= static_cast<uint32_t>(vertices.bindingDescriptions.size());
@@ -556,17 +522,11 @@ public:
 	void setupDescriptorPool()
 	{
 		std::vector<VkDescriptorPoolSize> poolSizes =
-		{
-			vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 8),
-			vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 6)
-		};
+			{	vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 8)
+			,	vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 6)
+			};
 
-		VkDescriptorPoolCreateInfo descriptorPoolInfo =
-			vks::initializers::descriptorPoolCreateInfo(
-				static_cast<uint32_t>(poolSizes.size()),
-				poolSizes.data(),
-				5);
-
+		VkDescriptorPoolCreateInfo descriptorPoolInfo = vks::initializers::descriptorPoolCreateInfo(static_cast<uint32_t>(poolSizes.size()), poolSizes.data(), 5);
 		VK_CHECK_RESULT(vkCreateDescriptorPool(device, &descriptorPoolInfo, nullptr, &descriptorPool));
 	}
 
@@ -577,21 +537,21 @@ public:
 		VkPipelineLayoutCreateInfo pipelineLayoutCreateInfo;
 
 		// Fullscreen blur
-		setLayoutBindings = {
-			vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT, 0),			// Binding 0: Fragment shader uniform buffer
-			vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, 1)	// Binding 1: Fragment shader image sampler
-		};
+		setLayoutBindings = 
+			{	vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT, 0)			// Binding 0: Fragment shader uniform buffer
+			,	vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, 1)	// Binding 1: Fragment shader image sampler
+			};
 		descriptorSetLayoutCreateInfo = vks::initializers::descriptorSetLayoutCreateInfo(setLayoutBindings.data(), static_cast<uint32_t>(setLayoutBindings.size()));
 		VK_CHECK_RESULT(vkCreateDescriptorSetLayout(device, &descriptorSetLayoutCreateInfo, nullptr, &descriptorSetLayouts.blur));
 		pipelineLayoutCreateInfo = vks::initializers::pipelineLayoutCreateInfo(&descriptorSetLayouts.blur, 1);
 		VK_CHECK_RESULT(vkCreatePipelineLayout(device, &pipelineLayoutCreateInfo, nullptr, &pipelineLayouts.blur));
 
 		// Scene rendering
-		setLayoutBindings = {			
-			vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT, 0),			// Binding 0 : Vertex shader uniform buffer			
-			vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, 1),	// Binding 1 : Fragment shader image sampler			
-			vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT, 2),			// Binding 2 : Framgnet shader image sampler
-		};
+		setLayoutBindings = 
+			{	vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT, 0)				// Binding 0 : Vertex shader uniform buffer			
+			,	vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, 1)	// Binding 1 : Fragment shader image sampler			
+			,	vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT, 2)			// Binding 2 : Framgnet shader image sampler
+			};
 
 		descriptorSetLayoutCreateInfo = vks::initializers::descriptorSetLayoutCreateInfo(setLayoutBindings.data(), static_cast<uint32_t>(setLayoutBindings.size()));
 		VK_CHECK_RESULT(vkCreateDescriptorSetLayout(device, &descriptorSetLayoutCreateInfo, nullptr, &descriptorSetLayouts.scene));
@@ -639,34 +599,21 @@ public:
 		vkUpdateDescriptorSets(device, static_cast<uint32_t>(writeDescriptorSets.size()), writeDescriptorSets.data(), 0, NULL);
 	}
 
-	void preparePipelines()
-	{
-		VkPipelineInputAssemblyStateCreateInfo inputAssemblyState = vks::initializers::pipelineInputAssemblyStateCreateInfo(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, 0, VK_FALSE);
-
-		VkPipelineRasterizationStateCreateInfo rasterizationState =
-			vks::initializers::pipelineRasterizationStateCreateInfo(
-				VK_POLYGON_MODE_FILL,
-				VK_CULL_MODE_NONE,
-				VK_FRONT_FACE_CLOCKWISE,
-				0);
-
+	void preparePipelines()	{
+		VkPipelineInputAssemblyStateCreateInfo				inputAssemblyState		= vks::initializers::pipelineInputAssemblyStateCreateInfo(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, 0, VK_FALSE);
+		VkPipelineRasterizationStateCreateInfo				rasterizationState		= vks::initializers::pipelineRasterizationStateCreateInfo(VK_POLYGON_MODE_FILL, VK_CULL_MODE_NONE, VK_FRONT_FACE_CLOCKWISE, 0);
 		VkPipelineColorBlendAttachmentState					blendAttachmentState	= vks::initializers::pipelineColorBlendAttachmentState(0xf, VK_FALSE);
 		VkPipelineColorBlendStateCreateInfo					colorBlendState			= vks::initializers::pipelineColorBlendStateCreateInfo(1, &blendAttachmentState);
 		VkPipelineDepthStencilStateCreateInfo				depthStencilState		= vks::initializers::pipelineDepthStencilStateCreateInfo(VK_TRUE, VK_TRUE, VK_COMPARE_OP_LESS_OR_EQUAL);
 		VkPipelineViewportStateCreateInfo					viewportState			= vks::initializers::pipelineViewportStateCreateInfo(1, 1, 0);
 		VkPipelineMultisampleStateCreateInfo				multisampleState		= vks::initializers::pipelineMultisampleStateCreateInfo(VK_SAMPLE_COUNT_1_BIT, 0);
 
-		std::vector<VkDynamicState> dynamicStateEnables = {VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR};
-		VkPipelineDynamicStateCreateInfo dynamicState = vks::initializers::pipelineDynamicStateCreateInfo(dynamicStateEnables.data(), static_cast<uint32_t>(dynamicStateEnables.size()), 0);
+		std::vector<VkDynamicState>							dynamicStateEnables		= {VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR};
+		VkPipelineDynamicStateCreateInfo					dynamicState			= vks::initializers::pipelineDynamicStateCreateInfo(dynamicStateEnables.data(), static_cast<uint32_t>(dynamicStateEnables.size()), 0);
 
-		std::array<VkPipelineShaderStageCreateInfo, 2> shaderStages = {};
+		std::array<VkPipelineShaderStageCreateInfo, 2>		shaderStages			= {};
 
-		VkGraphicsPipelineCreateInfo pipelineCreateInfo =
-			vks::initializers::pipelineCreateInfo(
-				pipelineLayouts.blur,
-				renderPass,
-				0);
-
+		VkGraphicsPipelineCreateInfo						pipelineCreateInfo		= vks::initializers::pipelineCreateInfo(pipelineLayouts.blur, renderPass, 0);
 		pipelineCreateInfo.pInputAssemblyState = &inputAssemblyState;
 		pipelineCreateInfo.pRasterizationState = &rasterizationState;
 		pipelineCreateInfo.pColorBlendState = &colorBlendState;
@@ -734,28 +681,10 @@ public:
 	}
 
 	// Prepare and initialize uniform buffer containing shader uniforms
-	void prepareUniformBuffers()
-	{
-		// Phong and color pass vertex shader uniform buffer
-		VK_CHECK_RESULT(vulkanDevice->createBuffer(
-			VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-			&uniformBuffers.scene,
-			sizeof(ubos.scene)));
-
-		// Blur parameters uniform buffers
-		VK_CHECK_RESULT(vulkanDevice->createBuffer(
-			VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-			&uniformBuffers.blurParams,
-			sizeof(ubos.blurParams)));
-
-		// Skybox
-		VK_CHECK_RESULT(vulkanDevice->createBuffer(
-			VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-			&uniformBuffers.skyBox,
-			sizeof(ubos.skyBox)));
+	void prepareUniformBuffers()	{
+		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBuffers.scene, sizeof(ubos.scene)));				// Phong and color pass vertex shader uniform buffer
+		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBuffers.blurParams, sizeof(ubos.blurParams)));	// Blur parameters uniform buffers
+		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBuffers.skyBox, sizeof(ubos.skyBox)));			// Skybox
 
 		// Map persistent
 		VK_CHECK_RESULT(uniformBuffers.scene.map());

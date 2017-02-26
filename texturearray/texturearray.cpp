@@ -234,33 +234,14 @@ public:
 		subresourceRange.levelCount = 1;
 		subresourceRange.layerCount = layerCount;
 
-		vks::tools::setImageLayout(
-			copyCmd,
-			textureArray.image,
-			VK_IMAGE_ASPECT_COLOR_BIT,
-			VK_IMAGE_LAYOUT_UNDEFINED,
-			VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-			subresourceRange);
+		vks::tools::setImageLayout(copyCmd, textureArray.image, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, subresourceRange);
 
 		// Copy the cube map faces from the staging buffer to the optimal tiled image
-		vkCmdCopyBufferToImage(
-			copyCmd,
-			stagingBuffer,
-			textureArray.image,
-			VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-			static_cast<uint32_t>(bufferCopyRegions.size()),
-			bufferCopyRegions.data()
-			);
+		vkCmdCopyBufferToImage(copyCmd, stagingBuffer, textureArray.image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, static_cast<uint32_t>(bufferCopyRegions.size()), bufferCopyRegions.data());
 
 		// Change texture image layout to shader read after all faces have been copied
 		textureArray.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-		vks::tools::setImageLayout(
-			copyCmd,
-			textureArray.image,
-			VK_IMAGE_ASPECT_COLOR_BIT,
-			VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-			textureArray.imageLayout,
-			subresourceRange);
+		vks::tools::setImageLayout(copyCmd, textureArray.image, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, textureArray.imageLayout, subresourceRange);
 
 		VulkanExampleBase::flushCommandBuffer(copyCmd, queue, true);
 
@@ -295,11 +276,8 @@ public:
 		vkDestroyBuffer(device, stagingBuffer, nullptr);
 	}
 
-	void loadTextures()
-	{
-		loadTextureArray(
-			getAssetPath() + "textures/texturearray_bc3.ktx", 
-			VK_FORMAT_BC3_UNORM_BLOCK);
+	void loadTextures()	{
+		loadTextureArray(getAssetPath() + "textures/texturearray_bc3.ktx", VK_FORMAT_BC3_UNORM_BLOCK);
 	}
 
 	void buildCommandBuffers()
@@ -353,12 +331,11 @@ public:
 	{
 		// Setup vertices for a single uv-mapped quad made from two triangles
 		std::vector<Vertex> vertices =
-		{
-			{ {  2.5f,  2.5f, 0.0f }, { 1.0f, 1.0f } },
-			{ { -2.5f,  2.5f, 0.0f }, { 0.0f, 1.0f } },
-			{ { -2.5f, -2.5f, 0.0f }, { 0.0f, 0.0f } },
-			{ {  2.5f, -2.5f, 0.0f }, { 1.0f, 0.0f } }
-		};
+			{	{ {  2.5f,  2.5f, 0.0f }, { 1.0f, 1.0f } }
+			,	{ { -2.5f,  2.5f, 0.0f }, { 0.0f, 1.0f } }
+			,	{ { -2.5f, -2.5f, 0.0f }, { 0.0f, 0.0f } }
+			,	{ {  2.5f, -2.5f, 0.0f }, { 1.0f, 0.0f } }
+			};
 
 		// Setup indices
 		std::vector<uint32_t> indices = { 0,1,2, 2,3,0 };
@@ -366,43 +343,21 @@ public:
 
 		// Create buffers
 		// For the sake of simplicity we won't stage the vertex data to the gpu memory
-		// Vertex buffer
-		VK_CHECK_RESULT(vulkanDevice->createBuffer(
-			VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-			&vertexBuffer,
-			vertices.size() * sizeof(Vertex),
-			vertices.data()));
-		// Index buffer
-		VK_CHECK_RESULT(vulkanDevice->createBuffer(
-			VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
-			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-			&indexBuffer,
-			indices.size() * sizeof(uint32_t),
-			indices.data()));
+		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &vertexBuffer, vertices.size() * sizeof(Vertex), vertices.data()));	// Vertex buffer
+		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &indexBuffer, indices.size() * sizeof(uint32_t), indices.data()));		// Index buffer
 	}
 
 	void setupVertexDescriptions()
 	{
 		// Binding description
 		vertices.bindingDescriptions.resize(1);
-		vertices.bindingDescriptions[0] =
-			vks::initializers::vertexInputBindingDescription(
-				VERTEX_BUFFER_BIND_ID,
-				sizeof(Vertex),
-				VK_VERTEX_INPUT_RATE_VERTEX);
+		vertices.bindingDescriptions[0] = vks::initializers::vertexInputBindingDescription(VERTEX_BUFFER_BIND_ID, sizeof(Vertex), VK_VERTEX_INPUT_RATE_VERTEX);
 
 		// Attribute descriptions
 		// Describes memory layout and shader positions
 		vertices.attributeDescriptions.resize(2);
-		// Location 0 : Position
-		vertices.attributeDescriptions[0] = vks::initializers::vertexInputAttributeDescription(VERTEX_BUFFER_BIND_ID, 0, VK_FORMAT_R32G32B32_SFLOAT, 0);		// Location 1 : Texture coordinates
-		vertices.attributeDescriptions[1] =
-			vks::initializers::vertexInputAttributeDescription(
-				VERTEX_BUFFER_BIND_ID,
-				1,
-				VK_FORMAT_R32G32_SFLOAT,
-				sizeof(float) * 3);
+		vertices.attributeDescriptions[0] = vks::initializers::vertexInputAttributeDescription(VERTEX_BUFFER_BIND_ID, 0, VK_FORMAT_R32G32B32_SFLOAT	, 0);					// Location 0 : Position
+		vertices.attributeDescriptions[1] = vks::initializers::vertexInputAttributeDescription(VERTEX_BUFFER_BIND_ID, 1, VK_FORMAT_R32G32_SFLOAT	, sizeof(float) * 3);	// Location 1 : Texture coordinates
 
 		vertices.inputState										= vks::initializers::pipelineVertexInputStateCreateInfo();
 		vertices.inputState.vertexBindingDescriptionCount		= static_cast<uint32_t>(vertices.bindingDescriptions.size());
@@ -414,88 +369,47 @@ public:
 	void setupDescriptorPool()
 	{
 		std::vector<VkDescriptorPoolSize> poolSizes =
-		{
-			vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1),
-			vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1)
-		};
+			{	vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER			, 1)
+			,	vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER	, 1)
+			};
 
-		VkDescriptorPoolCreateInfo descriptorPoolInfo =
-			vks::initializers::descriptorPoolCreateInfo(
-				static_cast<uint32_t>(poolSizes.size()),
-				poolSizes.data(),
-				2);
-
+		VkDescriptorPoolCreateInfo descriptorPoolInfo = vks::initializers::descriptorPoolCreateInfo(static_cast<uint32_t>(poolSizes.size()), poolSizes.data(), 2);
 		VK_CHECK_RESULT(vkCreateDescriptorPool(device, &descriptorPoolInfo, nullptr, &descriptorPool));
 	}
 
 	void setupDescriptorSetLayout()
 	{
 		std::vector<VkDescriptorSetLayoutBinding> setLayoutBindings =
-		{
-			// Binding 0 : Vertex shader uniform buffer
-			vks::initializers::descriptorSetLayoutBinding(
-				VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-				VK_SHADER_STAGE_VERTEX_BIT,
-				0),
-			// Binding 1 : Fragment shader image sampler (texture array)
-			vks::initializers::descriptorSetLayoutBinding(
-				VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-				VK_SHADER_STAGE_FRAGMENT_BIT,
-				1)
-		};
+			{	vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER			, VK_SHADER_STAGE_VERTEX_BIT	, 0)	// Binding 0 : Vertex shader uniform buffer
+			,	vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER	, VK_SHADER_STAGE_FRAGMENT_BIT	, 1)	// Binding 1 : Fragment shader image sampler (texture array)
+			};
 
 		VkDescriptorSetLayoutCreateInfo						descriptorLayout			= vks::initializers::descriptorSetLayoutCreateInfo(setLayoutBindings.data(), static_cast<uint32_t>(setLayoutBindings.size()));
-
 		VK_CHECK_RESULT(vkCreateDescriptorSetLayout(device, &descriptorLayout, nullptr, &descriptorSetLayout));
 
 		VkPipelineLayoutCreateInfo							pPipelineLayoutCreateInfo	= vks::initializers::pipelineLayoutCreateInfo(&descriptorSetLayout, 1);
-
 		VK_CHECK_RESULT(vkCreatePipelineLayout(device, &pPipelineLayoutCreateInfo, nullptr, &pipelineLayout));
 	}
 
 	void setupDescriptorSet()
 	{
 		VkDescriptorSetAllocateInfo							allocInfo = vks::initializers::descriptorSetAllocateInfo(descriptorPool, &descriptorSetLayout, 1);
-
 		VK_CHECK_RESULT(vkAllocateDescriptorSets(device, &allocInfo, &descriptorSet));
 
 		// Image descriptor for the texture array
-		VkDescriptorImageInfo textureDescriptor =
-			vks::initializers::descriptorImageInfo(
-				textureArray.sampler,
-				textureArray.view,
-				textureArray.imageLayout);
-
+		VkDescriptorImageInfo textureDescriptor = vks::initializers::descriptorImageInfo(textureArray.sampler, textureArray.view, textureArray.imageLayout);
 		std::vector<VkWriteDescriptorSet> writeDescriptorSets =
-		{
-			// Binding 0 : Vertex shader uniform buffer
-			vks::initializers::writeDescriptorSet(
-				descriptorSet,
-				VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-				0,
-				&uniformBufferVS.descriptor),
-			// Binding 1 : Fragment shader cubemap sampler
-			vks::initializers::writeDescriptorSet(
-				descriptorSet,
-				VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-				1,
-				&textureDescriptor)
-		};
+			{	vks::initializers::writeDescriptorSet(descriptorSet, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER			, 0, &uniformBufferVS.descriptor)	// Binding 0 : Vertex shader uniform buffer
+			,	vks::initializers::writeDescriptorSet(descriptorSet, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER	, 1, &textureDescriptor)			// Binding 1 : Fragment shader cubemap sampler
+			};
 
 		vkUpdateDescriptorSets(device, static_cast<uint32_t>(writeDescriptorSets.size()), writeDescriptorSets.data(), 0, NULL);
 	}
 
 	void preparePipelines()
 	{
-		VkPipelineInputAssemblyStateCreateInfo inputAssemblyState = vks::initializers::pipelineInputAssemblyStateCreateInfo(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, 0, VK_FALSE);
-
-		VkPipelineRasterizationStateCreateInfo rasterizationState =
-			vks::initializers::pipelineRasterizationStateCreateInfo(
-				VK_POLYGON_MODE_FILL,
-				VK_CULL_MODE_NONE,
-				VK_FRONT_FACE_COUNTER_CLOCKWISE,
-				0);
-
+		VkPipelineInputAssemblyStateCreateInfo				inputAssemblyState		= vks::initializers::pipelineInputAssemblyStateCreateInfo(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, 0, VK_FALSE);
+		VkPipelineRasterizationStateCreateInfo				rasterizationState		= vks::initializers::pipelineRasterizationStateCreateInfo(VK_POLYGON_MODE_FILL, VK_CULL_MODE_NONE, VK_FRONT_FACE_COUNTER_CLOCKWISE, 0);
 		VkPipelineColorBlendAttachmentState					blendAttachmentState	= vks::initializers::pipelineColorBlendAttachmentState(0xf, VK_FALSE);
 		VkPipelineColorBlendStateCreateInfo					colorBlendState			= vks::initializers::pipelineColorBlendStateCreateInfo(1, &blendAttachmentState);
 		VkPipelineDepthStencilStateCreateInfo				depthStencilState		= vks::initializers::pipelineDepthStencilStateCreateInfo(VK_TRUE, VK_TRUE, VK_COMPARE_OP_LESS_OR_EQUAL);

@@ -175,6 +175,30 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "deferredshadows", "deferred
 		{3977789C-B360-4E1B-A100-3D71A1567723} = {3977789C-B360-4E1B-A100-3D71A1567723}
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Base", "Base", "{09B9A54B-FC57-4A98-9671-5706FC3846C9}"
+	ProjectSection(SolutionItems) = preProject
+		base\camera.hpp = base\camera.hpp
+		base\frustum.hpp = base\frustum.hpp
+		base\threadpool.hpp = base\threadpool.hpp
+		base\vulkanandroid.cpp = base\vulkanandroid.cpp
+		base\vulkanandroid.h = base\vulkanandroid.h
+		base\VulkanBuffer.hpp = base\VulkanBuffer.hpp
+		base\vulkandebug.cpp = base\vulkandebug.cpp
+		base\vulkandebug.h = base\vulkandebug.h
+		base\VulkanDevice.hpp = base\VulkanDevice.hpp
+		base\vulkanexamplebase.cpp = base\vulkanexamplebase.cpp
+		base\vulkanexamplebase.h = base\vulkanexamplebase.h
+		base\VulkanFrameBuffer.hpp = base\VulkanFrameBuffer.hpp
+		base\VulkanHeightmap.hpp = base\VulkanHeightmap.hpp
+		base\VulkanInitializers.hpp = base\VulkanInitializers.hpp
+		base\VulkanModel.hpp = base\VulkanModel.hpp
+		base\vulkanswapchain.hpp = base\vulkanswapchain.hpp
+		base\vulkantextoverlay.hpp = base\vulkantextoverlay.hpp
+		base\VulkanTexture.hpp = base\VulkanTexture.hpp
+		base\VulkanTools.h = base\VulkanTools.h
+		base\VulkanTools.hpp = base\VulkanTools.hpp
+	EndProjectSection
+EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "indirectdraw", "indirectdraw\indirectdraw.vcxproj", "{2BBDD10F-2C9D-4BEA-8C7B-1C510A2CE08B}"
 	ProjectSection(ProjectDependencies) = postProject
 		{3977789C-B360-4E1B-A100-3D71A1567723} = {3977789C-B360-4E1B-A100-3D71A1567723}
@@ -262,6 +286,10 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vulkanexamplebase", "base\vulkanexamplebase.vcxproj", "{3977789C-B360-4E1B-A100-3D71A1567723}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pbribl", "pbribl\pbribl.vcxproj", "{659987E9-863C-4B9B-A3D4-CBA7D67A9516}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pbrbasic", "pbrbasic\pbrbasic.vcxproj", "{5E777010-A326-4D3B-A886-A4601A52F4BC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "pbr", "pbr", "{BE290A75-7E65-4D0A-B419-774A309B6A60}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -473,6 +501,10 @@ Global
 		{659987E9-863C-4B9B-A3D4-CBA7D67A9516}.Debug|x64.Build.0 = Debug|x64
 		{659987E9-863C-4B9B-A3D4-CBA7D67A9516}.Release|x64.ActiveCfg = Release|x64
 		{659987E9-863C-4B9B-A3D4-CBA7D67A9516}.Release|x64.Build.0 = Release|x64
+		{5E777010-A326-4D3B-A886-A4601A52F4BC}.Debug|x64.ActiveCfg = Debug|x64
+		{5E777010-A326-4D3B-A886-A4601A52F4BC}.Debug|x64.Build.0 = Debug|x64
+		{5E777010-A326-4D3B-A886-A4601A52F4BC}.Release|x64.ActiveCfg = Release|x64
+		{5E777010-A326-4D3B-A886-A4601A52F4BC}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -495,5 +527,7 @@ Global
 		{0CB44B34-A81F-4002-9AC7-E0EEA55D8A60} = {460EE42F-4178-49EF-9AC0-415599B80303}
 		{8418A364-3D1C-4938-A2CC-C1D1433039F2} = {6B47BC47-0394-429E-9441-867EC23DFCD4}
 		{6B4BC372-5897-40FB-91D4-421C2817F656} = {6B47BC47-0394-429E-9441-867EC23DFCD4}
+		{92B2640A-0CC5-48EA-B34C-520BA13938D1} = {BE290A75-7E65-4D0A-B419-774A309B6A60}
+		{659987E9-863C-4B9B-A3D4-CBA7D67A9516} = {BE290A75-7E65-4D0A-B419-774A309B6A60}
 	EndGlobalSection
 EndGlobal
