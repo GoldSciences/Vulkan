@@ -101,8 +101,7 @@ public:
 	// View frustum for culling invisible objects
 	vks::Frustum frustum;
 
-	VulkanExample() : VulkanExampleBase(ENABLE_VALIDATION)
-	{
+	VulkanExample() : VulkanExampleBase(ENABLE_VALIDATION)	{
 		zoom = -32.5f;
 		zoomSpeed = 2.5f;
 		rotationSpeed = 0.5f;
@@ -124,8 +123,7 @@ public:
 		numObjectsPerThread = 512 / numThreads;
 	}
 
-	~VulkanExample()
-	{
+	~VulkanExample()	{
 		// Clean up used Vulkan resources 
 		// Note : Inherited destructor cleans up resources stored in base class
 		vkDestroyPipeline(device, pipelines.phong, nullptr);
@@ -139,8 +137,7 @@ public:
 		models.ufo.destroy();
 		models.skysphere.destroy();
 
-		for (auto& thread : threadData)
-		{
+		for (auto& thread : threadData) {
 			vkFreeCommandBuffers(device, thread.commandPool, static_cast<uint32_t>(thread.commandBuffer.size()), thread.commandBuffer.data());
 			vkDestroyCommandPool(device, thread.commandPool, nullptr);
 		}
@@ -148,22 +145,16 @@ public:
 		vkDestroyFence(device, renderFence, nullptr);
 	}
 
-	float rnd(float range)
-	{
+	float rnd(float range)	{
 		return float(range * (rand() / double(RAND_MAX)));
 	}
 
 	// Create all threads and initialize shader push constants
-	void prepareMultiThreadedRenderer()
-	{
+	void prepareMultiThreadedRenderer()	{
 		// Since this demo updates the command buffers on each frame
 		// we don't use the per-framebuffer command buffers from the
 		// base class, and create a single primary command buffer instead
-		VkCommandBufferAllocateInfo cmdBufAllocateInfo =
-			vks::initializers::commandBufferAllocateInfo(
-				cmdPool,
-				VK_COMMAND_BUFFER_LEVEL_PRIMARY,
-				1);
+		VkCommandBufferAllocateInfo cmdBufAllocateInfo = vks::initializers::commandBufferAllocateInfo(cmdPool, VK_COMMAND_BUFFER_LEVEL_PRIMARY, 1);
 		VK_CHECK_RESULT(vkAllocateCommandBuffers(device, &cmdBufAllocateInfo, &primaryCommandBuffer));
 
 		// Create a secondary command buffer for rendering the star sphere
@@ -202,8 +193,7 @@ public:
 			thread->pushConstBlock.resize(numObjectsPerThread);
 			thread->objectData.resize(numObjectsPerThread);
 
-			for (uint32_t j = 0; j < numObjectsPerThread; j++)
-			{
+			for (uint32_t j = 0; j < numObjectsPerThread; j++) {
 				float theta = 2.0f * float(M_PI) * uniformDist(rndGenerator);
 				float phi = acos(1.0f - 2.0f * uniformDist(rndGenerator));
 				thread->objectData[j].pos = glm::vec3(sin(phi) * cos(theta), 0.0f, cos(phi)) * 35.0f;
@@ -221,8 +211,7 @@ public:
 	}
 
 	// Builds the secondary command buffer for each thread
-	void threadRenderCode(uint32_t threadIndex, uint32_t cmdBufferIndex, VkCommandBufferInheritanceInfo inheritanceInfo)
-	{
+	void threadRenderCode(uint32_t threadIndex, uint32_t cmdBufferIndex, VkCommandBufferInheritanceInfo inheritanceInfo)	{
 		ThreadData *thread = &threadData[threadIndex];
 		ObjectData *objectData = &thread->objectData[cmdBufferIndex];
 
@@ -230,9 +219,7 @@ public:
 		objectData->visible = frustum.checkSphere(objectData->pos, objectSphereDim * 0.5f); 
 
 		if (!objectData->visible)
-		{
 			return;
-		}
 
 		VkCommandBufferBeginInfo commandBufferBeginInfo = vks::initializers::commandBufferBeginInfo();
 		commandBufferBeginInfo.flags = VK_COMMAND_BUFFER_USAGE_RENDER_PASS_CONTINUE_BIT;
@@ -253,9 +240,8 @@ public:
 		// Update
 		objectData->rotation.y += 2.5f * objectData->rotationSpeed * frameTimer;
 		if (objectData->rotation.y > 360.0f)
-		{
 			objectData->rotation.y -= 360.0f;
-		}
+
 		objectData->deltaT += 0.15f * frameTimer;
 		if (objectData->deltaT > 1.0f)
 			objectData->deltaT -= 1.0f;
@@ -281,8 +267,7 @@ public:
 		VK_CHECK_RESULT(vkEndCommandBuffer(cmdBuffer));
 	}
 
-	void updateSecondaryCommandBuffer(VkCommandBufferInheritanceInfo inheritanceInfo)
-	{
+	void updateSecondaryCommandBuffer(VkCommandBufferInheritanceInfo inheritanceInfo)	{
 		// Secondary command buffer for the sky sphere
 		VkCommandBufferBeginInfo commandBufferBeginInfo = vks::initializers::commandBufferBeginInfo();
 		commandBufferBeginInfo.flags = VK_COMMAND_BUFFER_USAGE_RENDER_PASS_CONTINUE_BIT;
@@ -318,8 +303,7 @@ public:
 	// Updates the secondary command buffers using a thread pool 
 	// and puts them into the primary command buffer that's 
 	// lat submitted to the queue for rendering
-	void updateCommandBuffers(VkFramebuffer frameBuffer)
-	{
+	void updateCommandBuffers(VkFramebuffer frameBuffer)	{
 		VkCommandBufferBeginInfo cmdBufInfo = vks::initializers::commandBufferBeginInfo();
 
 		VkClearValue clearValues[2];
@@ -360,26 +344,16 @@ public:
 
 		// Add a job to the thread's queue for each object to be rendered
 		for (uint32_t t = 0; t < numThreads; t++)
-		{
 			for (uint32_t i = 0; i < numObjectsPerThread; i++)
-			{
 				threadPool.threads[t]->addJob([=] { threadRenderCode(t, i, inheritanceInfo); });
-			}
-		}
 			
 		threadPool.wait();
 
 		// Only submit if object is within the current view frustum
 		for (uint32_t t = 0; t < numThreads; t++)
-		{
 			for (uint32_t i = 0; i < numObjectsPerThread; i++)
-			{
 				if (threadData[t].objectData[i].visible)
-				{
 					commandBuffers.push_back(threadData[t].commandBuffer[i]);
-				}
-			}
-		}
 
 		// Execute render commands from the secondary command buffer
 		vkCmdExecuteCommands(primaryCommandBuffer, static_cast<uint32_t>(commandBuffers.size()), commandBuffers.data());
@@ -389,15 +363,13 @@ public:
 		VK_CHECK_RESULT(vkEndCommandBuffer(primaryCommandBuffer));
 	}
 
-	void loadMeshes()
-	{
+	void loadMeshes()	{
 		models.ufo.loadFromFile(getAssetPath() + "models/retroufo_red_lowpoly.dae", vertexLayout, 0.12f, vulkanDevice, queue);
 		models.skysphere.loadFromFile(getAssetPath() + "models/sphere.obj", vertexLayout, 1.0f, vulkanDevice, queue);
 		objectSphereDim = std::max(std::max(models.ufo.dim.size.x, models.ufo.dim.size.y), models.ufo.dim.size.z);
 	}
 
-	void setupVertexDescriptions()
-	{
+	void setupVertexDescriptions()	{
 		// Binding description
 		vertices.bindingDescriptions.resize(1);
 		vertices.bindingDescriptions[0] = vks::initializers::vertexInputBindingDescription(VERTEX_BUFFER_BIND_ID, vertexLayout.stride(), VK_VERTEX_INPUT_RATE_VERTEX);
@@ -414,10 +386,8 @@ public:
 		vertices.inputState.pVertexAttributeDescriptions		= vertices.attributeDescriptions.data();
 	}
 
-	void setupPipelineLayout()
-	{
-		VkPipelineLayoutCreateInfo pPipelineLayoutCreateInfo =
-			vks::initializers::pipelineLayoutCreateInfo(nullptr, 0);
+	void setupPipelineLayout()	{
+		VkPipelineLayoutCreateInfo pPipelineLayoutCreateInfo	= vks::initializers::pipelineLayoutCreateInfo(nullptr, 0);
 
 		// Push constants for model matrices
 		VkPushConstantRange pushConstantRange = vks::initializers::pushConstantRange(VK_SHADER_STAGE_VERTEX_BIT, sizeof(ThreadPushConstantBlock), 0);
@@ -429,8 +399,7 @@ public:
 		VK_CHECK_RESULT(vkCreatePipelineLayout(device, &pPipelineLayoutCreateInfo, nullptr, &pipelineLayout));
 	}
 
-	void preparePipelines()
-	{
+	void preparePipelines()	{
 		VkPipelineInputAssemblyStateCreateInfo				inputAssemblyState		= vks::initializers::pipelineInputAssemblyStateCreateInfo(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, 0, VK_FALSE);
 		VkPipelineRasterizationStateCreateInfo				rasterizationState		= vks::initializers::pipelineRasterizationStateCreateInfo(VK_POLYGON_MODE_FILL, VK_CULL_MODE_BACK_BIT, VK_FRONT_FACE_CLOCKWISE, 0);
 		VkPipelineColorBlendAttachmentState					blendAttachmentState	= vks::initializers::pipelineColorBlendAttachmentState(0xf, VK_FALSE);
@@ -471,8 +440,7 @@ public:
 		VK_CHECK_RESULT(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipelines.starsphere));
 	}
 
-	void updateMatrices()
-	{
+	void updateMatrices()	{
 		matrices.projection = glm::perspective(glm::radians(60.0f), (float)width / (float)height, 0.1f, 256.0f);
 		matrices.view = glm::translate(glm::mat4(), glm::vec3(0.0f, 0.0f, zoom));
 		matrices.view = glm::rotate(matrices.view, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
@@ -482,8 +450,7 @@ public:
 		frustum.update(matrices.projection * matrices.view);
 	}
 
-	void draw()
-	{
+	void draw()	{
 		VulkanExampleBase::prepareFrame();
 
 		updateCommandBuffers(frameBuffers[currentBuffer]);
@@ -495,8 +462,7 @@ public:
 
 		// Wait for fence to signal that all command buffers are ready
 		VkResult fenceRes;
-		do
-		{
+		do {
 			fenceRes = vkWaitForFences(device, 1, &renderFence, VK_TRUE, 100000000);
 		} while (fenceRes == VK_TIMEOUT);
 		VK_CHECK_RESULT(fenceRes);
@@ -505,8 +471,7 @@ public:
 		VulkanExampleBase::submitFrame();
 	}
 
-	void prepare()
-	{
+	void prepare()	{
 		VulkanExampleBase::prepare();
 		// Create a fence for synchronization
 		VkFenceCreateInfo fenceCreateInfo = vks::initializers::fenceCreateInfo(VK_FLAGS_NONE);
@@ -520,20 +485,14 @@ public:
 		prepared = true;
 	}
 
-	virtual void render()
-	{
+	virtual void render()	{
 		if (!prepared)
 			return;
 		draw();
 	}
 
-	virtual void viewChanged()
-	{
-		updateMatrices();
-	}
-
-	virtual void getOverlayText(VulkanTextOverlay *textOverlay)
-	{
+	virtual void viewChanged()	{ updateMatrices(); }
+	virtual void getOverlayText(VulkanTextOverlay *textOverlay)	{
 		textOverlay->addText("Using " + std::to_string(numThreads) + " threads", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
 	}
 };
