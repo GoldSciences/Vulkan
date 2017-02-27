@@ -252,12 +252,12 @@ public:
 		return res;
 	}
 
-	void											prepareSparseTexture		(uint32_t width, uint32_t height, uint32_t layerCount, VkFormat format)
+	void											prepareSparseTexture		(uint32_t width_, uint32_t height_, uint32_t layerCount, VkFormat format)
 	{
 		texture.device = vulkanDevice->logicalDevice;
-		texture.width = width;
-		texture.height = height;
-		texture.mipLevels = (uint32_t)(floor(log2(std::max(width, height))) + 1); 
+		texture.width = width_;
+		texture.height = height_;
+		texture.mipLevels = (uint32_t)(floor(log2(std::max(width_, height_))) + 1); 
 		texture.layerCount = layerCount;
 		texture.format = format;
 
@@ -538,12 +538,12 @@ public:
 	}
 
 	// Free all Vulkan resources used a texture object
-	void											destroyTextureImage			(SparseTexture texture)
+	void											destroyTextureImage			(SparseTexture texture_)
 	{
-		vkDestroyImageView(device, texture.view, nullptr);
-		vkDestroyImage(device, texture.image, nullptr);
-		vkDestroySampler(device, texture.sampler, nullptr);
-		texture.destroy();
+		vkDestroyImageView	(device, texture_.view		, nullptr);
+		vkDestroyImage		(device, texture_.image		, nullptr);
+		vkDestroySampler	(device, texture_.sampler	, nullptr);
+		texture_.destroy();
 	}
 
 	void											buildCommandBuffers			()
@@ -904,18 +904,18 @@ public:
 		}
 	}
 
-	virtual void									getOverlayText				(VulkanTextOverlay *textOverlay)
+	virtual void									getOverlayText				(VulkanTextOverlay *textOverlay_)
 	{
 		uint32_t													respages	= 0;
 		std::for_each(texture.pages.begin(), texture.pages.end(), [&respages](VirtualTexturePage page) { respages += (page.imageMemoryBind.memory != VK_NULL_HANDLE) ? 1 :0; });
 		std::stringstream											ss;
 		ss << std::setprecision(2) << std::fixed << uboVS.lodBias;
 #if defined(__ANDROID__)
-//		textOverlay->addText("LOD bias: " + ss.str() + " (Buttons L1/R1 to change)", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
+//		textOverlay_->addText("LOD bias: " + ss.str() + " (Buttons L1/R1 to change)", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
 #else
-		//textOverlay->addText("LOD bias: " + ss.str() + " (numpad +/- to change)", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
-		textOverlay->addText("Resident pages: " + std::to_string(respages) + " / " + std::to_string(texture.pages.size()), 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
-		textOverlay->addText("\"n\" to fill next mip level (" + std::to_string(lastFilledMip) + ")", 5.0f, 100.0f, VulkanTextOverlay::alignLeft);
+		//textOverlay_->addText("LOD bias: " + ss.str() + " (numpad +/- to change)", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
+		textOverlay_->addText("Resident pages: " + std::to_string(respages) + " / " + std::to_string(texture.pages.size()), 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
+		textOverlay_->addText("\"n\" to fill next mip level (" + std::to_string(lastFilledMip) + ")", 5.0f, 100.0f, VulkanTextOverlay::alignLeft);
 #endif
 	}
 };

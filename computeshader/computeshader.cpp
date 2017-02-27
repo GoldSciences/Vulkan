@@ -97,7 +97,7 @@ public:
 	}
 
 	// Prepare a texture target that is used to store compute shader calculations
-	void prepareTextureTarget(vks::Texture *tex, uint32_t width, uint32_t height, VkFormat format)
+	void prepareTextureTarget(vks::Texture *tex, uint32_t width_, uint32_t height_, VkFormat format)
 	{
 		VkFormatProperties formatProperties;
 
@@ -107,13 +107,13 @@ public:
 		assert(formatProperties.optimalTilingFeatures & VK_FORMAT_FEATURE_STORAGE_IMAGE_BIT);
 
 		// Prepare blit target texture
-		tex->width = width;
-		tex->height = height;
+		tex->width = width_;
+		tex->height = height_;
 
 		VkImageCreateInfo imageCreateInfo = vks::initializers::imageCreateInfo();
 		imageCreateInfo.imageType = VK_IMAGE_TYPE_2D;
 		imageCreateInfo.format = format;
-		imageCreateInfo.extent = { width, height, 1 };
+		imageCreateInfo.extent = { width_, height_, 1 };
 		imageCreateInfo.mipLevels = 1;
 		imageCreateInfo.arrayLayers = 1;
 		imageCreateInfo.samples = VK_SAMPLE_COUNT_1_BIT;
@@ -280,7 +280,7 @@ public:
 	void generateQuad()
 	{
 		// Setup vertices for a single uv-mapped quad made from two triangles
-		std::vector<Vertex> vertices =
+		std::vector<Vertex> _vertices	=
 			{	{ {  1.0f,  1.0f, 0.0f }, { 1.0f, 1.0f } }
 			,	{ { -1.0f,  1.0f, 0.0f }, { 0.0f, 1.0f } }
 			,	{ { -1.0f, -1.0f, 0.0f }, { 0.0f, 0.0f } }
@@ -293,7 +293,7 @@ public:
 
 		// Create buffers
 		// For the sake of simplicity we won't stage the vertex data to the gpu memory
-		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &vertexBuffer, vertices.size() * sizeof(Vertex), vertices.data()));	// Vertex buffer
+		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &vertexBuffer, _vertices.size() * sizeof(Vertex), _vertices.data()));	// Vertex buffer
 		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &indexBuffer, indices.size() * sizeof(uint32_t), indices.data()));		// Index buffer
 	}
 
@@ -600,11 +600,11 @@ public:
 		}
 	}
 
-	virtual void getOverlayText			(VulkanTextOverlay *textOverlay)	{
+	virtual void getOverlayText			(VulkanTextOverlay *textOverlay_)	{
 #if defined(__ANDROID__)
-		textOverlay->addText("Press \"L1/R1\" to change shaders", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
+		textOverlay_->addText("Press \"L1/R1\" to change shaders", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
 #else
-		textOverlay->addText("Press \"NUMPAD +/-\" to change shaders", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
+		textOverlay_->addText("Press \"NUMPAD +/-\" to change shaders", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
 #endif
 	}
 };

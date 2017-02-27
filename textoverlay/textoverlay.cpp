@@ -555,17 +555,18 @@ public:
 
 	// Submit the text command buffers to a queue
 	// Does a queue wait idle
-	void														submit						(VkQueue queue, uint32_t bufferindex)
+	void														submit						(VkQueue queue_, uint32_t bufferindex)
 	{
 		if (!visible)
 			return;
 
 		VkSubmitInfo													submitInfo						= {};
-		submitInfo.sType											= VK_STRUCTURE_TYPE_SUBMIT_INFO;submitInfo.commandBufferCount = 1;
+		submitInfo.sType											= VK_STRUCTURE_TYPE_SUBMIT_INFO;
+		submitInfo.commandBufferCount								= 1;
 		submitInfo.pCommandBuffers									= &cmdBuffers[bufferindex];
 
-		VK_CHECK_RESULT(vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE));
-		VK_CHECK_RESULT(vkQueueWaitIdle(queue));
+		VK_CHECK_RESULT(vkQueueSubmit(queue_, 1, &submitInfo, VK_NULL_HANDLE));
+		VK_CHECK_RESULT(vkQueueWaitIdle(queue_));
 	}
 
 };

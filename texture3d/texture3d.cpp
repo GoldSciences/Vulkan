@@ -109,15 +109,15 @@ public:
 	T												noise						(T x, T y, T z)
 	{
 		T														sum						= 0;
-		T														frequency				= (T)1;
-		T														amplitude				= (T)1;
+		T														_frequency				= (T)1;
+		T														_amplitude				= (T)1;
 		T														max						= (T)0;  
 		for (int32_t i = 0; i < (int32_t)octaves; i++)
 		{
-			sum													+= perlinNoise.noise(x * frequency, y * frequency, z * frequency) * amplitude;
-			max													+= amplitude;
-			amplitude											*= persistence;
-			frequency											*= (T)2;
+			sum													+= perlinNoise.noise(x * _frequency, y * _frequency, z * _frequency) * _amplitude;
+			max													+= _amplitude;
+			_amplitude											*= persistence;
+			_frequency											*= (T)2;
 		}
 
 		sum													= sum / max;
@@ -201,12 +201,12 @@ public:
 
 	// Prepare all Vulkan resources for the 3D texture (including descriptors)
 	// Does not fill the texture with data
-	void											prepareNoiseTexture			(uint32_t width, uint32_t height, uint32_t depth)
+	void											prepareNoiseTexture			(uint32_t width_, uint32_t height_, uint32_t depth_)
 	{
 		// A 3D texture is described as width x height x depth
-		texture.width										= width;
-		texture.height										= height;
-		texture.depth										= depth;
+		texture.width										= width_;
+		texture.height										= height_;
+		texture.depth										= depth_;
 		texture.mipLevels									= 1;
 		texture.format										= VK_FORMAT_R8_UNORM;
 
@@ -221,7 +221,7 @@ public:
 		}
 		// Check if GPU supports requested 3D texture dimensions
 		uint32_t maxImageDimension3D(vulkanDevice->properties.limits.maxImageDimension3D);
-		if (width > maxImageDimension3D || height > maxImageDimension3D || depth > maxImageDimension3D)
+		if (width_ > maxImageDimension3D || height_ > maxImageDimension3D || depth_ > maxImageDimension3D)
 		{
 			std::cout << "Error: Requested texture dimensions is greater than supported 3D texture dimension!" << std::endl;
 			return;
@@ -238,7 +238,7 @@ public:
 		imageCreateInfo.usage								= VK_IMAGE_USAGE_SAMPLED_BIT;
 		imageCreateInfo.sharingMode							= VK_SHARING_MODE_EXCLUSIVE;
 		imageCreateInfo.extent.width						= texture.width;
-		imageCreateInfo.extent.height						= texture.width;
+		imageCreateInfo.extent.height						= texture.height;
 		imageCreateInfo.extent.depth						= texture.depth;
 		// Set initial layout of the image to undefined
 		imageCreateInfo.initialLayout						= VK_IMAGE_LAYOUT_UNDEFINED;
@@ -406,12 +406,12 @@ public:
 	}
 
 	// Free all Vulkan resources used a texture object
-	void											destroyTextureImage			(Texture texture)
+	void											destroyTextureImage			(Texture texture_)
 	{
-		if (texture.view			!= VK_NULL_HANDLE) vkDestroyImageView	(device, texture.view			, nullptr);
-		if (texture.image			!= VK_NULL_HANDLE) vkDestroyImage		(device, texture.image			, nullptr);
-		if (texture.sampler			!= VK_NULL_HANDLE) vkDestroySampler		(device, texture.sampler		, nullptr);
-		if (texture.deviceMemory	!= VK_NULL_HANDLE) vkFreeMemory			(device, texture.deviceMemory	, nullptr);
+		if (texture_.view			!= VK_NULL_HANDLE) vkDestroyImageView	(device, texture_.view			, nullptr);
+		if (texture_.image			!= VK_NULL_HANDLE) vkDestroyImage		(device, texture_.image			, nullptr);
+		if (texture_.sampler		!= VK_NULL_HANDLE) vkDestroySampler		(device, texture_.sampler		, nullptr);
+		if (texture_.deviceMemory	!= VK_NULL_HANDLE) vkFreeMemory			(device, texture_.deviceMemory	, nullptr);
 	}
 
 	void											buildCommandBuffers			()
@@ -477,7 +477,7 @@ public:
 	void											generateQuad				()
 	{
 		// Setup vertices for a single uv-mapped quad made from two triangles
-		std::vector<Vertex>										vertices					 =
+		std::vector<Vertex>										_vertices					=
 			{	{ {  1.0f,  1.0f, 0.0f }, { 1.0f, 1.0f },{ 0.0f, 0.0f, 1.0f } }
 			,	{ { -1.0f,  1.0f, 0.0f }, { 0.0f, 1.0f },{ 0.0f, 0.0f, 1.0f } }
 			,	{ { -1.0f, -1.0f, 0.0f }, { 0.0f, 0.0f },{ 0.0f, 0.0f, 1.0f } }
@@ -490,7 +490,7 @@ public:
 
 		// Create buffers
 		// For the sake of simplicity we won't stage the vertex data to the gpu memory
-		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &vertexBuffer, vertices.size() * sizeof(Vertex), vertices.data()));	// Vertex buffer
+		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &vertexBuffer, _vertices.size() * sizeof(Vertex), _vertices.data()));	// Vertex buffer
 		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &indexBuffer, indices.size() * sizeof(uint32_t), indices.data()));		// Index buffer
 	}
 
@@ -662,15 +662,15 @@ public:
 		}
 	}
 
-	virtual void getOverlayText(VulkanTextOverlay *textOverlay)
+	virtual void getOverlayText(VulkanTextOverlay *textOverlay_)
 	{
 		if (regenerateNoise)
-			textOverlay->addText("Generating new noise texture...", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
+			textOverlay_->addText("Generating new noise texture...", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
 		else
 #ifdef __ANDROID__
-			textOverlay->addText("Press \"Button A\" to generate new noise", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
+			textOverlay_->addText("Press \"Button A\" to generate new noise", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
 #else
-			textOverlay->addText("Press \"n\" to generate new noise", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
+			textOverlay_->addText("Press \"n\" to generate new noise", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
 #endif
 	}
 };

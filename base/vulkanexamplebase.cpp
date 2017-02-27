@@ -49,9 +49,9 @@ VkResult									VulkanExampleBase::createInstance					(bool enableValidation)		
 }
 
 std::string									VulkanExampleBase::getWindowTitle					()																												{
-	std::string														device(deviceProperties.deviceName);
+	std::string														device_(deviceProperties.deviceName);
 	std::string														windowTitle;
-	windowTitle													= title + " - " + device;
+	windowTitle													= title + " - " + device_;
 	if (!enableTextOverlay)
 		windowTitle += " - " + std::to_string(frameCounter) + " fps";
 
@@ -101,19 +101,19 @@ VkCommandBuffer								VulkanExampleBase::createCommandBuffer				(VkCommandBuffe
 	return cmdBuffer;
 }
 
-void										VulkanExampleBase::flushCommandBuffer				(VkCommandBuffer commandBuffer, VkQueue queue, bool free)														{
+void										VulkanExampleBase::flushCommandBuffer				(VkCommandBuffer commandBuffer, VkQueue queue_, bool free)														{
 	if (commandBuffer == VK_NULL_HANDLE)
 		return;
 	
 	VK_CHECK_RESULT(vkEndCommandBuffer(commandBuffer));
 
-	VkSubmitInfo													submitInfo						= {};
-	submitInfo.sType											= VK_STRUCTURE_TYPE_SUBMIT_INFO;
-	submitInfo.commandBufferCount								= 1;
-	submitInfo.pCommandBuffers									= &commandBuffer;
+	VkSubmitInfo													_submitInfo						= {};
+	_submitInfo.sType											= VK_STRUCTURE_TYPE_SUBMIT_INFO;
+	_submitInfo.commandBufferCount								= 1;
+	_submitInfo.pCommandBuffers									= &commandBuffer;
 
-	VK_CHECK_RESULT(vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE));
-	VK_CHECK_RESULT(vkQueueWaitIdle(queue));
+	VK_CHECK_RESULT(vkQueueSubmit(queue_, 1, &_submitInfo, VK_NULL_HANDLE));
+	VK_CHECK_RESULT(vkQueueWaitIdle(queue_));
 
 	if (free)
 		vkFreeCommandBuffers(device, cmdPool, 1, &commandBuffer);
@@ -652,11 +652,11 @@ void										VulkanExampleBase::initVulkan						()																												{
 				std::vector<VkPhysicalDevice>								devices		(myGpuCount);
 				VK_CHECK_RESULT(vkEnumeratePhysicalDevices(instance, &myGpuCount, devices.data()));
 				for (uint32_t igpu = 0; igpu < myGpuCount; igpu++) {
-					VkPhysicalDeviceProperties									deviceProperties;
-					vkGetPhysicalDeviceProperties(devices[igpu], &deviceProperties);
-					std::cout << "Device [" << igpu << "] : " << deviceProperties.deviceName << std::endl;
-					std::cout << " Type: " << vks::tools::physicalDeviceTypeString(deviceProperties.deviceType) << std::endl;
-					std::cout << " API: " << (deviceProperties.apiVersion >> 22) << "." << ((deviceProperties.apiVersion >> 12) & 0x3ff) << "." << (deviceProperties.apiVersion & 0xfff) << std::endl;
+					VkPhysicalDeviceProperties									_deviceProperties;
+					vkGetPhysicalDeviceProperties(devices[igpu], &_deviceProperties);
+					std::cout << "Device [" << igpu << "] : " << _deviceProperties.deviceName << std::endl;
+					std::cout << " Type: " << vks::tools::physicalDeviceTypeString(_deviceProperties.deviceType) << std::endl;
+					std::cout << " API: " << (_deviceProperties.apiVersion >> 22) << "." << ((_deviceProperties.apiVersion >> 12) & 0x3ff) << "." << (_deviceProperties.apiVersion & 0xfff) << std::endl;
 				}
 			}
 		}
@@ -714,13 +714,13 @@ void										VulkanExampleBase::initVulkan						()																												{
 
 #if defined(_WIN32)
 // Win32 : Sets up a console window and redirects standard output to it
-void										VulkanExampleBase::setupConsole						(std::string title)																								{
+void										VulkanExampleBase::setupConsole						(std::string title_)																							{
 	AllocConsole();
 	AttachConsole(GetCurrentProcessId());
 	FILE															* stream;
 	freopen_s(&stream, "CONOUT$", "w+", stdout);
 	freopen_s(&stream, "CONOUT$", "w+", stderr);
-	SetConsoleTitle(TEXT(title.c_str()));
+	SetConsoleTitle(TEXT(title_.c_str()));
 }
 
 HWND										VulkanExampleBase::setupWindow						(HINSTANCE hinstance, WNDPROC wndproc)																			{
@@ -759,7 +759,7 @@ HWND										VulkanExampleBase::setupWindow						(HINSTANCE hinstance, WNDPROC 
 		dmScreenSettings.dmBitsPerPel								= 32;
 		dmScreenSettings.dmFields									= DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
 
-		if ((width != screenWidth) && (height != screenHeight))
+		if ((width != (uint32_t)screenWidth) && (height != (uint32_t)screenHeight))
 		{
 			if (ChangeDisplaySettings(&dmScreenSettings, CDS_FULLSCREEN) != DISP_CHANGE_SUCCESSFUL)
 			{
@@ -839,7 +839,7 @@ void										VulkanExampleBase::handleMessages					(HWND hWnd, UINT uMsg, WPARA
 		case KEY_ESCAPE	: PostQuitMessage(0);														break;
 		}
 
-		if (camera.firstperson) {
+		if (camera.firstperson == camera.type) {
 			switch (wParam) {
 			case KEY_W: camera.keys.up		= true; break;
 			case KEY_S: camera.keys.down	= true; break;
@@ -851,7 +851,7 @@ void										VulkanExampleBase::handleMessages					(HWND hWnd, UINT uMsg, WPARA
 		keyPressed((uint32_t)wParam);
 		break;
 	case WM_KEYUP:
-		if (camera.firstperson) {
+		if (camera.firstperson == camera.type) {
 			switch (wParam) {
 			case KEY_W: camera.keys.up		= false; break;
 			case KEY_S: camera.keys.down	= false; break;
@@ -1598,9 +1598,9 @@ LRESULT CALLBACK							WndProc												(HWND hWnd, UINT uMsg, WPARAM wParam, 
 
 int WINAPI									WinMain 
     ( _In_		HINSTANCE	hInstance
-    , _In_opt_	HINSTANCE	hPrevInstance
-    , _In_		LPSTR		lpCmdLine
-    , _In_		int			nShowCmd
+    , _In_opt_	HINSTANCE	/*hPrevInstance	*/
+    , _In_		LPSTR		/*lpCmdLine		*/
+    , _In_		int			/*nShowCmd		*/
     )
 {					
 	for (size_t i = 0; i < (size_t)__argc; i++) { VulkanExampleBase::args.push_back(__argv[i]); }

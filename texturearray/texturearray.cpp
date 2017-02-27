@@ -157,7 +157,9 @@ public:
 		bool sameDims = true;
 		for (uint32_t layer = 0; layer < layerCount; layer++)
 		{
-			if (tex2DArray[layer].extent().x != textureArray.width || tex2DArray[layer].extent().y != textureArray.height)
+			if ((tex2DArray[layer].extent().x != (int)textureArray.width	) 
+			 || (tex2DArray[layer].extent().y != (int)textureArray.height	) 
+			)
 			{
 				sameDims = false;
 				break;
@@ -330,7 +332,7 @@ public:
 	void generateQuad()
 	{
 		// Setup vertices for a single uv-mapped quad made from two triangles
-		std::vector<Vertex> vertices =
+		std::vector<Vertex> _vertices =
 			{	{ {  2.5f,  2.5f, 0.0f }, { 1.0f, 1.0f } }
 			,	{ { -2.5f,  2.5f, 0.0f }, { 0.0f, 1.0f } }
 			,	{ { -2.5f, -2.5f, 0.0f }, { 0.0f, 0.0f } }
@@ -343,7 +345,7 @@ public:
 
 		// Create buffers
 		// For the sake of simplicity we won't stage the vertex data to the gpu memory
-		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &vertexBuffer, vertices.size() * sizeof(Vertex), vertices.data()));	// Vertex buffer
+		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &vertexBuffer, _vertices.size() * sizeof(Vertex), _vertices.data()));	// Vertex buffer
 		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &indexBuffer, indices.size() * sizeof(uint32_t), indices.data()));		// Index buffer
 	}
 
@@ -457,7 +459,6 @@ public:
 
 		// Array indices and model matrices are fixed
 		float offset = -1.5f;
-		uint32_t index = 0;
 		float center = (layerCount*offset) / 2;
 		for (size_t i = 0; i < layerCount; i++)
 		{

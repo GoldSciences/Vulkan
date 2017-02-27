@@ -434,8 +434,8 @@ public:
 	}
 
 	virtual void	viewChanged		()									{ updateUniformBuffer(true); }
-	virtual void	getOverlayText	(VulkanTextOverlay *textOverlay)	{
-		textOverlay->addText("Rendering " + std::to_string(INSTANCE_COUNT) + " instances", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
+	virtual void	getOverlayText	(VulkanTextOverlay *textOverlay_)	{
+		textOverlay_->addText("Rendering " + std::to_string(INSTANCE_COUNT) + " instances", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
 	}
 };
 

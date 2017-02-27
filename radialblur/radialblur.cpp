@@ -666,13 +666,13 @@ public:
 		}
 	}
 
-	virtual void											getOverlayText									(VulkanTextOverlay *textOverlay)		{
+	virtual void											getOverlayText									(VulkanTextOverlay *textOverlay_)		{
 #if defined(__ANDROID__)
-		textOverlay->addText("Press \"Button A\" to toggle blur", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
-		textOverlay->addText("Press \"Button X\" to display offscreen texture", 5.0f, 105.0f, VulkanTextOverlay::alignLeft);
+		textOverlay_->addText("Press \"Button A\" to toggle blur", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
+		textOverlay_->addText("Press \"Button X\" to display offscreen texture", 5.0f, 105.0f, VulkanTextOverlay::alignLeft);
 #else
-		textOverlay->addText("Press \"B\" to toggle blur", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
-		textOverlay->addText("Press \"T\" to display offscreen texture", 5.0f, 105.0f, VulkanTextOverlay::alignLeft);
+		textOverlay_->addText("Press \"B\" to toggle blur", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
+		textOverlay_->addText("Press \"T\" to display offscreen texture", 5.0f, 105.0f, VulkanTextOverlay::alignLeft);
 #endif
 	}
 };

@@ -879,14 +879,14 @@ public:
 		}
 	}
 
-	virtual void getOverlayText(VulkanTextOverlay *textOverlay)
+	virtual void getOverlayText(VulkanTextOverlay *textOverlay_)
 	{
 #if defined(__ANDROID__)
-		textOverlay->addText("Press \"Button A\" to toggle debug view", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
-		textOverlay->addText("Press \"Button X\" to toggle shadows", 5.0f, 100.0f, VulkanTextOverlay::alignLeft);
+		textOverlay_->addText("Press \"Button A\" to toggle debug view", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
+		textOverlay_->addText("Press \"Button X\" to toggle shadows", 5.0f, 100.0f, VulkanTextOverlay::alignLeft);
 #else
-		textOverlay->addText("Press \"F1\" to toggle debug view", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
-		textOverlay->addText("Press \"F2\" to toggle shadows", 5.0f, 100.0f, VulkanTextOverlay::alignLeft);
+		textOverlay_->addText("Press \"F1\" to toggle debug view", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
+		textOverlay_->addText("Press \"F2\" to toggle shadows", 5.0f, 100.0f, VulkanTextOverlay::alignLeft);
 #endif
 	}
 };

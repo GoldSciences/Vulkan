@@ -210,13 +210,13 @@ public:
 	// Override framebuffer setup from base class
 	// Deferred components will be used as frame buffer attachments
 	void														setupFrameBuffer						()																					{
-		VkImageView														attachments[5];
+		VkImageView														_attachments[5];
 		VkFramebufferCreateInfo											frameBufferCreateInfo		= {};
 		frameBufferCreateInfo.sType									= VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
 		frameBufferCreateInfo.pNext									= NULL;
 		frameBufferCreateInfo.renderPass							= renderPass;
 		frameBufferCreateInfo.attachmentCount						= 5;
-		frameBufferCreateInfo.pAttachments							= attachments;
+		frameBufferCreateInfo.pAttachments							= _attachments;
 		frameBufferCreateInfo.width									= width;
 		frameBufferCreateInfo.height								= height;
 		frameBufferCreateInfo.layers								= 1;
@@ -224,11 +224,11 @@ public:
 		// Create frame buffers for every swap chain image
 		frameBuffers.resize(swapChain.imageCount);
 		for (uint32_t i = 0; i < frameBuffers.size(); i++) {
-			attachments[0]												= swapChain.buffers[i].view;
-			attachments[1]												= this->attachments.position.view;
-			attachments[2]												= this->attachments.normal.view;
-			attachments[3]												= this->attachments.albedo.view;
-			attachments[4]												= depthStencil.view;
+			_attachments[0]												= swapChain.buffers[i].view;
+			_attachments[1]												= this->attachments.position.view;
+			_attachments[2]												= this->attachments.normal.view;
+			_attachments[3]												= this->attachments.albedo.view;
+			_attachments[4]												= depthStencil.view;
 			VK_CHECK_RESULT(vkCreateFramebuffer(device, &frameBufferCreateInfo, nullptr, &frameBuffers[i]));
 		}
 	}
@@ -237,54 +237,54 @@ public:
 	void														setupRenderPass							()																					{
 		createGBufferAttachments(); 
 
-		std::array<VkAttachmentDescription, 5>							attachments{};
+		std::array<VkAttachmentDescription, 5>							_attachments{};
 		// Color attachment
-		attachments[0].format										= swapChain.colorFormat;
-		attachments[0].samples										= VK_SAMPLE_COUNT_1_BIT;
-		attachments[0].loadOp										= VK_ATTACHMENT_LOAD_OP_CLEAR;
-		attachments[0].storeOp										= VK_ATTACHMENT_STORE_OP_STORE;
-		attachments[0].stencilLoadOp								= VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-		attachments[0].stencilStoreOp								= VK_ATTACHMENT_STORE_OP_DONT_CARE;
-		attachments[0].initialLayout								= VK_IMAGE_LAYOUT_UNDEFINED;
-		attachments[0].finalLayout									= VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+		_attachments[0].format										= swapChain.colorFormat;
+		_attachments[0].samples										= VK_SAMPLE_COUNT_1_BIT;
+		_attachments[0].loadOp										= VK_ATTACHMENT_LOAD_OP_CLEAR;
+		_attachments[0].storeOp										= VK_ATTACHMENT_STORE_OP_STORE;
+		_attachments[0].stencilLoadOp								= VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+		_attachments[0].stencilStoreOp								= VK_ATTACHMENT_STORE_OP_DONT_CARE;
+		_attachments[0].initialLayout								= VK_IMAGE_LAYOUT_UNDEFINED;
+		_attachments[0].finalLayout									= VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
 
 		// Deferred attachments
 		// Position
-		attachments[1].format										= this->attachments.position.format;
-		attachments[1].samples										= VK_SAMPLE_COUNT_1_BIT;
-		attachments[1].loadOp										= VK_ATTACHMENT_LOAD_OP_CLEAR;
-		attachments[1].storeOp										= VK_ATTACHMENT_STORE_OP_DONT_CARE;
-		attachments[1].stencilLoadOp								= VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-		attachments[1].stencilStoreOp								= VK_ATTACHMENT_STORE_OP_DONT_CARE;
-		attachments[1].initialLayout								= VK_IMAGE_LAYOUT_UNDEFINED;
-		attachments[1].finalLayout									= VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+		_attachments[1].format										= this->attachments.position.format;
+		_attachments[1].samples										= VK_SAMPLE_COUNT_1_BIT;
+		_attachments[1].loadOp										= VK_ATTACHMENT_LOAD_OP_CLEAR;
+		_attachments[1].storeOp										= VK_ATTACHMENT_STORE_OP_DONT_CARE;
+		_attachments[1].stencilLoadOp								= VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+		_attachments[1].stencilStoreOp								= VK_ATTACHMENT_STORE_OP_DONT_CARE;
+		_attachments[1].initialLayout								= VK_IMAGE_LAYOUT_UNDEFINED;
+		_attachments[1].finalLayout									= VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 		// Normals
-		attachments[2].format										= this->attachments.normal.format;
-		attachments[2].samples										= VK_SAMPLE_COUNT_1_BIT;
-		attachments[2].loadOp										= VK_ATTACHMENT_LOAD_OP_CLEAR;
-		attachments[2].storeOp										= VK_ATTACHMENT_STORE_OP_DONT_CARE;
-		attachments[2].stencilLoadOp								= VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-		attachments[2].stencilStoreOp								= VK_ATTACHMENT_STORE_OP_DONT_CARE;
-		attachments[2].initialLayout								= VK_IMAGE_LAYOUT_UNDEFINED;
-		attachments[2].finalLayout									= VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+		_attachments[2].format										= this->attachments.normal.format;
+		_attachments[2].samples										= VK_SAMPLE_COUNT_1_BIT;
+		_attachments[2].loadOp										= VK_ATTACHMENT_LOAD_OP_CLEAR;
+		_attachments[2].storeOp										= VK_ATTACHMENT_STORE_OP_DONT_CARE;
+		_attachments[2].stencilLoadOp								= VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+		_attachments[2].stencilStoreOp								= VK_ATTACHMENT_STORE_OP_DONT_CARE;
+		_attachments[2].initialLayout								= VK_IMAGE_LAYOUT_UNDEFINED;
+		_attachments[2].finalLayout									= VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 		// Albedo
-		attachments[3].format										= this->attachments.albedo.format;
-		attachments[3].samples										= VK_SAMPLE_COUNT_1_BIT;
-		attachments[3].loadOp										= VK_ATTACHMENT_LOAD_OP_CLEAR;
-		attachments[3].storeOp										= VK_ATTACHMENT_STORE_OP_DONT_CARE;
-		attachments[3].stencilLoadOp								= VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-		attachments[3].stencilStoreOp								= VK_ATTACHMENT_STORE_OP_DONT_CARE;
-		attachments[3].initialLayout								= VK_IMAGE_LAYOUT_UNDEFINED;
-		attachments[3].finalLayout									= VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+		_attachments[3].format										= this->attachments.albedo.format;
+		_attachments[3].samples										= VK_SAMPLE_COUNT_1_BIT;
+		_attachments[3].loadOp										= VK_ATTACHMENT_LOAD_OP_CLEAR;
+		_attachments[3].storeOp										= VK_ATTACHMENT_STORE_OP_DONT_CARE;
+		_attachments[3].stencilLoadOp								= VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+		_attachments[3].stencilStoreOp								= VK_ATTACHMENT_STORE_OP_DONT_CARE;
+		_attachments[3].initialLayout								= VK_IMAGE_LAYOUT_UNDEFINED;
+		_attachments[3].finalLayout									= VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 		// Depth attachment
-		attachments[4].format										= depthFormat;
-		attachments[4].samples										= VK_SAMPLE_COUNT_1_BIT;
-		attachments[4].loadOp										= VK_ATTACHMENT_LOAD_OP_CLEAR;
-		attachments[4].storeOp										= VK_ATTACHMENT_STORE_OP_DONT_CARE;
-		attachments[4].stencilLoadOp								= VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-		attachments[4].stencilStoreOp								= VK_ATTACHMENT_STORE_OP_DONT_CARE;
-		attachments[4].initialLayout								= VK_IMAGE_LAYOUT_UNDEFINED;
-		attachments[4].finalLayout									= VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+		_attachments[4].format										= depthFormat;
+		_attachments[4].samples										= VK_SAMPLE_COUNT_1_BIT;
+		_attachments[4].loadOp										= VK_ATTACHMENT_LOAD_OP_CLEAR;
+		_attachments[4].storeOp										= VK_ATTACHMENT_STORE_OP_DONT_CARE;
+		_attachments[4].stencilLoadOp								= VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+		_attachments[4].stencilStoreOp								= VK_ATTACHMENT_STORE_OP_DONT_CARE;
+		_attachments[4].initialLayout								= VK_IMAGE_LAYOUT_UNDEFINED;
+		_attachments[4].finalLayout									= VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 
 		// Three subpasses
 		std::array<VkSubpassDescription,3>								subpassDescriptions{};
@@ -378,8 +378,8 @@ public:
 
 		VkRenderPassCreateInfo											renderPassInfo				= {};
 		renderPassInfo.sType										= VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-		renderPassInfo.attachmentCount								= static_cast<uint32_t>(attachments.size());
-		renderPassInfo.pAttachments									= attachments.data();
+		renderPassInfo.attachmentCount								= static_cast<uint32_t>(_attachments.size());
+		renderPassInfo.pAttachments									= _attachments.data();
 		renderPassInfo.subpassCount									= static_cast<uint32_t>(subpassDescriptions.size());
 		renderPassInfo.pSubpasses									= subpassDescriptions.data();
 		renderPassInfo.dependencyCount								= static_cast<uint32_t>(dependencies.size());

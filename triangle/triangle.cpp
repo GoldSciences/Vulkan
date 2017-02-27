@@ -186,10 +186,10 @@ public:
 
 		VK_CHECK_RESULT(vkEndCommandBuffer(commandBuffer));
 
-		VkSubmitInfo													submitInfo										= {};
-		submitInfo.sType											= VK_STRUCTURE_TYPE_SUBMIT_INFO;
-		submitInfo.commandBufferCount								= 1;
-		submitInfo.pCommandBuffers									= &commandBuffer;
+		VkSubmitInfo													_submitInfo										= {};
+		_submitInfo.sType											= VK_STRUCTURE_TYPE_SUBMIT_INFO;
+		_submitInfo.commandBufferCount								= 1;
+		_submitInfo.pCommandBuffers									= &commandBuffer;
 
 		// Create fence to ensure that the command buffer has finished executing
 		VkFenceCreateInfo												fenceCreateInfo									= {};
@@ -198,7 +198,7 @@ public:
 		VkFence															fence;
 		VK_CHECK_RESULT(vkCreateFence	(device, &fenceCreateInfo, nullptr, &fence));
 
-		VK_CHECK_RESULT(vkQueueSubmit	(queue, 1, &submitInfo, fence));						// Submit to the queue
+		VK_CHECK_RESULT(vkQueueSubmit	(queue, 1, &_submitInfo, fence));						// Submit to the queue
 		VK_CHECK_RESULT(vkWaitForFences	(device, 1, &fence, VK_TRUE, DEFAULT_FENCE_TIMEOUT));	// Wait for the fence to signal that command buffer has finished executing
 
 		vkDestroyFence					(device, fence, nullptr);
@@ -280,17 +280,17 @@ public:
 
 		
 		VkPipelineStageFlags											waitStageMask									= VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;	// Pipeline stage at which the queue submission will wait (via pWaitSemaphores)
-		VkSubmitInfo													submitInfo										= {};												// The submit info structure specifices a command buffer queue submission batch
-		submitInfo.sType											= VK_STRUCTURE_TYPE_SUBMIT_INFO;
-		submitInfo.pWaitDstStageMask								= &waitStageMask;							// Pointer to the list of pipeline stages that the semaphore waits will occur at
-		submitInfo.pWaitSemaphores									= &presentCompleteSemaphore;				// Semaphore(s) to wait upon before the submitted command buffer starts executing
-		submitInfo.waitSemaphoreCount								= 1;										// One wait semaphore																				
-		submitInfo.pSignalSemaphores								= &renderCompleteSemaphore;					// Semaphore(s) to be signaled when command buffers have completed
-		submitInfo.signalSemaphoreCount								= 1;										// One signal semaphore
-		submitInfo.pCommandBuffers									= &drawCmdBuffers[currentBuffer];			// Command buffers(s) to execute in this batch (submission)
-		submitInfo.commandBufferCount								= 1;										// One command buffer
+		VkSubmitInfo													_submitInfo										= {};												// The submit info structure specifices a command buffer queue submission batch
+		_submitInfo.sType											= VK_STRUCTURE_TYPE_SUBMIT_INFO;
+		_submitInfo.pWaitDstStageMask								= &waitStageMask;							// Pointer to the list of pipeline stages that the semaphore waits will occur at
+		_submitInfo.pWaitSemaphores									= &presentCompleteSemaphore;				// Semaphore(s) to wait upon before the submitted command buffer starts executing
+		_submitInfo.waitSemaphoreCount								= 1;										// One wait semaphore																				
+		_submitInfo.pSignalSemaphores								= &renderCompleteSemaphore;					// Semaphore(s) to be signaled when command buffers have completed
+		_submitInfo.signalSemaphoreCount							= 1;										// One signal semaphore
+		_submitInfo.pCommandBuffers									= &drawCmdBuffers[currentBuffer];			// Command buffers(s) to execute in this batch (submission)
+		_submitInfo.commandBufferCount								= 1;										// One command buffer
 
-		VK_CHECK_RESULT(vkQueueSubmit(queue, 1, &submitInfo, waitFences[currentBuffer]));			// Submit to the graphics queue passing a wait fence
+		VK_CHECK_RESULT(vkQueueSubmit(queue, 1, &_submitInfo, waitFences[currentBuffer]));			// Submit to the graphics queue passing a wait fence
 		
 		// Present the current buffer to the swap chain
 		// Pass the semaphore signaled by the command buffer submission from the submit info as the wait semaphore for swap chain presentation

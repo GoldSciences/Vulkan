@@ -360,7 +360,7 @@ public:
 		#define PATCH_SIZE 64
 		#define UV_SCALE 1.0f
 
-		Vertex *vertices = new Vertex[PATCH_SIZE * PATCH_SIZE * 4];
+		Vertex *_vertices = new Vertex[PATCH_SIZE * PATCH_SIZE * 4];
 			
 		const float wx = 2.0f;
 		const float wy = 2.0f;
@@ -369,10 +369,10 @@ public:
 			for (auto y = 0; y < PATCH_SIZE; y++)
 			{
 				uint32_t index = (x + y * PATCH_SIZE);
-				vertices[index].pos[0] = x * wx + wx / 2.0f - (float)PATCH_SIZE * wx / 2.0f;
-				vertices[index].pos[1] = 0.0f;
-				vertices[index].pos[2] = y * wy + wy / 2.0f - (float)PATCH_SIZE * wy / 2.0f;
-				vertices[index].uv = glm::vec2((float)x / PATCH_SIZE, (float)y / PATCH_SIZE) * UV_SCALE;
+				_vertices[index].pos[0] = x * wx + wx / 2.0f - (float)PATCH_SIZE * wx / 2.0f;
+				_vertices[index].pos[1] = 0.0f;
+				_vertices[index].pos[2] = y * wy + wy / 2.0f - (float)PATCH_SIZE * wy / 2.0f;
+				_vertices[index].uv = glm::vec2((float)x / PATCH_SIZE, (float)y / PATCH_SIZE) * UV_SCALE;
 			}
 
 		// Calculate normals from height map using a sobel filter
@@ -401,7 +401,7 @@ public:
 				// The first value controls the bump strength
 				normal.y = 0.25f * sqrt( 1.0f - normal.x * normal.x - normal.z * normal.z);
 
-				vertices[x + y * PATCH_SIZE].normal = glm::normalize(normal * glm::vec3(2.0f, 1.0f, 2.0f));
+				_vertices[x + y * PATCH_SIZE].normal = glm::normalize(normal * glm::vec3(2.0f, 1.0f, 2.0f));
 			}
 		}
 
@@ -431,7 +431,7 @@ public:
 
 		// Create staging buffers
 
-		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT	, vertexBufferSize	, &vertexStaging			.buffer, &vertexStaging.memory	, vertices	));
+		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT	, vertexBufferSize	, &vertexStaging			.buffer, &vertexStaging.memory	, _vertices	));
 		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT	, indexBufferSize	, &indexStaging				.buffer, &indexStaging.memory	, indices	));
 		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT	, vertexBufferSize	, &models.terrain.vertices	.buffer, &models.terrain.vertices	.memory	));
 		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT		, indexBufferSize	, &models.terrain.indices	.buffer, &models.terrain.indices	.memory	));
@@ -452,7 +452,7 @@ public:
 		vkDestroyBuffer(device, indexStaging.buffer, nullptr);
 		vkFreeMemory(device, indexStaging.memory, nullptr);
 
-		delete[] vertices;
+		delete[] _vertices;
 		delete[] indices;
 	}
 
@@ -741,24 +741,24 @@ public:
 		}
 	}
 
-	virtual void getOverlayText(VulkanTextOverlay *textOverlay)
+	virtual void getOverlayText(VulkanTextOverlay *textOverlay_)
 	{
 		std::stringstream ss;
 		ss << std::setprecision(2) << std::fixed << uboTess.tessellationFactor;
 
 #if defined(__ANDROID__)
-		textOverlay->addText("Tessellation factor: " + ss.str() + " (Buttons L1/R1)", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
-		textOverlay->addText("Press \"Button A\" to toggle wireframe", 5.0f, 100.0f, VulkanTextOverlay::alignLeft);
-		textOverlay->addText("Press \"Button X\" to toggle tessellation", 5.0f, 115.0f, VulkanTextOverlay::alignLeft);
+		textOverlay_->addText("Tessellation factor: " + ss.str() + " (Buttons L1/R1)", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
+		textOverlay_->addText("Press \"Button A\" to toggle wireframe", 5.0f, 100.0f, VulkanTextOverlay::alignLeft);
+		textOverlay_->addText("Press \"Button X\" to toggle tessellation", 5.0f, 115.0f, VulkanTextOverlay::alignLeft);
 #else
-		textOverlay->addText("Tessellation factor: " + ss.str() + " (numpad +/-)", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
-		textOverlay->addText("Press \"f\" to toggle wireframe", 5.0f, 100.0f, VulkanTextOverlay::alignLeft);
-		textOverlay->addText("Press \"t\" to toggle tessellation", 5.0f, 115.0f, VulkanTextOverlay::alignLeft);
+		textOverlay_->addText("Tessellation factor: " + ss.str() + " (numpad +/-)", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
+		textOverlay_->addText("Press \"f\" to toggle wireframe", 5.0f, 100.0f, VulkanTextOverlay::alignLeft);
+		textOverlay_->addText("Press \"t\" to toggle tessellation", 5.0f, 115.0f, VulkanTextOverlay::alignLeft);
 #endif
 
-		textOverlay->addText("pipeline stats:", width - 5.0f, 5.0f, VulkanTextOverlay::alignRight);
-		textOverlay->addText("VS:" + std::to_string(pipelineStats[0]), width - 5.0f, 20.0f, VulkanTextOverlay::alignRight);
-		textOverlay->addText("TE:" + std::to_string(pipelineStats[1]), width - 5.0f, 35.0f, VulkanTextOverlay::alignRight);
+		textOverlay_->addText("pipeline stats:", width - 5.0f, 5.0f, VulkanTextOverlay::alignRight);
+		textOverlay_->addText("VS:" + std::to_string(pipelineStats[0]), width - 5.0f, 20.0f, VulkanTextOverlay::alignRight);
+		textOverlay_->addText("TE:" + std::to_string(pipelineStats[1]), width - 5.0f, 35.0f, VulkanTextOverlay::alignRight);
 	}
 };
 

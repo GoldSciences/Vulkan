@@ -247,7 +247,7 @@ public:
 
 	// Creates a vertex buffer containing quads for the passed text
 	void generateText(std:: string text)	{
-		std::vector<Vertex> vertices;
+		std::vector<Vertex> _vertices;
 		std::vector<uint32_t> indices;
 		uint32_t indexOffset = 0;
 
@@ -274,12 +274,12 @@ public:
 			float te = (charInfo->y + charInfo->height) / w;
 
 			float xo = charInfo->xoffset / 36.0f;
-			float yo = charInfo->yoffset / 36.0f;
+			//float yo = charInfo->yoffset / 36.0f;
 
-			vertices.push_back({ { posx + dimx + xo,  posy + dimy, 0.0f }, { ue, te } });
-			vertices.push_back({ { posx + xo,         posy + dimy, 0.0f }, { us, te } });
-			vertices.push_back({ { posx + xo,         posy,        0.0f }, { us, ts } });
-			vertices.push_back({ { posx + dimx + xo,  posy,        0.0f }, { ue, ts } });
+			_vertices.push_back({ { posx + dimx + xo,  posy + dimy, 0.0f }, { ue, te } });
+			_vertices.push_back({ { posx + xo,         posy + dimy, 0.0f }, { us, te } });
+			_vertices.push_back({ { posx + xo,         posy,        0.0f }, { us, ts } });
+			_vertices.push_back({ { posx + dimx + xo,  posy,        0.0f }, { ue, ts } });
 
 			std::array<uint32_t, 6> letterIndices = { 0,1,2, 2,3,0 };
 			for (auto& index : letterIndices)
@@ -293,13 +293,13 @@ public:
 		indexCount = static_cast<uint32_t>(indices.size());
 
 		// Center
-		for (auto& v : vertices)	{
+		for (auto& v : _vertices)	{
 			v.pos[0] -= posx / 2.0f;
 			v.pos[1] -= 0.5f;
 		}
 
 		// Generate host accesible buffers for the text vertices and indices and upload the data
-		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &vertexBuffer, vertices.size() * sizeof(Vertex), vertices.data()));
+		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &vertexBuffer, _vertices.size() * sizeof(Vertex), _vertices.data()));
 		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &indexBuffer, indices.size() * sizeof(uint32_t), indices.data()));
 	}
 
@@ -508,14 +508,14 @@ public:
 		}
 	}
 
-	virtual void getOverlayText(VulkanTextOverlay *textOverlay)
+	virtual void getOverlayText(VulkanTextOverlay *textOverlay_)
 	{
 #if defined(__ANDROID__)
-		textOverlay->addText("\"Button A\" to toggle outline", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
-		textOverlay->addText("\"Button X\" to toggle splitscreen", 5.0f, 100.0f, VulkanTextOverlay::alignLeft);
+		textOverlay_->addText("\"Button A\" to toggle outline", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
+		textOverlay_->addText("\"Button X\" to toggle splitscreen", 5.0f, 100.0f, VulkanTextOverlay::alignLeft);
 #else
-		textOverlay->addText("\"o\" to toggle outline", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
-		textOverlay->addText("\"s\" to toggle splitscreen", 5.0f, 100.0f, VulkanTextOverlay::alignLeft);
+		textOverlay_->addText("\"o\" to toggle outline", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
+		textOverlay_->addText("\"s\" to toggle splitscreen", 5.0f, 100.0f, VulkanTextOverlay::alignLeft);
 #endif
 	}
 };

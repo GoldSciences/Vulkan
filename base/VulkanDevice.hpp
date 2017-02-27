@@ -74,12 +74,12 @@ namespace vks
 		// (Optional) memTypeFound	: Pointer to a bool that is set to true if a matching memory type has been found
 		// 
 		// Returns index of the requested memory type. Throws an exception if memTypeFound is null and no memory type could be found that supports the requested properties.
-		uint32_t									getMemoryType			(uint32_t typeBits, VkMemoryPropertyFlags properties, VkBool32 *memTypeFound = nullptr)		{
+		uint32_t									getMemoryType			(uint32_t typeBits, VkMemoryPropertyFlags properties_, VkBool32 *memTypeFound = nullptr)		{
 			for (uint32_t i = 0; i < memoryProperties.memoryTypeCount; i++)
 			{
 				if ((typeBits & 1) == 1)
 				{
-					if ((memoryProperties.memoryTypes[i].propertyFlags & properties) == properties)
+					if ((memoryProperties.memoryTypes[i].propertyFlags & properties_) == properties_)
 					{
 						if (memTypeFound)
 							*memTypeFound = true;

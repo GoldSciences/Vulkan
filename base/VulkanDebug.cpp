@@ -25,15 +25,15 @@ namespace vks
 		VkDebugReportCallbackEXT				msgCallback;
 
 		VkBool32								messageCallback				
-		(	VkDebugReportFlagsEXT		flags
-		,	VkDebugReportObjectTypeEXT	objType
-		,	uint64_t					srcObject
-		,	size_t						location
-		,	int32_t						msgCode
-		,	const char					* pLayerPrefix
-		,	const char					* pMsg
-		,	void						* pUserData
-		)
+			(	VkDebugReportFlagsEXT		flags
+			,	VkDebugReportObjectTypeEXT	objType
+			,	uint64_t					srcObject
+			,	size_t						location
+			,	int32_t						msgCode
+			,	const char					* pLayerPrefix
+			,	const char					* pMsg
+			,	void						* pUserData
+			)
 		{
 			
 			std::string									prefix("");												// Select prefix depending on flags passed to the callback. Note that multiple flags may be set for a single validation message

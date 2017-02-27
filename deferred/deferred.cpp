@@ -925,20 +925,20 @@ public:
 		}
 	}
 
-	virtual void getOverlayText(VulkanTextOverlay *textOverlay)
+	virtual void getOverlayText(VulkanTextOverlay *textOverlay_)
 	{
 #if defined(__ANDROID__)
-		textOverlay->addText("\"Button A\" to toggle debug display", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
+		textOverlay_->addText("\"Button A\" to toggle debug display", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
 #else
-		textOverlay->addText("\"F2\" to toggle debug display", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
+		textOverlay_->addText("\"F2\" to toggle debug display", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
 #endif
 		// Render targets
 		if (debugDisplay)
 		{
-			textOverlay->addText("World space position", (float)width * 0.25f, (float)height * 0.5f - 25.0f, VulkanTextOverlay::alignCenter);
-			textOverlay->addText("World space normals", (float)width * 0.75f, (float)height * 0.5f - 25.0f, VulkanTextOverlay::alignCenter);
-			textOverlay->addText("Albedo", (float)width * 0.25f, (float)height - 25.0f, VulkanTextOverlay::alignCenter);
-			textOverlay->addText("Final image", (float)width * 0.75f, (float)height - 25.0f, VulkanTextOverlay::alignCenter);
+			textOverlay_->addText("World space position", (float)width * 0.25f, (float)height * 0.5f - 25.0f, VulkanTextOverlay::alignCenter);
+			textOverlay_->addText("World space normals", (float)width * 0.75f, (float)height * 0.5f - 25.0f, VulkanTextOverlay::alignCenter);
+			textOverlay_->addText("Albedo", (float)width * 0.25f, (float)height - 25.0f, VulkanTextOverlay::alignCenter);
+			textOverlay_->addText("Final image", (float)width * 0.75f, (float)height - 25.0f, VulkanTextOverlay::alignCenter);
 		}
 	}
 };

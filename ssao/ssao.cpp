@@ -101,10 +101,10 @@ public:
 		VkDeviceMemory												mem;
 		VkImageView													view;
 		VkFormat													format;
-		void														destroy												(VkDevice device)				{
-			vkDestroyImage			(device, image	, nullptr);
-			vkDestroyImageView		(device, view	, nullptr);
-			vkFreeMemory			(device, mem	, nullptr);
+		void														destroy												(VkDevice device_)				{
+			vkDestroyImage			(device_, image	, nullptr);
+			vkDestroyImageView		(device_, view	, nullptr);
+			vkFreeMemory			(device_, mem	, nullptr);
 		}
 	};
 	struct FrameBuffer {
@@ -115,9 +115,9 @@ public:
 			this->width													= w;
 			this->height												= h;
 		}
-		void														destroy												(VkDevice device)				{
-			vkDestroyFramebuffer	(device, frameBuffer	, nullptr);
-			vkDestroyRenderPass		(device, renderPass		, nullptr);
+		void														destroy												(VkDevice device_)				{
+			vkDestroyFramebuffer	(device_, frameBuffer	, nullptr);
+			vkDestroyRenderPass		(device_, renderPass		, nullptr);
 		}
 	};
 
@@ -196,7 +196,7 @@ public:
 	}
 
 	// Create a frame buffer attachment
-	void														createAttachment									(VkFormat format, VkImageUsageFlagBits usage, FrameBufferAttachment *attachment, uint32_t width, uint32_t height)		{
+	void														createAttachment									(VkFormat format, VkImageUsageFlagBits usage, FrameBufferAttachment *attachment, uint32_t width_, uint32_t height_)		{
 		VkImageAspectFlags												aspectMask											= 0;
 		VkImageLayout													imageLayout;
 
@@ -216,8 +216,8 @@ public:
 		VkImageCreateInfo												image												= vks::initializers::imageCreateInfo();
 		image.imageType												= VK_IMAGE_TYPE_2D;
 		image.format												= format;
-		image.extent.width											= width;
-		image.extent.height											= height;
+		image.extent.width											= width_;
+		image.extent.height											= height_;
 		image.extent.depth											= 1;
 		image.mipLevels												= 1;
 		image.arrayLayers											= 1;
@@ -633,8 +633,6 @@ public:
 
 			VkRect2D															scissor											= vks::initializers::rect2D(width, height, 0, 0);
 			vkCmdSetScissor			(drawCmdBuffers[i], 0, 1, &scissor);
-
-			VkDeviceSize														offsets	[1]										= { 0 };
 			vkCmdBindDescriptorSets	(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayouts.composition, 0, 1, &descriptorSets.composition, 0, NULL);
 
 			// Final composition pass
@@ -974,15 +972,15 @@ public:
 		}
 	}
 
-	virtual void														getOverlayText								(VulkanTextOverlay *textOverlay)	{
+	virtual void														getOverlayText								(VulkanTextOverlay *textOverlay_)	{
 #if defined(__ANDROID__)
-		textOverlay->addText("\"Button A\" to toggle SSAO", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
-		textOverlay->addText("\"Button X\" to toggle SSAO blur", 5.0f, 100.0f, VulkanTextOverlay::alignLeft);
-		textOverlay->addText("\"Button Y\" to toggle SSAO display", 5.0f, 115.0f, VulkanTextOverlay::alignLeft);
+		textOverlay_->addText("\"Button A\" to toggle SSAO", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
+		textOverlay_->addText("\"Button X\" to toggle SSAO blur", 5.0f, 100.0f, VulkanTextOverlay::alignLeft);
+		textOverlay_->addText("\"Button Y\" to toggle SSAO display", 5.0f, 115.0f, VulkanTextOverlay::alignLeft);
 #else
-		textOverlay->addText("\"F2\" to toggle SSAO", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
-		textOverlay->addText("\"F3\" to toggle SSAO blur", 5.0f, 100.0f, VulkanTextOverlay::alignLeft);
-		textOverlay->addText("\"F4\" to toggle SSAO display", 5.0f, 115.0f, VulkanTextOverlay::alignLeft);
+		textOverlay_->addText("\"F2\" to toggle SSAO", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
+		textOverlay_->addText("\"F3\" to toggle SSAO blur", 5.0f, 100.0f, VulkanTextOverlay::alignLeft);
+		textOverlay_->addText("\"F4\" to toggle SSAO display", 5.0f, 115.0f, VulkanTextOverlay::alignLeft);
 #endif
 	}
 };

@@ -788,16 +788,15 @@ public:
 		}
 	}
 
-	virtual void										getOverlayText					(VulkanTextOverlay *textOverlay)
-	{
+	virtual void										getOverlayText					(VulkanTextOverlay *textOverlay_)		{
 		if (skinnedMesh != nullptr)
 		{
 			std::stringstream									ss;
 			ss << std::setprecision(2) << std::fixed << skinnedMesh->animationSpeed;
 #if defined(__ANDROID__)
-			textOverlay->addText("Animation speed: " + ss.str() + " (Buttons L1/R1 to change)", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
+			textOverlay_->addText("Animation speed: " + ss.str() + " (Buttons L1/R1 to change)", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
 #else
-			textOverlay->addText("Animation speed: " + ss.str() + " (numpad +/- to change)", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
+			textOverlay_->addText("Animation speed: " + ss.str() + " (numpad +/- to change)", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
 #endif
 		}
 	}

@@ -317,10 +317,10 @@ public:
 
 	virtual void	render			()									{ if (prepared) draw();		}
 	virtual void	viewChanged		()									{ updateUniformBuffers();	}
-	virtual void	getOverlayText	(VulkanTextOverlay *textOverlay)	{
-		textOverlay->addText("Phong shading pipeline",(float)width / 6.0f, height - 35.0f, VulkanTextOverlay::alignCenter);
-		textOverlay->addText("Toon shading pipeline", (float)width / 2.0f, height - 35.0f, VulkanTextOverlay::alignCenter);
-		textOverlay->addText("Wireframe pipeline", width - (float)width / 6.5f, height - 35.0f, VulkanTextOverlay::alignCenter);
+	virtual void	getOverlayText	(VulkanTextOverlay *textOverlay_)	{
+		textOverlay_->addText("Phong shading pipeline",(float)width / 6.0f, height - 35.0f, VulkanTextOverlay::alignCenter);
+		textOverlay_->addText("Toon shading pipeline", (float)width / 2.0f, height - 35.0f, VulkanTextOverlay::alignCenter);
+		textOverlay_->addText("Wireframe pipeline", width - (float)width / 6.5f, height - 35.0f, VulkanTextOverlay::alignCenter);
 	}
 };
 

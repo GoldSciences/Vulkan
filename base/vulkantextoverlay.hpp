@@ -547,14 +547,14 @@ public:
 	/**
 	* Submit the text command buffers to a queue
 	*/
-	void											submit						(VkQueue queue, uint32_t bufferindex, VkSubmitInfo submitInfo)	{
+	void											submit						(VkQueue queue_, uint32_t bufferindex, VkSubmitInfo submitInfo)	{
 		if (!visible)
 			return;
 
 		submitInfo.pCommandBuffers						= &cmdBuffers[bufferindex];
 		submitInfo.commandBufferCount					= 1;
 
-		VK_CHECK_RESULT(vkQueueSubmit	(queue, 1, &submitInfo, fence));
+		VK_CHECK_RESULT(vkQueueSubmit	(queue_, 1, &submitInfo, fence));
 
 		VK_CHECK_RESULT(vkWaitForFences	(vulkanDevice->logicalDevice, 1, &fence, VK_TRUE, UINT64_MAX));
 		VK_CHECK_RESULT(vkResetFences	(vulkanDevice->logicalDevice, 1, &fence));

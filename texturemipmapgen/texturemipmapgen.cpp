@@ -304,11 +304,11 @@ public:
 	}
 
 	// Free all Vulkan resources used a texture object
-	void													destroyTextureImage			(Texture texture)
+	void													destroyTextureImage			(Texture texture_)
 	{
-		vkDestroyImageView	(device, texture.view			, nullptr);
-		vkDestroyImage		(device, texture.image			, nullptr);
-		vkFreeMemory		(device, texture.deviceMemory	, nullptr);
+		vkDestroyImageView	(device, texture_.view			, nullptr);
+		vkDestroyImage		(device, texture_.image			, nullptr);
+		vkFreeMemory		(device, texture_.deviceMemory	, nullptr);
 	}
 
 	void													buildCommandBuffers			()
@@ -558,15 +558,15 @@ public:
 		}
 	}
 
-	virtual void											getOverlayText				(VulkanTextOverlay *textOverlay)	{
+	virtual void											getOverlayText				(VulkanTextOverlay *textOverlay_)	{
 		std::stringstream											ss;
 		ss << std::setprecision(2) << std::fixed << uboVS.lodBias;
 #if defined(__ANDROID__)
-		textOverlay->addText("LOD bias: " + ss.str() + " (Buttons L1/R1 to change)", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
-		textOverlay->addText("Sampler: " + samplerNames[uboVS.samplerIndex] + " (\"Button A\" to toggle)", 5.0f, 105.0f, VulkanTextOverlay::alignLeft);
+		textOverla_->addText("LOD bias: " + ss.str() + " (Buttons L1/R1 to change)", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
+		textOverla_->addText("Sampler: " + samplerNames[uboVS.samplerIndex] + " (\"Button A\" to toggle)", 5.0f, 105.0f, VulkanTextOverlay::alignLeft);
 #else
-		textOverlay->addText("LOD bias: " + ss.str() + " (numpad +/- to change)", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
-		textOverlay->addText("Sampler: " + samplerNames[uboVS.samplerIndex] + " (\"f\" to toggle)", 5.0f, 105.0f, VulkanTextOverlay::alignLeft);
+		textOverlay_->addText("LOD bias: " + ss.str() + " (numpad +/- to change)", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
+		textOverlay_->addText("Sampler: " + samplerNames[uboVS.samplerIndex] + " (\"f\" to toggle)", 5.0f, 105.0f, VulkanTextOverlay::alignLeft);
 #endif
 	}
 };

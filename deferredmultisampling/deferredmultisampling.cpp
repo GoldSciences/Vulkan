@@ -521,7 +521,6 @@ public:
 			VkRect2D scissor = vks::initializers::rect2D(width, height, 0, 0);
 			vkCmdSetScissor(drawCmdBuffers[i], 0, 1, &scissor);
 
-			VkDeviceSize offsets[1] = { 0 };
 			vkCmdBindDescriptorSets(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayouts.deferred, 0, 1, &descriptorSet, 0, NULL);
 
 			if (debugDisplay)
@@ -973,22 +972,22 @@ public:
 		}
 	}
 
-	virtual void getOverlayText(VulkanTextOverlay *textOverlay)
+	virtual void getOverlayText(VulkanTextOverlay *textOverlay_)
 	{
 #if defined(__ANDROID__)
-		textOverlay->addText("Press \"Button A\" to toggle debug display", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
+		textOverlay_->addText("Press \"Button A\" to toggle debug display", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
 #else
-		textOverlay->addText("MSAA (\"F2\"): " + std::to_string(useMSAA), 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
-		textOverlay->addText("Sample Shading (\"F3\"): " + std::to_string(useSampleShading), 5.0f, 105.0f, VulkanTextOverlay::alignLeft);
-		textOverlay->addText("G-Buffers (\"F4\")", 5.0f, 125.0f, VulkanTextOverlay::alignLeft);
+		textOverlay_->addText("MSAA (\"F2\"): " + std::to_string(useMSAA), 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
+		textOverlay_->addText("Sample Shading (\"F3\"): " + std::to_string(useSampleShading), 5.0f, 105.0f, VulkanTextOverlay::alignLeft);
+		textOverlay_->addText("G-Buffers (\"F4\")", 5.0f, 125.0f, VulkanTextOverlay::alignLeft);
 #endif
 		// Render targets
 		if (debugDisplay)
 		{
-			textOverlay->addText("World space position", (float)width * 0.25f, (float)height * 0.5f - 25.0f, VulkanTextOverlay::alignCenter);
-			textOverlay->addText("World space normals", (float)width * 0.75f, (float)height * 0.5f - 25.0f, VulkanTextOverlay::alignCenter);
-			textOverlay->addText("Albedo", (float)width * 0.25f, (float)height - 25.0f, VulkanTextOverlay::alignCenter);
-			textOverlay->addText("Final image", (float)width * 0.75f, (float)height - 25.0f, VulkanTextOverlay::alignCenter);
+			textOverlay_->addText("World space position", (float)width * 0.25f, (float)height * 0.5f - 25.0f, VulkanTextOverlay::alignCenter);
+			textOverlay_->addText("World space normals", (float)width * 0.75f, (float)height * 0.5f - 25.0f, VulkanTextOverlay::alignCenter);
+			textOverlay_->addText("Albedo", (float)width * 0.25f, (float)height - 25.0f, VulkanTextOverlay::alignCenter);
+			textOverlay_->addText("Final image", (float)width * 0.75f, (float)height - 25.0f, VulkanTextOverlay::alignCenter);
 		}
 	}
 };

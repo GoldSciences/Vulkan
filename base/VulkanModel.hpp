@@ -123,9 +123,9 @@ namespace vks
 		// @param createInfo MeshCreateInfo structure for load time settings like scale, center, etc.
 		// @param copyQueue Queue used for the memory staging copy commands (must support transfer)
 		// @param (Optional) flags ASSIMP model loading flags
-		bool							loadFromFile			(const std::string& filename, vks::VertexLayout layout, vks::ModelCreateInfo *createInfo, vks::VulkanDevice *device, VkQueue copyQueue, const int flags = defaultFlags)
+		bool							loadFromFile			(const std::string& filename, vks::VertexLayout layout, vks::ModelCreateInfo *createInfo, vks::VulkanDevice *device_, VkQueue copyQueue, const int flags = defaultFlags)
 		{
-			this->device					= device->logicalDevice;
+			this->device					= device_->logicalDevice;
 
 			Assimp::Importer					Importer;
 			const aiScene						* pScene;
@@ -273,26 +273,26 @@ namespace vks
 				// Create staging buffers
 				vks::Buffer							vertexStaging, indexStaging;
 
-				VK_CHECK_RESULT(device->createBuffer(VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, &vertexStaging	, vBufferSize, vertexBuffer	.data()));				// Vertex buffer
-				VK_CHECK_RESULT(device->createBuffer(VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, &indexStaging	, iBufferSize, indexBuffer	.data()));				// Index buffer
+				VK_CHECK_RESULT(device_->createBuffer(VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, &vertexStaging	, vBufferSize, vertexBuffer	.data()));				// Vertex buffer
+				VK_CHECK_RESULT(device_->createBuffer(VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, &indexStaging	, iBufferSize, indexBuffer	.data()));				// Index buffer
 				// Create device local target buffers
-				VK_CHECK_RESULT(device->createBuffer(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT	, &vertices	, vBufferSize));	// Vertex buffer
-				VK_CHECK_RESULT(device->createBuffer(VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT	, &indices	, iBufferSize));		// Index buffer
+				VK_CHECK_RESULT(device_->createBuffer(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT	, &vertices	, vBufferSize));	// Vertex buffer
+				VK_CHECK_RESULT(device_->createBuffer(VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT	, &indices	, iBufferSize));		// Index buffer
 
 				// Copy from staging buffers
-				VkCommandBuffer						copyCmd						= device->createCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY, true);
+				VkCommandBuffer						copyCmd						= device_->createCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY, true);
 
 				VkBufferCopy						copyRegion{};
 				copyRegion.size					= vertices.size;	vkCmdCopyBuffer(copyCmd, vertexStaging	.buffer, vertices	.buffer, 1, &copyRegion);
 				copyRegion.size					= indices.size;		vkCmdCopyBuffer(copyCmd, indexStaging	.buffer, indices	.buffer, 1, &copyRegion);
 
-				device->flushCommandBuffer(copyCmd, copyQueue);
+				device_->flushCommandBuffer(copyCmd, copyQueue);
 
 				// Destroy staging resources
-				vkDestroyBuffer	(device->logicalDevice, vertexStaging.buffer	, nullptr);
-				vkFreeMemory	(device->logicalDevice, vertexStaging.memory	, nullptr);
-				vkDestroyBuffer	(device->logicalDevice, indexStaging.buffer		, nullptr);
-				vkFreeMemory	(device->logicalDevice, indexStaging.memory		, nullptr);
+				vkDestroyBuffer	(device_->logicalDevice, vertexStaging.buffer	, nullptr);
+				vkFreeMemory	(device_->logicalDevice, vertexStaging.memory	, nullptr);
+				vkDestroyBuffer	(device_->logicalDevice, indexStaging.buffer		, nullptr);
+				vkFreeMemory	(device_->logicalDevice, indexStaging.memory		, nullptr);
 
 				return true;
 			}
@@ -313,10 +313,10 @@ namespace vks
 		// @param scale Load time scene scale
 		// @param copyQueue Queue used for the memory staging copy commands (must support transfer)
 		// @param (Optional) flags ASSIMP model loading flags
-		bool							loadFromFile			(const std::string& filename, vks::VertexLayout layout, float scale, vks::VulkanDevice *device, VkQueue copyQueue, const int flags = defaultFlags)
+		bool							loadFromFile			(const std::string& filename, vks::VertexLayout layout, float scale, vks::VulkanDevice *device_, VkQueue copyQueue, const int flags = defaultFlags)
 		{
 			vks::ModelCreateInfo				modelCreateInfo			(scale, 1.0f, 0.0f);
-			return loadFromFile(filename, layout, &modelCreateInfo, device, copyQueue, flags);
+			return loadFromFile(filename, layout, &modelCreateInfo, device_, copyQueue, flags);
 		}
 	};
 };

@@ -428,10 +428,10 @@ public:
 
 	virtual void render				()									{ if (prepared) draw(); }
 	virtual void viewChanged		()									{ updateUniformBuffer(true); }
-	virtual void getOverlayText		(VulkanTextOverlay *textOverlay)	{
-		textOverlay->addText(std::to_string(objectCount) + " objects", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
+	virtual void getOverlayText		(VulkanTextOverlay *textOverlay_)	{
+		textOverlay_->addText(std::to_string(objectCount) + " objects", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
 		if (!vulkanDevice->features.multiDrawIndirect)
-			textOverlay->addText("multiDrawIndirect not supported", 5.0f, 105.0f, VulkanTextOverlay::alignLeft);
+			textOverlay_->addText("multiDrawIndirect not supported", 5.0f, 105.0f, VulkanTextOverlay::alignLeft);
 	}
 };
 

@@ -466,14 +466,14 @@ public:
 		}
 	}
 
-	virtual void getOverlayText(VulkanTextOverlay *textOverlay)
+	virtual void getOverlayText(VulkanTextOverlay *textOverlay_)
 	{
 #if defined(__ANDROID__)
-		textOverlay->addText("Base material: " + materials[materialIndex].name + " (L1/R1)", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
-		textOverlay->addText("\"X\" to toggle object", 5.0f, 100.0f, VulkanTextOverlay::alignLeft);
+		textOverlay_->addText("Base material: " + materials[materialIndex].name + " (L1/R1)", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
+		textOverlay_->addText("\"X\" to toggle object", 5.0f, 100.0f, VulkanTextOverlay::alignLeft);
 #else
-		textOverlay->addText("Base material: " + materials[materialIndex].name + " (-/+)", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
-		textOverlay->addText("\"space\" to toggle object", 5.0f, 100.0f, VulkanTextOverlay::alignLeft);
+		textOverlay_->addText("Base material: " + materials[materialIndex].name + " (-/+)", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
+		textOverlay_->addText("\"space\" to toggle object", 5.0f, 100.0f, VulkanTextOverlay::alignLeft);
 #endif
 	}
 };

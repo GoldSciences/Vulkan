@@ -56,14 +56,14 @@ public:
 
 	void														rotate						(glm::vec3 delta)											{ this->rotation += delta;		updateViewMatrix();			}
 	void														translate					(glm::vec3 delta)											{ this->position += delta;		updateViewMatrix();			}
-	void														setPosition					(glm::vec3 position)										{ this->position = position;	updateViewMatrix();			}
-	void														setRotation					(glm::vec3 rotation)										{ this->rotation = rotation;	updateViewMatrix();			}
+	void														setPosition					(glm::vec3 position_)										{ this->position = position_;	updateViewMatrix();			}
+	void														setRotation					(glm::vec3 rotation_)										{ this->rotation = rotation_;	updateViewMatrix();			}
 	void														setTranslation				(glm::vec3 translation)										{ this->position = translation;	updateViewMatrix();			}
-	void														setPerspective				(float fov, float aspect, float znear, float zfar)			{
-		this->fov													= fov;
-		this->znear													= znear;
-		this->zfar													= zfar;
-		matrices.perspective										= glm::perspective(glm::radians(fov), aspect, znear, zfar);
+	void														setPerspective				(float fov_, float aspect_, float znear_, float zfar_)		{
+		this->fov													= fov_;
+		this->znear													= znear_;
+		this->zfar													= zfar_;
+		matrices.perspective										= glm::perspective(glm::radians(fov_), aspect_, znear_, zfar_);
 	}
 
 	void															updateAspectRatio			(float aspect)												{ matrices.perspective	= glm::perspective(glm::radians(fov), aspect, znear, zfar); }

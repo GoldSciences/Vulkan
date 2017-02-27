@@ -54,12 +54,12 @@ public:
 			VkDeviceMemory memory;
 		} indices;
 		// Destroys all Vulkan resources created for this model
-		void destroy(VkDevice device)
+		void destroy(VkDevice device_)
 		{
-			vkDestroyBuffer(device, vertices.buffer, nullptr);
-			vkFreeMemory(device, vertices.memory, nullptr);
-			vkDestroyBuffer(device, indices.buffer, nullptr);
-			vkFreeMemory(device, indices.memory, nullptr);
+			vkDestroyBuffer	(device_, vertices.buffer, nullptr);
+			vkFreeMemory	(device_, vertices.memory, nullptr);
+			vkDestroyBuffer	(device_, indices.buffer, nullptr);
+			vkFreeMemory	(device_, indices.memory, nullptr);
 		};
 	} model;
 
@@ -439,11 +439,11 @@ public:
 		}
 	}
 
-	virtual void getOverlayText		(VulkanTextOverlay *textOverlay)	{
+	virtual void getOverlayText		(VulkanTextOverlay *textOverlay_)	{
 #if defined(__ANDROID__)
-		textOverlay->addText("Press \"Button A\" to toggle wireframe", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
+		textOverlay_->addText("Press \"Button A\" to toggle wireframe", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
 #else
-		textOverlay->addText("Press \"w\" to toggle wireframe", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
+		textOverlay_->addText("Press \"w\" to toggle wireframe", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
 #endif
 	}
 };

@@ -79,11 +79,11 @@ public:
 		VkDeviceMemory mem;
 		VkImageView view;
 		VkFormat format;
-		void destroy(VkDevice device)
+		void destroy(VkDevice device_)
 		{
-			vkDestroyImageView(device, view, nullptr);
-			vkDestroyImage(device, image, nullptr);
-			vkFreeMemory(device, mem, nullptr);
+			vkDestroyImageView	(device_, view, nullptr);
+			vkDestroyImage		(device_, image, nullptr);
+			vkFreeMemory		(device_, mem, nullptr);
 		}
 	};
 	struct FrameBuffer {
@@ -181,7 +181,6 @@ public:
 
 		VkViewport viewport;
 		VkRect2D scissor;
-		VkDeviceSize offsets[1] = { 0 };
 
 		for (size_t i = 0; i < drawCmdBuffers.size(); ++i)
 		{
@@ -917,13 +916,13 @@ public:
 		}
 	}
 
-	virtual void	getOverlayText	(VulkanTextOverlay *textOverlay)	{
+	virtual void	getOverlayText	(VulkanTextOverlay *textOverlay_)	{
 		std::stringstream ss;
 		ss << std::setprecision(2) << std::fixed << uboParams.exposure;
 #if defined(__ANDROID__)
-		textOverlay->addText("Exposure: " + ss.str() + " (L1/R1)", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
+		textOverlay_->addText("Exposure: " + ss.str() + " (L1/R1)", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
 #else
-		textOverlay->addText("Exposure: " + ss.str() + " (+/-)", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
+		textOverlay_->addText("Exposure: " + ss.str() + " (+/-)", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
 #endif
 	}
 };

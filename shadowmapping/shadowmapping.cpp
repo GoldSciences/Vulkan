@@ -226,8 +226,6 @@ public:
 		offscreenPass.width										= SHADOWMAP_DIM;
 		offscreenPass.height									= SHADOWMAP_DIM;
 
-		VkFormat													fbColorFormat						= FB_COLOR_FORMAT;
-
 		// For shadow mapping we only need a depth attachment
 		VkImageCreateInfo											image								= vks::initializers::imageCreateInfo();
 		image.imageType											= VK_IMAGE_TYPE_2D;
@@ -696,15 +694,15 @@ public:
 		}
 	}
 
-	virtual void											getOverlayText						(VulkanTextOverlay *textOverlay)			{
+	virtual void											getOverlayText						(VulkanTextOverlay *textOverlay_)			{
 #if defined(__ANDROID__)
-		textOverlay->addText("\"Button A\" to toggle shadow map", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
-		textOverlay->addText("\"Button X\" to toggle light's pov", 5.0f, 100.0f, VulkanTextOverlay::alignLeft);
-		textOverlay->addText("\"Button Y\" to toggle PCF filtering", 5.0f, 115.0f, VulkanTextOverlay::alignLeft);
+		textOverlay_->addText("\"Button A\" to toggle shadow map", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
+		textOverlay_->addText("\"Button X\" to toggle light's pov", 5.0f, 100.0f, VulkanTextOverlay::alignLeft);
+		textOverlay_->addText("\"Button Y\" to toggle PCF filtering", 5.0f, 115.0f, VulkanTextOverlay::alignLeft);
 #else
-		textOverlay->addText("\"s\" to toggle shadow map", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
-		textOverlay->addText("\"l\" to toggle light's pov", 5.0f, 100.0f, VulkanTextOverlay::alignLeft);
-		textOverlay->addText("\"f\" to toggle PCF filtering", 5.0f, 115.0f, VulkanTextOverlay::alignLeft);
+		textOverlay_->addText("\"s\" to toggle shadow map", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
+		textOverlay_->addText("\"l\" to toggle light's pov", 5.0f, 100.0f, VulkanTextOverlay::alignLeft);
+		textOverlay_->addText("\"f\" to toggle PCF filtering", 5.0f, 115.0f, VulkanTextOverlay::alignLeft);
 #endif
 	}
 

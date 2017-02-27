@@ -484,11 +484,11 @@ public:
 		VulkanExampleBase::updateTextOverlay();
 	}
 
-	virtual void getOverlayText(VulkanTextOverlay *textOverlay)
+	virtual void getOverlayText(VulkanTextOverlay *textOverlay_)
 	{
-		textOverlay->addText("Occlusion queries:", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
-		textOverlay->addText("Teapot: " + std::to_string(passedSamples[0]) + " samples passed" , 5.0f, 105.0f, VulkanTextOverlay::alignLeft);
-		textOverlay->addText("Sphere: " + std::to_string(passedSamples[1]) + " samples passed", 5.0f, 125.0f, VulkanTextOverlay::alignLeft);
+		textOverlay_->addText("Occlusion queries:", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
+		textOverlay_->addText("Teapot: " + std::to_string(passedSamples[0]) + " samples passed" , 5.0f, 105.0f, VulkanTextOverlay::alignLeft);
+		textOverlay_->addText("Sphere: " + std::to_string(passedSamples[1]) + " samples passed", 5.0f, 125.0f, VulkanTextOverlay::alignLeft);
 	}
 };
 

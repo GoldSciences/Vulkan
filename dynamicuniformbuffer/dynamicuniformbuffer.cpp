@@ -186,7 +186,7 @@ public:
 
 	void generateTriangle()	{
 		// Setup vertices indices for a colored cube
-		std::vector<Vertex> vertices = 
+		std::vector<Vertex> _vertices = 
 			{	{ { -1.0f, -1.0f,  1.0f },{ 1.0f, 0.0f, 0.0f } }
 			,	{ {  1.0f, -1.0f,  1.0f },{ 0.0f, 1.0f, 0.0f } }
 			,	{ {  1.0f,  1.0f,  1.0f },{ 0.0f, 0.0f, 1.0f } }
@@ -205,7 +205,7 @@ public:
 
 		// Create buffers
 		// For the sake of simplicity we won't stage the vertex data to the gpu memory
-		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &vertexBuffer, vertices.size() * sizeof(Vertex), vertices.data()));	// Vertex buffer
+		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &vertexBuffer, _vertices.size() * sizeof(Vertex), _vertices.data()));	// Vertex buffer
 		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &indexBuffer, indices.size() * sizeof(uint32_t), indices.data()));		// Index buffer
 	}
 

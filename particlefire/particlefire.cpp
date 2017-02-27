@@ -208,7 +208,7 @@ public:
 		return range * (rand() / float(RAND_MAX));
 	}
 
-	void initParticle(Particle *particle, glm::vec3 emitterPos)
+	void initParticle(Particle *particle, glm::vec3 emitterPos_)
 	{
 		particle->vel = glm::vec4(0.0f, minVel.y + rnd(maxVel.y - minVel.y), 0.0f, 0.0f);
 		particle->alpha = rnd(0.75f);
@@ -227,7 +227,7 @@ public:
 		particle->pos.y = r * sin(phi);
 		particle->pos.z = r * sin(theta) * cos(phi);
 
-		particle->pos += glm::vec4(emitterPos, 0.0f);
+		particle->pos += glm::vec4(emitterPos_, 0.0f);
 	}
 
 	void transitionParticle(Particle *particle)

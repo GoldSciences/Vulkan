@@ -269,19 +269,19 @@ public:
 	* @param device Logical representation of the device to create the swapchain for
 	*
 	*/
-	void												connect										(VkInstance instance, VkPhysicalDevice physicalDevice, VkDevice device)				{
-		this->instance										= instance;
-		this->physicalDevice								= physicalDevice;
-		this->device										= device;
-		GET_INSTANCE_PROC_ADDR(instance, GetPhysicalDeviceSurfaceSupportKHR);
-		GET_INSTANCE_PROC_ADDR(instance, GetPhysicalDeviceSurfaceCapabilitiesKHR);
-		GET_INSTANCE_PROC_ADDR(instance, GetPhysicalDeviceSurfaceFormatsKHR);
-		GET_INSTANCE_PROC_ADDR(instance, GetPhysicalDeviceSurfacePresentModesKHR);
-		GET_DEVICE_PROC_ADDR(device, CreateSwapchainKHR);
-		GET_DEVICE_PROC_ADDR(device, DestroySwapchainKHR);
-		GET_DEVICE_PROC_ADDR(device, GetSwapchainImagesKHR);
-		GET_DEVICE_PROC_ADDR(device, AcquireNextImageKHR);
-		GET_DEVICE_PROC_ADDR(device, QueuePresentKHR);
+	void												connect										(VkInstance instance_, VkPhysicalDevice physicalDevice_, VkDevice device_)				{
+		this->instance										= instance_;
+		this->physicalDevice								= physicalDevice_;
+		this->device										= device_;
+		GET_INSTANCE_PROC_ADDR(instance_, GetPhysicalDeviceSurfaceSupportKHR);
+		GET_INSTANCE_PROC_ADDR(instance_, GetPhysicalDeviceSurfaceCapabilitiesKHR);
+		GET_INSTANCE_PROC_ADDR(instance_, GetPhysicalDeviceSurfaceFormatsKHR);
+		GET_INSTANCE_PROC_ADDR(instance_, GetPhysicalDeviceSurfacePresentModesKHR);
+		GET_DEVICE_PROC_ADDR(device_, CreateSwapchainKHR);
+		GET_DEVICE_PROC_ADDR(device_, DestroySwapchainKHR);
+		GET_DEVICE_PROC_ADDR(device_, GetSwapchainImagesKHR);
+		GET_DEVICE_PROC_ADDR(device_, AcquireNextImageKHR);
+		GET_DEVICE_PROC_ADDR(device_, QueuePresentKHR);
 	}
 
 	// Create the swapchain and get it's images with given width and height
@@ -289,7 +289,7 @@ public:
 	// width	: Pointer to the width of the swapchain (may be adjusted to fit the requirements of the swapchain)
 	// height	: Pointer to the height of the swapchain (may be adjusted to fit the requirements of the swapchain)
 	// vsync	: (Optional) Can be used to force vsync'd rendering (by using VK_PRESENT_MODE_FIFO_KHR as presentation mode)
-	void												create										(uint32_t *width, uint32_t *height, bool vsync = false)								{
+	void												create										(uint32_t *width_, uint32_t *height_, bool vsync = false)								{
 		VkResult												err;
 		VkSwapchainKHR											oldSwapchain								= swapChain;
 
@@ -312,13 +312,13 @@ public:
 		// If width (and height) equals the special value 0xFFFFFFFF, the size of the surface will be set by the swapchain
 		if (surfCaps.currentExtent.width == (uint32_t)-1) {
 			// If the surface size is undefined, the size is set to the size of the images requested.
-			swapchainExtent.width								= *width;
-			swapchainExtent.height								= *height;
+			swapchainExtent.width								= *width_;
+			swapchainExtent.height								= *height_;
 		}
 		else { // If the surface size is defined, the swap chain size must match
 			swapchainExtent										= surfCaps.currentExtent;
-			*width												= surfCaps.currentExtent.width;
-			*height												= surfCaps.currentExtent.height;
+			*width_												= surfCaps.currentExtent.width;
+			*height_											= surfCaps.currentExtent.height;
 		}
 
 

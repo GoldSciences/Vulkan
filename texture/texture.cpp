@@ -84,8 +84,7 @@ public:
 		uniformBufferVS.destroy();
 	}
 
-	// Create an image memory barrier for changing the layout of
-	// an image and put it into an active command buffer
+	// Create an image memory barrier for changing the layout of an image and put it into an active command buffer
 	void setImageLayout(VkCommandBuffer cmdBuffer, VkImage image, VkImageAspectFlags aspectMask, VkImageLayout oldImageLayout, VkImageLayout newImageLayout, VkImageSubresourceRange subresourceRange)	{
 		// Create an image barrier object
 		VkImageMemoryBarrier imageMemoryBarrier = vks::initializers::imageMemoryBarrier();;
@@ -390,11 +389,11 @@ public:
 	}
 
 	// Free all Vulkan resources used a texture object
-	void destroyTextureImage(Texture texture)	{
-		vkDestroyImageView	(device, texture.view			, nullptr);
-		vkDestroyImage		(device, texture.image			, nullptr);
-		vkDestroySampler	(device, texture.sampler		, nullptr);
-		vkFreeMemory		(device, texture.deviceMemory	, nullptr);
+	void destroyTextureImage(Texture texture_)	{
+		vkDestroyImageView	(device, texture_.view			, nullptr);
+		vkDestroyImage		(device, texture_.image			, nullptr);
+		vkDestroySampler	(device, texture_.sampler		, nullptr);
+		vkFreeMemory		(device, texture_.deviceMemory	, nullptr);
 	}
 
 	void buildCommandBuffers()	{
@@ -457,7 +456,7 @@ public:
 
 	void generateQuad()	{
 		// Setup vertices for a single uv-mapped quad made from two triangles
-		std::vector<Vertex> vertices =
+		std::vector<Vertex> _vertices =
 			{	{ {  1.0f,  1.0f, 0.0f }, { 1.0f, 1.0f },{ 0.0f, 0.0f, 1.0f } }
 			,	{ { -1.0f,  1.0f, 0.0f }, { 0.0f, 1.0f },{ 0.0f, 0.0f, 1.0f } }
 			,	{ { -1.0f, -1.0f, 0.0f }, { 0.0f, 0.0f },{ 0.0f, 0.0f, 1.0f } }
@@ -470,7 +469,7 @@ public:
 
 		// Create buffers
 		// For the sake of simplicity we won't stage the vertex data to the gpu memory
-		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &vertexBuffer	, vertices.size() * sizeof(Vertex), vertices.data()));	// Vertex buffer
+		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &vertexBuffer	, _vertices.size() * sizeof(Vertex), _vertices.data()));	// Vertex buffer
 		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_INDEX_BUFFER_BIT	, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &indexBuffer	, indices.size() * sizeof(uint32_t), indices.data()));	// Index buffer
 	}
 
@@ -632,13 +631,13 @@ public:
 		}
 	}
 
-	virtual void	getOverlayText	(VulkanTextOverlay *textOverlay)	{
+	virtual void	getOverlayText	(VulkanTextOverlay *textOverlay_)	{
 		std::stringstream ss;
 		ss << std::setprecision(2) << std::fixed << uboVS.lodBias;
 #if defined(__ANDROID__)
-		textOverlay->addText("LOD bias: " + ss.str() + " (Buttons L1/R1 to change)", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
+		textOverlay_->addText("LOD bias: " + ss.str() + " (Buttons L1/R1 to change)", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
 #else
-		textOverlay->addText("LOD bias: " + ss.str() + " (numpad +/- to change)", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
+		textOverlay_->addText("LOD bias: " + ss.str() + " (numpad +/- to change)", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
 #endif
 	}
 };

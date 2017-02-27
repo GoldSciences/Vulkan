@@ -227,7 +227,7 @@ public:
 	virtual VkResult					createInstance				(bool enableValidation);																							// Create the application wide Vulkan instance: note: Virtual, can be overriden by derived example class for custom instance creation
 	virtual void						render						()															= 0;													// Pure virtual render function (override in derived class)
 	virtual void						viewChanged					()															{}														// Called when view change occurs. Can be overriden in derived class to e.g. update uniform buffers. Containing view dependant matrices
-	virtual void						keyPressed					(uint32_t keyCode)											{}														// Called if a key is pressed. Can be overriden in derived class to do custom key handling
+	virtual void						keyPressed					(uint32_t)													{}														// Called if a key is pressed. Can be overriden in derived class to do custom key handling
 	virtual void						windowResized				()															{}														// Called when the window has been resized. Can be overriden in derived class to recreate or rebuild resources attached to the frame buffer / swapchain
 	virtual void						buildCommandBuffers			()															{}														// Pure virtual function to be overriden by the dervice class. Called in case of an event where e.g. the framebuffer has to be rebuild and thus all command buffers that may reference this
 
@@ -249,7 +249,7 @@ public:
 	VkPipelineShaderStageCreateInfo		loadShader					(std::string fileName, VkShaderStageFlagBits stage);																// Load a SPIR-V shader
 	void								renderLoop					();																													// Start the main render loop
 	void								updateTextOverlay			();
-	virtual void						getOverlayText				(VulkanTextOverlay * textOverlay)							{}														// Called when the text overlay is updating. Can be overriden in derived class to add custom text to the overlay
+	virtual void						getOverlayText				(VulkanTextOverlay *)										{}														// Called when the text overlay is updating. Can be overriden in derived class to add custom text to the overlay
 
 	// Prepare the frame for workload submission
 	// - Acquires the next image from the swap chain 

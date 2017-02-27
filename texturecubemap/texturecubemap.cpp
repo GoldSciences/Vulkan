@@ -569,18 +569,18 @@ public:
 		}
 	}
 
-	virtual void getOverlayText(VulkanTextOverlay *textOverlay)
+	virtual void getOverlayText(VulkanTextOverlay *textOverlay_)
 	{
 		std::stringstream ss;
 		ss << std::setprecision(2) << std::fixed << uboVS.lodBias;
 #if defined(__ANDROID__)
-		textOverlay->addText("Press \"Button A\" to toggle skybox", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
-		textOverlay->addText("Press \"Button X\" to toggle object", 5.0f, 100.0f, VulkanTextOverlay::alignLeft);
-		textOverlay->addText("LOD bias: " + ss.str() + " (Buttons L1/R1 to change)", 5.0f, 115.0f, VulkanTextOverlay::alignLeft);
+		textOverlay_->addText("Press \"Button A\" to toggle skybox", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
+		textOverlay_->addText("Press \"Button X\" to toggle object", 5.0f, 100.0f, VulkanTextOverlay::alignLeft);
+		textOverlay_->addText("LOD bias: " + ss.str() + " (Buttons L1/R1 to change)", 5.0f, 115.0f, VulkanTextOverlay::alignLeft);
 #else
-		textOverlay->addText("Press \"s\" to toggle skybox", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
-		textOverlay->addText("Press \"space\" to toggle object", 5.0f, 100.0f, VulkanTextOverlay::alignLeft);
-		textOverlay->addText("LOD bias: " + ss.str() + " (numpad +/- to change)", 5.0f, 115.0f, VulkanTextOverlay::alignLeft);
+		textOverlay_->addText("Press \"s\" to toggle skybox", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
+		textOverlay_->addText("Press \"space\" to toggle object", 5.0f, 100.0f, VulkanTextOverlay::alignLeft);
+		textOverlay_->addText("LOD bias: " + ss.str() + " (numpad +/- to change)", 5.0f, 115.0f, VulkanTextOverlay::alignLeft);
 #endif
 	}
 };

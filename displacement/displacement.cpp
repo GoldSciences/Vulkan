@@ -296,8 +296,6 @@ public:
 		uboTessEval.projection = glm::perspective(glm::radians(45.0f), (float)(width) / (float)height, 0.1f, 256.0f);
 		viewMatrix = glm::translate(viewMatrix, glm::vec3(0.0f, 0.0f, zoom));
 
-		float offset = 0.5f;
-		int uboIndex = 1;
 		uboTessEval.model = glm::mat4();
 		uboTessEval.model = viewMatrix * glm::translate(uboTessEval.model, glm::vec3(0, 0, 0));
 		uboTessEval.model = glm::rotate(uboTessEval.model, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
@@ -389,17 +387,17 @@ public:
 		}
 	}
 
-	virtual void getOverlayText(VulkanTextOverlay *textOverlay)	{
+	virtual void getOverlayText(VulkanTextOverlay *textOverlay_)	{
 		std::stringstream ss;
 		ss << std::setprecision(2) << std::fixed << uboTessEval.tessStrength;
 #if defined(__ANDROID__)
-		textOverlay->addText("Tessellation height: " + ss.str() + " (Buttons L1/R1)", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
-		textOverlay->addText("\"Button A\" to toggle displacement", 5.0f, 100.0f, VulkanTextOverlay::alignLeft);
-		textOverlay->addText("\"Button X\" to toggle splitscreen", 5.0f, 115.0f, VulkanTextOverlay::alignLeft);
+		textOverlay_->addText("Tessellation height: " + ss.str() + " (Buttons L1/R1)", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
+		textOverlay_->addText("\"Button A\" to toggle displacement", 5.0f, 100.0f, VulkanTextOverlay::alignLeft);
+		textOverlay_->addText("\"Button X\" to toggle splitscreen", 5.0f, 115.0f, VulkanTextOverlay::alignLeft);
 #else
-		textOverlay->addText("Tessellation height: " + ss.str() + " (numpad +/-)", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
-		textOverlay->addText("\"d\" to toggle displacement", 5.0f, 100.0f, VulkanTextOverlay::alignLeft);
-		textOverlay->addText("\"s\" to toggle splitscreen", 5.0f, 115.0f, VulkanTextOverlay::alignLeft);
+		textOverlay_->addText("Tessellation height: " + ss.str() + " (numpad +/-)", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
+		textOverlay_->addText("\"d\" to toggle displacement", 5.0f, 100.0f, VulkanTextOverlay::alignLeft);
+		textOverlay_->addText("\"s\" to toggle splitscreen", 5.0f, 115.0f, VulkanTextOverlay::alignLeft);
 #endif
 	}
 };

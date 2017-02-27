@@ -826,11 +826,11 @@ public:
 		}
 	}
 
-	virtual void	getOverlayText	(VulkanTextOverlay *textOverlay)	{
+	virtual void	getOverlayText	(VulkanTextOverlay *textOverlay_)	{
 		if (DebugMarker::active)
-			textOverlay->addText("VK_EXT_debug_marker active", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
+			textOverlay_->addText("VK_EXT_debug_marker active", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
 		else
-			textOverlay->addText("VK_EXT_debug_marker not present", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
+			textOverlay_->addText("VK_EXT_debug_marker not present", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
 	}
 };
 
