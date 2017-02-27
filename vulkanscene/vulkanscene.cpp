@@ -207,8 +207,9 @@ public:
 
 		// Pipeline for the meshes (armadillo, bunny, etc.)
 		// Load shaders
-		std::array<VkPipelineShaderStageCreateInfo, 2>			shaderStages			= {};
-		VkGraphicsPipelineCreateInfo							pipelineCreateInfo		= vks::initializers::pipelineCreateInfo(pipelineLayout, renderPass, 0);
+		std::array<VkPipelineShaderStageCreateInfo, 2>			shaderStages	= {};
+
+		VkGraphicsPipelineCreateInfo							pipelineCreateInfo	= vks::initializers::pipelineCreateInfo(pipelineLayout, renderPass, 0);
 		pipelineCreateInfo.pInputAssemblyState				= &stateInputAssembly;
 		pipelineCreateInfo.pRasterizationState				= &stateRasterization;
 		pipelineCreateInfo.pColorBlendState					= &stateColorBlend;
@@ -219,14 +220,16 @@ public:
 		pipelineCreateInfo.stageCount						= static_cast<uint32_t>(shaderStages.size());
 		pipelineCreateInfo.pStages							= shaderStages.data();
 
-		VkVertexInputBindingDescription							vertexInputBinding		= vks::initializers::vertexInputBindingDescription(VERTEX_BUFFER_BIND_ID, vertexLayout.stride(), VK_VERTEX_INPUT_RATE_VERTEX);
-		// Attribute descriptions. Describes memory layout and shader positions
-		std::vector<VkVertexInputAttributeDescription>			vertexInputAttributes	= 
-		{	vks::initializers::vertexInputAttributeDescription(VERTEX_BUFFER_BIND_ID, 0, VK_FORMAT_R32G32B32_SFLOAT, 0)						// Location 0: Position		
-		,	vks::initializers::vertexInputAttributeDescription(VERTEX_BUFFER_BIND_ID, 1, VK_FORMAT_R32G32B32_SFLOAT, sizeof(float) * 3)		// Location 1: Normal		
-		,	vks::initializers::vertexInputAttributeDescription(VERTEX_BUFFER_BIND_ID, 2, VK_FORMAT_R32G32_SFLOAT, sizeof(float) * 5)		// Location 2: Texture coordinates		
-		,	vks::initializers::vertexInputAttributeDescription(VERTEX_BUFFER_BIND_ID, 3, VK_FORMAT_R32G32B32_SFLOAT, sizeof(float) * 8)		// Location 3: Color		
-		};
+		VkVertexInputBindingDescription vertexInputBinding	= vks::initializers::vertexInputBindingDescription(VERTEX_BUFFER_BIND_ID, vertexLayout.stride(), VK_VERTEX_INPUT_RATE_VERTEX);
+
+		// Attribute descriptions
+		// Describes memory layout and shader positions
+		std::vector<VkVertexInputAttributeDescription>		vertexInputAttributes = 
+			{	vks::initializers::vertexInputAttributeDescription(VERTEX_BUFFER_BIND_ID, 0, VK_FORMAT_R32G32B32_SFLOAT	, 0)					// Location 0: Position		
+			,	vks::initializers::vertexInputAttributeDescription(VERTEX_BUFFER_BIND_ID, 1, VK_FORMAT_R32G32B32_SFLOAT	, sizeof(float) * 3)	// Location 1: Normal		
+			,	vks::initializers::vertexInputAttributeDescription(VERTEX_BUFFER_BIND_ID, 2, VK_FORMAT_R32G32_SFLOAT	, sizeof(float) * 5)	// Location 2: Texture coordinates		
+			,	vks::initializers::vertexInputAttributeDescription(VERTEX_BUFFER_BIND_ID, 3, VK_FORMAT_R32G32B32_SFLOAT	, sizeof(float) * 8)	// Location 3: Color		
+			};
 
 		VkPipelineVertexInputStateCreateInfo					stateVertexInput		= vks::initializers::pipelineVertexInputStateCreateInfo();
 		stateVertexInput.vertexBindingDescriptionCount		= 1;

@@ -224,6 +224,7 @@ public:
 			VK_DYNAMIC_STATE_SCISSOR,
 			VK_DYNAMIC_STATE_LINE_WIDTH,
 		};
+
 		VkPipelineDynamicStateCreateInfo							dynamicState				= vks::initializers::pipelineDynamicStateCreateInfo(dynamicStateEnables.data(), static_cast<uint32_t>(dynamicStateEnables.size()), 0);
 		std::array<VkPipelineShaderStageCreateInfo, 2>				shaderStages				= {};
 		VkGraphicsPipelineCreateInfo								pipelineCreateInfo			= vks::initializers::pipelineCreateInfo(pipelineLayout, renderPass, 0);

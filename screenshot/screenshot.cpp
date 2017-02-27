@@ -152,20 +152,19 @@ public:
 
 	void												preparePipelines					()
 	{
-		VkPipelineInputAssemblyStateCreateInfo					inputAssemblyState		= vks::initializers::pipelineInputAssemblyStateCreateInfo(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, 0, VK_FALSE);
-		VkPipelineRasterizationStateCreateInfo					rasterizationState		= vks::initializers::pipelineRasterizationStateCreateInfo(VK_POLYGON_MODE_FILL, VK_CULL_MODE_BACK_BIT, VK_FRONT_FACE_CLOCKWISE, 0);
-		VkPipelineColorBlendAttachmentState						blendAttachmentState	= vks::initializers::pipelineColorBlendAttachmentState(0xf, VK_FALSE);
-		VkPipelineColorBlendStateCreateInfo						colorBlendState			= vks::initializers::pipelineColorBlendStateCreateInfo(1, &blendAttachmentState);
-		VkPipelineDepthStencilStateCreateInfo					depthStencilState		= vks::initializers::pipelineDepthStencilStateCreateInfo(VK_TRUE, VK_TRUE, VK_COMPARE_OP_LESS_OR_EQUAL);
-		VkPipelineViewportStateCreateInfo						viewportState			= vks::initializers::pipelineViewportStateCreateInfo(1, 1, 0);
-		VkPipelineMultisampleStateCreateInfo					multisampleState		= vks::initializers::pipelineMultisampleStateCreateInfo(VK_SAMPLE_COUNT_1_BIT, 0);
+		VkPipelineInputAssemblyStateCreateInfo					inputAssemblyState		= vks::initializers::pipelineInputAssemblyStateCreateInfo	(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, 0, VK_FALSE);
+		VkPipelineRasterizationStateCreateInfo					rasterizationState		= vks::initializers::pipelineRasterizationStateCreateInfo	(VK_POLYGON_MODE_FILL, VK_CULL_MODE_BACK_BIT, VK_FRONT_FACE_CLOCKWISE, 0);
+		VkPipelineColorBlendAttachmentState						blendAttachmentState	= vks::initializers::pipelineColorBlendAttachmentState		(0xf, VK_FALSE);
+		VkPipelineColorBlendStateCreateInfo						colorBlendState			= vks::initializers::pipelineColorBlendStateCreateInfo		(1, &blendAttachmentState);
+		VkPipelineDepthStencilStateCreateInfo					depthStencilState		= vks::initializers::pipelineDepthStencilStateCreateInfo	(VK_TRUE, VK_TRUE, VK_COMPARE_OP_LESS_OR_EQUAL);
+		VkPipelineViewportStateCreateInfo						viewportState			= vks::initializers::pipelineViewportStateCreateInfo		(1, 1, 0);
+		VkPipelineMultisampleStateCreateInfo					multisampleState		= vks::initializers::pipelineMultisampleStateCreateInfo		(VK_SAMPLE_COUNT_1_BIT, 0);
+
 		std::vector<VkDynamicState>								dynamicStateEnables		= {VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR};
-		VkPipelineDynamicStateCreateInfo						dynamicState			= vks::initializers::pipelineDynamicStateCreateInfo(dynamicStateEnables.data(), static_cast<uint32_t>(dynamicStateEnables.size()), 0);
+		VkPipelineDynamicStateCreateInfo						dynamicState			= vks::initializers::pipelineDynamicStateCreateInfo			(dynamicStateEnables.data(), static_cast<uint32_t>(dynamicStateEnables.size()), 0);
+		VkGraphicsPipelineCreateInfo							pipelineCreateInfo		= vks::initializers::pipelineCreateInfo						(pipelineLayout, renderPass, 0);
 
-		VkGraphicsPipelineCreateInfo							pipelineCreateInfo		= vks::initializers::pipelineCreateInfo(pipelineLayout, renderPass, 0);
-
-		std::array<VkPipelineShaderStageCreateInfo, 2>			shaderStages;
-
+		std::array<VkPipelineShaderStageCreateInfo, 2>			shaderStages			= {};
 		pipelineCreateInfo.pInputAssemblyState				= &inputAssemblyState;
 		pipelineCreateInfo.pRasterizationState				= &rasterizationState;
 		pipelineCreateInfo.pColorBlendState					= &colorBlendState;
@@ -179,15 +178,15 @@ public:
 		// Vertex bindings and attributes
 		// Binding description
 		std::vector<VkVertexInputBindingDescription>			vertexInputBindings		= 
-		{	vks::initializers::vertexInputBindingDescription(0, vertexLayout.stride(), VK_VERTEX_INPUT_RATE_VERTEX)
-		};
+			{	vks::initializers::vertexInputBindingDescription(0, vertexLayout.stride(), VK_VERTEX_INPUT_RATE_VERTEX)
+			};
 
 		// Attribute descriptions
 		std::vector<VkVertexInputAttributeDescription>			vertexInputAttributes	= 
-		{	vks::initializers::vertexInputAttributeDescription(0, 0, VK_FORMAT_R32G32B32_SFLOAT, 0)						// Position
-		,	vks::initializers::vertexInputAttributeDescription(0, 1, VK_FORMAT_R32G32B32_SFLOAT, sizeof(float) * 3)		// Normal
-		,	vks::initializers::vertexInputAttributeDescription(0, 2, VK_FORMAT_R32G32B32_SFLOAT, sizeof(float) * 6)		// Color
-		};
+			{	vks::initializers::vertexInputAttributeDescription(0, 0, VK_FORMAT_R32G32B32_SFLOAT, 0)						// Position
+			,	vks::initializers::vertexInputAttributeDescription(0, 1, VK_FORMAT_R32G32B32_SFLOAT, sizeof(float) * 3)		// Normal
+			,	vks::initializers::vertexInputAttributeDescription(0, 2, VK_FORMAT_R32G32B32_SFLOAT, sizeof(float) * 6)		// Color
+			};
 
 		VkPipelineVertexInputStateCreateInfo					vertexInputState		= vks::initializers::pipelineVertexInputStateCreateInfo();
 		vertexInputState.vertexBindingDescriptionCount		= static_cast<uint32_t>(vertexInputBindings.size());

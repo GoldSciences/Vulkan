@@ -704,8 +704,9 @@ public:
 		VkPipelineDynamicStateCreateInfo					dynamicState			= vks::initializers::pipelineDynamicStateCreateInfo(dynamicStateEnables.data(), static_cast<uint32_t>(dynamicStateEnables.size()), 0);
 
 		// Final fullscreen pass pipeline
-		std::array<VkPipelineShaderStageCreateInfo, 2> shaderStages = {};
-		VkGraphicsPipelineCreateInfo pipelineCreateInfo = vks::initializers::pipelineCreateInfo(pipelineLayouts.deferred, renderPass, 0);
+		std::array<VkPipelineShaderStageCreateInfo, 2>		shaderStages			= {};
+
+		VkGraphicsPipelineCreateInfo						pipelineCreateInfo		= vks::initializers::pipelineCreateInfo(pipelineLayouts.deferred, renderPass, 0);
 		pipelineCreateInfo.pInputAssemblyState = &inputAssemblyState;
 		pipelineCreateInfo.pRasterizationState = &rasterizationState;
 		pipelineCreateInfo.pColorBlendState = &colorBlendState;

@@ -623,6 +623,7 @@ public:
 
 		// Skinned rendering pipeline
 		std::array<VkPipelineShaderStageCreateInfo, 2>			shaderStages			= {};
+
 		VkGraphicsPipelineCreateInfo							pipelineCreateInfo		= vks::initializers::pipelineCreateInfo(pipelineLayout, renderPass, 0);
 		pipelineCreateInfo.pInputAssemblyState				= &inputAssemblyState;
 		pipelineCreateInfo.pRasterizationState				= &rasterizationState;

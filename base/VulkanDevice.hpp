@@ -330,8 +330,8 @@ namespace vks
 		// queue		: Pointer
 		// copyRegion	: Pointer to a copy region, if NULL, the whole buffer is copied
 		void										copyBuffer				(vks::Buffer *src, vks::Buffer *dst, VkQueue queue, VkBufferCopy *copyRegion = nullptr)		{
-			assert(dst->size	<= src->size);
-			assert(dst->buffer	&& src->buffer);
+			assert(dst->size	<= src->size	);
+			assert(dst->buffer	&& src->buffer	);
 			VkCommandBuffer									copyCmd					= createCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY, true);
 			VkBufferCopy									bufferCopy				= {};
 			if (copyRegion == nullptr)

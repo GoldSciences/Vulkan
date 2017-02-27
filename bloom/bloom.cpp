@@ -610,19 +610,18 @@ public:
 
 		std::vector<VkDynamicState>							dynamicStateEnables		= {VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR};
 		VkPipelineDynamicStateCreateInfo					dynamicState			= vks::initializers::pipelineDynamicStateCreateInfo(dynamicStateEnables.data(), static_cast<uint32_t>(dynamicStateEnables.size()), 0);
-
 		std::array<VkPipelineShaderStageCreateInfo, 2>		shaderStages			= {};
 
 		VkGraphicsPipelineCreateInfo						pipelineCreateInfo		= vks::initializers::pipelineCreateInfo(pipelineLayouts.blur, renderPass, 0);
-		pipelineCreateInfo.pInputAssemblyState = &inputAssemblyState;
-		pipelineCreateInfo.pRasterizationState = &rasterizationState;
-		pipelineCreateInfo.pColorBlendState = &colorBlendState;
-		pipelineCreateInfo.pMultisampleState = &multisampleState;
-		pipelineCreateInfo.pViewportState = &viewportState;
-		pipelineCreateInfo.pDepthStencilState = &depthStencilState;
-		pipelineCreateInfo.pDynamicState = &dynamicState;
-		pipelineCreateInfo.stageCount = static_cast<uint32_t>(shaderStages.size());
-		pipelineCreateInfo.pStages = shaderStages.data();
+		pipelineCreateInfo.pInputAssemblyState			= &inputAssemblyState;
+		pipelineCreateInfo.pRasterizationState			= &rasterizationState;
+		pipelineCreateInfo.pColorBlendState				= &colorBlendState;
+		pipelineCreateInfo.pMultisampleState			= &multisampleState;
+		pipelineCreateInfo.pViewportState				= &viewportState;
+		pipelineCreateInfo.pDepthStencilState			= &depthStencilState;
+		pipelineCreateInfo.pDynamicState				= &dynamicState;
+		pipelineCreateInfo.stageCount					= static_cast<uint32_t>(shaderStages.size());
+		pipelineCreateInfo.pStages						= shaderStages.data();
 
 		// Blur pipelines
 		shaderStages[0] = loadShader(getAssetPath() + "shaders/bloom/gaussblur.vert.spv", VK_SHADER_STAGE_VERTEX_BIT);

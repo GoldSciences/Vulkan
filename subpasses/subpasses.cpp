@@ -533,7 +533,6 @@ public:
 		// Final fullscreen pass pipeline
 		std::array<VkPipelineShaderStageCreateInfo, 2>					shaderStages				= {};
 		VkGraphicsPipelineCreateInfo									pipelineCreateInfo			= vks::initializers::pipelineCreateInfo(pipelineLayouts.offscreen, renderPass, 0);
-
 		pipelineCreateInfo.pVertexInputState						= &vertices.inputState;
 		pipelineCreateInfo.pInputAssemblyState						= &inputAssemblyState;
 		pipelineCreateInfo.pRasterizationState						= &rasterizationState;
@@ -545,6 +544,7 @@ public:
 		pipelineCreateInfo.stageCount								= static_cast<uint32_t>(shaderStages.size());
 		pipelineCreateInfo.pStages									= shaderStages.data();
 		pipelineCreateInfo.subpass									= 0;
+
 
 		std::array<VkPipelineColorBlendAttachmentState, 4>				blendAttachmentStates		= 
 			{	vks::initializers::pipelineColorBlendAttachmentState(0xf, VK_FALSE)
