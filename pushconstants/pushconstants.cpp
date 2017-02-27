@@ -219,11 +219,9 @@ public:
 	void setupDescriptorSet()
 	{
 		VkDescriptorSetAllocateInfo							allocInfo				= vks::initializers::descriptorSetAllocateInfo(descriptorPool, &descriptorSetLayout, 1);
-
 		VK_CHECK_RESULT(vkAllocateDescriptorSets(device, &allocInfo, &descriptorSet));
 
-		// Binding 0 : Vertex shader uniform buffer
-		VkWriteDescriptorSet								writeDescriptorSet		= vks::initializers::writeDescriptorSet(descriptorSet, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 0, &uniformBuffer.descriptor);
+		VkWriteDescriptorSet								writeDescriptorSet		= vks::initializers::writeDescriptorSet(descriptorSet, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 0, &uniformBuffer.descriptor);	// Binding 0 : Vertex shader uniform buffer
 		vkUpdateDescriptorSets(device, 1, &writeDescriptorSet, 0, NULL);
 	}
 
