@@ -144,11 +144,8 @@ public:
 		semaphoreCreateInfo.sType									= VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
 		semaphoreCreateInfo.pNext									= nullptr;
 
-		// Semaphore used to ensures that image presentation is complete before starting to submit again
-		VK_CHECK_RESULT(vkCreateSemaphore(device, &semaphoreCreateInfo, nullptr, &presentCompleteSemaphore));
-
-		// Semaphore used to ensures that all commands submitted have been finished before submitting the image to the queue
-		VK_CHECK_RESULT(vkCreateSemaphore(device, &semaphoreCreateInfo, nullptr, &renderCompleteSemaphore));
+		VK_CHECK_RESULT(vkCreateSemaphore(device, &semaphoreCreateInfo, nullptr, &presentCompleteSemaphore));	// Semaphore used to ensures that image presentation is complete before starting to submit again
+		VK_CHECK_RESULT(vkCreateSemaphore(device, &semaphoreCreateInfo, nullptr, &renderCompleteSemaphore));	// Semaphore used to ensures that all commands submitted have been finished before submitting the image to the queue
 
 		// Fences (Used to check draw command buffer completion)
 		VkFenceCreateInfo												fenceCreateInfo									= {};
@@ -892,9 +889,7 @@ public:
 		// Fragment shader
 		shaderStages[1].sType										= VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 		shaderStages[1].stage										= VK_SHADER_STAGE_FRAGMENT_BIT;										// Set pipeline stage for this shader
-		
 		shaderStages[1].module										= loadSPIRVShader(getAssetPath() + "shaders/triangle.frag.spv");	// Load binary SPIR-V shader
-		
 		shaderStages[1].pName										= "main";															// Main entry point for the shader
 		assert(shaderStages[1].module != VK_NULL_HANDLE);
 
