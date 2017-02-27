@@ -155,9 +155,9 @@ public:
 	void								setupDescriptorPool			()									{
 		// Example uses one ubo and one image sampler
 		std::vector<VkDescriptorPoolSize>					poolSizes					=
-		{	vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 2)
-		,	vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1)
-		};
+			{	vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER			, 2)
+			,	vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER	, 1)
+			};
 
 		VkDescriptorPoolCreateInfo							descriptorPoolInfo			= vks::initializers::descriptorPoolCreateInfo(static_cast<uint32_t>(poolSizes.size()), poolSizes.data(), 2);
 		VK_CHECK_RESULT(vkCreateDescriptorPool(device, &descriptorPoolInfo, nullptr, &descriptorPool));
@@ -165,9 +165,9 @@ public:
 
 	void								setupDescriptorSetLayout	()									{
 		std::vector<VkDescriptorSetLayoutBinding>			setLayoutBindings			=
-		{	vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER			, VK_SHADER_STAGE_VERTEX_BIT	, 0)	// Binding 0 : Vertex shader uniform buffer
-		,	vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER	, VK_SHADER_STAGE_FRAGMENT_BIT	, 1)	// Binding 1 : Fragment shader color map image sampler
-		};
+			{	vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER			, VK_SHADER_STAGE_VERTEX_BIT	, 0)	// Binding 0 : Vertex shader uniform buffer
+			,	vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER	, VK_SHADER_STAGE_FRAGMENT_BIT	, 1)	// Binding 1 : Fragment shader color map image sampler
+			};
 
 		VkDescriptorSetLayoutCreateInfo						descriptorLayout			= vks::initializers::descriptorSetLayoutCreateInfo(setLayoutBindings.data(), static_cast<uint32_t>(setLayoutBindings.size()));
 		VK_CHECK_RESULT(vkCreateDescriptorSetLayout(device, &descriptorLayout, nullptr, &descriptorSetLayout));
@@ -183,9 +183,9 @@ public:
 		// Cube map image descriptor
 		VkDescriptorImageInfo								texDescriptorCubeMap		= vks::initializers::descriptorImageInfo(textures.skybox.sampler, textures.skybox.view, VK_IMAGE_LAYOUT_GENERAL);
 		std::vector<VkWriteDescriptorSet>					writeDescriptorSets			=
-		{	vks::initializers::writeDescriptorSet(descriptorSet, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 0, &uniformData.meshVS.descriptor)	// Binding 0 : Vertex shader uniform buffer
-		,	vks::initializers::writeDescriptorSet(descriptorSet, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, &texDescriptorCubeMap)	// Binding 1 : Fragment shader image sampler
-		};
+			{	vks::initializers::writeDescriptorSet(descriptorSet, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 0, &uniformData.meshVS.descriptor)	// Binding 0 : Vertex shader uniform buffer
+			,	vks::initializers::writeDescriptorSet(descriptorSet, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, &texDescriptorCubeMap)	// Binding 1 : Fragment shader image sampler
+			};
 
 		vkUpdateDescriptorSets(device, static_cast<uint32_t>(writeDescriptorSets.size()), writeDescriptorSets.data(), 0, NULL);
 	}
@@ -198,16 +198,13 @@ public:
 		VkPipelineDepthStencilStateCreateInfo					stateDepthStencil		= vks::initializers::pipelineDepthStencilStateCreateInfo(VK_TRUE, VK_TRUE, VK_COMPARE_OP_LESS_OR_EQUAL);
 		VkPipelineViewportStateCreateInfo						stateViewport			= vks::initializers::pipelineViewportStateCreateInfo(1, 1, 0);
 		VkPipelineMultisampleStateCreateInfo					stateMultisample		= vks::initializers::pipelineMultisampleStateCreateInfo(VK_SAMPLE_COUNT_1_BIT, 0);
-		std::vector<VkDynamicState>								dynamicStateEnables		= 
-		{	VK_DYNAMIC_STATE_VIEWPORT
-		,	VK_DYNAMIC_STATE_SCISSOR
-		};
+
+		std::vector<VkDynamicState>								dynamicStateEnables		= {VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR};
 		VkPipelineDynamicStateCreateInfo						dynamicState			= vks::initializers::pipelineDynamicStateCreateInfo(dynamicStateEnables.data(), static_cast<uint32_t>(dynamicStateEnables.size()), 0);
 
 		// Pipeline for the meshes (armadillo, bunny, etc.)
 		// Load shaders
 		std::array<VkPipelineShaderStageCreateInfo, 2>			shaderStages	= {};
-
 		VkGraphicsPipelineCreateInfo							pipelineCreateInfo	= vks::initializers::pipelineCreateInfo(pipelineLayout, renderPass, 0);
 		pipelineCreateInfo.pInputAssemblyState				= &stateInputAssembly;
 		pipelineCreateInfo.pRasterizationState				= &stateRasterization;

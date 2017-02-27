@@ -399,10 +399,10 @@ public:
 	void													setupDescriptorPool			()
 	{
 		std::vector<VkDescriptorPoolSize>							poolSizes					=
-		{	vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER	, 1)	// Vertex shader UBO
-		,	vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE	, 1)		// Sampled image
-		,	vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_SAMPLER		, 3)			// 3 samplers (array)
-		};
+			{	vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER	, 1)	// Vertex shader UBO
+			,	vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE	, 1)	// Sampled image
+			,	vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_SAMPLER		, 3)	// 3 samplers (array)
+			};
 
 		VkDescriptorPoolCreateInfo									descriptorPoolInfo			= vks::initializers::descriptorPoolCreateInfo(static_cast<uint32_t>(poolSizes.size()), poolSizes.data(), 1);
 		VK_CHECK_RESULT(vkCreateDescriptorPool(device, &descriptorPoolInfo, nullptr, &descriptorPool));

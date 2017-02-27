@@ -37,8 +37,7 @@ public:
 	VkDescriptorSetLayout descriptorSetLayout;
 	VkDescriptorSet descriptorSet;
 
-	VulkanExample() : VulkanExampleBase(ENABLE_VALIDATION)
-	{
+	VulkanExample() : VulkanExampleBase(ENABLE_VALIDATION) {
 		title = "Vulkan Example - Screenshot";
 		enableTextOverlay = true;
 
@@ -48,8 +47,7 @@ public:
 		camera.setTranslation(glm::vec3(0.0f, 0.0f, -2.0f));
 	}
 
-	~VulkanExample()
-	{
+	~VulkanExample() {
 		// Clean up used Vulkan resources 
 		// Note : Inherited destructor cleans up resources stored in base class
 		vkDestroyPipeline(device, pipeline, nullptr);
@@ -61,13 +59,11 @@ public:
 		uniformBuffer.destroy();
 	}
 
-	void loadAssets()
-	{
+	void loadAssets() {
 		models.object.loadFromFile(getAssetPath() + "models/chinesedragon.dae", vertexLayout, 0.1f, vulkanDevice, queue);
 	}
 
-	void buildCommandBuffers()
-	{
+	void buildCommandBuffers() {
 		VkCommandBufferBeginInfo cmdBufInfo = vks::initializers::commandBufferBeginInfo();
 
 		VkClearValue clearValues[2];
@@ -113,8 +109,7 @@ public:
 		}
 	}
 
-	void setupDescriptorPool()
-	{
+	void setupDescriptorPool() {
 		// Example uses one ubo and one image sampler
 		std::vector<VkDescriptorPoolSize>			poolSizes							= 
 			{	vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1),
@@ -125,8 +120,7 @@ public:
 		VK_CHECK_RESULT(vkCreateDescriptorPool(device, &descriptorPoolInfo, nullptr, &descriptorPool));
 	}
 
-	void setupDescriptorSetLayout()
-	{
+	void setupDescriptorSetLayout() {
 		std::vector<VkDescriptorSetLayoutBinding>	setLayoutBindings = 
 			{	vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT, 0),			// Binding 0 : Vertex shader uniform buffer
 			};
@@ -306,8 +300,7 @@ public:
 			);
 
 		// If source and destination support blit we'll blit as this also does automatic format conversion (e.g. from BGR to RGB)
-		if (supportsBlit)
-		{
+		if (supportsBlit) {
 			// Define the region to blit (we will blit the whole swapchain image)
 			VkOffset3D blitSize;
 			blitSize.x = width;
@@ -324,9 +317,7 @@ public:
 			// Issue the blit command
 			vkCmdBlitImage(copyCmd, srcImage, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, dstImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &imageBlitRegion, VK_FILTER_NEAREST);
 		}
-		else
-		{
-			// Otherwise use image copy (requires us to manually flip components)
+		else {	// Otherwise use image copy (requires us to manually flip components)
 			VkImageCopy imageCopyRegion{};
 			imageCopyRegion.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
 			imageCopyRegion.srcSubresource.layerCount = 1;
@@ -444,11 +435,11 @@ public:
 		setupDescriptorPool();
 		setupDescriptorSet();
 		buildCommandBuffers();
-		prepared = true;
+		prepared											= true;
 	}
 
-	virtual void										render								()										{ if (!prepared) return; draw(); }
-	virtual void										viewChanged							()										{ updateUniformBuffers(); }
+	virtual void										render								()										{ if (!prepared) return; draw();	}
+	virtual void										viewChanged							()										{ updateUniformBuffers();			}
 	virtual void										keyPressed							(uint32_t keyCode)						{
 		switch (keyCode) {
 		case KEY_F2				:
