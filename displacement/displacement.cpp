@@ -65,8 +65,7 @@ public:
 	VkDescriptorSet descriptorSet;
 	VkDescriptorSetLayout descriptorSetLayout;
 
-	VulkanExample() : VulkanExampleBase(ENABLE_VALIDATION)
-	{
+	VulkanExample() : VulkanExampleBase(ENABLE_VALIDATION)	{
 		zoom = -1.25f;
 		rotation = glm::vec3(-20.0f, 45.0f, 0.0f);
 		enableTextOverlay = true;
@@ -78,8 +77,7 @@ public:
 		enabledFeatures.fillModeNonSolid = VK_TRUE;
 	}
 
-	~VulkanExample()
-	{
+	~VulkanExample()	{
 		// Clean up used Vulkan resources 
 		// Note : Inherited destructor cleans up resources stored in base class
 		vkDestroyPipeline(device, pipelines.solid, nullptr);
@@ -94,16 +92,13 @@ public:
 		textures.colorHeightMap.destroy();
 	}
 
-	void loadAssets()
-	{
-		models.object.loadFromFile(getAssetPath() + "models/plane.obj", vertexLayout, 0.25f, vulkanDevice, queue);
-		textures.colorHeightMap.loadFromFile(getAssetPath() + "textures/pattern_36_bc3.ktx", VK_FORMAT_BC3_UNORM_BLOCK, vulkanDevice, queue);
+	void loadAssets()	{
+		models.object			.loadFromFile(getAssetPath() + "models/plane.obj"			, vertexLayout		, 0.25f, vulkanDevice, queue);
+		textures.colorHeightMap	.loadFromFile(getAssetPath() + "textures/pattern_36_bc3.ktx", VK_FORMAT_BC3_UNORM_BLOCK, vulkanDevice, queue);
 	}
 
-	void reBuildCommandBuffers()
-	{
-		if (!checkCommandBuffers())
-		{
+	void reBuildCommandBuffers()	{
+		if (!checkCommandBuffers()) {
 			destroyCommandBuffers();
 			createCommandBuffers();
 		}
@@ -196,83 +191,38 @@ public:
 			vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1)
 		};
 
-		VkDescriptorPoolCreateInfo descriptorPoolInfo =
-			vks::initializers::descriptorPoolCreateInfo(
-				static_cast<uint32_t>(poolSizes.size()),
-				poolSizes.data(),
-				2);
-
+		VkDescriptorPoolCreateInfo descriptorPoolInfo = vks::initializers::descriptorPoolCreateInfo(static_cast<uint32_t>(poolSizes.size()), poolSizes.data(), 2);
 		VK_CHECK_RESULT(vkCreateDescriptorPool(device, &descriptorPoolInfo, nullptr, &descriptorPool));
 	}
 
 	void setupDescriptorSetLayout()
 	{
 		std::vector<VkDescriptorSetLayoutBinding> setLayoutBindings =
-		{
-			// Binding 0 : Tessellation control shader ubo
-			vks::initializers::descriptorSetLayoutBinding(
-				VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 
-				VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT, 
-				0),
-			// Binding 1 : Tessellation evaluation shader ubo
-			vks::initializers::descriptorSetLayoutBinding(
-				VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-				VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT, 
-				1),
-			// Binding 2 : Combined color (rgb) and height (alpha) map
-			vks::initializers::descriptorSetLayoutBinding(
-				VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-				VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
-				2),
-		};
+			{	vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER			, VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT										, 0)	// Binding 0 : Tessellation control shader ubo
+			,	vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER			, VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT									, 1)	// Binding 1 : Tessellation evaluation shader ubo
+			,	vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER	, VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT | VK_SHADER_STAGE_FRAGMENT_BIT	, 2)	// Binding 2 : Combined color (rgb) and height (alpha) map
+			};
 
 		VkDescriptorSetLayoutCreateInfo						descriptorLayout			= vks::initializers::descriptorSetLayoutCreateInfo(setLayoutBindings.data(), static_cast<uint32_t>(setLayoutBindings.size()));
-
 		VK_CHECK_RESULT(vkCreateDescriptorSetLayout(device, &descriptorLayout, nullptr, &descriptorSetLayout));
 
 		VkPipelineLayoutCreateInfo							pPipelineLayoutCreateInfo	= vks::initializers::pipelineLayoutCreateInfo(&descriptorSetLayout, 1);
-
 		VK_CHECK_RESULT(vkCreatePipelineLayout(device, &pPipelineLayoutCreateInfo, nullptr, &pipelineLayout));
 	}
 
 	void setupDescriptorSet()
 	{
-		VkDescriptorSetAllocateInfo allocInfo = 
-			vks::initializers::descriptorSetAllocateInfo(
-				descriptorPool,
-				&descriptorSetLayout,
-				1);
-
+		VkDescriptorSetAllocateInfo allocInfo = vks::initializers::descriptorSetAllocateInfo(descriptorPool, &descriptorSetLayout, 1);
 		VK_CHECK_RESULT(vkAllocateDescriptorSets(device, &allocInfo, &descriptorSet));
 
 		// Color and height map image descriptor
-		VkDescriptorImageInfo texDescriptor =
-			vks::initializers::descriptorImageInfo(
-				textures.colorHeightMap.sampler,
-				textures.colorHeightMap.view,
-				VK_IMAGE_LAYOUT_GENERAL);
+		VkDescriptorImageInfo texDescriptor = vks::initializers::descriptorImageInfo(textures.colorHeightMap.sampler, textures.colorHeightMap.view, VK_IMAGE_LAYOUT_GENERAL);
 
 		std::vector<VkWriteDescriptorSet> writeDescriptorSets =
-		{
-			// Binding 0 : Tessellation control shader ubo
-			vks::initializers::writeDescriptorSet(
-				descriptorSet, 
-				VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 
-				0, 
-				&uniformBuffers.tessControl.descriptor),
-			// Binding 1 : Tessellation evaluation shader ubo
-			vks::initializers::writeDescriptorSet(
-				descriptorSet, 
-				VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-				1, 
-				&uniformBuffers.tessEval.descriptor),
-			// Binding 2 : Color and displacement map (alpha channel)
-			vks::initializers::writeDescriptorSet(
-				descriptorSet,
-				VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-				2,
-				&texDescriptor),
-		};
+			{	vks::initializers::writeDescriptorSet(descriptorSet, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER			, 0, &uniformBuffers.tessControl.descriptor	)	// Binding 0 : Tessellation control shader ubo
+			,	vks::initializers::writeDescriptorSet(descriptorSet, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER			, 1, &uniformBuffers.tessEval.descriptor	)	// Binding 1 : Tessellation evaluation shader ubo
+			,	vks::initializers::writeDescriptorSet(descriptorSet, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER	, 2, &texDescriptor							)	// Binding 2 : Color and displacement map (alpha channel)
+			};
 
 		vkUpdateDescriptorSets(device, static_cast<uint32_t>(writeDescriptorSets.size()), writeDescriptorSets.data(), 0, NULL);
 	}
@@ -280,25 +230,19 @@ public:
 	void preparePipelines()
 	{
 		VkPipelineInputAssemblyStateCreateInfo				inputAssemblyState		= vks::initializers::pipelineInputAssemblyStateCreateInfo(VK_PRIMITIVE_TOPOLOGY_PATCH_LIST, 0, VK_FALSE);
-		VkPipelineRasterizationStateCreateInfo rasterizationState =
-			vks::initializers::pipelineRasterizationStateCreateInfo(
-				VK_POLYGON_MODE_FILL,
-				VK_CULL_MODE_NONE,
-				VK_FRONT_FACE_COUNTER_CLOCKWISE,
-				0);
-
+		VkPipelineRasterizationStateCreateInfo				rasterizationState		= vks::initializers::pipelineRasterizationStateCreateInfo(VK_POLYGON_MODE_FILL, VK_CULL_MODE_NONE, VK_FRONT_FACE_COUNTER_CLOCKWISE, 0);
 		VkPipelineColorBlendAttachmentState					blendAttachmentState	= vks::initializers::pipelineColorBlendAttachmentState(0xf, VK_FALSE);
 		VkPipelineColorBlendStateCreateInfo					colorBlendState			= vks::initializers::pipelineColorBlendStateCreateInfo(1, &blendAttachmentState);
 		VkPipelineDepthStencilStateCreateInfo				depthStencilState		= vks::initializers::pipelineDepthStencilStateCreateInfo(VK_TRUE, VK_TRUE, VK_COMPARE_OP_LESS_OR_EQUAL);
 		VkPipelineViewportStateCreateInfo					viewportState			= vks::initializers::pipelineViewportStateCreateInfo(1, 1, 0);
 		VkPipelineMultisampleStateCreateInfo				multisampleState		= vks::initializers::pipelineMultisampleStateCreateInfo(VK_SAMPLE_COUNT_1_BIT, 0);
 
-		std::vector<VkDynamicState> dynamicStateEnables = {
-			VK_DYNAMIC_STATE_VIEWPORT,
-			VK_DYNAMIC_STATE_SCISSOR,
-			VK_DYNAMIC_STATE_LINE_WIDTH
-		};
-		VkPipelineDynamicStateCreateInfo dynamicState = vks::initializers::pipelineDynamicStateCreateInfo(dynamicStateEnables.data(), static_cast<uint32_t>(dynamicStateEnables.size()), 0);
+		std::vector<VkDynamicState> dynamicStateEnables = 
+			{	VK_DYNAMIC_STATE_VIEWPORT
+			,	VK_DYNAMIC_STATE_SCISSOR
+			,	VK_DYNAMIC_STATE_LINE_WIDTH
+			};
+		VkPipelineDynamicStateCreateInfo	dynamicState = vks::initializers::pipelineDynamicStateCreateInfo(dynamicStateEnables.data(), static_cast<uint32_t>(dynamicStateEnables.size()), 0);
 
 		VkPipelineTessellationStateCreateInfo tessellationState =
 			vks::initializers::pipelineTessellationStateCreateInfo(3);
@@ -312,7 +256,6 @@ public:
 		shaderStages[3] = loadShader(getAssetPath() + "shaders/displacement/displacement.tese.spv", VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT);
 
 		VkGraphicsPipelineCreateInfo pipelineCreateInfo = vks::initializers::pipelineCreateInfo(pipelineLayout, renderPass, 0);
-
 		pipelineCreateInfo.pVertexInputState = &vertices.inputState;
 		pipelineCreateInfo.pInputAssemblyState = &inputAssemblyState;
 		pipelineCreateInfo.pRasterizationState = &rasterizationState;
@@ -336,21 +279,9 @@ public:
 	}
 
 	// Prepare and initialize uniform buffer containing shader uniforms
-	void prepareUniformBuffers()
-	{
-		// Tessellation evaluation shader uniform buffer
-		VK_CHECK_RESULT(vulkanDevice->createBuffer(
-			VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-			&uniformBuffers.tessEval,
-			sizeof(uboTessEval)));
-
-		// Tessellation control shader uniform buffer
-		VK_CHECK_RESULT(vulkanDevice->createBuffer(
-			VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-			&uniformBuffers.tessControl,
-			sizeof(uboTessControl)));
+	void prepareUniformBuffers()	{
+		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBuffers.tessEval, sizeof(uboTessEval)));			// Tessellation evaluation shader uniform buffer
+		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBuffers.tessControl, sizeof(uboTessControl)));	// Tessellation control shader uniform buffer
 
 		// Map persistent
 		VK_CHECK_RESULT(uniformBuffers.tessControl.map());
@@ -359,8 +290,7 @@ public:
 		updateUniformBuffers();
 	}
 
-	void updateUniformBuffers()
-	{
+	void updateUniformBuffers()	{
 		// Tessellation eval
 		glm::mat4 viewMatrix = glm::mat4();
 		uboTessEval.projection = glm::perspective(glm::radians(45.0f), (float)(width) / (float)height, 0.1f, 256.0f);
@@ -381,20 +311,15 @@ public:
 		// Tessellation control
 		float savedLevel = uboTessControl.tessLevel;
 		if (!displacement)
-		{
 			uboTessControl.tessLevel = 1.0f;
-		}
 
 		memcpy(uniformBuffers.tessControl.mapped, &uboTessControl, sizeof(uboTessControl));
 
 		if (!displacement)
-		{
 			uboTessControl.tessLevel = savedLevel;
-		}
 	}
 
-	void draw()
-	{
+	void draw()	{
 		VulkanExampleBase::prepareFrame();
 
 		// Command buffer to be sumitted to the queue
@@ -407,13 +332,10 @@ public:
 		VulkanExampleBase::submitFrame();
 	}
 
-	void prepare()
-	{
+	void prepare()	{
 		// Check if device supports tessellation shaders
 		if (!deviceFeatures.tessellationShader)
-		{
 			vks::tools::exitFatal("Selected GPU does not support tessellation shaders!", "Feature not supported");
-		}
 
 		VulkanExampleBase::prepare();
 		loadAssets();
@@ -427,72 +349,47 @@ public:
 		prepared = true;
 	}
 
-	virtual void render()
-	{
-		if (!prepared)
-			return;
-		draw();
-	}
-
-	virtual void viewChanged()
-	{
-		updateUniformBuffers();
-	}
-
-	void changeTessellationLevel(float delta)
-	{
+	virtual void	render						()					{ if (prepared) draw();		}
+	virtual void	viewChanged					()					{ updateUniformBuffers();	}
+	void			changeTessellationLevel		(float delta)		{
 		uboTessControl.tessLevel += delta;
 		uboTessControl.tessLevel = fmax(1.0f, fmin(uboTessControl.tessLevel, 32.0f));
 		updateUniformBuffers();
 		updateTextOverlay();
 	}
 
-	void changeTessellationStrength(float delta)
-	{
+	void			changeTessellationStrength	(float delta)		{
 		uboTessEval.tessStrength += delta;
 		uboTessEval.tessStrength = fmax(0.0f, fmin(uboTessEval.tessStrength, 1.0f));
 		updateUniformBuffers();
 		updateTextOverlay();
 	}
 
-	void toggleSplitScreen()
-	{
+	void			toggleSplitScreen			()					{
 		splitScreen = !splitScreen;
 		reBuildCommandBuffers();
 		updateUniformBuffers();
 	}
 
-	void toggleDisplacement()
-	{
+	void			toggleDisplacement			()					{
 		displacement = !displacement;
 		updateUniformBuffers();
 	}
 
-	virtual void keyPressed(uint32_t keyCode)
-	{
-		switch (keyCode)
-		{
-		case KEY_KPADD:
-		case GAMEPAD_BUTTON_R1:
-			changeTessellationStrength(0.025f);
-			break;
-		case KEY_KPSUB:
-		case GAMEPAD_BUTTON_L1:
-			changeTessellationStrength(-0.025f);
-			break;
-		case KEY_D:
-		case GAMEPAD_BUTTON_A:
-			toggleDisplacement();
-			break;
-		case KEY_S:
-		case GAMEPAD_BUTTON_X:
-			toggleSplitScreen();
-			break;
+	virtual void	keyPressed					(uint32_t keyCode)	{
+		switch (keyCode) {
+		case KEY_KPADD			:
+		case GAMEPAD_BUTTON_R1	: changeTessellationStrength( 0.025f);	break;
+		case KEY_KPSUB			:
+		case GAMEPAD_BUTTON_L1	: changeTessellationStrength(-0.025f);	break;
+		case KEY_D				:
+		case GAMEPAD_BUTTON_A	: toggleDisplacement		();			break;
+		case KEY_S				:
+		case GAMEPAD_BUTTON_X	: toggleSplitScreen			();			break;
 		}
 	}
 
-	virtual void getOverlayText(VulkanTextOverlay *textOverlay)
-	{
+	virtual void getOverlayText(VulkanTextOverlay *textOverlay)	{
 		std::stringstream ss;
 		ss << std::setprecision(2) << std::fixed << uboTessEval.tessStrength;
 #if defined(__ANDROID__)

@@ -119,8 +119,7 @@ public:
 		enabledFeatures.pipelineStatisticsQuery = VK_TRUE;
 	}
 
-	~VulkanExample()
-	{
+	~VulkanExample()	{
 		// Clean up used Vulkan resources 
 		// Note : Inherited destructor cleans up resources stored in base class
 		vkDestroyPipeline(device, pipelines.terrain, nullptr);
@@ -150,16 +149,12 @@ public:
 	}
 
 	// Setup pool and buffer for storing pipeline statistics results
-	void setupQueryResultBuffer()
-	{
+	void setupQueryResultBuffer()	{
 		uint32_t bufSize = 2 * sizeof(uint64_t);
 
 		VkMemoryRequirements memReqs;
 		VkMemoryAllocateInfo memAlloc = vks::initializers::memoryAllocateInfo();
-		VkBufferCreateInfo bufferCreateInfo =
-			vks::initializers::bufferCreateInfo(
-				VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
-				bufSize);
+		VkBufferCreateInfo bufferCreateInfo = vks::initializers::bufferCreateInfo(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, bufSize);
 
 		// Results are saved in a host visible buffer for easy access by the application
 		VK_CHECK_RESULT(vkCreateBuffer(device, &bufferCreateInfo, nullptr, &queryResult.buffer));
@@ -182,29 +177,16 @@ public:
 	}
 
 	// Retrieves the results of the pipeline statistics query submitted to the command buffer
-	void getQueryResults()
-	{
+	void getQueryResults()	{
 		// We use vkGetQueryResults to copy the results into a host visible buffer
-		vkGetQueryPoolResults(
-			device,
-			queryPool,
-			0,
-			1,
-			sizeof(pipelineStats),
-			pipelineStats,
-			sizeof(uint64_t),
-			VK_QUERY_RESULT_64_BIT);
+		vkGetQueryPoolResults(device, queryPool, 0, 1, sizeof(pipelineStats), pipelineStats, sizeof(uint64_t), VK_QUERY_RESULT_64_BIT);
 	}
 
-	void loadAssets()
-	{
-		models.skysphere.loadFromFile(getAssetPath() + "models/geosphere.obj", vertexLayout, 1.0f, vulkanDevice, queue);
-
-		textures.skySphere.loadFromFile(getAssetPath() + "textures/skysphere_bc3.ktx", VK_FORMAT_BC3_UNORM_BLOCK, vulkanDevice, queue);
-		// Height data is stored in a one-channel texture
-		textures.heightMap.loadFromFile(getAssetPath() + "textures/terrain_heightmap_r16.ktx", VK_FORMAT_R16_UNORM, vulkanDevice, queue);
-		// Terrain textures are stored in a texture array with layers corresponding to terrain height
-		textures.terrainArray.loadFromFile(getAssetPath() + "textures/terrain_texturearray_bc3.ktx", VK_FORMAT_BC3_UNORM_BLOCK, vulkanDevice, queue);
+	void loadAssets()	{
+		models.skysphere		.loadFromFile(getAssetPath() + "models/geosphere.obj", vertexLayout, 1.0f, vulkanDevice, queue);
+		textures.skySphere		.loadFromFile(getAssetPath() + "textures/skysphere_bc3.ktx", VK_FORMAT_BC3_UNORM_BLOCK, vulkanDevice, queue);
+		textures.heightMap		.loadFromFile(getAssetPath() + "textures/terrain_heightmap_r16.ktx", VK_FORMAT_R16_UNORM, vulkanDevice, queue);				// Height data is stored in a one-channel texture
+		textures.terrainArray	.loadFromFile(getAssetPath() + "textures/terrain_texturearray_bc3.ktx", VK_FORMAT_BC3_UNORM_BLOCK, vulkanDevice, queue);	// Terrain textures are stored in a texture array with layers corresponding to terrain height
 
 		VkSamplerCreateInfo samplerInfo = vks::initializers::samplerCreateInfo();
 
@@ -384,7 +366,6 @@ public:
 		const float wy = 2.0f;
 
 		for (auto x = 0; x < PATCH_SIZE; x++)
-		{
 			for (auto y = 0; y < PATCH_SIZE; y++)
 			{
 				uint32_t index = (x + y * PATCH_SIZE);
@@ -393,7 +374,6 @@ public:
 				vertices[index].pos[2] = y * wy + wy / 2.0f - (float)PATCH_SIZE * wy / 2.0f;
 				vertices[index].uv = glm::vec2((float)x / PATCH_SIZE, (float)y / PATCH_SIZE) * UV_SCALE;
 			}
-		}
 
 		// Calculate normals from height map using a sobel filter
 #if defined(__ANDROID__)
@@ -408,12 +388,8 @@ public:
 				// Get height samples centered around current position
 				float heights[3][3];
 				for (auto hx = -1; hx <= 1; hx++)
-				{
 					for (auto hy = -1; hy <= 1; hy++)
-					{
 						heights[hx+1][hy+1] = heightMap.getHeight(x + hx, y + hy);
-					}
-				}
 
 				// Calcualte the normal
 				glm::vec3 normal;
@@ -455,56 +431,17 @@ public:
 
 		// Create staging buffers
 
-		VK_CHECK_RESULT(vulkanDevice->createBuffer(
-			VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-			vertexBufferSize,
-			&vertexStaging.buffer,
-			&vertexStaging.memory,
-			vertices));
-
-		VK_CHECK_RESULT(vulkanDevice->createBuffer(
-			VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-			indexBufferSize,
-			&indexStaging.buffer,
-			&indexStaging.memory,
-			indices));
-
-		VK_CHECK_RESULT(vulkanDevice->createBuffer(
-			VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
-			VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-			vertexBufferSize,
-			&models.terrain.vertices.buffer,
-			&models.terrain.vertices.memory));
-
-		VK_CHECK_RESULT(vulkanDevice->createBuffer(
-			VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
-			VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-			indexBufferSize,
-			&models.terrain.indices.buffer,
-			&models.terrain.indices.memory));
+		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT	, vertexBufferSize	, &vertexStaging			.buffer, &vertexStaging.memory	, vertices	));
+		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT	, indexBufferSize	, &indexStaging				.buffer, &indexStaging.memory	, indices	));
+		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT	, vertexBufferSize	, &models.terrain.vertices	.buffer, &models.terrain.vertices	.memory	));
+		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT		, indexBufferSize	, &models.terrain.indices	.buffer, &models.terrain.indices	.memory	));
 
 		// Copy from staging buffers
 		VkCommandBuffer copyCmd = VulkanExampleBase::createCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY, true);
 
 		VkBufferCopy copyRegion = {};
-
-		copyRegion.size = vertexBufferSize;
-		vkCmdCopyBuffer(
-			copyCmd,
-			vertexStaging.buffer,
-			models.terrain.vertices.buffer,
-			1,
-			&copyRegion);
-
-		copyRegion.size = indexBufferSize;
-		vkCmdCopyBuffer(
-			copyCmd,
-			indexStaging.buffer,
-			models.terrain.indices.buffer,
-			1,
-			&copyRegion);
+		copyRegion.size = vertexBufferSize	;	vkCmdCopyBuffer(copyCmd, vertexStaging.buffer	, models.terrain.vertices	.buffer, 1, &copyRegion);
+		copyRegion.size = indexBufferSize	;	vkCmdCopyBuffer(copyCmd, indexStaging.buffer	, models.terrain.indices	.buffer, 1, &copyRegion);
 
 		VulkanExampleBase::flushCommandBuffer(copyCmd, queue, true);
 
@@ -542,17 +479,11 @@ public:
 	void setupDescriptorPool()
 	{
 		std::vector<VkDescriptorPoolSize> poolSizes =
-		{
-			vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 3),
-			vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 3)
-		};
+			{	vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 3)
+			,	vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 3)
+			};
 
-		VkDescriptorPoolCreateInfo descriptorPoolInfo =
-			vks::initializers::descriptorPoolCreateInfo(
-				static_cast<uint32_t>(poolSizes.size()),
-				poolSizes.data(),
-				2);
-
+		VkDescriptorPoolCreateInfo descriptorPoolInfo = vks::initializers::descriptorPoolCreateInfo(static_cast<uint32_t>(poolSizes.size()), poolSizes.data(), 2);
 		VK_CHECK_RESULT(vkCreateDescriptorPool(device, &descriptorPoolInfo, nullptr, &descriptorPool));
 	}
 
@@ -564,23 +495,10 @@ public:
 
 		// Terrain
 		setLayoutBindings =
-		{
-			// Binding 0 : Shared Tessellation shader ubo
-			vks::initializers::descriptorSetLayoutBinding(
-				VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 
-				VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT | VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT,
-				0),
-			// Binding 1 : Height map
-			vks::initializers::descriptorSetLayoutBinding(
-				VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-				VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT | VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
-				1),
-			// Binding 3 : Terrain texture array layers
-			vks::initializers::descriptorSetLayoutBinding(
-				VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-				VK_SHADER_STAGE_FRAGMENT_BIT,
-				2),
-		};
+			{	vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT | VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT, 0)											// Binding 0 : Shared Tessellation shader ubo
+			,	vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT | VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 1)	// Binding 1 : Height map
+			,	vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, 2)																							// Binding 3 : Terrain texture array layers
+			};
 
 		descriptorLayout = vks::initializers::descriptorSetLayoutCreateInfo(setLayoutBindings.data(), static_cast<uint32_t>(setLayoutBindings.size()));
 		VK_CHECK_RESULT(vkCreateDescriptorSetLayout(device, &descriptorLayout, nullptr, &descriptorSetLayouts.terrain));
@@ -589,18 +507,9 @@ public:
 
 		// Skysphere
 		setLayoutBindings =
-		{
-			// Binding 0 : Vertex shader ubo
-			vks::initializers::descriptorSetLayoutBinding(
-				VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-				VK_SHADER_STAGE_VERTEX_BIT,
-				0),
-			// Binding 1 : Color map
-			vks::initializers::descriptorSetLayoutBinding(
-				VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-				VK_SHADER_STAGE_FRAGMENT_BIT,
-				1),
-		};
+			{	vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT, 0)				// Binding 0 : Vertex shader ubo
+			,	vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, 1)	// Binding 1 : Color map
+			};
 
 		descriptorLayout = vks::initializers::descriptorSetLayoutCreateInfo(setLayoutBindings.data(), static_cast<uint32_t>(setLayoutBindings.size()));
 		VK_CHECK_RESULT(vkCreateDescriptorSetLayout(device, &descriptorLayout, nullptr, &descriptorSetLayouts.skysphere));
@@ -618,26 +527,10 @@ public:
 		VK_CHECK_RESULT(vkAllocateDescriptorSets(device, &allocInfo, &descriptorSets.terrain));
 
 		writeDescriptorSets =
-		{
-			// Binding 0 : Shared tessellation shader ubo
-			vks::initializers::writeDescriptorSet(
-				descriptorSets.terrain, 
-				VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 
-				0, 
-				&uniformBuffers.terrainTessellation.descriptor),
-			// Binding 1 : Displacement map
-			vks::initializers::writeDescriptorSet(
-				descriptorSets.terrain,
-				VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-				1,
-				&textures.heightMap.descriptor),
-			// Binding 2 : Color map (alpha channel)
-			vks::initializers::writeDescriptorSet(
-				descriptorSets.terrain,
-				VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-				2,
-				&textures.terrainArray.descriptor),
-		};
+			{	vks::initializers::writeDescriptorSet(descriptorSets.terrain, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 0, &uniformBuffers.terrainTessellation.descriptor)		// Binding 0 : Shared tessellation shader ubo
+			,	vks::initializers::writeDescriptorSet(descriptorSets.terrain, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, &textures.heightMap.descriptor)				// Binding 1 : Displacement map
+			,	vks::initializers::writeDescriptorSet(descriptorSets.terrain, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 2, &textures.terrainArray.descriptor)			// Binding 2 : Color map (alpha channel)
+			};
 		vkUpdateDescriptorSets(device, static_cast<uint32_t>(writeDescriptorSets.size()), writeDescriptorSets.data(), 0, NULL);
 
 		// Skysphere
@@ -645,20 +538,9 @@ public:
 		VK_CHECK_RESULT(vkAllocateDescriptorSets(device, &allocInfo, &descriptorSets.skysphere));
 
 		writeDescriptorSets =
-		{
-			// Binding 0 : Vertex shader ubo
-			vks::initializers::writeDescriptorSet(
-				descriptorSets.skysphere,
-				VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-				0,
-				&uniformBuffers.skysphereVertex.descriptor),
-			// Binding 1 : Fragment shader color map
-			vks::initializers::writeDescriptorSet(
-				descriptorSets.skysphere,
-				VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-				1,
-				&textures.skySphere.descriptor),
-		};
+			{	vks::initializers::writeDescriptorSet(descriptorSets.skysphere, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 0, &uniformBuffers.skysphereVertex.descriptor)	// Binding 0 : Vertex shader ubo
+			,	vks::initializers::writeDescriptorSet(descriptorSets.skysphere, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, &textures.skySphere.descriptor)		// Binding 1 : Fragment shader color map
+			};
 		vkUpdateDescriptorSets(device, static_cast<uint32_t>(writeDescriptorSets.size()), writeDescriptorSets.data(), 0, NULL);
 	}
 
@@ -680,8 +562,7 @@ public:
 		VkPipelineDynamicStateCreateInfo dynamicState = vks::initializers::pipelineDynamicStateCreateInfo(dynamicStateEnables.data(), static_cast<uint32_t>(dynamicStateEnables.size()), 0);
 
 		// We render the terrain as a grid of quad patches
-		VkPipelineTessellationStateCreateInfo tessellationState =
-			vks::initializers::pipelineTessellationStateCreateInfo(4);
+		VkPipelineTessellationStateCreateInfo tessellationState = vks::initializers::pipelineTessellationStateCreateInfo(4);
 
 		std::array<VkPipelineShaderStageCreateInfo, 4> shaderStages;
 
@@ -691,12 +572,7 @@ public:
 		shaderStages[2] = loadShader(getAssetPath() + "shaders/terraintessellation/terrain.tesc.spv", VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT);
 		shaderStages[3] = loadShader(getAssetPath() + "shaders/terraintessellation/terrain.tese.spv", VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT);
 
-		VkGraphicsPipelineCreateInfo pipelineCreateInfo =
-			vks::initializers::pipelineCreateInfo(
-				pipelineLayouts.terrain,
-				renderPass,
-				0);
-
+		VkGraphicsPipelineCreateInfo pipelineCreateInfo = vks::initializers::pipelineCreateInfo(pipelineLayouts.terrain, renderPass, 0);
 		pipelineCreateInfo.pVertexInputState = &vertices.inputState;
 		pipelineCreateInfo.pInputAssemblyState = &inputAssemblyState;
 		pipelineCreateInfo.pRasterizationState = &rasterizationState;
@@ -734,19 +610,8 @@ public:
 	// Prepare and initialize uniform buffer containing shader uniforms
 	void prepareUniformBuffers()
 	{
-		// Shared tessellation shader stages uniform buffer
-		VK_CHECK_RESULT(vulkanDevice->createBuffer(
-			VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-			&uniformBuffers.terrainTessellation,
-			sizeof(uboTess)));
-
-		// Skysphere vertex shader uniform buffer
-		VK_CHECK_RESULT(vulkanDevice->createBuffer(
-			VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-			&uniformBuffers.skysphereVertex,
-			sizeof(uboVS)));
+		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBuffers.terrainTessellation, sizeof(uboTess)));	// Shared tessellation shader stages uniform buffer
+		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBuffers.skysphereVertex, sizeof(uboVS)));		// Skysphere vertex shader uniform buffer
 
 		// Map persistent
 		VK_CHECK_RESULT(uniformBuffers.terrainTessellation.map());
@@ -777,9 +642,7 @@ public:
 		memcpy(uniformBuffers.terrainTessellation.mapped, &uboTess, sizeof(uboTess));
 
 		if (!tessellation)
-		{
 			uboTess.tessellationFactor = savedFactor;
-		}
 
 		// Skysphere vertex shader
 		uboVS.mvp = camera.matrices.perspective * glm::mat4(glm::mat3(camera.matrices.view));
@@ -807,9 +670,7 @@ public:
 	{
 		// Check if device supports tessellation shaders
 		if (!deviceFeatures.tessellationShader)
-		{
 			vks::tools::exitFatal("Selected GPU does not support tessellation shaders!", "Feature not supported");
-		}
 
 		VulkanExampleBase::prepare();
 		loadAssets();
@@ -827,9 +688,8 @@ public:
 
 	virtual void render()
 	{
-		if (!prepared)
-			return;
-		draw();
+		if (prepared)
+			draw();
 	}
 
 	virtual void viewChanged()
