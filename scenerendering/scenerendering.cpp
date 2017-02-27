@@ -81,8 +81,7 @@ private:
 
 	// We will be using separate descriptor sets (and bindings)
 	// for material and scene related uniforms
-	struct
-	{
+	struct {
 		VkDescriptorSetLayout										material;
 		VkDescriptorSetLayout										scene;
 	}															descriptorSetLayouts;
@@ -198,8 +197,7 @@ private:
 		VK_CHECK_RESULT(vkAllocateDescriptorSets(vulkanDevice->logicalDevice, &allocInfo, &descriptorSetScene));
 
 		std::vector<VkWriteDescriptorSet>								writeDescriptorSets;
-		// Binding 0 : Vertex shader uniform buffer
-		writeDescriptorSets.push_back(vks::initializers::writeDescriptorSet(descriptorSetScene, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 0, &uniformBuffer.descriptor));
+		writeDescriptorSets.push_back(vks::initializers::writeDescriptorSet(descriptorSetScene, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 0, &uniformBuffer.descriptor));	// Binding 0 : Vertex shader uniform buffer
 
 		vkUpdateDescriptorSets(vulkanDevice->logicalDevice, static_cast<uint32_t>(writeDescriptorSets.size()), writeDescriptorSets.data(), 0, NULL);
 	}
