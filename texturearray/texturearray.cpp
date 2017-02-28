@@ -12,8 +12,8 @@
 
 // Vertex layout for this example
 struct Vertex {
-	float														pos[3];
-	float														uv[2];
+	float														pos	[3];
+	float														uv	[2];
 };
 
 class VulkanExample : public VulkanExampleBase
