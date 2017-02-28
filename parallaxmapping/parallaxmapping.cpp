@@ -16,21 +16,21 @@
 class VulkanExample : public VulkanExampleBase
 {
 public:
-	bool splitScreen = false;
+	bool														splitScreen				= false;
 
 	struct {
-		vks::Texture2D													colorMap;
-		vks::Texture2D													normalHeightMap;	// Normals and height are combined in one texture (height = alpha channel)
-	}																textures;
+		vks::Texture2D												colorMap;
+		vks::Texture2D												normalHeightMap;	// Normals and height are combined in one texture (height = alpha channel)
+	}															textures;
 
 	struct {
-		VkPipelineVertexInputStateCreateInfo							inputState;
-		std::vector<VkVertexInputBindingDescription>					bindingDescriptions;
-		std::vector<VkVertexInputAttributeDescription>					attributeDescriptions;
-	}																vertices;
+		VkPipelineVertexInputStateCreateInfo						inputState;
+		std::vector<VkVertexInputBindingDescription>				bindingDescriptions;
+		std::vector<VkVertexInputAttributeDescription>				attributeDescriptions;
+	}															vertices;
 
 	// Vertex layout for the models
-	vks::VertexLayout												vertexLayout			= vks::VertexLayout(
+	vks::VertexLayout											vertexLayout			= vks::VertexLayout(
 		{	vks::VERTEX_COMPONENT_POSITION
 		,	vks::VERTEX_COMPONENT_UV
 		,	vks::VERTEX_COMPONENT_NORMAL
@@ -39,13 +39,13 @@ public:
 		});
 
 	struct {
-		vks::Model														quad;
-	}																models;
+		vks::Model													quad;
+	}															models;
 
 	struct {
-		vks::Buffer														vertexShader;
-		vks::Buffer														fragmentShader;
-	}																uniformBuffers;
+		vks::Buffer													vertexShader;
+		vks::Buffer													fragmentShader;
+	}															uniformBuffers;
 
 	struct {
 		struct {

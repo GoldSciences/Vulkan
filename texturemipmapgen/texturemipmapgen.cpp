@@ -510,7 +510,7 @@ public:
 		setupDescriptorPool();
 		setupDescriptorSet();
 		buildCommandBuffers();
-		prepared = true;
+		prepared													= true;
 	}
 
 	virtual void											viewChanged					()									{ updateUniformBuffers(); }

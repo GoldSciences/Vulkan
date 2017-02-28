@@ -542,7 +542,7 @@ public:
 		setupDescriptorSet();
 		prepareCompute();
 		buildCommandBuffers(); 
-		prepared = true;
+		prepared													= true;
 	}
 
 	virtual void render()	{

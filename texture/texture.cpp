@@ -608,7 +608,7 @@ public:
 		setupDescriptorPool();
 		setupDescriptorSet();
 		buildCommandBuffers();
-		prepared = true;
+		prepared													= true;
 	}
 
 	virtual void	render			()									{ if (prepared) draw(); }

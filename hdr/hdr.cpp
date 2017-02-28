@@ -877,7 +877,7 @@ public:
 		setupDescriptorSets();
 		buildCommandBuffers();
 		buildDeferredCommandBuffer();
-		prepared = true;
+		prepared													= true;
 	}
 
 	virtual void	render			()									{ if (prepared) draw(); }

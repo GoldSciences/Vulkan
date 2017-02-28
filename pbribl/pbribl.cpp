@@ -477,7 +477,7 @@ public:
 		preparePipelines();
 		setupDescriptorSets();
 		buildCommandBuffers();
-		prepared = true;
+		prepared													= true;
 	}
 
 	virtual void render()

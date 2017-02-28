@@ -17,15 +17,15 @@
 class VulkanExample : public VulkanExampleBase
 {
 public:
-	bool															blur									= true;
-	bool															displayTexture							= false;
+	bool														blur									= true;
+	bool														displayTexture							= false;
 
 	struct {
-		vks::Texture2D													gradient;
-	}																textures;
+		vks::Texture2D												gradient;
+	}															textures;
 
 	// Vertex layout for the models
-	vks::VertexLayout												vertexLayout							= vks::VertexLayout(
+	vks::VertexLayout											vertexLayout							= vks::VertexLayout(
 	{	vks::VERTEX_COMPONENT_POSITION
 	,	vks::VERTEX_COMPONENT_UV
 	,	vks::VERTEX_COMPONENT_COLOR

@@ -834,7 +834,7 @@ public:
 		setupDescriptorSet();
 		buildCommandBuffers();
 		buildDeferredCommandBuffer();
-		prepared = true;
+		prepared													= true;
 	}
 
 	virtual void render()

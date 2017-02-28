@@ -804,7 +804,7 @@ public:
 		buildCommandBuffers();
 		buildOffscreenCommandBuffer();
 		updateTextOverlay();
-		prepared = true;
+		prepared													= true;
 	}
 
 	virtual void	render			()									{ if (prepared) draw(); }

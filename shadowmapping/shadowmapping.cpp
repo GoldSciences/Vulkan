@@ -35,7 +35,7 @@ public:
 	float														zFar								= 96.0f;
 
 	// Depth bias (and slope) are used to avoid shadowing artefacts
-	float													depthBiasConstant					= 1.25f;		// Constant depth bias factor (always applied)
+	float														depthBiasConstant					= 1.25f;		// Constant depth bias factor (always applied)
 	float														depthBiasSlope						= 1.75f;		// Slope depth bias factor, applied depending on polygon's slope
 
 	glm::vec3													lightPos							= glm::vec3();
