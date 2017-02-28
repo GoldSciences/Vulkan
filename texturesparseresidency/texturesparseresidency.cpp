@@ -268,11 +268,11 @@ public:
 		sparseProperties.resize(sparsePropertiesCount);
 		vkGetPhysicalDeviceSparseImageFormatProperties(physicalDevice, format, VK_IMAGE_TYPE_2D, VK_SAMPLE_COUNT_1_BIT, VK_IMAGE_USAGE_SAMPLED_BIT, VK_IMAGE_TILING_OPTIMAL, &sparsePropertiesCount, sparseProperties.data());
 
-		std::cout << "Sparse image format properties: " << sparsePropertiesCount << std::endl;
+		std::cout << "Sparse image format properties: " << sparsePropertiesCount		<< std::endl;
 		for (auto props : sparseProperties) {
-			std::cout << "\t Image granularity: w = " << props.imageGranularity.width << " h = " << props.imageGranularity.height << " d = " << props.imageGranularity.depth << std::endl;
-			std::cout << "\t Aspect mask: " << props.aspectMask << std::endl;
-			std::cout << "\t Flags: " << props.flags << std::endl;
+			std::cout << "\t Image granularity: w = "		<< props.imageGranularity.width << " h = " << props.imageGranularity.height << " d = " << props.imageGranularity.depth << std::endl;
+			std::cout << "\t Aspect mask: "					<< props.aspectMask				<< std::endl;
+			std::cout << "\t Flags: "						<< props.flags					<< std::endl;
 		}
 
 		// Create sparse image
@@ -296,9 +296,9 @@ public:
 		// Sparse image memory requirement counts
 		vkGetImageMemoryRequirements(device, texture.image, &sparseImageMemoryReqs);
 
-		std::cout << "Image memory requirements:" << std::endl;
-		std::cout << "\t Size: "		<< sparseImageMemoryReqs.size		<< std::endl;
-		std::cout << "\t Alignment: "	<< sparseImageMemoryReqs.alignment	<< std::endl;
+		std::cout << "Image memory requirements:"	<< std::endl;
+		std::cout << "\t Size: "					<< sparseImageMemoryReqs.size		<< std::endl;
+		std::cout << "\t Alignment: "				<< sparseImageMemoryReqs.alignment	<< std::endl;
 
 		// Check requested image size against hardware sparse limit
 		if (sparseImageMemoryReqs.size > vulkanDevice->properties.limits.sparseAddressSpaceSize) {
@@ -341,8 +341,7 @@ public:
 				break;
 			}
 
-		if (!colorAspectFound)
-		{
+		if (!colorAspectFound) {
 			std::cout << "Error: Could not find sparse image memory requirements for color aspect bit!" << std::endl;
 			return;
 		}
@@ -408,13 +407,13 @@ public:
 							}
 
 							index++;
-						}
-			}
+						}	
+			}	// for mipLevel
 
 			// Check if format has one mip tail per layer
 			if ((!singleMipTail) && (sparseMemoryReq.imageMipTailFirstLod < texture.mipLevels)) {
 				// Allocate memory for the mip tail
-				VkMemoryAllocateInfo											allocInfo = vks::initializers::memoryAllocateInfo();
+				VkMemoryAllocateInfo											allocInfo								= vks::initializers::memoryAllocateInfo();
 				allocInfo.allocationSize									= sparseMemoryReq.imageMipTailSize;
 				allocInfo.memoryTypeIndex									= memoryTypeIndex;
 
@@ -431,14 +430,14 @@ public:
 			}
 		} // end layers and mips
 
-		std::cout << "Texture info:" << std::endl;
-		std::cout << "\tDim: " << texture.width << " x " << texture.height << std::endl;
-		std::cout << "\tVirtual pages: " << texture.pages.size() << std::endl;
+		std::cout << "Texture info:"		<< std::endl;
+		std::cout << "\tDim: "				<< texture.width		<< " x " << texture.height << std::endl;
+		std::cout << "\tVirtual pages: "	<< texture.pages.size() << std::endl;
 
 		// Check if format has one mip tail for all layers
 		if ((sparseMemoryReq.formatProperties.flags & VK_SPARSE_IMAGE_FORMAT_SINGLE_MIPTAIL_BIT) && (sparseMemoryReq.imageMipTailFirstLod < texture.mipLevels)) {
 			// Allocate memory for the mip tail
-			VkMemoryAllocateInfo											allocInfo									= vks::initializers::memoryAllocateInfo();
+			VkMemoryAllocateInfo											allocInfo								= vks::initializers::memoryAllocateInfo();
 			allocInfo.allocationSize									= sparseMemoryReq.imageMipTailSize;
 			allocInfo.memoryTypeIndex									= memoryTypeIndex;
 
@@ -455,7 +454,7 @@ public:
 		}
 
 		// Create signal semaphore for sparse binding
-		VkSemaphoreCreateInfo											semaphoreCreateInfo							= vks::initializers::semaphoreCreateInfo();
+		VkSemaphoreCreateInfo											semaphoreCreateInfo						= vks::initializers::semaphoreCreateInfo();
 		VK_CHECK_RESULT(vkCreateSemaphore(device, &semaphoreCreateInfo, nullptr, &bindSparseSemaphore));
 
 		// Prepare bind sparse info for reuse in queue submission
@@ -468,7 +467,7 @@ public:
 		vkQueueWaitIdle(queue);
 
 		// Create sampler
-		VkSamplerCreateInfo												sampler										= vks::initializers::samplerCreateInfo();
+		VkSamplerCreateInfo												sampler									= vks::initializers::samplerCreateInfo();
 		sampler.magFilter											= VK_FILTER_LINEAR;
 		sampler.minFilter											= VK_FILTER_LINEAR;
 		sampler.mipmapMode											= VK_SAMPLER_MIPMAP_MODE_LINEAR;
@@ -486,7 +485,7 @@ public:
 		VK_CHECK_RESULT(vkCreateSampler(device, &sampler, nullptr, &texture.sampler));
 
 		// Create image view
-		VkImageViewCreateInfo											view										= vks::initializers::imageViewCreateInfo();
+		VkImageViewCreateInfo											view									= vks::initializers::imageViewCreateInfo();
 		view.image													= VK_NULL_HANDLE;
 		view.viewType												= VK_IMAGE_VIEW_TYPE_2D;
 		view.format													= format;
@@ -584,7 +583,7 @@ public:
 
 	// Generate a terrain quad patch for feeding to the tessellation control shader
 	void														generateTerrain							()																			{
-		heightMap												= new vks::HeightMap(vulkanDevice, queue);
+		heightMap													= new vks::HeightMap(vulkanDevice, queue);
 #if defined(__ANDROID__)
 		heightMap->loadFromFile(getAssetPath() + "textures/terrain_heightmap_r16.ktx", 128, glm::vec3(2.0f, 48.0f, 2.0f), vks::HeightMap::topologyTriangles, androidApp->activity->assetManager);
 #else
