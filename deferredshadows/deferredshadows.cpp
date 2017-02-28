@@ -15,18 +15,18 @@
 
 // Shadowmap properties
 #if defined(__ANDROID__)
-#define SHADOWMAP_DIM 1024
+#define SHADOWMAP_DIM		1024
 #else
-#define SHADOWMAP_DIM 2048
+#define SHADOWMAP_DIM		2048
 #endif
 // 16 bits of depth is enough for such a small scene
-#define SHADOWMAP_FORMAT VK_FORMAT_D32_SFLOAT_S8_UINT
+#define SHADOWMAP_FORMAT	VK_FORMAT_D32_SFLOAT_S8_UINT
 
 #if defined(__ANDROID__)
 // Use max. screen dimension as deferred framebuffer size
-#define FB_DIM std::max(width,height) 
+#define FB_DIM				std::max(width,height) 
 #else
-#define FB_DIM 2048
+#define FB_DIM				2048
 #endif
 
 // Must match the LIGHT_COUNT define in the shadow and deferred shaders
