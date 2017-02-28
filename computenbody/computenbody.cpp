@@ -9,7 +9,7 @@
 #include <random>
 
 #define VERTEX_BUFFER_BIND_ID		0
-#define ENABLE_VALIDATION false
+#define ENABLE_VALIDATION			false
 #if defined(__ANDROID__)
 // Lower particle count on Android for performance reasons
 #define PARTICLES_PER_ATTRACTOR		3 * 1024
