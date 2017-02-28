@@ -90,12 +90,12 @@ public:
 	}														pipelineLayouts;
 
 	struct {
-		VkDescriptorSet											model;
-		VkDescriptorSet											floor;
+		VkDescriptorSet											model										= VK_NULL_HANDLE;
+		VkDescriptorSet											floor										= VK_NULL_HANDLE;
 	}														descriptorSets;
 
-	VkDescriptorSet											descriptorSet;
-	VkDescriptorSetLayout									descriptorSetLayout;
+	VkDescriptorSet											descriptorSet								= VK_NULL_HANDLE;
+	VkDescriptorSetLayout									descriptorSetLayout							= VK_NULL_HANDLE;
 
 	// Framebuffer for offscreen rendering
 	struct FrameBufferAttachment {
