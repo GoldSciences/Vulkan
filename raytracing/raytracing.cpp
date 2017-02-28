@@ -18,95 +18,89 @@
 class VulkanExample : public VulkanExampleBase
 {
 public:
-	vks::Texture textureComputeTarget;
+	vks::Texture												textureComputeTarget;
 
 	// Resources for the graphics part of the example
 	struct {
-		VkDescriptorSetLayout descriptorSetLayout;	// Raytraced image display shader binding layout
-		VkDescriptorSet descriptorSetPreCompute;	// Raytraced image display shader bindings before compute shader image manipulation
-		VkDescriptorSet descriptorSet;				// Raytraced image display shader bindings after compute shader image manipulation
-		VkPipeline pipeline;						// Raytraced image display pipeline
-		VkPipelineLayout pipelineLayout;			// Layout of the graphics pipeline
-	} graphics;
+		VkDescriptorSetLayout										descriptorSetLayout						= VK_NULL_HANDLE;	// Raytraced image display shader binding layout
+		VkDescriptorSet												descriptorSetPreCompute					= VK_NULL_HANDLE;	// Raytraced image display shader bindings before compute shader image manipulation
+		VkDescriptorSet												descriptorSet							= VK_NULL_HANDLE;	// Raytraced image display shader bindings after compute shader image manipulation
+		VkPipeline													pipeline								= VK_NULL_HANDLE;	// Raytraced image display pipeline
+		VkPipelineLayout											pipelineLayout							= VK_NULL_HANDLE;	// Layout of the graphics pipeline
+	}															graphics;
 
 	// Resources for the compute part of the example
 	struct {
 		struct {
-			vks::Buffer spheres;						// (Shader) storage buffer object with scene spheres
-			vks::Buffer planes;						// (Shader) storage buffer object with scene planes
-		} storageBuffers;
-		vks::Buffer uniformBuffer;					// Uniform buffer object containing scene data
-		VkQueue queue;								// Separate queue for compute commands (queue family may differ from the one used for graphics)
-		VkCommandPool commandPool;					// Use a separate command pool (queue family may differ from the one used for graphics)
-		VkCommandBuffer commandBuffer;				// Command buffer storing the dispatch commands and barriers
-		VkFence fence;								// Synchronization fence to avoid rewriting compute CB if still in use
-		VkDescriptorSetLayout descriptorSetLayout;	// Compute shader binding layout
-		VkDescriptorSet descriptorSet;				// Compute shader bindings
-		VkPipelineLayout pipelineLayout;			// Layout of the compute pipeline
-		VkPipeline pipeline;						// Compute raytracing pipeline
-		struct UBOCompute {							// Compute shader uniform block object
-			glm::vec3 lightPos;
-			float aspectRatio;						// Aspect ratio of the viewport
-			glm::vec4 fogColor = glm::vec4(0.0f);
+			vks::Buffer													spheres;				// (Shader) storage buffer object with scene spheres
+			vks::Buffer													planes;					// (Shader) storage buffer object with scene planes
+		}															storageBuffers;				//
+		vks::Buffer													uniformBuffer;				// Uniform buffer object containing scene data
+		VkQueue														queue;						// Separate queue for compute commands (queue family may differ from the one used for graphics)
+		VkCommandPool												commandPool;				// Use a separate command pool (queue family may differ from the one used for graphics)
+		VkCommandBuffer												commandBuffer;				// Command buffer storing the dispatch commands and barriers
+		VkFence														fence;						// Synchronization fence to avoid rewriting compute CB if still in use
+		VkDescriptorSetLayout										descriptorSetLayout;		// Compute shader binding layout
+		VkDescriptorSet												descriptorSet;				// Compute shader bindings
+		VkPipelineLayout											pipelineLayout;				// Layout of the compute pipeline
+		VkPipeline													pipeline;					// Compute raytracing pipeline
+		struct UBOCompute {		// Compute shader uniform block object
+			glm::vec3													lightPos;
+			float														aspectRatio;		// Aspect ratio of the viewport
+			glm::vec4													fogColor									= glm::vec4(0.0f);
 			struct {
-				glm::vec3 pos = glm::vec3(0.0f, 0.0f, 4.0f);
-				glm::vec3 lookat = glm::vec3(0.0f, 0.5f, 0.0f);
-				float fov = 10.0f;
-			} camera;
-		} ubo;
-	} compute;
+				glm::vec3													pos											= glm::vec3(0.0f, 0.0f, 4.0f);
+				glm::vec3													lookat										= glm::vec3(0.0f, 0.5f, 0.0f);
+				float														fov = 10.0f;
+			}															camera;
+		}															ubo;
+	}															compute;
 
 	// SSBO sphere declaration 
 	struct Sphere {									// Shader uses std140 layout (so we only use vec4 instead of vec3)
-		glm::vec3 pos;								
-		float radius;
-		glm::vec3 diffuse;
-		float specular;
-		uint32_t id;								// Id used to identify sphere for raytracing
-		glm::ivec3 _pad;
+		glm::vec3													pos;								
+		float														radius;
+		glm::vec3													diffuse;
+		float														specular;
+		uint32_t													id;								// Id used to identify sphere for raytracing
+		glm::ivec3													_pad;
 	};
 
 	// SSBO plane declaration
 	struct Plane {
-		glm::vec3 normal;
-		float distance;
-		glm::vec3 diffuse;
-		float specular;
-		uint32_t id;
-		glm::ivec3 _pad;
+		glm::vec3													normal;
+		float														distance;
+		glm::vec3													diffuse;
+		float														specular;
+		uint32_t													id;
+		glm::ivec3													_pad;
 	};
 
-	VulkanExample() : VulkanExampleBase(ENABLE_VALIDATION)
-	{
-		title = "Vulkan Example - Compute shader ray tracing";
-		enableTextOverlay = true;
-		compute.ubo.aspectRatio = (float)width / (float)height;
-		timerSpeed *= 0.25f;
+																VulkanExample							() : VulkanExampleBase(ENABLE_VALIDATION)								{
+		title														= "Vulkan Example - Compute shader ray tracing";
+		enableTextOverlay											= true;
+		compute.ubo.aspectRatio										= (float)width / (float)height;
+		timerSpeed													*= 0.25f;
 
-		camera.type = Camera::CameraType::lookat;
-		camera.setPerspective(60.0f, (float)width / (float)height, 0.1f, 512.0f);
-		camera.setRotation(glm::vec3(0.0f, 0.0f, 0.0f));
-		camera.setTranslation(glm::vec3(0.0f, 0.0f, -4.0f));
-		camera.rotationSpeed = 0.0f;
-		camera.movementSpeed = 2.5f;
+		camera.type													= Camera::CameraType::lookat;
+		camera.setPerspective	(60.0f, (float)width / (float)height, 0.1f, 512.0f);
+		camera.setRotation		(glm::vec3(0.0f, 0.0f, 0.0f));
+		camera.setTranslation	(glm::vec3(0.0f, 0.0f, -4.0f));
+		camera.rotationSpeed										= 0.0f;
+		camera.movementSpeed										= 2.5f;
 	}
 
-	~VulkanExample()
-	{
-		// Graphics
-		vkDestroyPipeline(device, graphics.pipeline, nullptr);
-		vkDestroyPipelineLayout(device, graphics.pipelineLayout, nullptr);
-		vkDestroyDescriptorSetLayout(device, graphics.descriptorSetLayout, nullptr);
+																~VulkanExample							()																		{
+		
+		vkDestroyPipeline				(device, graphics	.pipeline, nullptr);	vkDestroyPipelineLayout(device, graphics.pipelineLayout, nullptr);	vkDestroyDescriptorSetLayout	(device, graphics.descriptorSetLayout	, nullptr);	// Graphics
+		vkDestroyPipeline				(device, compute	.pipeline, nullptr);	vkDestroyPipelineLayout(device, compute	.pipelineLayout, nullptr);	vkDestroyDescriptorSetLayout	(device, compute.descriptorSetLayout	, nullptr);	// Compute
 
-		// Compute
-		vkDestroyPipeline(device, compute.pipeline, nullptr);
-		vkDestroyPipelineLayout(device, compute.pipelineLayout, nullptr);
-		vkDestroyDescriptorSetLayout(device, compute.descriptorSetLayout, nullptr);
-		vkDestroyFence(device, compute.fence, nullptr);
-		vkDestroyCommandPool(device, compute.commandPool, nullptr);
-		compute.uniformBuffer.destroy();
-		compute.storageBuffers.spheres.destroy();
-		compute.storageBuffers.planes.destroy();
+		vkDestroyFence					(device, compute.fence		, nullptr);
+		vkDestroyCommandPool			(device, compute.commandPool, nullptr);
+
+		compute.uniformBuffer			.destroy();
+		compute.storageBuffers.spheres	.destroy();
+		compute.storageBuffers.planes	.destroy();
 
 		textureComputeTarget.destroy();
 	}

@@ -593,8 +593,7 @@ public:
 	void														setupFrameBuffer						()																{
 		// Create a frame buffer for every image in the swapchain
 		frameBuffers.resize(swapChain.imageCount);
-		for (size_t i = 0; i < frameBuffers.size(); i++)
-		{
+		for (size_t i = 0; i < frameBuffers.size(); i++) {
 			std::array<VkImageView, 2>										attachments;										
 			attachments[0]												= swapChain.buffers[i].view;									// Color attachment is the view of the swapchain image			
 			attachments[1]												= depthStencil.view;											// Depth/Stencil attachment is the same for all frame buffers			
@@ -724,8 +723,7 @@ public:
 #else
 		std::ifstream													is(filename, std::ios::binary | std::ios::in | std::ios::ate);
 
-		if (is.is_open())
-		{
+		if (is.is_open()) {
 			shaderSize													= (size_t)is.tellg();
 			is.seekg(0, std::ios::beg);
 			// Copy file contents into a buffer
@@ -735,8 +733,7 @@ public:
 			assert(shaderSize > 0);
 		}
 #endif
-		if (shaderCode)
-		{
+		if (shaderCode) {
 			// Create a new shader module that will be used for pipeline creation
 			VkShaderModuleCreateInfo										moduleCreateInfo{};
 			moduleCreateInfo.sType										= VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
@@ -750,8 +747,7 @@ public:
 
 			return shaderModule;
 		}
-		else
-		{
+		else {
 			std::cerr << "Error: Could not open shader file \"" << filename << "\"" << std::endl;
 			return VK_NULL_HANDLE;
 		}

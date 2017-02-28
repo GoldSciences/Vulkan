@@ -71,36 +71,35 @@ public:
 	bool														visible							= true;
 
 																TextOverlay
-	(	vks::VulkanDevice								* vulkanDevice
-	,	VkQueue											queue
-	,	std::vector<VkFramebuffer>						& framebuffers
-	,	VkFormat										colorformat
-	,	VkFormat										depthformat
-	,	uint32_t										* framebufferwidth
-	,	uint32_t										* framebufferheight
-	,	std::vector<VkPipelineShaderStageCreateInfo>	shaderstages
-	)
+		(	vks::VulkanDevice								* vulkanDevice
+		,	VkQueue											queue
+		,	std::vector<VkFramebuffer>						& framebuffers
+		,	VkFormat										colorformat
+		,	VkFormat										depthformat
+		,	uint32_t										* framebufferwidth
+		,	uint32_t										* framebufferheight
+		,	std::vector<VkPipelineShaderStageCreateInfo>	shaderstages
+		)
 	{
-		this->vulkanDevice			= vulkanDevice;
-		this->queue					= queue;
-		this->colorFormat			= colorformat;
-		this->depthFormat			= depthformat;
-		this->shaderStages			= shaderstages;
-		this->frameBufferWidth		= framebufferwidth;
-		this->frameBufferHeight		= framebufferheight;
+		this->vulkanDevice											= vulkanDevice;
+		this->queue													= queue;
+		this->colorFormat											= colorformat;
+		this->depthFormat											= depthformat;
+		this->shaderStages											= shaderstages;
+		this->frameBufferWidth										= framebufferwidth;
+		this->frameBufferHeight										= framebufferheight;
 
 		this->frameBuffers.resize(framebuffers.size());
 		for (uint32_t i = 0; i < framebuffers.size(); i++)
-			this->frameBuffers[i]		= &framebuffers[i];
+			this->frameBuffers[i]										= &framebuffers[i];
 
 		cmdBuffers.resize(framebuffers.size());
-		prepareResources();
-		prepareRenderPass();
-		preparePipeline();
+		prepareResources	();
+		prepareRenderPass	();
+		preparePipeline		();
 	}
 
-																~TextOverlay					()
-	{
+																~TextOverlay					()													{
 		// Free up all Vulkan resources requested by the text overlay
 		vkDestroySampler					(vulkanDevice->logicalDevice, sampler				, nullptr);
 		vkDestroyImage						(vulkanDevice->logicalDevice, image					, nullptr);
@@ -119,8 +118,7 @@ public:
 
 	// Prepare all vulkan resources required to render the font
 	// The text overlay uses separate resources for descriptors (pool, sets, layouts), pipelines and command buffers
-	void														prepareResources				()
-	{
+	void														prepareResources				()													{
 		static unsigned char											font24pixels[STB_FONT_HEIGHT][STB_FONT_WIDTH];
 		STB_FONT_NAME(stbFontData, font24pixels, STB_FONT_HEIGHT);
 
@@ -300,8 +298,7 @@ public:
 	}
 
 	// Prepare a separate pipeline for the font rendering decoupled from the main application
-	void														preparePipeline				()
-	{
+	void														preparePipeline				()														{
 		VkPipelineInputAssemblyStateCreateInfo							inputAssemblyState				= vks::initializers::pipelineInputAssemblyStateCreateInfo(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP, 0, VK_FALSE);
 		VkPipelineRasterizationStateCreateInfo							rasterizationState				= vks::initializers::pipelineRasterizationStateCreateInfo(VK_POLYGON_MODE_FILL, VK_CULL_MODE_BACK_BIT, VK_FRONT_FACE_CLOCKWISE, 0);
 
@@ -352,8 +349,7 @@ public:
 	}
 
 	// Prepare a separate render pass for rendering the text as an overlay
-	void														prepareRenderPass			()
-	{
+	void														prepareRenderPass			()														{
 		VkAttachmentDescription											attachments[2]					= {};
 
 		// Color attachment
@@ -432,16 +428,14 @@ public:
 	}
 
 	// Map buffer 
-	void														beginTextUpdate				()
-	{
+	void														beginTextUpdate				()														{
 		VK_CHECK_RESULT(vkMapMemory(vulkanDevice->logicalDevice, memory, 0, VK_WHOLE_SIZE, 0, (void **)&mapped));
 		numLetters													= 0;
 	}
 
 	// Add text to the current buffer
 	// todo : drop shadow? color attribute?
-	void														addText						(std::string text, float x, float y, TextAlign align)
-	{
+	void														addText						(std::string text, float x, float y, TextAlign align)	{
 		assert(mapped != nullptr);
 
 		const float														charW							= 1.5f / *frameBufferWidth;
@@ -501,16 +495,14 @@ public:
 	}
 
 	// Unmap buffer and update command buffers
-	void														endTextUpdate				()
-	{
+	void														endTextUpdate				()														{
 		vkUnmapMemory(vulkanDevice->logicalDevice, memory);
 		mapped														= nullptr;
 		updateCommandBuffers();
 	}
 
 	// Needs to be called by the application
-	void														updateCommandBuffers		()
-	{
+	void														updateCommandBuffers		()														{
 		VkCommandBufferBeginInfo										cmdBufInfo						= vks::initializers::commandBufferBeginInfo();
 
 		VkClearValue													clearValues[2];
@@ -555,8 +547,7 @@ public:
 
 	// Submit the text command buffers to a queue
 	// Does a queue wait idle
-	void														submit						(VkQueue queue_, uint32_t bufferindex)
-	{
+	void														submit						(VkQueue queue_, uint32_t bufferindex)					{
 		if (!visible)
 			return;
 
@@ -587,17 +578,17 @@ public:
 	struct {
 		vks::Texture2D												background;
 		vks::Texture2D												cube;
-	} textures;
+	}															textures;
 
 	struct {
 		vks::Model													cube;
-	} models;
+	}															models;
 
 	struct {
 		VkPipelineVertexInputStateCreateInfo						inputState;
 		std::vector<VkVertexInputBindingDescription>				bindingDescriptions;
 		std::vector<VkVertexInputAttributeDescription>				attributeDescriptions;
-	} vertices;
+	}															vertices;
 
 	vks::Buffer													uniformBuffer;
 
@@ -605,12 +596,12 @@ public:
 		glm::mat4													projection;
 		glm::mat4													model;
 		glm::vec4													lightPos					= glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
-	} uboVS;
+	}															uboVS;
 
 	struct {
 		VkPipeline													solid;
 		VkPipeline													background;
-	} pipelines;
+	}															pipelines;
 
 	VkPipelineLayout											pipelineLayout;
 	VkDescriptorSetLayout										descriptorSetLayout;
@@ -618,7 +609,7 @@ public:
 	struct {
 		VkDescriptorSet												background;
 		VkDescriptorSet												cube;
-	} descriptorSets;
+	}															descriptorSets;
 
 
 																VulkanExample					()								: VulkanExampleBase(ENABLE_VALIDATION)	{
@@ -879,8 +870,7 @@ public:
 		memcpy(uniformBuffer.mapped, &uboVS, sizeof(uboVS));
 	}
 
-	void														prepareTextOverlay				()
-	{
+	void														prepareTextOverlay				()								{
 		// Load the text rendering shaders		
 		std::vector<VkPipelineShaderStageCreateInfo>					shaderStages;
 		shaderStages.push_back(loadShader(getAssetPath() + "shaders/textoverlay/text.vert.spv", VK_SHADER_STAGE_VERTEX_BIT));
@@ -890,8 +880,7 @@ public:
 		updateTextOverlay();
 	}
 
-	void														draw							()
-	{
+	void														draw							()								{
 		VulkanExampleBase::prepareFrame();
 
 		// Command buffer to be sumitted to the queue
