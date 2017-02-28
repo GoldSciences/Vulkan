@@ -35,7 +35,6 @@ namespace vks
 			,	void						* pUserData
 			)
 		{
-			
 			std::string									prefix("");												// Select prefix depending on flags passed to the callback. Note that multiple flags may be set for a single validation message
 			
 			if (flags & VK_DEBUG_REPORT_ERROR_BIT_EXT)					{ prefix += "ERROR:"		; }		// Error that may result in undefined behaviour
@@ -94,8 +93,7 @@ namespace vks
 
 		void									setObjectName					(VkDevice device, uint64_t object, VkDebugReportObjectTypeEXT objectType, const char *name)	{
 			// Check for valid function pointer (may not be present if not running in a debugging application)
-			if (pfnDebugMarkerSetObjectName)
-			{
+			if (pfnDebugMarkerSetObjectName) {
 				VkDebugMarkerObjectNameInfoEXT			nameInfo = {};
 				nameInfo.sType						= VK_STRUCTURE_TYPE_DEBUG_MARKER_OBJECT_NAME_INFO_EXT;
 				nameInfo.objectType					= objectType;
@@ -108,8 +106,7 @@ namespace vks
 		void									setObjectTag					(VkDevice device, uint64_t object, VkDebugReportObjectTypeEXT objectType, uint64_t name, size_t tagSize, const void* tag)
 		{
 			// Check for valid function pointer (may not be present if not running in a debugging application)
-			if (pfnDebugMarkerSetObjectTag)
-			{
+			if (pfnDebugMarkerSetObjectTag) {
 				VkDebugMarkerObjectTagInfoEXT			tagInfo = {};
 				tagInfo.sType						= VK_STRUCTURE_TYPE_DEBUG_MARKER_OBJECT_TAG_INFO_EXT;
 				tagInfo.objectType					= objectType;
@@ -123,8 +120,7 @@ namespace vks
 
 		void									beginRegion						(VkCommandBuffer cmdbuffer, const char* pMarkerName, glm::vec4 color)						{
 			// Check for valid function pointer (may not be present if not running in a debugging application)
-			if (pfnCmdDebugMarkerBegin)
-			{
+			if (pfnCmdDebugMarkerBegin) {
 				VkDebugMarkerMarkerInfoEXT				markerInfo = {};
 				markerInfo.sType					= VK_STRUCTURE_TYPE_DEBUG_MARKER_MARKER_INFO_EXT;
 				memcpy(markerInfo.color, &color[0], sizeof(float) * 4);
@@ -135,8 +131,7 @@ namespace vks
 
 		void									insert							(VkCommandBuffer cmdbuffer, std::string markerName, glm::vec4 color)						{
 			// Check for valid function pointer (may not be present if not running in a debugging application)
-			if (pfnCmdDebugMarkerInsert)
-			{
+			if (pfnCmdDebugMarkerInsert) {
 				VkDebugMarkerMarkerInfoEXT				markerInfo = {};
 				markerInfo.sType					= VK_STRUCTURE_TYPE_DEBUG_MARKER_MARKER_INFO_EXT;
 				memcpy(markerInfo.color, &color[0], sizeof(float) * 4);
@@ -145,7 +140,8 @@ namespace vks
 			}
 		}
 
-		void									endRegion						(VkCommandBuffer cmdBuffer)																	{ if (pfnCmdDebugMarkerEnd) pfnCmdDebugMarkerEnd(cmdBuffer); }	// End the current debug marker region. Check for valid function (may not be present if not runnin in a debugging application)
+		// End the current debug marker region. Check for valid function (may not be present if not runnin in a debugging application)
+		void									endRegion						(VkCommandBuffer cmdBuffer)																	{ if (pfnCmdDebugMarkerEnd) pfnCmdDebugMarkerEnd(cmdBuffer); }
 
 	}	// namespace
 }	// namespace
