@@ -13,16 +13,16 @@
 
 struct {
 	struct {
-		VkImage														image	= VK_NULL_HANDLE;
-		VkImageView													view	= VK_NULL_HANDLE;
-		VkDeviceMemory												memory	= VK_NULL_HANDLE;
-	}															color;
+		VkImage															image	= VK_NULL_HANDLE;
+		VkImageView														view	= VK_NULL_HANDLE;
+		VkDeviceMemory													memory	= VK_NULL_HANDLE;
+	}																color;
 	struct {
-		VkImage														image	= VK_NULL_HANDLE;
-		VkImageView													view	= VK_NULL_HANDLE;
-		VkDeviceMemory												memory	= VK_NULL_HANDLE;
-	}															depth;
-}															multisampleTarget;
+		VkImage															image	= VK_NULL_HANDLE;
+		VkImageView														view	= VK_NULL_HANDLE;
+		VkDeviceMemory													memory	= VK_NULL_HANDLE;
+	}																depth;
+}																multisampleTarget;
 
 class VulkanExample : public VulkanExampleBase
 {

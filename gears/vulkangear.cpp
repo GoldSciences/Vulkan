@@ -164,8 +164,7 @@ void VulkanGear::generate(GearInfo *gearinfo, VkQueue queue)	{
 
 	bool useStaging = true;
 
-	if (useStaging)
-	{
+	if (useStaging) {
 		vks::Buffer vertexStaging, indexStaging;
 
 		// Create staging buffers

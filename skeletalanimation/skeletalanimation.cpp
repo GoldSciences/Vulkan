@@ -29,13 +29,13 @@ struct Vertex {
 
 // Vertex layout for the models
 vks::VertexLayout											vertexLayout					= vks::VertexLayout(
-{	vks::VERTEX_COMPONENT_POSITION
-,	vks::VERTEX_COMPONENT_NORMAL
-,	vks::VERTEX_COMPONENT_UV
-,	vks::VERTEX_COMPONENT_COLOR
-,	vks::VERTEX_COMPONENT_DUMMY_VEC4
-,	vks::VERTEX_COMPONENT_DUMMY_VEC4
-});
+	{	vks::VERTEX_COMPONENT_POSITION
+	,	vks::VERTEX_COMPONENT_NORMAL
+	,	vks::VERTEX_COMPONENT_UV
+	,	vks::VERTEX_COMPONENT_COLOR
+	,	vks::VERTEX_COMPONENT_DUMMY_VEC4
+	,	vks::VERTEX_COMPONENT_DUMMY_VEC4
+	});
 
 
 #define MAX_BONES 64			// Maximum number of bones per mesh. Must not be higher than same const in skinning shader
