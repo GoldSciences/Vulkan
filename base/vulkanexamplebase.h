@@ -168,13 +168,13 @@ public:
 		bool								left						= false;
 		bool								right						= false;
 		bool								middle						= false;
-	} mouseButtons;
+	}									mouseButtons;
 #elif defined(__linux__)				
 	struct {
 		bool								left						= false;
 		bool								right						= false;
 		bool								middle						= false;
-	} mouseButtons;
+	}									mouseButtons;
 	bool								quit						= false;
 	xcb_connection_t					* connection				= nullptr;
 	xcb_screen_t						* screen					= nullptr;
