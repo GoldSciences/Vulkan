@@ -963,7 +963,7 @@ public:
 		uboVS.modelMatrix											= glm::rotate(uboVS.modelMatrix, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
 
 		// Map uniform buffer and update it
-		uint8_t													* pData										= nullptr;
+		uint8_t															* pData										= nullptr;
 		VK_CHECK_RESULT(vkMapMemory(device, uniformBufferVS.memory, 0, sizeof(uboVS), 0, (void **)&pData));
 		memcpy(pData, &uboVS, sizeof(uboVS));
 		// Unmap after data has been copied
