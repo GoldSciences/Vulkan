@@ -12,11 +12,11 @@
 class VulkanExample : public VulkanExampleBase
 {
 public:
-	bool														bloom										= true;
-	bool														displaySkybox								= true;
+	bool														bloom									= true;
+	bool														displaySkybox							= true;
 
 	// Vertex layout for the models
-	vks::VertexLayout											vertexLayout								= vks::VertexLayout(
+	vks::VertexLayout											vertexLayout							= vks::VertexLayout(
 		{	vks::VERTEX_COMPONENT_POSITION
 		,	vks::VERTEX_COMPONENT_NORMAL
 		,	vks::VERTEX_COMPONENT_UV
@@ -29,7 +29,7 @@ public:
 	struct Models {
 		vks::Model													skybox;
 		std::vector<vks::Model>										objects;
-		uint32_t													objectIndex									= 1;
+		uint32_t													objectIndex								= 1;
 	}															models;
 
 	struct {
@@ -43,7 +43,7 @@ public:
 	}															uboVS;
 
 	struct UBOParams {
-		float														exposure									= 1.0f;
+		float														exposure								= 1.0f;
 	}															uboParams;
 
 	struct {
@@ -79,9 +79,9 @@ public:
 		VkImageView													view;
 		VkFormat													format;
 		void														destroy									(VkDevice device_)					{
-			vkDestroyImageView	(device_, view, nullptr);
-			vkDestroyImage		(device_, image, nullptr);
-			vkFreeMemory		(device_, mem, nullptr);
+			vkDestroyImageView	(device_, view	, nullptr);
+			vkDestroyImage		(device_, image	, nullptr);
+			vkFreeMemory		(device_, mem	, nullptr);
 		}
 	};
 	struct FrameBuffer {

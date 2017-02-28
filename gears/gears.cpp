@@ -13,19 +13,19 @@ class VulkanExample : public VulkanExampleBase
 {
 public:
 	struct {
-		VkPipelineVertexInputStateCreateInfo						inputState;
+		VkPipelineVertexInputStateCreateInfo						inputState						= {};
 		std::vector<VkVertexInputBindingDescription>				bindingDescriptions;
 		std::vector<VkVertexInputAttributeDescription>				attributeDescriptions;
 	}															vertices;
 
 	struct {
-		VkPipeline													solid;
+		VkPipeline													solid							= VK_NULL_HANDLE;
 	}															pipelines;
 
 	std::vector<VulkanGear*>									gears;
 
-	VkPipelineLayout											pipelineLayout;
-	VkDescriptorSetLayout										descriptorSetLayout;
+	VkPipelineLayout											pipelineLayout					= VK_NULL_HANDLE;
+	VkDescriptorSetLayout										descriptorSetLayout				= VK_NULL_HANDLE;
 
 																VulkanExample					()										: VulkanExampleBase(ENABLE_VALIDATION)	{
 		zoom														= -16.0f;
@@ -38,12 +38,12 @@ public:
 																~VulkanExample					()										{
 		// Clean up used Vulkan resources 
 		// Note : Inherited destructor cleans up resources stored in base class
-		vkDestroyPipeline			(device, pipelines.solid, nullptr);
+		vkDestroyPipeline				(device, pipelines.solid		, nullptr);
 
-		vkDestroyPipelineLayout		(device, pipelineLayout, nullptr);
-		vkDestroyDescriptorSetLayout(device, descriptorSetLayout, nullptr);
+		vkDestroyPipelineLayout			(device, pipelineLayout			, nullptr);
+		vkDestroyDescriptorSetLayout	(device, descriptorSetLayout	, nullptr);
 
-		for (auto& gear : gears)
+		for (VulkanGear* gear : gears)
 			delete(gear);
 	}
 
