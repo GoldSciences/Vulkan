@@ -53,7 +53,7 @@ namespace vks
 			return VK_FALSE;
 		}
 
-		void									setupDebugging					(VkInstance instance, VkDebugReportFlagsEXT flags, VkDebugReportCallbackEXT callBack)										{
+		void									setupDebugging					(VkInstance instance, VkDebugReportFlagsEXT flags, VkDebugReportCallbackEXT callBack)				{
 			CreateDebugReportCallback				= reinterpret_cast<PFN_vkCreateDebugReportCallbackEXT	>(vkGetInstanceProcAddr(instance, "vkCreateDebugReportCallbackEXT"	));
 			DestroyDebugReportCallback				= reinterpret_cast<PFN_vkDestroyDebugReportCallbackEXT	>(vkGetInstanceProcAddr(instance, "vkDestroyDebugReportCallbackEXT"	));
 			dbgBreakCallback						= reinterpret_cast<PFN_vkDebugReportMessageEXT			>(vkGetInstanceProcAddr(instance, "vkDebugReportMessageEXT"			));
@@ -67,7 +67,7 @@ namespace vks
 			assert(!err);
 		}
 
-		void									freeDebugCallback				(VkInstance instance)																										{ if (msgCallback != VK_NULL_HANDLE) DestroyDebugReportCallback(instance, msgCallback, nullptr); }
+		void									freeDebugCallback				(VkInstance instance)																				{ if (msgCallback != VK_NULL_HANDLE) DestroyDebugReportCallback(instance, msgCallback, nullptr); }
 	}	// namespace
 
 	namespace debugmarker
@@ -80,7 +80,7 @@ namespace vks
 		PFN_vkCmdDebugMarkerEndEXT				pfnCmdDebugMarkerEnd			= VK_NULL_HANDLE;
 		PFN_vkCmdDebugMarkerInsertEXT			pfnCmdDebugMarkerInsert			= VK_NULL_HANDLE;
 
-		void									setup							(VkDevice device)																			{
+		void									setup							(VkDevice device)																					{
 			pfnDebugMarkerSetObjectTag				= reinterpret_cast<PFN_vkDebugMarkerSetObjectTagEXT		>(vkGetDeviceProcAddr(device, "vkDebugMarkerSetObjectTagEXT"	));
 			pfnDebugMarkerSetObjectName				= reinterpret_cast<PFN_vkDebugMarkerSetObjectNameEXT	>(vkGetDeviceProcAddr(device, "vkDebugMarkerSetObjectNameEXT"	));
 			pfnCmdDebugMarkerBegin					= reinterpret_cast<PFN_vkCmdDebugMarkerBeginEXT			>(vkGetDeviceProcAddr(device, "vkCmdDebugMarkerBeginEXT"		));
@@ -91,7 +91,7 @@ namespace vks
 			active									= (pfnDebugMarkerSetObjectName != VK_NULL_HANDLE);
 		}
 
-		void									setObjectName					(VkDevice device, uint64_t object, VkDebugReportObjectTypeEXT objectType, const char *name)									{
+		void									setObjectName					(VkDevice device, uint64_t object, VkDebugReportObjectTypeEXT objectType, const char *name)			{
 			// Check for valid function pointer (may not be present if not running in a debugging application)
 			if (pfnDebugMarkerSetObjectName) {
 				VkDebugMarkerObjectNameInfoEXT			nameInfo = {};
@@ -117,7 +117,7 @@ namespace vks
 			}
 		}
 
-		void									beginRegion						(VkCommandBuffer cmdbuffer, const char* pMarkerName, glm::vec4 color)														{
+		void									beginRegion						(VkCommandBuffer cmdbuffer, const char* pMarkerName, glm::vec4 color)								{
 			// Check for valid function pointer (may not be present if not running in a debugging application)
 			if (pfnCmdDebugMarkerBegin) {
 				VkDebugMarkerMarkerInfoEXT				markerInfo = {};
@@ -128,7 +128,7 @@ namespace vks
 			}
 		}
 
-		void									insert							(VkCommandBuffer cmdbuffer, std::string markerName, glm::vec4 color)														{
+		void									insert							(VkCommandBuffer cmdbuffer, std::string markerName, glm::vec4 color)								{
 			// Check for valid function pointer (may not be present if not running in a debugging application)
 			if (pfnCmdDebugMarkerInsert) {
 				VkDebugMarkerMarkerInfoEXT				markerInfo = {};
@@ -140,7 +140,7 @@ namespace vks
 		}
 
 		// End the current debug marker region. Check for valid function (may not be present if not runnin in a debugging application)
-		void									endRegion						(VkCommandBuffer cmdBuffer)																									{ if (pfnCmdDebugMarkerEnd) pfnCmdDebugMarkerEnd(cmdBuffer); }
+		void									endRegion						(VkCommandBuffer cmdBuffer)																			{ if (pfnCmdDebugMarkerEnd) pfnCmdDebugMarkerEnd(cmdBuffer); }
 
 	}	// namespace
 }	// namespace
