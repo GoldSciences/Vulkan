@@ -15,23 +15,23 @@
 class VulkanExample : public VulkanExampleBase
 {
 public:
-	bool													debugDisplay								= false;
-	bool													useMSAA										= true;
-	bool													useSampleShading							= true;
+	bool														debugDisplay								= false;
+	bool														useMSAA										= true;
+	bool														useSampleShading							= true;
 
 	struct {
 		struct {
-			vks::Texture2D											colorMap;
-			vks::Texture2D											normalMap;
-		}														model;
+			vks::Texture2D												colorMap;
+			vks::Texture2D												normalMap;
+		}															model;
 		struct {
-			vks::Texture2D											colorMap;
-			vks::Texture2D											normalMap;
-		}														floor;
-	}														textures;
+			vks::Texture2D												colorMap;
+			vks::Texture2D												normalMap;
+		}															floor;
+	}															textures;
 
 	// Vertex layout for the models
-	vks::VertexLayout										vertexLayout								= vks::VertexLayout(
+	vks::VertexLayout											vertexLayout								= vks::VertexLayout(
 		{	vks::VERTEX_COMPONENT_POSITION
 		,	vks::VERTEX_COMPONENT_UV
 		,	vks::VERTEX_COMPONENT_COLOR
@@ -40,99 +40,99 @@ public:
 		});
 
 	struct {
-		vks::Model												model;
-		vks::Model												floor;
-		vks::Model												quad;
-	}														models;
+		vks::Model													model;
+		vks::Model													floor;
+		vks::Model													quad;
+	}															models;
 
 	struct {
-		VkPipelineVertexInputStateCreateInfo					inputState;
-		std::vector<VkVertexInputBindingDescription>			bindingDescriptions;
-		std::vector<VkVertexInputAttributeDescription>			attributeDescriptions;
-	}														vertices;
+		VkPipelineVertexInputStateCreateInfo						inputState;
+		std::vector<VkVertexInputBindingDescription>				bindingDescriptions;
+		std::vector<VkVertexInputAttributeDescription>				attributeDescriptions;
+	}															vertices;
 
 	struct {
-		glm::mat4												projection;
-		glm::mat4												model;
-		glm::mat4												view;
-		glm::vec4												instancePos[3];
-	}														uboVS, uboOffscreenVS;
+		glm::mat4													projection;
+		glm::mat4													model;
+		glm::mat4													view;
+		glm::vec4													instancePos[3];
+	}															uboVS, uboOffscreenVS;
 
 	struct Light {
-		glm::vec4												position;
-		glm::vec3												color;
-		float												radius;
+		glm::vec4													position;
+		glm::vec3													color;
+		float													radius;
 	};
 
 	struct {
-		Light													lights[6];
-		glm::vec4												viewPos;
-		glm::ivec2												windowSize;
-	}														uboFragmentLights;
+		Light														lights[6];
+		glm::vec4													viewPos;
+		glm::ivec2													windowSize;
+	}															uboFragmentLights;
 
 	struct {
-		vks::Buffer												vsFullScreen;
-		vks::Buffer												vsOffscreen;
-		vks::Buffer												fsLights;
-	}														uniformBuffers;
+		vks::Buffer													vsFullScreen;
+		vks::Buffer													vsOffscreen;
+		vks::Buffer													fsLights;
+	}															uniformBuffers;
 
 	struct {
-		VkPipeline												deferred									= VK_NULL_HANDLE;	// Deferred lighting calculation
-		VkPipeline												deferredNoMSAA								= VK_NULL_HANDLE;	// Deferred lighting calculation with explicit MSAA resolve
-		VkPipeline												offscreen									= VK_NULL_HANDLE;	// (Offscreen) scene rendering (fill G-Buffers)
-		VkPipeline												offscreenSampleShading						= VK_NULL_HANDLE;	// (Offscreen) scene rendering (fill G-Buffers) with sample shading rate enabled
-		VkPipeline												debug										= VK_NULL_HANDLE;	// G-Buffers debug display
-	}														pipelines;
+		VkPipeline													deferred									= VK_NULL_HANDLE;	// Deferred lighting calculation
+		VkPipeline													deferredNoMSAA								= VK_NULL_HANDLE;	// Deferred lighting calculation with explicit MSAA resolve
+		VkPipeline													offscreen									= VK_NULL_HANDLE;	// (Offscreen) scene rendering (fill G-Buffers)
+		VkPipeline													offscreenSampleShading						= VK_NULL_HANDLE;	// (Offscreen) scene rendering (fill G-Buffers) with sample shading rate enabled
+		VkPipeline													debug										= VK_NULL_HANDLE;	// G-Buffers debug display
+	}															pipelines;
 
 	struct {
-		VkPipelineLayout										deferred									= VK_NULL_HANDLE; 
-		VkPipelineLayout										offscreen									= VK_NULL_HANDLE;
-	}														pipelineLayouts;
+		VkPipelineLayout											deferred									= VK_NULL_HANDLE; 
+		VkPipelineLayout											offscreen									= VK_NULL_HANDLE;
+	}															pipelineLayouts;
 
 	struct {
-		VkDescriptorSet											model										= VK_NULL_HANDLE;
-		VkDescriptorSet											floor										= VK_NULL_HANDLE;
-	}														descriptorSets;
+		VkDescriptorSet												model										= VK_NULL_HANDLE;
+		VkDescriptorSet												floor										= VK_NULL_HANDLE;
+	}															descriptorSets;
 
-	VkDescriptorSet											descriptorSet								= VK_NULL_HANDLE;
-	VkDescriptorSetLayout									descriptorSetLayout							= VK_NULL_HANDLE;
+	VkDescriptorSet												descriptorSet								= VK_NULL_HANDLE;
+	VkDescriptorSetLayout										descriptorSetLayout							= VK_NULL_HANDLE;
 
 	// Framebuffer for offscreen rendering
 	struct FrameBufferAttachment {
-		VkImage													image										= VK_NULL_HANDLE;
-		VkDeviceMemory											mem											= VK_NULL_HANDLE;
-		VkImageView												view										= VK_NULL_HANDLE;
-		VkFormat												format;
+		VkImage														image										= VK_NULL_HANDLE;
+		VkDeviceMemory												mem											= VK_NULL_HANDLE;
+		VkImageView													view										= VK_NULL_HANDLE;
+		VkFormat													format;
 	};
 	struct FrameBuffer {
-		int32_t													width, height;
-		VkFramebuffer											frameBuffer									= VK_NULL_HANDLE;		
-		FrameBufferAttachment									position, normal, albedo;
-		FrameBufferAttachment									depth;
-		VkRenderPass											renderPass									= VK_NULL_HANDLE;
-	}														offScreenFrameBuf;
+		int32_t														width, height;
+		VkFramebuffer												frameBuffer									= VK_NULL_HANDLE;		
+		FrameBufferAttachment										position, normal, albedo;
+		FrameBufferAttachment										depth;
+		VkRenderPass												renderPass									= VK_NULL_HANDLE;
+	}															offScreenFrameBuf;
 	
-	VkSampler												colorSampler								= VK_NULL_HANDLE;		// One sampler for the frame buffer color attachments
-	VkCommandBuffer											offScreenCmdBuffer							= VK_NULL_HANDLE;
-	VkSemaphore												offscreenSemaphore							= VK_NULL_HANDLE;		// Semaphore used to synchronize between offscreen and final scene rendering
+	VkSampler													colorSampler								= VK_NULL_HANDLE;		// One sampler for the frame buffer color attachments
+	VkCommandBuffer												offScreenCmdBuffer							= VK_NULL_HANDLE;
+	VkSemaphore													offscreenSemaphore							= VK_NULL_HANDLE;		// Semaphore used to synchronize between offscreen and final scene rendering
 
-															VulkanExample								()									: VulkanExampleBase(ENABLE_VALIDATION)	{
-		zoom													= -8.0f;
-		rotation												= { 0.0f, 0.0f, 0.0f };
-		enableTextOverlay										= true;
-		title													= "Vulkan Example - Deferred shading (2016 by Sascha Willems)";
-		camera.type												= Camera::CameraType::firstperson;
-		camera.movementSpeed									= 5.0f;
+																VulkanExample								()									: VulkanExampleBase(ENABLE_VALIDATION)	{
+		zoom														= -8.0f;
+		rotation													= { 0.0f, 0.0f, 0.0f };
+		enableTextOverlay											= true;
+		title														= "Vulkan Example - Deferred shading (2016 by Sascha Willems)";
+		camera.type													= Camera::CameraType::firstperson;
+		camera.movementSpeed										= 5.0f;
 #ifndef __ANDROID__
-		camera.rotationSpeed									= 0.25f;
+		camera.rotationSpeed										= 0.25f;
 #endif
-		camera.position											= { 2.15f, 0.3f, -8.75f };
+		camera.position												= { 2.15f, 0.3f, -8.75f };
 		camera.setRotation		(glm::vec3(-0.75f, 12.5f, 0.0f));
 		camera.setPerspective	(60.0f, (float)width / (float)height, 0.1f, 256.0f);
 		paused = true;
 	}
 
-															~VulkanExample								()									{
+																~VulkanExample								()									{
 		// Clean up used Vulkan resources 
 		// Note : Inherited destructor cleans up resources stored in base class
 
@@ -193,66 +193,66 @@ public:
 	}
 
 	// Create a frame buffer attachment
-	void													createAttachment							(VkFormat format,  VkImageUsageFlagBits usage, FrameBufferAttachment *attachment, VkCommandBuffer layoutCmd)	{
-		VkImageAspectFlags											aspectMask									= 0;
-		VkImageLayout												imageLayout;
+	void														createAttachment							(VkFormat format,  VkImageUsageFlagBits usage, FrameBufferAttachment *attachment, VkCommandBuffer layoutCmd)	{
+		VkImageAspectFlags												aspectMask									= 0;
+		VkImageLayout													imageLayout;
 
-		attachment->format										= format;
+		attachment->format											= format;
 
 		if (usage & VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT) {
-			aspectMask												= VK_IMAGE_ASPECT_COLOR_BIT;
-			imageLayout												= VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+			aspectMask													= VK_IMAGE_ASPECT_COLOR_BIT;
+			imageLayout													= VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 		}
 		if (usage & VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT) {
-			aspectMask												= VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT;
-			imageLayout												= VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+			aspectMask													= VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT;
+			imageLayout													= VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 		}
 
 		assert(aspectMask > 0);
 
-		VkImageCreateInfo											image										= vks::initializers::imageCreateInfo();
-		image.imageType											= VK_IMAGE_TYPE_2D;
-		image.format											= format;
-		image.extent.width										= offScreenFrameBuf.width;
-		image.extent.height										= offScreenFrameBuf.height;
-		image.extent.depth										= 1;
-		image.mipLevels											= 1;
-		image.arrayLayers										= 1;
-		image.samples											= SAMPLE_COUNT;
-		image.tiling											= VK_IMAGE_TILING_OPTIMAL;
-		image.usage												= usage | VK_IMAGE_USAGE_SAMPLED_BIT;
+		VkImageCreateInfo												image										= vks::initializers::imageCreateInfo();
+		image.imageType												= VK_IMAGE_TYPE_2D;
+		image.format												= format;
+		image.extent.width											= offScreenFrameBuf.width;
+		image.extent.height											= offScreenFrameBuf.height;
+		image.extent.depth											= 1;
+		image.mipLevels												= 1;
+		image.arrayLayers											= 1;
+		image.samples												= SAMPLE_COUNT;
+		image.tiling												= VK_IMAGE_TILING_OPTIMAL;
+		image.usage													= usage | VK_IMAGE_USAGE_SAMPLED_BIT;
 
-		VkMemoryAllocateInfo										memAlloc									= vks::initializers::memoryAllocateInfo();
-		VkMemoryRequirements										memReqs;
+		VkMemoryAllocateInfo											memAlloc									= vks::initializers::memoryAllocateInfo();
+		VkMemoryRequirements											memReqs;
 
 		VK_CHECK_RESULT(vkCreateImage		(device, &image, nullptr, &attachment->image));
 		vkGetImageMemoryRequirements		(device, attachment->image, &memReqs);
-		memAlloc.allocationSize									= memReqs.size;
-		memAlloc.memoryTypeIndex								= vulkanDevice->getMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+		memAlloc.allocationSize										= memReqs.size;
+		memAlloc.memoryTypeIndex									= vulkanDevice->getMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 		VK_CHECK_RESULT(vkAllocateMemory	(device, &memAlloc, nullptr, &attachment->mem));
 		VK_CHECK_RESULT(vkBindImageMemory	(device, attachment->image, attachment->mem, 0));
 		
-		VkImageViewCreateInfo										imageView									= vks::initializers::imageViewCreateInfo();
-		imageView.viewType										= VK_IMAGE_VIEW_TYPE_2D;
-		imageView.format										= format;
-		imageView.subresourceRange								= {};
-		imageView.subresourceRange.aspectMask					= aspectMask;
-		imageView.subresourceRange.baseMipLevel					= 0;
-		imageView.subresourceRange.levelCount					= 1;
-		imageView.subresourceRange.baseArrayLayer				= 0;
-		imageView.subresourceRange.layerCount					= 1;
-		imageView.image											= attachment->image;
+		VkImageViewCreateInfo											imageView									= vks::initializers::imageViewCreateInfo();
+		imageView.viewType											= VK_IMAGE_VIEW_TYPE_2D;
+		imageView.format											= format;
+		imageView.subresourceRange									= {};
+		imageView.subresourceRange.aspectMask						= aspectMask;
+		imageView.subresourceRange.baseMipLevel						= 0;
+		imageView.subresourceRange.levelCount						= 1;
+		imageView.subresourceRange.baseArrayLayer					= 0;
+		imageView.subresourceRange.layerCount						= 1;
+		imageView.image												= attachment->image;
 		VK_CHECK_RESULT(vkCreateImageView(device, &imageView, nullptr, &attachment->view));
 	}
 
 	// Prepare a new framebuffer for offscreen rendering
 	// The contents of this framebuffer are then
 	// blitted to our render target
-	void													prepareOffscreenFramebuffer					()									{
-		VkCommandBuffer												layoutCmd									= VulkanExampleBase::createCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY, true);
+	void														prepareOffscreenFramebuffer					()									{
+		VkCommandBuffer													layoutCmd									= VulkanExampleBase::createCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY, true);
 
-		offScreenFrameBuf.width									= this->width;
-		offScreenFrameBuf.height								= this->height;
+		offScreenFrameBuf.width										= this->width;
+		offScreenFrameBuf.height									= this->height;
 
 		//offScreenFrameBuf.width = FB_DIM;
 		//offScreenFrameBuf.height = FB_DIM;
@@ -264,9 +264,9 @@ public:
 
 		// Depth attachment
 
-		// Find a suitable depth format
-		VkFormat													attDepthFormat;
-		VkBool32													validDepthFormat							= vks::tools::getSupportedDepthFormat(physicalDevice, &attDepthFormat);
+		// Find a suitable depth format	
+		VkFormat														attDepthFormat;
+		VkBool32														validDepthFormat							= vks::tools::getSupportedDepthFormat(physicalDevice, &attDepthFormat);
 		assert(validDepthFormat);
 
 		createAttachment(attDepthFormat, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, &offScreenFrameBuf.depth, layoutCmd);
@@ -275,106 +275,106 @@ public:
 		// Set up separate renderpass with references
 		// to the color and depth attachments
 
-		std::array<VkAttachmentDescription, 4>						attachmentDescs								= {};
+		std::array<VkAttachmentDescription, 4>							attachmentDescs								= {};
 
 		// Init attachment properties
 		for (uint32_t i = 0; i < 4; ++i) {
-			attachmentDescs[i].samples							= SAMPLE_COUNT;
-			attachmentDescs[i].loadOp							= VK_ATTACHMENT_LOAD_OP_CLEAR;
-			attachmentDescs[i].storeOp							= VK_ATTACHMENT_STORE_OP_STORE;
-			attachmentDescs[i].stencilLoadOp					= VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-			attachmentDescs[i].stencilStoreOp					= VK_ATTACHMENT_STORE_OP_DONT_CARE;
+			attachmentDescs[i].samples									= SAMPLE_COUNT;
+			attachmentDescs[i].loadOp									= VK_ATTACHMENT_LOAD_OP_CLEAR;
+			attachmentDescs[i].storeOp									= VK_ATTACHMENT_STORE_OP_STORE;
+			attachmentDescs[i].stencilLoadOp							= VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+			attachmentDescs[i].stencilStoreOp							= VK_ATTACHMENT_STORE_OP_DONT_CARE;
 			if (i == 3) {
-				attachmentDescs[i].initialLayout					= VK_IMAGE_LAYOUT_UNDEFINED;
-				attachmentDescs[i].finalLayout						= VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+				attachmentDescs[i].initialLayout							= VK_IMAGE_LAYOUT_UNDEFINED;
+				attachmentDescs[i].finalLayout								= VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 			}
 			else {
-				attachmentDescs[i].initialLayout					= VK_IMAGE_LAYOUT_UNDEFINED;
-				attachmentDescs[i].finalLayout						= VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+				attachmentDescs[i].initialLayout							= VK_IMAGE_LAYOUT_UNDEFINED;
+				attachmentDescs[i].finalLayout								= VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 			}
 		}
 
 		// Formats
-		attachmentDescs[0].format										= offScreenFrameBuf.position.format;
-		attachmentDescs[1].format										= offScreenFrameBuf.normal.format;
-		attachmentDescs[2].format										= offScreenFrameBuf.albedo.format;
-		attachmentDescs[3].format										= offScreenFrameBuf.depth.format;
+		attachmentDescs[0].format									= offScreenFrameBuf.position.format;
+		attachmentDescs[1].format									= offScreenFrameBuf.normal.format;
+		attachmentDescs[2].format									= offScreenFrameBuf.albedo.format;
+		attachmentDescs[3].format									= offScreenFrameBuf.depth.format;
 
-		std::vector<VkAttachmentReference>									colorReferences;
+		std::vector<VkAttachmentReference>								colorReferences;
 		colorReferences.push_back({ 0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL });
 		colorReferences.push_back({ 1, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL });
 		colorReferences.push_back({ 2, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL });
 
-		VkAttachmentReference												depthReference						= {};
-		depthReference.attachment										= 3;
-		depthReference.layout											= VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+		VkAttachmentReference											depthReference						= {};
+		depthReference.attachment									= 3;
+		depthReference.layout										= VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 
-		VkSubpassDescription												subpass								= {};
-		subpass.pipelineBindPoint										= VK_PIPELINE_BIND_POINT_GRAPHICS;
-		subpass.pColorAttachments										= colorReferences.data();
-		subpass.colorAttachmentCount									= static_cast<uint32_t>(colorReferences.size());
-		subpass.pDepthStencilAttachment									= &depthReference;
+		VkSubpassDescription											subpass								= {};
+		subpass.pipelineBindPoint									= VK_PIPELINE_BIND_POINT_GRAPHICS;
+		subpass.pColorAttachments									= colorReferences.data();
+		subpass.colorAttachmentCount								= static_cast<uint32_t>(colorReferences.size());
+		subpass.pDepthStencilAttachment								= &depthReference;
 
 		// Use subpass dependencies for attachment layput transitions
-		std::array<VkSubpassDependency, 2>									dependencies;
+		std::array<VkSubpassDependency, 2>								dependencies;
 
-		dependencies[0].srcSubpass										= VK_SUBPASS_EXTERNAL;
-		dependencies[0].dstSubpass										= 0;
-		dependencies[0].srcStageMask									= VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
-		dependencies[0].dstStageMask									= VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-		dependencies[0].srcAccessMask									= VK_ACCESS_MEMORY_READ_BIT;
-		dependencies[0].dstAccessMask									= VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-		dependencies[0].dependencyFlags									= VK_DEPENDENCY_BY_REGION_BIT;
+		dependencies[0].srcSubpass									= VK_SUBPASS_EXTERNAL;
+		dependencies[0].dstSubpass									= 0;
+		dependencies[0].srcStageMask								= VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
+		dependencies[0].dstStageMask								= VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+		dependencies[0].srcAccessMask								= VK_ACCESS_MEMORY_READ_BIT;
+		dependencies[0].dstAccessMask								= VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+		dependencies[0].dependencyFlags								= VK_DEPENDENCY_BY_REGION_BIT;
 
-		dependencies[1].srcSubpass										= 0;													
-		dependencies[1].dstSubpass										= VK_SUBPASS_EXTERNAL;								
-		dependencies[1].srcStageMask									= VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-		dependencies[1].dstStageMask									= VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
-		dependencies[1].srcAccessMask									= VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-		dependencies[1].dstAccessMask									= VK_ACCESS_MEMORY_READ_BIT;
-		dependencies[1].dependencyFlags									= VK_DEPENDENCY_BY_REGION_BIT;
+		dependencies[1].srcSubpass									= 0;													
+		dependencies[1].dstSubpass									= VK_SUBPASS_EXTERNAL;								
+		dependencies[1].srcStageMask								= VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+		dependencies[1].dstStageMask								= VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
+		dependencies[1].srcAccessMask								= VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+		dependencies[1].dstAccessMask								= VK_ACCESS_MEMORY_READ_BIT;
+		dependencies[1].dependencyFlags								= VK_DEPENDENCY_BY_REGION_BIT;
 
-		VkRenderPassCreateInfo												renderPassInfo						= {};
-		renderPassInfo.sType											= VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-		renderPassInfo.pAttachments										= attachmentDescs.data();
-		renderPassInfo.attachmentCount									= static_cast<uint32_t>(attachmentDescs.size());
-		renderPassInfo.subpassCount										= 1;
-		renderPassInfo.pSubpasses										= &subpass;
-		renderPassInfo.dependencyCount									= 2;
-		renderPassInfo.pDependencies									= dependencies.data();
+		VkRenderPassCreateInfo											renderPassInfo						= {};
+		renderPassInfo.sType										= VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+		renderPassInfo.pAttachments									= attachmentDescs.data();
+		renderPassInfo.attachmentCount								= static_cast<uint32_t>(attachmentDescs.size());
+		renderPassInfo.subpassCount									= 1;
+		renderPassInfo.pSubpasses									= &subpass;
+		renderPassInfo.dependencyCount								= 2;
+		renderPassInfo.pDependencies								= dependencies.data();
 	
 		VK_CHECK_RESULT(vkCreateRenderPass(device, &renderPassInfo, nullptr, &offScreenFrameBuf.renderPass));
 	
-		std::array<VkImageView,4>											attachments;
-		attachments[0]													= offScreenFrameBuf.position.view;
-		attachments[1]													= offScreenFrameBuf.normal.view;
-		attachments[2]													= offScreenFrameBuf.albedo.view;
-		attachments[3]													= offScreenFrameBuf.depth.view;
+		std::array<VkImageView,4>										attachments;
+		attachments[0]												= offScreenFrameBuf.position.view;
+		attachments[1]												= offScreenFrameBuf.normal.view;
+		attachments[2]												= offScreenFrameBuf.albedo.view;
+		attachments[3]												= offScreenFrameBuf.depth.view;
 
-		VkFramebufferCreateInfo												fbufCreateInfo						= {};
-		fbufCreateInfo.sType											= VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-		fbufCreateInfo.pNext											= NULL;
-		fbufCreateInfo.renderPass										= offScreenFrameBuf.renderPass;
-		fbufCreateInfo.pAttachments										= attachments.data();
-		fbufCreateInfo.attachmentCount									= static_cast<uint32_t>(attachments.size());
-		fbufCreateInfo.width											= offScreenFrameBuf.width;
-		fbufCreateInfo.height											= offScreenFrameBuf.height;
-		fbufCreateInfo.layers											= 1;
+		VkFramebufferCreateInfo											fbufCreateInfo						= {};
+		fbufCreateInfo.sType										= VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+		fbufCreateInfo.pNext										= NULL;
+		fbufCreateInfo.renderPass									= offScreenFrameBuf.renderPass;
+		fbufCreateInfo.pAttachments									= attachments.data();
+		fbufCreateInfo.attachmentCount								= static_cast<uint32_t>(attachments.size());
+		fbufCreateInfo.width										= offScreenFrameBuf.width;
+		fbufCreateInfo.height										= offScreenFrameBuf.height;
+		fbufCreateInfo.layers										= 1;
 		VK_CHECK_RESULT(vkCreateFramebuffer(device, &fbufCreateInfo, nullptr, &offScreenFrameBuf.frameBuffer));
 
 		// Create sampler to sample from the color attachments
-		VkSamplerCreateInfo													sampler								= vks::initializers::samplerCreateInfo();
-		sampler.magFilter												= VK_FILTER_NEAREST;
-		sampler.minFilter												= VK_FILTER_NEAREST;
-		sampler.mipmapMode												= VK_SAMPLER_MIPMAP_MODE_LINEAR;
-		sampler.addressModeU											= VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
-		sampler.addressModeV											= sampler.addressModeU;
-		sampler.addressModeW											= sampler.addressModeU;
-		sampler.mipLodBias												= 0.0f;
-		sampler.maxAnisotropy											= 0;
-		sampler.minLod													= 0.0f;
-		sampler.maxLod													= 1.0f;
-		sampler.borderColor												= VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
+		VkSamplerCreateInfo												sampler								= vks::initializers::samplerCreateInfo();
+		sampler.magFilter											= VK_FILTER_NEAREST;
+		sampler.minFilter											= VK_FILTER_NEAREST;
+		sampler.mipmapMode											= VK_SAMPLER_MIPMAP_MODE_LINEAR;
+		sampler.addressModeU										= VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+		sampler.addressModeV										= sampler.addressModeU;
+		sampler.addressModeW										= sampler.addressModeU;
+		sampler.mipLodBias											= 0.0f;
+		sampler.maxAnisotropy										= 0;
+		sampler.minLod												= 0.0f;
+		sampler.maxLod												= 1.0f;
+		sampler.borderColor											= VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
 		VK_CHECK_RESULT(vkCreateSampler(device, &sampler, nullptr, &colorSampler));
 	}
 
