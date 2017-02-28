@@ -10,8 +10,8 @@
 
 #include <gli/gli.hpp>
 
-#define VERTEX_BUFFER_BIND_ID 0
-#define ENABLE_VALIDATION false
+#define VERTEX_BUFFER_BIND_ID	0
+#define ENABLE_VALIDATION		false
 
 class VulkanExample : public VulkanExampleBase
 {
@@ -204,14 +204,14 @@ public:
 		subresourceRange.levelCount									= cubeMap.mipLevels;
 		subresourceRange.layerCount									= 6;
 
-		vks::tools::setImageLayout(copyCmd, cubeMap.image, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, subresourceRange);
+		vks::tools::setImageLayout	(copyCmd, cubeMap.image, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, subresourceRange);
 
 		// Copy the cube map faces from the staging buffer to the optimal tiled image
-		vkCmdCopyBufferToImage(copyCmd, stagingBuffer, cubeMap.image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, static_cast<uint32_t>(bufferCopyRegions.size()), bufferCopyRegions.data());
+		vkCmdCopyBufferToImage		(copyCmd, stagingBuffer, cubeMap.image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, static_cast<uint32_t>(bufferCopyRegions.size()), bufferCopyRegions.data());
 
 		// Change texture image layout to shader read after all faces have been copied
 		cubeMap.imageLayout											= VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-		vks::tools::setImageLayout(copyCmd, cubeMap.image, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, cubeMap.imageLayout, subresourceRange);
+		vks::tools::setImageLayout	(copyCmd, cubeMap.image, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, cubeMap.imageLayout, subresourceRange);
 
 		VulkanExampleBase::flushCommandBuffer(copyCmd, queue, true);
 
