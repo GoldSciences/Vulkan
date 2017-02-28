@@ -10,11 +10,9 @@
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 #include "vulkanexamplebase.h"
 
-// Set to "true" to enable Vulkan's validation layers (see vulkandebug.cpp for details)
-#define ENABLE_VALIDATION false
-// Set to "true" to use staging buffers for uploading vertex and index data to device local memory
-// See "prepareVertices" for details on what's staging and on why to use it
-#define USE_STAGING true
+#define ENABLE_VALIDATION	false		// Set to "true" to enable Vulkan's validation layers (see vulkandebug.cpp for details)
+#define USE_STAGING			true		// Set to "true" to use staging buffers for uploading vertex and index data to device local memory
+										// See "prepareVertices" for details on what's staging and on why to use it
 
 class VulkanExample : public VulkanExampleBase
 {
@@ -125,12 +123,11 @@ public:
 	// You can check http://vulkan.gpuinfo.org/ for details on different memory configurations
 	uint32_t													getMemoryTypeIndex						(uint32_t typeBits, VkMemoryPropertyFlags properties)			{
 		// Iterate over all memory types available for the device used in this example
-		for (uint32_t i = 0; i < deviceMemoryProperties.memoryTypeCount; i++)
-		{
-			if ((typeBits & 1) == 1) {
+		for (uint32_t i = 0; i < deviceMemoryProperties.memoryTypeCount; i++) {
+			if ((typeBits & 1) == 1)
 				if ((deviceMemoryProperties.memoryTypes[i].propertyFlags & properties) == properties)
 					return i;
-			}
+
 			typeBits >>= 1;
 		}
 
@@ -144,8 +141,8 @@ public:
 		semaphoreCreateInfo.sType									= VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
 		semaphoreCreateInfo.pNext									= nullptr;
 
-		VK_CHECK_RESULT(vkCreateSemaphore(device, &semaphoreCreateInfo, nullptr, &presentCompleteSemaphore));	// Semaphore used to ensures that image presentation is complete before starting to submit again
-		VK_CHECK_RESULT(vkCreateSemaphore(device, &semaphoreCreateInfo, nullptr, &renderCompleteSemaphore));	// Semaphore used to ensures that all commands submitted have been finished before submitting the image to the queue
+		VK_CHECK_RESULT(vkCreateSemaphore	(device, &semaphoreCreateInfo	, nullptr, &presentCompleteSemaphore));	// Semaphore used to ensures that image presentation is complete before starting to submit again
+		VK_CHECK_RESULT(vkCreateSemaphore	(device, &semaphoreCreateInfo	, nullptr, &renderCompleteSemaphore));	// Semaphore used to ensures that all commands submitted have been finished before submitting the image to the queue
 
 		// Fences (Used to check draw command buffer completion)
 		VkFenceCreateInfo												fenceCreateInfo									= {};
@@ -154,7 +151,7 @@ public:
 		fenceCreateInfo.flags										= VK_FENCE_CREATE_SIGNALED_BIT;
 		waitFences.resize(drawCmdBuffers.size());
 		for (VkFence& fence : waitFences)
-			VK_CHECK_RESULT(vkCreateFence(device, &fenceCreateInfo, nullptr, &fence));
+			VK_CHECK_RESULT(vkCreateFence	(device, &fenceCreateInfo		, nullptr, &fence));
 	}
 
 	// Get a new command buffer from the command pool
