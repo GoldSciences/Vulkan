@@ -6,8 +6,6 @@
 
 // todo: Fallback for sampler selection on devices that don't support shaderSampledImageArrayDynamicIndexing
 #include "vulkanexamplebase.h"
-#include "VulkanDevice.hpp"
-#include "VulkanBuffer.hpp"
 #include "VulkanModel.hpp"
 
 #include <algorithm>

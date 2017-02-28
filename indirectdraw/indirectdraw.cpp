@@ -16,7 +16,6 @@
 // 
 // See readme.md for details
 #include "vulkanexamplebase.h"
-#include "VulkanBuffer.hpp"
 #include "VulkanTexture.hpp"
 #include "VulkanModel.hpp"
 

@@ -6,7 +6,6 @@
 #include "vulkanexamplebase.h"
 #include "VulkanTexture.hpp"
 #include "VulkanModel.hpp"
-#include "VulkanBuffer.hpp"
 
 #include <gli/gli.hpp>
 

@@ -26,7 +26,6 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "VulkanDevice.hpp"
-#include "VulkanBuffer.hpp"
 
 #if defined(__ANDROID__)
 #include <android/asset_manager.h>
