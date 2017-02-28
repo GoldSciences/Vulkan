@@ -16,22 +16,22 @@
 class VulkanExample : public VulkanExampleBase
 {
 public:
-	bool displaySkybox = true;
+	bool														displaySkybox							= true;
 
-	vks::Texture cubeMap;
+	vks::Texture												cubeMap;
 
 	struct {
-		VkPipelineVertexInputStateCreateInfo inputState;
-		std::vector<VkVertexInputBindingDescription> bindingDescriptions;
-		std::vector<VkVertexInputAttributeDescription> attributeDescriptions;
-	} vertices;
+		VkPipelineVertexInputStateCreateInfo						inputState;
+		std::vector<VkVertexInputBindingDescription>				bindingDescriptions;
+		std::vector<VkVertexInputAttributeDescription>				attributeDescriptions;
+	}															vertices;
 
 	// Vertex layout for the models
-	vks::VertexLayout vertexLayout = vks::VertexLayout({
-		vks::VERTEX_COMPONENT_POSITION,
-		vks::VERTEX_COMPONENT_NORMAL,
-		vks::VERTEX_COMPONENT_UV,
-	});
+	vks::VertexLayout											vertexLayout							= vks::VertexLayout(
+		{	vks::VERTEX_COMPONENT_POSITION
+		,	vks::VERTEX_COMPONENT_NORMAL
+		,	vks::VERTEX_COMPONENT_UV
+		});
 
 	struct Meshes {
 		vks::Model													skybox;
@@ -252,7 +252,7 @@ public:
 		vkDestroyBuffer	(device, stagingBuffer, nullptr);
 	}
 
-	void														reBuildCommandBuffers					()									{
+	void														reBuildCommandBuffers					()																{
 		if (!checkCommandBuffers()) {
 			destroyCommandBuffers();
 			createCommandBuffers();
@@ -260,7 +260,7 @@ public:
 		buildCommandBuffers();
 	}
 
-	void														buildCommandBuffers						()									{
+	void														buildCommandBuffers						()																{
 		VkCommandBufferBeginInfo										cmdBufInfo								= vks::initializers::commandBufferBeginInfo();
 
 		VkClearValue													clearValues[2];
@@ -314,7 +314,7 @@ public:
 		}
 	}
 
-	void														loadMeshes								()									{
+	void														loadMeshes								()																{
 		// Skybox
 		models.skybox.loadFromFile(getAssetPath() + "models/cube.obj", vertexLayout, 0.05f, vulkanDevice, queue);
 		// Objects
@@ -326,7 +326,7 @@ public:
 		}
 	}
 
-	void														setupVertexDescriptions					()									{
+	void														setupVertexDescriptions					()																{
 		// Binding description
 		vertices.bindingDescriptions.resize(1);
 		vertices.bindingDescriptions[0]								= vks::initializers::vertexInputBindingDescription(VERTEX_BUFFER_BIND_ID, vertexLayout.stride(), VK_VERTEX_INPUT_RATE_VERTEX);
@@ -344,7 +344,7 @@ public:
 		vertices.inputState.pVertexAttributeDescriptions			= vertices.attributeDescriptions.data();
 	}
 
-	void														setupDescriptorPool						()									{
+	void														setupDescriptorPool						()																{
 		std::vector<VkDescriptorPoolSize>								poolSizes								=
 			{	vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 2)
 			,	vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 2)
@@ -355,7 +355,7 @@ public:
 		VK_CHECK_RESULT(vkCreateDescriptorPool(device, &descriptorPoolInfo, nullptr, &descriptorPool));
 	}
 
-	void														setupDescriptorSetLayout				()									{
+	void														setupDescriptorSetLayout				()																{
 		std::vector<VkDescriptorSetLayoutBinding>						setLayoutBindings						= 
 			{	vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT, 0)					// Binding 0 : Vertex shader uniform buffer
 			,	vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, 1)		// Binding 1 : Fragment shader image sampler
@@ -368,7 +368,7 @@ public:
 		VK_CHECK_RESULT(vkCreatePipelineLayout(device, &pPipelineLayoutCreateInfo, nullptr, &pipelineLayout));
 	}
 
-	void														setupDescriptorSets						()									{
+	void														setupDescriptorSets						()																{
 		// Image descriptor for the cube map texture
 		VkDescriptorImageInfo											textureDescriptor						= vks::initializers::descriptorImageInfo(cubeMap.sampler, cubeMap.view, cubeMap.imageLayout);
 		VkDescriptorSetAllocateInfo										allocInfo								= vks::initializers::descriptorSetAllocateInfo(descriptorPool, &descriptorSetLayout, 1);
@@ -392,7 +392,7 @@ public:
 		vkUpdateDescriptorSets(device, static_cast<uint32_t>(writeDescriptorSets.size()), writeDescriptorSets.data(), 0, NULL);
 	}
 
-	void														preparePipelines						()									{
+	void														preparePipelines						()																{
 		VkPipelineInputAssemblyStateCreateInfo							inputAssemblyState						= vks::initializers::pipelineInputAssemblyStateCreateInfo(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, 0, VK_FALSE);
 		VkPipelineRasterizationStateCreateInfo							rasterizationState						= vks::initializers::pipelineRasterizationStateCreateInfo(VK_POLYGON_MODE_FILL, VK_CULL_MODE_BACK_BIT, VK_FRONT_FACE_COUNTER_CLOCKWISE, 0);
 		VkPipelineColorBlendAttachmentState								blendAttachmentState					= vks::initializers::pipelineColorBlendAttachmentState(0xf, VK_FALSE);
@@ -437,7 +437,7 @@ public:
 	}
 
 	// Prepare and initialize uniform buffer containing shader uniforms
-	void														prepareUniformBuffers					()									{
+	void														prepareUniformBuffers					()																{
 		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBuffers.object, sizeof(uboVS)));		// Objact vertex shader uniform buffer
 		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBuffers.skybox, sizeof(uboVS)));		// Skybox vertex shader uniform buffer
 
@@ -448,7 +448,7 @@ public:
 		updateUniformBuffers();
 	}
 
-	void														updateUniformBuffers					()									{
+	void														updateUniformBuffers					()																{
 		// 3D object
 		glm::mat4 viewMatrix = glm::mat4();
 		uboVS.projection = glm::perspective(glm::radians(60.0f), (float)width / (float)height, 0.001f, 256.0f);
@@ -475,7 +475,7 @@ public:
 		memcpy(uniformBuffers.skybox.mapped, &uboVS, sizeof(uboVS));
 	}
 
-	void														draw									()									{
+	void														draw									()																{
 		VulkanExampleBase::prepareFrame();
 
 		submitInfo.commandBufferCount								= 1;
@@ -485,7 +485,7 @@ public:
 		VulkanExampleBase::submitFrame();
 	}
 
-	void														prepare									()									{
+	void														prepare									()																{
 		VulkanExampleBase::prepare();
 		loadMeshes();
 		setupVertexDescriptions();
@@ -499,10 +499,10 @@ public:
 		prepared													= true;
 	}
 
-	virtual void												render									()									{ if (prepared) draw();										}
-	virtual void												viewChanged								()									{ updateUniformBuffers();									}
-	void														toggleSkyBox							()									{ displaySkybox = !displaySkybox; reBuildCommandBuffers();	}
-	void														toggleObject							()									{
+	virtual void												render									()																{ if (prepared) draw();										}
+	virtual void												viewChanged								()																{ updateUniformBuffers();									}
+	void														toggleSkyBox							()																{ displaySkybox = !displaySkybox; reBuildCommandBuffers();	}
+	void														toggleObject							()																{
 		models.objectIndex++;
 		if (models.objectIndex >= static_cast<uint32_t>(models.objects.size()))
 			models.objectIndex = 0;
@@ -510,7 +510,7 @@ public:
 		reBuildCommandBuffers();
 	}
 
-	void														changeLodBias							(float delta)						{
+	void														changeLodBias							(float delta)													{
 		uboVS.lodBias += delta;
 		if (uboVS.lodBias < 0.0f)
 			uboVS.lodBias = 0.0f;
@@ -522,7 +522,7 @@ public:
 		updateTextOverlay();
 	}
 
-	virtual void												keyPressed								(uint32_t keyCode)					{
+	virtual void												keyPressed								(uint32_t keyCode)												{
 		switch (keyCode) {
 		case KEY_S				:
 		case GAMEPAD_BUTTON_A	: toggleSkyBox();		break;
@@ -535,7 +535,7 @@ public:
 		}
 	}
 
-	virtual void												getOverlayText							(VulkanTextOverlay *textOverlay_)	{
+	virtual void												getOverlayText							(VulkanTextOverlay *textOverlay_)								{
 		std::stringstream ss;
 		ss << std::setprecision(2) << std::fixed << uboVS.lodBias;
 #if defined(__ANDROID__)
