@@ -80,7 +80,7 @@ public:
 		vkDestroyDescriptorSetLayout	(device, graphics.descriptorSetLayout	, nullptr);
 
 		// Compute
-		for (auto& pipeline : compute.pipelines)
+		for (VkPipeline& pipeline : compute.pipelines)
 			vkDestroyPipeline				(device, pipeline, nullptr);
 
 		vkDestroyPipelineLayout			(device, compute.pipelineLayout			, nullptr);
@@ -206,8 +206,7 @@ public:
 		renderPassBeginInfo.clearValueCount = 2;
 		renderPassBeginInfo.pClearValues = clearValues;
 
-		for (size_t i = 0; i < drawCmdBuffers.size(); ++i)
-		{
+		for (size_t i = 0; i < drawCmdBuffers.size(); ++i) {
 			// Set target frame buffer
 			renderPassBeginInfo.framebuffer = frameBuffers[i];
 
@@ -260,9 +259,7 @@ public:
 	void buildComputeCommandBuffer()	{
 		// Flush the queue if we're rebuilding the command buffer after a pipeline change to ensure it's not currently in use
 		vkQueueWaitIdle(compute.queue);
-
 		VkCommandBufferBeginInfo cmdBufInfo = vks::initializers::commandBufferBeginInfo();
-
 		VK_CHECK_RESULT(vkBeginCommandBuffer(compute.commandBuffer, &cmdBufInfo));
 
 		vkCmdBindPipeline(compute.commandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, compute.pipelines[compute.pipelineIndex]);
@@ -362,7 +359,7 @@ public:
 		vkUpdateDescriptorSets(device, static_cast<uint32_t>(baseImageWriteDescriptorSets.size()), baseImageWriteDescriptorSets.data(), 0, NULL);
 	}
 
-	void preparePipelines()	{
+	void																		preparePipelines		()									{
 		VkPipelineInputAssemblyStateCreateInfo				inputAssemblyState		= vks::initializers::pipelineInputAssemblyStateCreateInfo	(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, 0, VK_FALSE);
 		VkPipelineRasterizationStateCreateInfo				rasterizationState		= vks::initializers::pipelineRasterizationStateCreateInfo	(VK_POLYGON_MODE_FILL, VK_CULL_MODE_NONE, VK_FRONT_FACE_COUNTER_CLOCKWISE, 0);
 		VkPipelineColorBlendAttachmentState					blendAttachmentState	= vks::initializers::pipelineColorBlendAttachmentState		(0xf, VK_FALSE);
@@ -435,28 +432,27 @@ public:
 		vkGetDeviceQueue(device, compute.queueFamilyIndex, 0, &compute.queue);
 	}
 
-	void prepareCompute()
-	{
+	void														prepareCompute							()									{
 		getComputeQueue();
 
 		// Create compute pipeline
 		// Compute pipelines are created separate from graphics pipelines even if they use the same queue
 
-		std::vector<VkDescriptorSetLayoutBinding> setLayoutBindings = 
+		std::vector<VkDescriptorSetLayoutBinding>						setLayoutBindings						= 
 			{	vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_SHADER_STAGE_COMPUTE_BIT, 0)	// Binding 0 : Sampled image (read)
 			,	vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, VK_SHADER_STAGE_COMPUTE_BIT, 1)	// Binding 1 : Sampled image (write)
 			};
 
-		VkDescriptorSetLayoutCreateInfo						descriptorLayout			= vks::initializers::descriptorSetLayoutCreateInfo(setLayoutBindings.data(), static_cast<uint32_t>(setLayoutBindings.size()));
+		VkDescriptorSetLayoutCreateInfo									descriptorLayout						= vks::initializers::descriptorSetLayoutCreateInfo(setLayoutBindings.data(), static_cast<uint32_t>(setLayoutBindings.size()));
 		VK_CHECK_RESULT(vkCreateDescriptorSetLayout(device,	&descriptorLayout, nullptr, &compute.descriptorSetLayout));
 
-		VkPipelineLayoutCreateInfo							pPipelineLayoutCreateInfo	= vks::initializers::pipelineLayoutCreateInfo(&compute.descriptorSetLayout, 1);
+		VkPipelineLayoutCreateInfo										pPipelineLayoutCreateInfo				= vks::initializers::pipelineLayoutCreateInfo(&compute.descriptorSetLayout, 1);
 		VK_CHECK_RESULT(vkCreatePipelineLayout(device, &pPipelineLayoutCreateInfo, nullptr, &compute.pipelineLayout));
 
-		VkDescriptorSetAllocateInfo allocInfo = vks::initializers::descriptorSetAllocateInfo(descriptorPool, &compute.descriptorSetLayout, 1);
+		VkDescriptorSetAllocateInfo										allocInfo								= vks::initializers::descriptorSetAllocateInfo(descriptorPool, &compute.descriptorSetLayout, 1);
 		VK_CHECK_RESULT(vkAllocateDescriptorSets(device, &allocInfo, &compute.descriptorSet));
 
-		std::vector<VkWriteDescriptorSet>					computeWriteDescriptorSets	=
+		std::vector<VkWriteDescriptorSet>								computeWriteDescriptorSets				=
 			{	vks::initializers::writeDescriptorSet(compute.descriptorSet, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 0, &textureColorMap		.descriptor)	// Binding 0 : Sampled image (read)
 			,	vks::initializers::writeDescriptorSet(compute.descriptorSet, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1, &textureComputeTarget	.descriptor)	// Binding 1 : Sampled image (write)
 			};
@@ -465,15 +461,14 @@ public:
 
 
 		// Create compute shader pipelines
-		VkComputePipelineCreateInfo computePipelineCreateInfo = vks::initializers::computePipelineCreateInfo(compute.pipelineLayout, 0);
+		VkComputePipelineCreateInfo										computePipelineCreateInfo				= vks::initializers::computePipelineCreateInfo(compute.pipelineLayout, 0);
 
 		// One pipeline for each effect
-		std::vector<std::string> shaderNames = { "sharpen", "edgedetect", "emboss" };
-		for (auto& shaderName : shaderNames)
-		{
-			std::string fileName = getAssetPath() + "shaders/computeshader/" + shaderName + ".comp.spv";
-			computePipelineCreateInfo.stage = loadShader(fileName.c_str(), VK_SHADER_STAGE_COMPUTE_BIT);
-			VkPipeline pipeline;
+		std::vector<std::string>										shaderNames								= { "sharpen", "edgedetect", "emboss" };
+		for (auto& shaderName : shaderNames) {
+			std::string														fileName								= getAssetPath() + "shaders/computeshader/" + shaderName + ".comp.spv";
+			computePipelineCreateInfo.stage								= loadShader(fileName.c_str(), VK_SHADER_STAGE_COMPUTE_BIT);
+			VkPipeline														pipeline;
 			VK_CHECK_RESULT(vkCreateComputePipelines(device, pipelineCache, 1, &computePipelineCreateInfo, nullptr, &pipeline));
 
 			compute.pipelines.push_back(pipeline);
@@ -499,7 +494,7 @@ public:
 	}
 
 	// Prepare and initialize uniform buffer containing shader uniforms
-	void prepareUniformBuffers()	{
+	void														prepareUniformBuffers					()									{
 		
 		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBufferVS, sizeof(uboVS)));	// Vertex shader uniform buffer block
 		VK_CHECK_RESULT(uniformBufferVS.map());		// Map persistent
@@ -507,7 +502,7 @@ public:
 		updateUniformBuffers();
 	}
 
-	void updateUniformBuffers()		{
+	void														updateUniformBuffers					()									{
 		// Vertex shader uniform buffer block
 		uboVS.projection = glm::perspective(glm::radians(60.0f), (float)width*0.5f / (float)height, 0.1f, 256.0f);
 		glm::mat4 viewMatrix = glm::translate(glm::mat4(), glm::vec3(0.0f, 0.0f, zoom));
@@ -520,7 +515,7 @@ public:
 		memcpy(uniformBufferVS.mapped, &uboVS, sizeof(uboVS));
 	}
 
-	void draw()		{
+	void														draw									()									{
 		VulkanExampleBase::prepareFrame();
 
 		submitInfo.commandBufferCount = 1;
@@ -541,8 +536,7 @@ public:
 		VK_CHECK_RESULT(vkQueueSubmit(compute.queue, 1, &computeSubmitInfo, compute.fence));
 	}
 
-	void prepare()
-	{
+	void														prepare									()									{
 		VulkanExampleBase::prepare();
 		loadAssets();
 		generateQuad();
@@ -558,9 +552,9 @@ public:
 		prepared													= true;
 	}
 
-	virtual void render					()									{ if (prepared) draw();		}
-	virtual void viewChanged			()									{ updateUniformBuffers();	}
-	virtual void switchComputePipeline	(int32_t dir)						{
+	virtual void												render									()									{ if (prepared) draw();		}
+	virtual void												viewChanged								()									{ updateUniformBuffers();	}
+	virtual void												switchComputePipeline					(int32_t dir)						{
 		if ((dir < 0) && (compute.pipelineIndex > 0)) {
 			compute.pipelineIndex--;
 			buildComputeCommandBuffer();
@@ -571,21 +565,16 @@ public:
 		}
 	}
 
-	virtual void keyPressed				(uint32_t keyCode)					{
-		switch (keyCode)
-		{
-		case KEY_KPADD:
-		case GAMEPAD_BUTTON_R1:
-			switchComputePipeline(1);
-			break;
-		case KEY_KPSUB:
-		case GAMEPAD_BUTTON_L1:
-			switchComputePipeline(-1);
-			break;
+	virtual void												keyPressed						(uint32_t keyCode)					{
+		switch (keyCode) {
+		case KEY_KPADD			:
+		case GAMEPAD_BUTTON_R1	:	switchComputePipeline( 1); break;
+		case KEY_KPSUB			:
+		case GAMEPAD_BUTTON_L1	:	switchComputePipeline(-1); break;
 		}
 	}
 
-	virtual void getOverlayText			(VulkanTextOverlay *textOverlay_)	{
+	virtual void												getOverlayText					(VulkanTextOverlay *textOverlay_)	{
 #if defined(__ANDROID__)
 		textOverlay_->addText("Press \"L1/R1\" to change shaders", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
 #else
