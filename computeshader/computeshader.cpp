@@ -97,8 +97,7 @@ public:
 	}
 
 	// Prepare a texture target that is used to store compute shader calculations
-	void prepareTextureTarget(vks::Texture *tex, uint32_t width_, uint32_t height_, VkFormat format)
-	{
+	void prepareTextureTarget(vks::Texture *tex, uint32_t width_, uint32_t height_, VkFormat format)	{
 		VkFormatProperties formatProperties;
 
 		// Get device properties for the requested texture format
@@ -175,8 +174,7 @@ public:
 		tex->device = vulkanDevice;
 	}
 
-	void loadAssets()
-	{
+	void loadAssets()	{
 		textureColorMap.loadFromFile(
 			getAssetPath() + "textures/het_kanonschot_rgba8.ktx",
 			VK_FORMAT_R8G8B8A8_UNORM,
@@ -186,8 +184,7 @@ public:
 			VK_IMAGE_LAYOUT_GENERAL);
 	}
 
-	void buildCommandBuffers()
-	{
+	void buildCommandBuffers()	{
 		// Destroy command buffers if already present
 		if (!checkCommandBuffers()) {
 			destroyCommandBuffers();
@@ -277,8 +274,7 @@ public:
 	}
 
 	// Setup vertices for a single uv-mapped quad
-	void generateQuad()
-	{
+	void generateQuad()	{
 		// Setup vertices for a single uv-mapped quad made from two triangles
 		std::vector<Vertex> _vertices	=
 			{	{ {  1.0f,  1.0f, 0.0f }, { 1.0f, 1.0f } }
@@ -297,8 +293,7 @@ public:
 		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &indexBuffer, indices.size() * sizeof(uint32_t), indices.data()));		// Index buffer
 	}
 
-	void setupVertexDescriptions()
-	{
+	void setupVertexDescriptions()	{
 		// Binding description
 		vertices.bindingDescriptions.resize(1);
 		vertices.bindingDescriptions[0] = vks::initializers::vertexInputBindingDescription(VERTEX_BUFFER_BIND_ID, sizeof(Vertex), VK_VERTEX_INPUT_RATE_VERTEX);
@@ -318,8 +313,7 @@ public:
 		vertices.inputState.pVertexAttributeDescriptions		= vertices.attributeDescriptions.data();
 	}
 
-	void setupDescriptorPool()
-	{
+	void setupDescriptorPool()	{
 		std::vector<VkDescriptorPoolSize> poolSizes =
 			{	vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 2)
 			,	vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 2)	// Graphics pipeline uses image samplers for display
@@ -331,8 +325,7 @@ public:
 		VK_CHECK_RESULT(vkCreateDescriptorPool(device, &descriptorPoolInfo, nullptr, &descriptorPool));
 	}
 
-	void setupDescriptorSetLayout()
-	{
+	void setupDescriptorSetLayout()	{
 		std::vector<VkDescriptorSetLayoutBinding> setLayoutBindings =
 			{	vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER			, VK_SHADER_STAGE_VERTEX_BIT	, 0)	// Binding 0 : Vertex shader uniform buffer
 			,	vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER	, VK_SHADER_STAGE_FRAGMENT_BIT	, 1)	// Binding 1 : Fragment shader image sampler
@@ -345,8 +338,7 @@ public:
 		VK_CHECK_RESULT(vkCreatePipelineLayout(device, &pPipelineLayoutCreateInfo, nullptr, &graphics.pipelineLayout));
 	}
 
-	void setupDescriptorSet()
-	{
+	void setupDescriptorSet()	{
 		VkDescriptorSetAllocateInfo allocInfo = vks::initializers::descriptorSetAllocateInfo(descriptorPool, &graphics.descriptorSetLayout, 1);
 		VK_CHECK_RESULT(vkAllocateDescriptorSets(device, &allocInfo, &graphics.descriptorSetPostCompute));
 
@@ -370,8 +362,7 @@ public:
 		vkUpdateDescriptorSets(device, static_cast<uint32_t>(baseImageWriteDescriptorSets.size()), baseImageWriteDescriptorSets.data(), 0, NULL);
 	}
 
-	void preparePipelines()
-	{
+	void preparePipelines()	{
 		VkPipelineInputAssemblyStateCreateInfo				inputAssemblyState		= vks::initializers::pipelineInputAssemblyStateCreateInfo	(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, 0, VK_FALSE);
 		VkPipelineRasterizationStateCreateInfo				rasterizationState		= vks::initializers::pipelineRasterizationStateCreateInfo	(VK_POLYGON_MODE_FILL, VK_CULL_MODE_NONE, VK_FRONT_FACE_COUNTER_CLOCKWISE, 0);
 		VkPipelineColorBlendAttachmentState					blendAttachmentState	= vks::initializers::pipelineColorBlendAttachmentState		(0xf, VK_FALSE);
@@ -419,26 +410,20 @@ public:
 		// Some devices have dedicated compute queues, so we first try to find a queue that supports compute and not graphics
 		bool computeQueueFound = false;
 		for (uint32_t i = 0; i < static_cast<uint32_t>(queueFamilyProperties.size()); i++)
-		{
-			if ((queueFamilyProperties[i].queueFlags & VK_QUEUE_COMPUTE_BIT) && ((queueFamilyProperties[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) == 0))
-			{
+			if ((queueFamilyProperties[i].queueFlags & VK_QUEUE_COMPUTE_BIT) && ((queueFamilyProperties[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) == 0)) {
 				compute.queueFamilyIndex = i;
 				computeQueueFound = true;
 				break;
 			}
-		}
+
 		// If there is no dedicated compute queue, just find the first queue family that supports compute
-		if (!computeQueueFound)
-		{
+		if (!computeQueueFound) {
 			for (uint32_t i = 0; i < static_cast<uint32_t>(queueFamilyProperties.size()); i++)
-			{
-				if (queueFamilyProperties[i].queueFlags & VK_QUEUE_COMPUTE_BIT)
-				{
+				if (queueFamilyProperties[i].queueFlags & VK_QUEUE_COMPUTE_BIT) {
 					compute.queueFamilyIndex = i;
 					computeQueueFound = true;
 					break;
 				}
-			}
 		}
 
 		// Compute is mandatory in Vulkan, so there must be at least one queue family that supports compute

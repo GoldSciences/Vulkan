@@ -104,8 +104,7 @@ public:
 
 	uint32_t objectCount = 0;
 
-	VulkanExample() : VulkanExampleBase(ENABLE_VALIDATION)
-	{
+	VulkanExample() : VulkanExampleBase(ENABLE_VALIDATION)	{
 		enableTextOverlay = true;
 		title = "Vulkan Example - Compute cull and lod";
 		camera.type = Camera::CameraType::firstperson;
@@ -115,8 +114,7 @@ public:
 		memset(&indirectStats, 0, sizeof(indirectStats));
 	}
 
-	~VulkanExample()
-	{
+	~VulkanExample()	{
 		vkDestroyPipeline(device, pipelines.plants, nullptr);
 		vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
 		vkDestroyDescriptorSetLayout(device, descriptorSetLayout, nullptr);
@@ -142,8 +140,7 @@ public:
 		buildCommandBuffers();
 	}
 
-	void buildCommandBuffers()
-	{
+	void buildCommandBuffers()	{
 		VkCommandBufferBeginInfo cmdBufInfo = vks::initializers::commandBufferBeginInfo();
 
 		VkClearValue clearValues[2];
@@ -196,16 +193,13 @@ public:
 		}
 	}
 
-	void loadAssets()
-	{
+	void loadAssets()	{
 		models.lodObject.loadFromFile(getAssetPath() + "models/suzanne_lods.dae", vertexLayout, 0.1f, vulkanDevice, queue);
 	}
 
-	void setupVertexDescriptions()
-	{
+	void setupVertexDescriptions()	{
 		vertices.bindingDescriptions.resize(2);
 
-		
 		vertices.bindingDescriptions[0] = vks::initializers::vertexInputBindingDescription(VERTEX_BUFFER_BIND_ID	, vertexLayout.stride()	, VK_VERTEX_INPUT_RATE_VERTEX	);	// Binding 0: Per vertex
 		vertices.bindingDescriptions[1] = vks::initializers::vertexInputBindingDescription(INSTANCE_BUFFER_BIND_ID	, sizeof(InstanceData)	, VK_VERTEX_INPUT_RATE_INSTANCE	);	// Binding 1: Per instance
 
@@ -229,8 +223,7 @@ public:
 		vertices.inputState.pVertexAttributeDescriptions		= vertices.attributeDescriptions.data();
 	}
 
-	void buildComputeCommandBuffer()
-	{
+	void buildComputeCommandBuffer()	{
 		VkCommandBufferBeginInfo cmdBufInfo = vks::initializers::commandBufferBeginInfo();
 
 		VK_CHECK_RESULT(vkBeginCommandBuffer(compute.commandBuffer, &cmdBufInfo));
@@ -269,8 +262,7 @@ public:
 		vkEndCommandBuffer(compute.commandBuffer);
 	}
 
-	void setupDescriptorPool()
-	{
+	void setupDescriptorPool()	{
 		// Example uses one ubo 
 		std::vector<VkDescriptorPoolSize> poolSizes =
 			{	vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 2)
@@ -278,12 +270,10 @@ public:
 			};
 
 		VkDescriptorPoolCreateInfo descriptorPoolInfo = vks::initializers::descriptorPoolCreateInfo(static_cast<uint32_t>(poolSizes.size()), poolSizes.data(), 2);
-
 		VK_CHECK_RESULT(vkCreateDescriptorPool(device, &descriptorPoolInfo, nullptr, &descriptorPool));
 	}
 
-	void setupDescriptorSetLayout()
-	{
+	void setupDescriptorSetLayout()	{
 		std::vector<VkDescriptorSetLayoutBinding> setLayoutBindings =
 			{	vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT, 0),	// Binding 0: Vertex shader uniform buffer
 			};
@@ -295,8 +285,7 @@ public:
 		VK_CHECK_RESULT(vkCreatePipelineLayout(device, &pPipelineLayoutCreateInfo, nullptr, &pipelineLayout));
 	}
 
-	void setupDescriptorSet()
-	{
+	void setupDescriptorSet()	{
 		VkDescriptorSetAllocateInfo							allocInfo = vks::initializers::descriptorSetAllocateInfo(descriptorPool, &descriptorSetLayout, 1);
 		VK_CHECK_RESULT(vkAllocateDescriptorSets(device, &allocInfo, &descriptorSet));
 
@@ -307,8 +296,7 @@ public:
 		vkUpdateDescriptorSets(device, static_cast<uint32_t>(writeDescriptorSets.size()), writeDescriptorSets.data(), 0, NULL);
 	}
 
-	void preparePipelines()
-	{
+	void preparePipelines()	{
 		VkPipelineInputAssemblyStateCreateInfo				inputAssemblyState		= vks::initializers::pipelineInputAssemblyStateCreateInfo(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, 0, VK_FALSE);
 		VkPipelineRasterizationStateCreateInfo				rasterizationState		= vks::initializers::pipelineRasterizationStateCreateInfo(VK_POLYGON_MODE_FILL, VK_CULL_MODE_BACK_BIT, VK_FRONT_FACE_CLOCKWISE, 0);
 		VkPipelineColorBlendAttachmentState					blendAttachmentState	= vks::initializers::pipelineColorBlendAttachmentState(0xf, VK_FALSE);
@@ -340,8 +328,7 @@ public:
 		VK_CHECK_RESULT(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipelines.plants));
 	}
 
-	void prepareBuffers()
-	{
+	void prepareBuffers()	{
 		objectCount = OBJECT_COUNT * OBJECT_COUNT * OBJECT_COUNT;
 
 		vks::Buffer stagingBuffer;
@@ -405,8 +392,7 @@ public:
 		};
 		std::vector<LOD> LODLevels;
 		uint32_t n = 0;
-		for (auto modelPart : models.lodObject.parts)
-		{
+		for (auto modelPart : models.lodObject.parts) {
 			LOD lod;
 			lod.firstIndex = modelPart.indexBase;			// First index for this LOD
 			lod.indexCount = modelPart.indexCount;			// Index count for this LOD
@@ -428,8 +414,7 @@ public:
 		updateUniformBuffer(true);
 	}
 
-	void prepareCompute()
-	{
+	void prepareCompute()	{
 		// Create a compute capable device queue
 		VkDeviceQueueCreateInfo queueCreateInfo = {};
 		queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
@@ -512,14 +497,11 @@ public:
 		buildComputeCommandBuffer();
 	}
 
-	void updateUniformBuffer(bool viewChanged)
-	{
-		if (viewChanged)
-		{
+	void updateUniformBuffer(bool viewChanged)	{
+		if (viewChanged) {
 			uboScene.projection = camera.matrices.perspective;
 			uboScene.modelview = camera.matrices.view;
-			if (!fixedFrustum)
-			{
+			if (!fixedFrustum) {
 				uboScene.cameraPos = glm::vec4(camera.position, 1.0f) * -1.0f;
 				frustum.update(uboScene.projection * uboScene.modelview);
 				memcpy(uboScene.frustumPlanes, frustum.planes.data(), sizeof(glm::vec4) * 6);
@@ -591,18 +573,16 @@ public:
 	virtual void render			()					{ if (prepared)	draw();			}
 	virtual void viewChanged	()					{ updateUniformBuffer(true);	}
 	virtual void keyPressed		(uint32_t keyCode)	{
-		switch (keyCode)
-		{
-		case KEY_F:
-		case GAMEPAD_BUTTON_A:
-			fixedFrustum = !fixedFrustum;
-			updateUniformBuffer(true);
+		switch (keyCode) {
+		case KEY_F				:
+		case GAMEPAD_BUTTON_A	: 
+			fixedFrustum = !fixedFrustum;	
+			updateUniformBuffer(true);	
 			break;
 		}
 	}
 
-	virtual void getOverlayText(VulkanTextOverlay *textOverlay_)
-	{
+	virtual void getOverlayText(VulkanTextOverlay *textOverlay_)	{
 #if defined(__ANDROID__)
 		textOverlay_->addText("\"Button A\" to freeze frustum", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
 #else

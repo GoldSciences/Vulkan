@@ -194,23 +194,17 @@ public:
 	}
 
 	// Create a frame buffer attachment
-	void createAttachment(
-		VkFormat format,  
-		VkImageUsageFlagBits usage,
-		FrameBufferAttachment *attachment)
-	{
+	void createAttachment(VkFormat format, VkImageUsageFlagBits usage, FrameBufferAttachment *attachment)	{
 		VkImageAspectFlags aspectMask = 0;
 		VkImageLayout imageLayout;
 
 		attachment->format = format;
 
-		if (usage & VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT)
-		{
+		if (usage & VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT) {
 			aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
 			imageLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 		}
-		if (usage & VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT)
-		{
+		if (usage & VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT) {
 			aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT;
 			imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 		}
@@ -253,8 +247,7 @@ public:
 	}
 
 	// Prepare a new framebuffer and attachments for offscreen rendering (G-Buffer)
-	void prepareOffscreenFramebuffer()
-	{
+	void prepareOffscreenFramebuffer()	{
 		offScreenFrameBuf.width = FB_DIM;
 		offScreenFrameBuf.height = FB_DIM;
 
@@ -276,20 +269,17 @@ public:
 		std::array<VkAttachmentDescription, 4> attachmentDescs = {};
 
 		// Init attachment properties
-		for (uint32_t i = 0; i < 4; ++i)
-		{
+		for (uint32_t i = 0; i < 4; ++i) {
 			attachmentDescs[i].samples = VK_SAMPLE_COUNT_1_BIT;
 			attachmentDescs[i].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
 			attachmentDescs[i].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
 			attachmentDescs[i].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
 			attachmentDescs[i].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-			if (i == 3)
-			{
+			if (i == 3) {
 				attachmentDescs[i].initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 				attachmentDescs[i].finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 			}
-			else
-			{
+			else {
 				attachmentDescs[i].initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 				attachmentDescs[i].finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 			}
@@ -380,12 +370,9 @@ public:
 	}
 
 	// Build command buffer for rendering the scene to the offscreen frame buffer attachments
-	void buildDeferredCommandBuffer()
-	{
+	void buildDeferredCommandBuffer() {
 		if (offScreenCmdBuffer == VK_NULL_HANDLE)
-		{
 			offScreenCmdBuffer = VulkanExampleBase::createCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY, false);
-		}
 
 		// Create a semaphore used to synchronize offscreen rendering and usage
 		VkSemaphoreCreateInfo semaphoreCreateInfo = vks::initializers::semaphoreCreateInfo();
@@ -439,8 +426,7 @@ public:
 		VK_CHECK_RESULT(vkEndCommandBuffer(offScreenCmdBuffer));
 	}
 
-	void loadAssets()
-	{
+	void loadAssets()	{
 		models.model.loadFromFile(getAssetPath() + "models/armor/armor.dae", vertexLayout, 1.0f, vulkanDevice, queue);
 
 		vks::ModelCreateInfo modelCreateInfo;
@@ -456,18 +442,15 @@ public:
 		textures.floor.normalMap.loadFromFile(getAssetPath() + "textures/pattern_35_normalmap_bc3.ktx", VK_FORMAT_BC3_UNORM_BLOCK, vulkanDevice, queue);
 	}
 
-	void reBuildCommandBuffers()
-	{
-		if (!checkCommandBuffers())
-		{
+	void reBuildCommandBuffers	()	{
+		if (!checkCommandBuffers()) {
 			destroyCommandBuffers();
 			createCommandBuffers();
 		}
 		buildCommandBuffers();
 	}
 
-	void buildCommandBuffers()
-	{
+	void buildCommandBuffers	()	{
 		VkCommandBufferBeginInfo cmdBufInfo = vks::initializers::commandBufferBeginInfo();
 
 		VkClearValue clearValues[2];
@@ -483,8 +466,7 @@ public:
 		renderPassBeginInfo.clearValueCount = 2;
 		renderPassBeginInfo.pClearValues = clearValues;
 
-		for (size_t i = 0; i < drawCmdBuffers.size(); ++i)
-		{
+		for (size_t i = 0; i < drawCmdBuffers.size(); ++i) {
 			// Set target frame buffer
 			renderPassBeginInfo.framebuffer = frameBuffers[i];
 
@@ -501,8 +483,7 @@ public:
 			VkDeviceSize offsets[1] = { 0 };
 			vkCmdBindDescriptorSets(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayouts.deferred, 0, 1, &descriptorSet, 0, NULL);
 
-			if (debugDisplay)
-			{
+			if (debugDisplay) {
 				vkCmdBindPipeline(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines.debug);
 				vkCmdBindVertexBuffers(drawCmdBuffers[i], VERTEX_BUFFER_BIND_ID, 1, &models.quad.vertices.buffer, offsets);
 				vkCmdBindIndexBuffer(drawCmdBuffers[i], models.quad.indices.buffer, 0, VK_INDEX_TYPE_UINT32);
@@ -527,8 +508,7 @@ public:
 		}
 	}
 
-	void generateQuads()
-	{
+	void generateQuads() {
 		// Setup vertices for multiple screen aligned quads
 		// Used for displaying final result and debug 
 		struct Vertex {
@@ -543,16 +523,14 @@ public:
 
 		float x = 0.0f;
 		float y = 0.0f;
-		for (uint32_t i = 0; i < 3; i++)
-		{
+		for (uint32_t i = 0; i < 3; i++) {
 			// Last component of normal is used for debug display sampler index
 			vertexBuffer.push_back({ { x+1.0f, y+1.0f, 0.0f }, { 1.0f, 1.0f }, { 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f, (float)i } });
 			vertexBuffer.push_back({ { x,      y+1.0f, 0.0f }, { 0.0f, 1.0f }, { 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f, (float)i } });
 			vertexBuffer.push_back({ { x,      y,      0.0f }, { 0.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f, (float)i } });
 			vertexBuffer.push_back({ { x+1.0f, y,      0.0f }, { 1.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f, (float)i } });
 			x += 1.0f;
-			if (x > 1.0f)
-			{
+			if (x > 1.0f) {
 				x = 0.0f;
 				y += 1.0f;
 			}
@@ -562,8 +540,7 @@ public:
 
 		// Setup indices
 		std::vector<uint32_t> indexBuffer = { 0,1,2, 2,3,0 };
-		for (uint32_t i = 0; i < 3; ++i)
-		{
+		for (uint32_t i = 0; i < 3; ++i) {
 			uint32_t indices[6] = { 0,1,2, 2,3,0 };
 			for (auto index : indices)
 				indexBuffer.push_back(i * 4 + index);
@@ -581,8 +558,7 @@ public:
 		models.quad.device = device;
 	}
 
-	void setupVertexDescriptions()
-	{
+	void setupVertexDescriptions() {
 		// Binding description
 		vertices.bindingDescriptions.resize(1);
 		vertices.bindingDescriptions[0] = vks::initializers::vertexInputBindingDescription(VERTEX_BUFFER_BIND_ID, vertexLayout.stride(), VK_VERTEX_INPUT_RATE_VERTEX);
@@ -602,8 +578,7 @@ public:
 		vertices.inputState.pVertexAttributeDescriptions		= vertices.attributeDescriptions.data();
 	}
 
-	void setupDescriptorPool()
-	{
+	void setupDescriptorPool() {
 		std::vector<VkDescriptorPoolSize> poolSizes =
 			{	vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 8)
 			,	vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 9)
@@ -613,8 +588,7 @@ public:
 		VK_CHECK_RESULT(vkCreateDescriptorPool(device, &descriptorPoolInfo, nullptr, &descriptorPool));
 	}
 
-	void setupDescriptorSetLayout()
-	{
+	void setupDescriptorSetLayout() {
 		// Deferred shading layout
 		std::vector<VkDescriptorSetLayoutBinding> setLayoutBindings =
 			{	vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT, 0)				// Binding 0 : Vertex shader uniform buffer
@@ -634,8 +608,7 @@ public:
 		VK_CHECK_RESULT(vkCreatePipelineLayout(device, &pPipelineLayoutCreateInfo, nullptr, &pipelineLayouts.offscreen));
 	}
 
-	void setupDescriptorSet()
-	{
+	void setupDescriptorSet() {
 		std::vector<VkWriteDescriptorSet> writeDescriptorSets;
 
 		// Textured quad descriptor set
@@ -679,8 +652,7 @@ public:
 		vkUpdateDescriptorSets(device, static_cast<uint32_t>(writeDescriptorSets.size()), writeDescriptorSets.data(), 0, NULL);
 	}
 
-	void preparePipelines()
-	{
+	void preparePipelines()	{
 		VkPipelineInputAssemblyStateCreateInfo				inputAssemblyState		= vks::initializers::pipelineInputAssemblyStateCreateInfo(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, 0, VK_FALSE);
 		VkPipelineRasterizationStateCreateInfo				rasterizationState		= vks::initializers::pipelineRasterizationStateCreateInfo(VK_POLYGON_MODE_FILL, VK_CULL_MODE_BACK_BIT, VK_FRONT_FACE_CLOCKWISE, 0);
 		VkPipelineColorBlendAttachmentState					blendAttachmentState	= vks::initializers::pipelineColorBlendAttachmentState(0xf, VK_FALSE);
@@ -767,8 +739,7 @@ public:
 		updateUniformBufferDeferredLights();
 	}
 
-	void updateUniformBuffersScreen()
-	{
+	void updateUniformBuffersScreen()	{
 		if (debugDisplay)	uboVS.projection = glm::ortho(0.0f, 2.0f, 0.0f, 2.0f, -1.0f, 1.0f);
 		else				uboVS.projection = glm::ortho(0.0f, 1.0f, 0.0f, 1.0f, -1.0f, 1.0f);
 		
@@ -777,8 +748,7 @@ public:
 		memcpy(uniformBuffers.vsFullScreen.mapped, &uboVS, sizeof(uboVS));
 	}
 
-	void updateUniformBufferDeferredMatrices()
-	{
+	void updateUniformBufferDeferredMatrices()	{
 		uboOffscreenVS.projection = camera.matrices.perspective;
 		uboOffscreenVS.view = camera.matrices.view;
 		uboOffscreenVS.model = glm::mat4();
@@ -787,8 +757,7 @@ public:
 	}
 
 	// Update fragment shader light position uniform block
-	void updateUniformBufferDeferredLights()
-	{
+	void updateUniformBufferDeferredLights()	{
 		// White
 		uboFragmentLights.lights[0].position = glm::vec4(0.0f, 0.0f, 1.0f, 0.0f);
 		uboFragmentLights.lights[0].color = glm::vec3(1.5f);
@@ -835,8 +804,7 @@ public:
 		memcpy(uniformBuffers.fsLights.mapped, &uboFragmentLights, sizeof(uboFragmentLights));
 	}
 
-	void draw()
-	{
+	void draw()	{
 		VulkanExampleBase::prepareFrame();
 
 		// The scene render command buffer has to wait for the offscreen
@@ -876,8 +844,7 @@ public:
 		VulkanExampleBase::submitFrame();
 	}
 
-	void prepare()
-	{
+	void prepare()	{
 		VulkanExampleBase::prepare();
 		loadAssets();
 		generateQuads();
@@ -893,28 +860,22 @@ public:
 		prepared													= true;
 	}
 
-	virtual void render()
-	{
+	virtual void render()	{
 		if (!prepared)
 			return;
 		draw();
 		updateUniformBufferDeferredLights();
 	}
 
-	virtual void viewChanged()
-	{
-		updateUniformBufferDeferredMatrices();
-	}
+	virtual void viewChanged()	{ updateUniformBufferDeferredMatrices(); }
 
-	void toggleDebugDisplay()
-	{
+	void toggleDebugDisplay()	{
 		debugDisplay = !debugDisplay;
 		reBuildCommandBuffers();
 		updateUniformBuffersScreen();
 	}
 
-	virtual void keyPressed(uint32_t keyCode)
-	{
+	virtual void keyPressed(uint32_t keyCode)	{
 		switch (keyCode) {
 		case KEY_F2:
 		case GAMEPAD_BUTTON_A:
@@ -924,8 +885,7 @@ public:
 		}
 	}
 
-	virtual void getOverlayText(VulkanTextOverlay *textOverlay_)
-	{
+	virtual void getOverlayText(VulkanTextOverlay *textOverlay_)	{
 #if defined(__ANDROID__)
 		textOverlay_->addText("\"Button A\" to toggle debug display", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
 #else

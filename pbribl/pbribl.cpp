@@ -97,8 +97,7 @@ public:
 	std::vector<Material> materials;
 	int32_t materialIndex = 0;
 
-	VulkanExample() : VulkanExampleBase(ENABLE_VALIDATION)
-	{
+	VulkanExample() : VulkanExampleBase(ENABLE_VALIDATION)	{
 		title = "Vulkan Example - Physical based rendering with image based lighting";
 		enableTextOverlay = true;
 		camera.type = Camera::CameraType::firstperson;
@@ -125,17 +124,16 @@ public:
 		materialIndex = 4;
 	}
 
-	~VulkanExample()
-	{
+	~VulkanExample()	{
 		vkDestroyPipeline(device, pipelines.skybox, nullptr);
 		vkDestroyPipeline(device, pipelines.pbr, nullptr);
 
 		vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
 		vkDestroyDescriptorSetLayout(device, descriptorSetLayout, nullptr);
 
-		for (auto& model : models.objects) {
+		for (auto& model : models.objects) 
 			model.destroy();
-		}
+
 		models.skybox.destroy();
 
 		uniformBuffers.object.destroy();
@@ -145,18 +143,15 @@ public:
 		textures.irradianceMap.destroy();
 	}
 
-	void reBuildCommandBuffers()
-	{
-		if (!checkCommandBuffers())
-		{
+	void reBuildCommandBuffers()	{
+		if (!checkCommandBuffers())	{
 			destroyCommandBuffers();
 			createCommandBuffers();
 		}
 		buildCommandBuffers();
 	}
 
-	void buildCommandBuffers()
-	{
+	void buildCommandBuffers()	{
 		VkCommandBufferBeginInfo cmdBufInfo = vks::initializers::commandBufferBeginInfo();
 
 		VkClearValue clearValues[2];
@@ -238,8 +233,7 @@ public:
 		}
 	}
 
-	void loadAssets()
-	{
+	void loadAssets()	{
 		// Skybox
 		models.skybox.loadFromFile(getAssetPath() + "models/cube.obj", vertexLayout, 1.0f, vulkanDevice, queue);
 		// Objects
@@ -255,8 +249,7 @@ public:
 		textures.irradianceMap.loadFromFile(getAssetPath() + "textures/hamarikyu_bridge_irradiance_cube.ktx", VK_FORMAT_R16G16B16A16_SFLOAT, vulkanDevice, queue);
 	}
 
-	void setupDescriptorSetLayout()
-	{
+	void setupDescriptorSetLayout()	{
 		std::vector<VkDescriptorSetLayoutBinding> setLayoutBindings = {
 			vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0),
 			vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT, 1),
@@ -264,13 +257,11 @@ public:
 			vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, 3),
 		};
 
-		VkDescriptorSetLayoutCreateInfo descriptorLayout = 
-			vks::initializers::descriptorSetLayoutCreateInfo(setLayoutBindings);
+		VkDescriptorSetLayoutCreateInfo descriptorLayout = vks::initializers::descriptorSetLayoutCreateInfo(setLayoutBindings);
 
 		VK_CHECK_RESULT(vkCreateDescriptorSetLayout(device, &descriptorLayout, nullptr, &descriptorSetLayout));
 
-		VkPipelineLayoutCreateInfo pipelineLayoutCreateInfo =
-			vks::initializers::pipelineLayoutCreateInfo(&descriptorSetLayout, 1);
+		VkPipelineLayoutCreateInfo pipelineLayoutCreateInfo = vks::initializers::pipelineLayoutCreateInfo(&descriptorSetLayout, 1);
 
 		std::vector<VkPushConstantRange> pushConstantRanges = {
 			vks::initializers::pushConstantRange(VK_SHADER_STAGE_VERTEX_BIT, sizeof(glm::vec3), 0),
@@ -283,23 +274,20 @@ public:
 		VK_CHECK_RESULT(vkCreatePipelineLayout(device, &pipelineLayoutCreateInfo, nullptr, &pipelineLayout));
 	}
 
-	void setupDescriptorSets()
-	{
+	void setupDescriptorSets()	{
 		// Descriptor Pool
 		std::vector<VkDescriptorPoolSize> poolSizes = {
 			vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 4),
 			vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 6)
 		};
 
-		VkDescriptorPoolCreateInfo descriptorPoolInfo =
-			vks::initializers::descriptorPoolCreateInfo(poolSizes, 2);
+		VkDescriptorPoolCreateInfo descriptorPoolInfo = vks::initializers::descriptorPoolCreateInfo(poolSizes, 2);
 
 		VK_CHECK_RESULT(vkCreateDescriptorPool(device, &descriptorPoolInfo, nullptr, &descriptorPool));
 
 		// Descriptor sets
 		
-		VkDescriptorSetAllocateInfo allocInfo =
-			vks::initializers::descriptorSetAllocateInfo(descriptorPool, &descriptorSetLayout, 1);
+		VkDescriptorSetAllocateInfo allocInfo = vks::initializers::descriptorSetAllocateInfo(descriptorPool, &descriptorSetLayout, 1);
 
 		// 3D object descriptor set
 		VK_CHECK_RESULT(vkAllocateDescriptorSets(device, &allocInfo, &descriptorSets.object));
@@ -323,40 +311,20 @@ public:
 		vkUpdateDescriptorSets(device, static_cast<uint32_t>(writeDescriptorSets.size()), writeDescriptorSets.data(), 0, NULL);
 	}
 
-	void preparePipelines()
-	{
-		VkPipelineInputAssemblyStateCreateInfo inputAssemblyState =
-			vks::initializers::pipelineInputAssemblyStateCreateInfo(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, 0, VK_FALSE);
+	void preparePipelines()	{
+		VkPipelineInputAssemblyStateCreateInfo			inputAssemblyState		= vks::initializers::pipelineInputAssemblyStateCreateInfo(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, 0, VK_FALSE);
+		VkPipelineRasterizationStateCreateInfo			rasterizationState		= vks::initializers::pipelineRasterizationStateCreateInfo(VK_POLYGON_MODE_FILL, VK_CULL_MODE_BACK_BIT, VK_FRONT_FACE_COUNTER_CLOCKWISE);
+		VkPipelineColorBlendAttachmentState				blendAttachmentState	= vks::initializers::pipelineColorBlendAttachmentState(0xf, VK_FALSE);
+		VkPipelineColorBlendStateCreateInfo				colorBlendState			= vks::initializers::pipelineColorBlendStateCreateInfo(1, &blendAttachmentState);
+		VkPipelineDepthStencilStateCreateInfo			depthStencilState		= vks::initializers::pipelineDepthStencilStateCreateInfo(VK_FALSE, VK_FALSE, VK_COMPARE_OP_LESS_OR_EQUAL);
+		VkPipelineViewportStateCreateInfo				viewportState			= vks::initializers::pipelineViewportStateCreateInfo(1, 1);
+		VkPipelineMultisampleStateCreateInfo			multisampleState		= vks::initializers::pipelineMultisampleStateCreateInfo(VK_SAMPLE_COUNT_1_BIT);
 
-		VkPipelineRasterizationStateCreateInfo rasterizationState =
-			vks::initializers::pipelineRasterizationStateCreateInfo(VK_POLYGON_MODE_FILL, VK_CULL_MODE_BACK_BIT, VK_FRONT_FACE_COUNTER_CLOCKWISE);
+		std::vector<VkDynamicState>						dynamicStateEnables		= {VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR};
+		VkPipelineDynamicStateCreateInfo				dynamicState			= vks::initializers::pipelineDynamicStateCreateInfo(dynamicStateEnables);
 
-		VkPipelineColorBlendAttachmentState blendAttachmentState =
-			vks::initializers::pipelineColorBlendAttachmentState(0xf, VK_FALSE);
-
-		VkPipelineColorBlendStateCreateInfo colorBlendState =
-			vks::initializers::pipelineColorBlendStateCreateInfo(1, &blendAttachmentState);
-
-		VkPipelineDepthStencilStateCreateInfo depthStencilState =
-			vks::initializers::pipelineDepthStencilStateCreateInfo(VK_FALSE, VK_FALSE, VK_COMPARE_OP_LESS_OR_EQUAL);
-
-		VkPipelineViewportStateCreateInfo viewportState =
-			vks::initializers::pipelineViewportStateCreateInfo(1, 1);
-
-		VkPipelineMultisampleStateCreateInfo multisampleState =
-			vks::initializers::pipelineMultisampleStateCreateInfo(VK_SAMPLE_COUNT_1_BIT);
-
-		std::vector<VkDynamicState> dynamicStateEnables = {
-			VK_DYNAMIC_STATE_VIEWPORT,
-			VK_DYNAMIC_STATE_SCISSOR
-		};
-		VkPipelineDynamicStateCreateInfo dynamicState =
-			vks::initializers::pipelineDynamicStateCreateInfo(dynamicStateEnables);
-
-		VkGraphicsPipelineCreateInfo pipelineCreateInfo =
-			vks::initializers::pipelineCreateInfo(pipelineLayout, renderPass);
-
-		std::array<VkPipelineShaderStageCreateInfo, 2> shaderStages = {};
+		VkGraphicsPipelineCreateInfo					pipelineCreateInfo		= vks::initializers::pipelineCreateInfo(pipelineLayout, renderPass);
+		std::array<VkPipelineShaderStageCreateInfo, 2>	shaderStages			= {};
 
 		pipelineCreateInfo.pInputAssemblyState = &inputAssemblyState;
 		pipelineCreateInfo.pRasterizationState = &rasterizationState;
@@ -406,28 +374,10 @@ public:
 	}
 
 	// Prepare and initialize uniform buffer containing shader uniforms
-	void prepareUniformBuffers()
-	{
-		// Objact vertex shader uniform buffer
-		VK_CHECK_RESULT(vulkanDevice->createBuffer(
-			VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-			&uniformBuffers.object,
-			sizeof(uboMatrices)));
-
-		// Skybox vertex shader uniform buffer
-		VK_CHECK_RESULT(vulkanDevice->createBuffer(
-			VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-			&uniformBuffers.skybox,
-			sizeof(uboMatrices)));
-
-		// Shared parameter uniform buffer
-		VK_CHECK_RESULT(vulkanDevice->createBuffer(
-			VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-			&uniformBuffers.params,
-			sizeof(uboParams)));
+	void prepareUniformBuffers()	{
+		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBuffers.object, sizeof(uboMatrices)));	// Objact vertex shader uniform buffer
+		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBuffers.skybox, sizeof(uboMatrices)));	// Skybox vertex shader uniform buffer
+		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBuffers.params, sizeof(uboParams)));		// Shared parameter uniform buffer
 
 		// Map persistent
 		VK_CHECK_RESULT(uniformBuffers.object.map());
@@ -438,8 +388,7 @@ public:
 		updateParams();
 	}
 
-	void updateUniformBuffers()
-	{
+	void updateUniformBuffers()	{
 		// 3D object
 		uboMatrices.projection = camera.matrices.perspective;
 		uboMatrices.view = camera.matrices.view;
@@ -452,13 +401,9 @@ public:
 		memcpy(uniformBuffers.skybox.mapped, &uboMatrices, sizeof(uboMatrices));
 	}
 
-	void updateParams()
-	{
-		memcpy(uniformBuffers.params.mapped, &uboParams, sizeof(uboParams));
-	}
+	void updateParams()	{ memcpy(uniformBuffers.params.mapped, &uboParams, sizeof(uboParams));	}
 
-	void draw()
-	{
+	void draw()	{
 		VulkanExampleBase::prepareFrame();
 
 		submitInfo.commandBufferCount = 1;
@@ -468,8 +413,7 @@ public:
 		VulkanExampleBase::submitFrame();
 	}
 
-	void prepare()
-	{
+	void prepare()	{
 		VulkanExampleBase::prepare();
 		loadAssets();
 		prepareUniformBuffers();
@@ -480,91 +424,62 @@ public:
 		prepared													= true;
 	}
 
-	virtual void render()
-	{
-		if (!prepared)
-			return;
-		draw();
-	}
-
-	virtual void viewChanged()
-	{
+	virtual void	render		()			{ if (prepared) draw(); }
+	virtual void	viewChanged	()			{
 		updateUniformBuffers();
 		updateTextOverlay();
 	}
 
-	void toggleSkyBox()
-	{
+	void			toggleSkyBox()			{
 		displaySkybox = !displaySkybox;
 		reBuildCommandBuffers();
 	}
 
-	void toggleObject()
-	{
+	void toggleObject()	{
 		models.objectIndex++;
 		if (models.objectIndex >= static_cast<uint32_t>(models.objects.size()))
-		{
 			models.objectIndex = 0;
-		}
+
 		updateUniformBuffers();
 		reBuildCommandBuffers();
 	}
 
-	void toggleMaterial(int32_t dir)
-	{
+	void toggleMaterial(int32_t dir)	{
 		materialIndex += dir;
-		if (materialIndex < 0) {
+		if (materialIndex < 0) 
 			materialIndex = static_cast<int32_t>(materials.size()) - 1;
-		}
-		if (materialIndex > static_cast<int32_t>(materials.size()) - 1) {
+		
+		if (materialIndex > static_cast<int32_t>(materials.size()) - 1) 
 			materialIndex = 0;
-		}
 		reBuildCommandBuffers();
 		updateTextOverlay();
 	}
 
-	void changeExposure(float delta)
-	{
+	void changeExposure(float delta)	{
 		uboParams.exposure += delta;
-		if (uboParams.exposure < 0.01f) {
+		if (uboParams.exposure < 0.01f) 
 			uboParams.exposure = 0.01f;
-		}
+
 		updateParams();
 		updateTextOverlay();
 	}
 
-	virtual void keyPressed(uint32_t keyCode)
-	{
-		switch (keyCode)
-		{
-		case KEY_F2:
-		case GAMEPAD_BUTTON_A:
-			toggleSkyBox();
-			break;
-		case KEY_SPACE:
-		case GAMEPAD_BUTTON_X:
-			toggleObject();
-			break;
-		case KEY_KPADD:
-		case GAMEPAD_BUTTON_R1:
-			toggleMaterial(1);
-			break;
-		case KEY_KPSUB:
-		case GAMEPAD_BUTTON_L1:
-			toggleMaterial(-1);
-			break;
-		case KEY_F3:
-			changeExposure(-0.1f);
-			break;
-		case KEY_F4:
-			changeExposure(0.1f);
-			break;
-
+	virtual void keyPressed(uint32_t keyCode)	{
+		switch (keyCode) {
+		case KEY_F2				:
+		case GAMEPAD_BUTTON_A	: toggleSkyBox()		; break;
+		case KEY_SPACE			:
+		case GAMEPAD_BUTTON_X	: toggleObject()		; break;
+		case KEY_KPADD			:
+		case GAMEPAD_BUTTON_R1	: toggleMaterial(1)		; break;
+		case KEY_KPSUB			:
+		case GAMEPAD_BUTTON_L1	: toggleMaterial(-1)	; break;
+		case KEY_F3				: changeExposure(-0.1f)	; break;
+		case KEY_F4				: changeExposure(0.1f)	; break;
 		}
 	}
 
-	virtual void getOverlayText(VulkanTextOverlay *textOverlay_)
-	{
+	virtual void getOverlayText(VulkanTextOverlay *textOverlay_) {
 #if defined(__ANDROID__)
 		textOverlay_->addText("\"Button A\" to toggle skybox", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
 		textOverlay_->addText("\"Button X\" to toggle object", 5.0f, 100.0f, VulkanTextOverlay::alignLeft);

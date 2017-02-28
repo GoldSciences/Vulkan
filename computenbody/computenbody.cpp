@@ -227,8 +227,7 @@ public:
 	}
 
 	// Setup and fill the compute shader storage buffers containing the particles
-	void prepareStorageBuffers()
-	{
+	void prepareStorageBuffers()	{
 #if 0
 		std::vector<glm::vec3> attractors = {
 			glm::vec3(2.5f, 1.5f, 0.0f),
@@ -587,10 +586,7 @@ public:
 		updateUniformBuffers();
 	}
 
-	virtual void viewChanged()
-	{
-		updateGraphicsUniformBuffers();
-	}
+	virtual void viewChanged()	{ updateGraphicsUniformBuffers();	}
 };
 
 VULKAN_EXAMPLE_EXPORT_FUNCTIONS()
