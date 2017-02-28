@@ -17,46 +17,46 @@ class VulkanExample : public VulkanExampleBase
 {
 public:
 	// Vertex layout for the models
-	vks::VertexLayout												vertexLayout						= vks::VertexLayout(
+	vks::VertexLayout											vertexLayout						= vks::VertexLayout(
 		{	vks::VERTEX_COMPONENT_POSITION
 		,	vks::VERTEX_COMPONENT_NORMAL
 		,	vks::VERTEX_COMPONENT_COLOR
 		});
 
 	struct {
-		vks::Model														ufo;
-		vks::Model														skysphere;
-	}																models;
+		vks::Model													ufo;
+		vks::Model													skysphere;
+	}															models;
 
 	struct {
-		VkPipelineVertexInputStateCreateInfo							inputState;
-		std::vector<VkVertexInputBindingDescription>					bindingDescriptions;
-		std::vector<VkVertexInputAttributeDescription>					attributeDescriptions;
-	}																vertices;
+		VkPipelineVertexInputStateCreateInfo						inputState;
+		std::vector<VkVertexInputBindingDescription>				bindingDescriptions;
+		std::vector<VkVertexInputAttributeDescription>				attributeDescriptions;
+	}															vertices;
 
 	// Shared matrices used for thread push constant blocks
 	struct {
-		glm::mat4														projection;
-		glm::mat4														view;
-	}																matrices;
+		glm::mat4													projection;
+		glm::mat4													view;
+	}															matrices;
 
 	struct {
-		VkPipeline														phong;
-		VkPipeline														starsphere;
-	}																pipelines;
+		VkPipeline													phong;
+		VkPipeline													starsphere;
+	}															pipelines;
 
-	VkPipelineLayout												pipelineLayout;
+	VkPipelineLayout											pipelineLayout;
 
-	VkCommandBuffer													primaryCommandBuffer;
-	VkCommandBuffer													secondaryCommandBuffer;
+	VkCommandBuffer												primaryCommandBuffer;
+	VkCommandBuffer												secondaryCommandBuffer;
 
 	// Number of animated objects to be renderer
 	// by using threads and secondary command buffers
-	uint32_t														numObjectsPerThread;
+	uint32_t													numObjectsPerThread;
 
 	// Multi threaded stuff
 	
-	uint32_t														numThreads;			// Max. number of concurrent threads
+	uint32_t													numThreads;			// Max. number of concurrent threads
 
 	// Use push constants to update shader parameters on a per-thread base
 	struct ThreadPushConstantBlock {
@@ -159,11 +159,11 @@ public:
 			// Create one command pool for each thread
 			VkCommandPoolCreateInfo											cmdPoolInfo										= vks::initializers::commandPoolCreateInfo();
 			cmdPoolInfo.queueFamilyIndex								= swapChain.queueNodeIndex;
-			cmdPoolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
+			cmdPoolInfo.flags											= VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
 			VK_CHECK_RESULT(vkCreateCommandPool(device, &cmdPoolInfo, nullptr, &thread->commandPool));
 
 			// One secondary command buffer per object that is updated by this thread
-			thread->commandBuffer.resize(numObjectsPerThread);
+			thread->commandBuffer	.resize(numObjectsPerThread);
 			// Generate secondary command buffers for each thread
 			VkCommandBufferAllocateInfo										secondaryCmdBufAllocateInfo						= vks::initializers::commandBufferAllocateInfo(thread->commandPool, VK_COMMAND_BUFFER_LEVEL_SECONDARY, static_cast<uint32_t>(thread->commandBuffer.size()));
 			VK_CHECK_RESULT(vkAllocateCommandBuffers(device, &secondaryCmdBufAllocateInfo, thread->commandBuffer.data()));
@@ -207,7 +207,7 @@ public:
 		VK_CHECK_RESULT(vkBeginCommandBuffer(cmdBuffer, &commandBufferBeginInfo));
 
 		VkViewport														viewport										= vks::initializers::viewport((float)width, (float)height, 0.0f, 1.0f);
-		vkCmdSetViewport(cmdBuffer, 0, 1, &viewport);
+		vkCmdSetViewport	(cmdBuffer, 0, 1, &viewport);
 
 		VkRect2D														scissor											= vks::initializers::rect2D(width, height, 0, 0);
 		vkCmdSetScissor		(cmdBuffer, 0, 1, &scissor);
@@ -234,12 +234,12 @@ public:
 
 		// Update shader push constant block
 		// Contains model view matrix
-		vkCmdPushConstants(cmdBuffer, pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(ThreadPushConstantBlock), &thread->pushConstBlock[cmdBufferIndex]);
+		vkCmdPushConstants		(cmdBuffer, pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(ThreadPushConstantBlock), &thread->pushConstBlock[cmdBufferIndex]);
 
 		VkDeviceSize													offsets[1]										= { 0 };
-		vkCmdBindVertexBuffers(cmdBuffer, 0, 1, &models.ufo.vertices.buffer, offsets);
-		vkCmdBindIndexBuffer(cmdBuffer, models.ufo.indices.buffer, 0, VK_INDEX_TYPE_UINT32);
-		vkCmdDrawIndexed(cmdBuffer, models.ufo.indexCount, 1, 0, 0, 0);
+		vkCmdBindVertexBuffers	(cmdBuffer, 0, 1, &models.ufo.vertices.buffer, offsets);
+		vkCmdBindIndexBuffer	(cmdBuffer, models.ufo.indices.buffer, 0, VK_INDEX_TYPE_UINT32);
+		vkCmdDrawIndexed		(cmdBuffer, models.ufo.indexCount, 1, 0, 0, 0);
 
 		VK_CHECK_RESULT(vkEndCommandBuffer(cmdBuffer));
 	}
@@ -253,12 +253,12 @@ public:
 		VK_CHECK_RESULT(vkBeginCommandBuffer(secondaryCommandBuffer, &commandBufferBeginInfo));
 
 		VkViewport														viewport										= vks::initializers::viewport((float)width, (float)height, 0.0f, 1.0f);
-		vkCmdSetViewport(secondaryCommandBuffer, 0, 1, &viewport);
+		vkCmdSetViewport		(secondaryCommandBuffer, 0, 1, &viewport);
 
 		VkRect2D														scissor											= vks::initializers::rect2D(width, height, 0, 0);
-		vkCmdSetScissor(secondaryCommandBuffer, 0, 1, &scissor);
+		vkCmdSetScissor			(secondaryCommandBuffer, 0, 1, &scissor);
 
-		vkCmdBindPipeline(secondaryCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines.starsphere);
+		vkCmdBindPipeline		(secondaryCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines.starsphere);
 
 		glm::mat4														view											= glm::mat4();
 		view														= glm::rotate(view, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
