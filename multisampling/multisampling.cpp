@@ -497,15 +497,15 @@ public:
 
 	void														updateUniformBuffers							()						{
 		// Vertex shader
-		glm::mat4 viewMatrix = glm::mat4();
-		uboVS.projection = glm::perspective(glm::radians(60.0f), (float)width / (float)height, 0.1f, 256.0f);
-		viewMatrix = glm::translate(viewMatrix, glm::vec3(0.0f, 0.0f, zoom));
+		glm::mat4														viewMatrix										= glm::mat4();
+		uboVS.projection											= glm::perspective(glm::radians(60.0f), (float)width / (float)height, 0.1f, 256.0f);
+		viewMatrix													= glm::translate(viewMatrix, glm::vec3(0.0f, 0.0f, zoom));
 
-		uboVS.model = glm::mat4();
-		uboVS.model = viewMatrix * glm::translate(uboVS.model, cameraPos);
-		uboVS.model = glm::rotate(uboVS.model, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
-		uboVS.model = glm::rotate(uboVS.model, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
-		uboVS.model = glm::rotate(uboVS.model, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+		uboVS.model													= glm::mat4();
+		uboVS.model													= viewMatrix * glm::translate(uboVS.model, cameraPos);
+		uboVS.model													= glm::rotate(uboVS.model, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+		uboVS.model													= glm::rotate(uboVS.model, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+		uboVS.model													= glm::rotate(uboVS.model, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
 
 		memcpy(uniformBuffer.mapped, &uboVS, sizeof(uboVS));
 	}
@@ -514,8 +514,8 @@ public:
 		VulkanExampleBase::prepareFrame();
 
 		// Command buffer to be sumitted to the queue
-		submitInfo.commandBufferCount = 1;
-		submitInfo.pCommandBuffers = &drawCmdBuffers[currentBuffer];
+		submitInfo.commandBufferCount								= 1;
+		submitInfo.pCommandBuffers									= &drawCmdBuffers[currentBuffer];
 
 		// Submit to queue
 		VK_CHECK_RESULT(vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE));
@@ -524,15 +524,15 @@ public:
 	}
 
 	void														prepare											()						{
-		VulkanExampleBase::prepare();
-		loadAssets();
-		setupVertexDescriptions();
-		prepareUniformBuffers();
-		setupDescriptorSetLayout();
-		preparePipelines();
-		setupDescriptorPool();
-		setupDescriptorSet();
-		buildCommandBuffers();
+		VulkanExampleBase::prepare	();
+		loadAssets					();
+		setupVertexDescriptions		();
+		prepareUniformBuffers		();
+		setupDescriptorSetLayout	();
+		preparePipelines			();
+		setupDescriptorPool			();
+		setupDescriptorSet			();
+		buildCommandBuffers			();
 		prepared													= true;
 	}
 
