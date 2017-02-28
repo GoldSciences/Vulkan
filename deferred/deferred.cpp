@@ -197,7 +197,7 @@ public:
 
 		assert(aspectMask > 0);
 
-		VkImageCreateInfo												image = vks::initializers::imageCreateInfo();
+		VkImageCreateInfo												image									= vks::initializers::imageCreateInfo();
 		image.imageType												= VK_IMAGE_TYPE_2D;
 		image.format												= format;
 		image.extent.width											= offScreenFrameBuf.width;
@@ -251,7 +251,7 @@ public:
 		createAttachment(attDepthFormat					, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT	, &offScreenFrameBuf.depth);
 
 		// Set up separate renderpass with references to the color and depth attachments
-		std::array<VkAttachmentDescription, 4>							attachmentDescs = {};
+		std::array<VkAttachmentDescription, 4>							attachmentDescs							= {};
 
 		// Init attachment properties
 		for (uint32_t i = 0; i < 4; ++i) {
@@ -559,7 +559,7 @@ public:
 			,	vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 9)
 			};
 
-		VkDescriptorPoolCreateInfo descriptorPoolInfo = vks::initializers::descriptorPoolCreateInfo(static_cast<uint32_t>(poolSizes.size()), poolSizes.data(), 3);
+		VkDescriptorPoolCreateInfo										descriptorPoolInfo							= vks::initializers::descriptorPoolCreateInfo(static_cast<uint32_t>(poolSizes.size()), poolSizes.data(), 3);
 		VK_CHECK_RESULT(vkCreateDescriptorPool(device, &descriptorPoolInfo, nullptr, &descriptorPool));
 	}
 
@@ -715,7 +715,7 @@ public:
 		if (debugDisplay)	uboVS.projection							= glm::ortho(0.0f, 2.0f, 0.0f, 2.0f, -1.0f, 1.0f);
 		else				uboVS.projection							= glm::ortho(0.0f, 1.0f, 0.0f, 1.0f, -1.0f, 1.0f);
 		
-		uboVS.model = glm::mat4();
+		uboVS.model													= glm::mat4();
 
 		memcpy(uniformBuffers.vsFullScreen.mapped, &uboVS, sizeof(uboVS));
 	}
@@ -778,7 +778,7 @@ public:
 		submitInfo.pSignalSemaphores								= &semaphores.renderComplete;	// Signal ready with render complete semaphpre
 
 		// Submit work
-		submitInfo.pCommandBuffers = &drawCmdBuffers[currentBuffer];
+		submitInfo.pCommandBuffers									= &drawCmdBuffers[currentBuffer];
 		VK_CHECK_RESULT(vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE));
 
 		VulkanExampleBase::submitFrame();
@@ -807,12 +807,8 @@ public:
 		updateUniformBufferDeferredLights();
 	}
 
-	virtual void												viewChanged									()																				{ updateUniformBufferDeferredMatrices(); }
-	void														toggleDebugDisplay							()																				{ 
-		debugDisplay = !debugDisplay;
-		reBuildCommandBuffers();
-		updateUniformBuffersScreen();
-	}
+	virtual void												viewChanged									()																				{ updateUniformBufferDeferredMatrices();												}
+	void														toggleDebugDisplay							()																				{ debugDisplay = !debugDisplay; reBuildCommandBuffers(); updateUniformBuffersScreen();	}
 
 	virtual void												keyPressed									(uint32_t keyCode)																{
 		switch (keyCode) {

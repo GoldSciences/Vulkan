@@ -690,14 +690,14 @@ public:
 
 	// Prepare and initialize uniform buffer containing shader uniforms
 	void														prepareUniformBuffers					()									{
-		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBuffers.vsFullScreen, sizeof(uboVS)));			// Fullscreen vertex shader
-		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBuffers.vsOffscreen, sizeof(uboOffscreenVS)));	// Deferred vertex shader
-		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBuffers.fsLights, sizeof(uboFragmentLights)));	// Deferred fragment shader
+		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBuffers.vsFullScreen	, sizeof(uboVS				)));	// Fullscreen vertex shader
+		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBuffers.vsOffscreen	, sizeof(uboOffscreenVS		)));	// Deferred vertex shader
+		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBuffers.fsLights		, sizeof(uboFragmentLights	)));	// Deferred fragment shader
 
 		// Map persistent
-		VK_CHECK_RESULT(uniformBuffers.vsFullScreen.map());
-		VK_CHECK_RESULT(uniformBuffers.vsOffscreen.map());
-		VK_CHECK_RESULT(uniformBuffers.fsLights.map());
+		VK_CHECK_RESULT(uniformBuffers.vsFullScreen	.map());
+		VK_CHECK_RESULT(uniformBuffers.vsOffscreen	.map());
+		VK_CHECK_RESULT(uniformBuffers.fsLights		.map());
 
 		// Init some values
 		uboOffscreenVS.instancePos[0]								= glm::vec4(0.0f);
@@ -739,27 +739,18 @@ public:
 	// Update fragment shader light position uniform block
 	void														updateUniformBufferDeferredLights		()									{
 		
-		uboFragmentLights.lights[0].position						= glm::vec4(0.0f, 0.0f, 1.0f, 0.0f);	uboFragmentLights.lights[0].color							= glm::vec3(1.5f);				uboFragmentLights.lights[0].radius							= 15.0f * 0.25f;	// White
-		uboFragmentLights.lights[1].position						= glm::vec4(-2.0f, 0.0f, 0.0f, 0.0f);	uboFragmentLights.lights[1].color							= glm::vec3(1.0f, 0.0f, 0.0f);	uboFragmentLights.lights[1].radius							= 15.0f;			// Red
-		uboFragmentLights.lights[2].position						= glm::vec4(2.0f, 1.0f, 0.0f, 0.0f);	uboFragmentLights.lights[2].color							= glm::vec3(0.0f, 0.0f, 2.5f);	uboFragmentLights.lights[2].radius							= 5.0f;				// Blue
-		uboFragmentLights.lights[3].position						= glm::vec4(0.0f, 0.9f, 0.5f, 0.0f);	uboFragmentLights.lights[3].color							= glm::vec3(1.0f, 1.0f, 0.0f);	uboFragmentLights.lights[3].radius							= 2.0f;				// Yellow
-		uboFragmentLights.lights[4].position						= glm::vec4(0.0f, 0.5f, 0.0f, 0.0f);	uboFragmentLights.lights[4].color							= glm::vec3(0.0f, 1.0f, 0.2f);	uboFragmentLights.lights[4].radius							= 5.0f;				// Green
-		uboFragmentLights.lights[5].position						= glm::vec4(0.0f, 1.0f, 0.0f, 0.0f);	uboFragmentLights.lights[5].color							= glm::vec3(1.0f, 0.7f, 0.3f);	uboFragmentLights.lights[5].radius							= 25.0f;			// Yellow
+		uboFragmentLights.lights[0].position						= glm::vec4( 0.0f, 0.0f, 1.0f, 0.0f);	uboFragmentLights.lights[0].color	= glm::vec3(1.5f);				uboFragmentLights.lights[0].radius			= 15.0f * 0.25f;	// White
+		uboFragmentLights.lights[1].position						= glm::vec4(-2.0f, 0.0f, 0.0f, 0.0f);	uboFragmentLights.lights[1].color	= glm::vec3(1.0f, 0.0f, 0.0f);	uboFragmentLights.lights[1].radius			= 15.0f;			// Red
+		uboFragmentLights.lights[2].position						= glm::vec4( 2.0f, 1.0f, 0.0f, 0.0f);	uboFragmentLights.lights[2].color	= glm::vec3(0.0f, 0.0f, 2.5f);	uboFragmentLights.lights[2].radius			= 5.0f;				// Blue
+		uboFragmentLights.lights[3].position						= glm::vec4( 0.0f, 0.9f, 0.5f, 0.0f);	uboFragmentLights.lights[3].color	= glm::vec3(1.0f, 1.0f, 0.0f);	uboFragmentLights.lights[3].radius			= 2.0f;				// Yellow
+		uboFragmentLights.lights[4].position						= glm::vec4( 0.0f, 0.5f, 0.0f, 0.0f);	uboFragmentLights.lights[4].color	= glm::vec3(0.0f, 1.0f, 0.2f);	uboFragmentLights.lights[4].radius			= 5.0f;				// Green
+		uboFragmentLights.lights[5].position						= glm::vec4( 0.0f, 1.0f, 0.0f, 0.0f);	uboFragmentLights.lights[5].color	= glm::vec3(1.0f, 0.7f, 0.3f);	uboFragmentLights.lights[5].radius			= 25.0f;			// Yellow
 
-		uboFragmentLights.lights[0].position.x						= sin(glm::radians(360.0f * timer)) * 5.0f;
-		uboFragmentLights.lights[0].position.z						= cos(glm::radians(360.0f * timer)) * 5.0f;
-
-		uboFragmentLights.lights[1].position.x						= -4.0f + sin(glm::radians(360.0f * timer) + 45.0f) * 2.0f;
-		uboFragmentLights.lights[1].position.z						=  0.0f + cos(glm::radians(360.0f * timer) + 45.0f) * 2.0f;
-
-		uboFragmentLights.lights[2].position.x						= 4.0f + sin(glm::radians(360.0f * timer)) * 2.0f;
-		uboFragmentLights.lights[2].position.z						= 0.0f + cos(glm::radians(360.0f * timer)) * 2.0f;
-
-		uboFragmentLights.lights[4].position.x						= 0.0f + sin(glm::radians(360.0f * timer + 90.0f)) * 5.0f;
-		uboFragmentLights.lights[4].position.z						= 0.0f - cos(glm::radians(360.0f * timer + 45.0f)) * 5.0f;
-
-		uboFragmentLights.lights[5].position.x						= 0.0f + sin(glm::radians(-360.0f * timer + 135.0f)) * 10.0f;
-		uboFragmentLights.lights[5].position.z						= 0.0f - cos(glm::radians(-360.0f * timer - 45.0f)) * 10.0f;
+		uboFragmentLights.lights[0].position.x						= sin(glm::radians(360.0f * timer)) * 5.0f;						uboFragmentLights.lights[0].position.z	= cos(glm::radians(360.0f * timer)) * 5.0f;
+		uboFragmentLights.lights[1].position.x						= -4.0f + sin(glm::radians( 360.0f * timer) + 45.0f) * 2.0f;	uboFragmentLights.lights[1].position.z	= 0.0f + cos(glm::radians( 360.0f * timer) + 45.0f) * 2.0f;
+		uboFragmentLights.lights[2].position.x						=  4.0f + sin(glm::radians( 360.0f * timer)) * 2.0f;			uboFragmentLights.lights[2].position.z	= 0.0f + cos(glm::radians( 360.0f * timer)) * 2.0f;
+		uboFragmentLights.lights[4].position.x						=  0.0f + sin(glm::radians( 360.0f * timer + 90.0f)) * 5.0f;	uboFragmentLights.lights[4].position.z	= 0.0f - cos(glm::radians( 360.0f * timer + 45.0f)) * 5.0f;
+		uboFragmentLights.lights[5].position.x						=  0.0f + sin(glm::radians(-360.0f * timer + 135.0f)) * 10.0f;	uboFragmentLights.lights[5].position.z	= 0.0f - cos(glm::radians(-360.0f * timer - 45.0f)) * 10.0f;
 
 		// Current view position
 		uboFragmentLights.viewPos									= glm::vec4(camera.position, 0.0f) * glm::vec4(-1.0f, 1.0f, -1.0f, 1.0f);
