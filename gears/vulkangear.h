@@ -51,7 +51,7 @@ private:
 		glm::vec3													lightPos;
 	};
 
-	vks::VulkanDevice											* vulkanDevice;
+	vks::VulkanDevice											* vulkanDevice				= nullptr;
 
 	glm::vec3													color;
 	glm::vec3													pos;
