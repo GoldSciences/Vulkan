@@ -70,10 +70,10 @@ private:
 
 	void														prepareUniformBuffer		();
 public:
+	VkDescriptorSet												descriptorSet				= VK_NULL_HANDLE;
+
 																VulkanGear					(vks::VulkanDevice *vulkanDevice)														: vulkanDevice(vulkanDevice) {};
 																~VulkanGear					();
-
-	VkDescriptorSet												descriptorSet;
 
 	void														draw						(VkCommandBuffer cmdbuffer, VkPipelineLayout pipelineLayout);
 	void														updateUniformBuffer			(glm::mat4 perspective, glm::vec3 rotation, float zoom, float timer);
