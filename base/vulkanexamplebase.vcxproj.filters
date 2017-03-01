@@ -72,7 +72,7 @@
     <ClInclude Include="vertex.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="helper_types.h">
+    <ClInclude Include="VulkanFrameBufferAttachment.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

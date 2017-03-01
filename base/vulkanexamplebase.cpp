@@ -1577,6 +1577,9 @@ int WINAPI									WinMain
     , _In_		int			/*nShowCmd		*/
     )
 {					
+#if defined (DEBUG) || defined(_DEBUG)
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF | _CRTDBG_DELAY_FREE_MEM_DF);
+#endif
 	for (size_t i = 0; i < (size_t)__argc; i++) { VulkanExampleBase::args.push_back(__argv[i]); }
 	createVulkanExample(&vulkanExample);			
 	vulkanExample->initVulkan	();					

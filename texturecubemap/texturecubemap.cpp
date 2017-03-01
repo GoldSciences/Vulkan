@@ -72,14 +72,10 @@ public:
 	}
 
 																~VulkanExample							()																{
-		// Clean up used Vulkan resources 
-		// Note : Inherited destructor cleans up resources stored in base class
+		// Clean up used Vulkan resources. Inherited destructor cleans up resources stored in base class
 
 		// Clean up texture resources
-		vkDestroyImageView				(device, cubeMap.view			, nullptr);
-		vkDestroyImage					(device, cubeMap.image			, nullptr);
-		vkDestroySampler				(device, cubeMap.sampler		, nullptr);
-		vkFreeMemory					(device, cubeMap.deviceMemory	, nullptr);
+		cubeMap					.destroy();
 
 		vkDestroyPipeline				(device, pipelines.skybox		, nullptr);
 		vkDestroyPipeline				(device, pipelines.reflect		, nullptr);
@@ -88,12 +84,12 @@ public:
 		vkDestroyDescriptorSetLayout	(device, descriptorSetLayout	, nullptr);
 
 		for (auto& model : models.objects) 
-			model.destroy();
+			model					.destroy();
 
-		models.skybox.destroy();
+		models.skybox			.destroy();
 
-		uniformBuffers.object.destroy();
-		uniformBuffers.skybox.destroy();
+		uniformBuffers.object	.destroy();
+		uniformBuffers.skybox	.destroy();
 	}
 
 	void														loadCubemap								(std::string filename, VkFormat format, bool forceLinearTiling)	{

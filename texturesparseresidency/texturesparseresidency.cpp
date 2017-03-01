@@ -155,6 +155,14 @@ public:
 		uint32_t													width, height;
 		uint32_t													mipLevels;
 		uint32_t													layerCount;
+
+		// Free all Vulkan resources used a texture object
+		void														destroy									()															{
+			if(VK_NULL_HANDLE != view		) vkDestroyImageView	(device, view		, nullptr);
+			if(VK_NULL_HANDLE != image		) vkDestroyImage		(device, image		, nullptr);
+			if(VK_NULL_HANDLE != sampler	) vkDestroySampler		(device, sampler	, nullptr);
+			VirtualTexture::destroy();
+		}
 	}															texture;
 
 	struct {
@@ -216,7 +224,7 @@ public:
 		if (heightMap)
 			delete heightMap;
 
-		destroyTextureImage(texture);
+		texture			.destroy();
 
 		vkDestroySemaphore				(device, bindSparseSemaphore, nullptr);
 
@@ -225,7 +233,7 @@ public:
 		vkDestroyPipelineLayout			(device, pipelineLayout, nullptr);
 		vkDestroyDescriptorSetLayout	(device, descriptorSetLayout, nullptr);
 
-		uniformBufferVS.destroy();
+		uniformBufferVS	.destroy();
 	}
 
 	glm::uvec3													alignedDivision							(const VkExtent3D& extent, const VkExtent3D& granularity)					{
@@ -500,14 +508,6 @@ public:
 
 		// Fill smallest (non-tail) mip map leve
 		fillVirtualTexture(lastFilledMip);
-	}
-
-	// Free all Vulkan resources used a texture object
-	void														destroyTextureImage						(SparseTexture texture_)													{
-		vkDestroyImageView	(device, texture_.view		, nullptr);
-		vkDestroyImage		(device, texture_.image		, nullptr);
-		vkDestroySampler	(device, texture_.sampler	, nullptr);
-		texture_.destroy();
 	}
 
 	void														buildCommandBuffers						()																			{

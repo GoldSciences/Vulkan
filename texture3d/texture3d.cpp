@@ -130,6 +130,14 @@ public:
 		VkFormat													format									= VK_FORMAT_UNDEFINED;
 		uint32_t													width, height, depth;
 		uint32_t													mipLevels;
+	
+		// Free all Vulkan resources used a texture object
+		void														destroy									(VkDevice device)						{
+			if (view			!= VK_NULL_HANDLE) vkDestroyImageView	(device, view			, nullptr);
+			if (image			!= VK_NULL_HANDLE) vkDestroyImage		(device, image			, nullptr);
+			if (sampler			!= VK_NULL_HANDLE) vkDestroySampler		(device, sampler		, nullptr);
+			if (deviceMemory	!= VK_NULL_HANDLE) vkFreeMemory			(device, deviceMemory	, nullptr);
+		};
 	}															texture;
 
 	bool														regenerateNoise							= true;
@@ -175,16 +183,16 @@ public:
 
 																~VulkanExample							()														{
 		// Clean up used Vulkan resources. Inherited destructor cleans up resources stored in base class
-		destroyTextureImage(texture);
+		texture			.destroy(device);	// Free all Vulkan resources used a texture object
 
 		vkDestroyPipeline				(device, pipelines.solid		, nullptr);
 
 		vkDestroyPipelineLayout			(device, pipelineLayout			, nullptr);
 		vkDestroyDescriptorSetLayout	(device, descriptorSetLayout	, nullptr);
 
-		vertexBuffer.destroy();
-		indexBuffer.destroy();
-		uniformBufferVS.destroy();
+		vertexBuffer	.destroy();
+		indexBuffer		.destroy();
+		uniformBufferVS	.destroy();
 	}
 
 	// Prepare all Vulkan resources for the 3D texture (including descriptors). Does not fill the texture with data.
@@ -387,13 +395,6 @@ public:
 		regenerateNoise												= false;
 	}
 
-	// Free all Vulkan resources used a texture object
-	void														destroyTextureImage						(Texture texture_)										{
-		if (texture_.view			!= VK_NULL_HANDLE) vkDestroyImageView	(device, texture_.view			, nullptr);
-		if (texture_.image			!= VK_NULL_HANDLE) vkDestroyImage		(device, texture_.image			, nullptr);
-		if (texture_.sampler		!= VK_NULL_HANDLE) vkDestroySampler		(device, texture_.sampler		, nullptr);
-		if (texture_.deviceMemory	!= VK_NULL_HANDLE) vkFreeMemory			(device, texture_.deviceMemory	, nullptr);
-	}
 
 	void														buildCommandBuffers						()
 	{

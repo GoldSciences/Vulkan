@@ -25,6 +25,13 @@ public:
 		VkImageView													view					= VK_NULL_HANDLE;
 		uint32_t													width, height;
 		uint32_t													mipLevels;
+		
+		// Free all Vulkan resources used a texture object
+		void														destroy					(VkDevice device)													{
+			if(VK_NULL_HANDLE != view			)	vkDestroyImageView	(device, view			, nullptr);
+			if(VK_NULL_HANDLE != image			)	vkDestroyImage		(device, image			, nullptr);
+			if(VK_NULL_HANDLE != deviceMemory	)	vkFreeMemory		(device, deviceMemory	, nullptr);
+		}
 	}															texture;
 
 	// To demonstrate mip mapping and filtering this example uses separate samplers
@@ -48,7 +55,7 @@ public:
 		std::vector<VkVertexInputAttributeDescription>				attributeDescriptions;
 	}															vertices;
 
-	vks::Buffer uniformBufferVS;
+	vks::Buffer													uniformBufferVS;
 
 	struct uboVS {
 		glm::mat4													projection;
@@ -81,17 +88,18 @@ public:
 	}
 
 																~VulkanExample				()																	{
-		destroyTextureImage(texture);
+		texture				.destroy(device);
+
 		vkDestroyPipeline			(device, pipelines.solid, nullptr);
 		vkDestroyPipelineLayout		(device, pipelineLayout, nullptr);
 		vkDestroyDescriptorSetLayout(device, descriptorSetLayout, nullptr);
 
-		uniformBufferVS.destroy();
+		uniformBufferVS		.destroy();
 
 		for (VkSampler& sampler : samplers)
 			vkDestroySampler			(device, sampler, nullptr);
 
-		models.tunnel.destroy();
+		models.tunnel		.destroy();
 	}
 
 	void														loadTexture					(std::string fileName, VkFormat format, bool forceLinearTiling)		{
@@ -294,13 +302,6 @@ public:
 		view.subresourceRange.layerCount							= 1;
 		view.subresourceRange.levelCount							= texture.mipLevels;
 		VK_CHECK_RESULT(vkCreateImageView(device, &view, nullptr, &texture.view));
-	}
-
-	// Free all Vulkan resources used a texture object
-	void														destroyTextureImage			(Texture texture_)													{
-		vkDestroyImageView	(device, texture_.view			, nullptr);
-		vkDestroyImage		(device, texture_.image			, nullptr);
-		vkFreeMemory		(device, texture_.deviceMemory	, nullptr);
 	}
 
 	void														buildCommandBuffers			()																	{

@@ -38,7 +38,7 @@
 #include "camera.hpp"
 
 #include "vertex.h"
-#include "helper_types.h"
+#include "VulkanFrameBufferAttachment.h"
 
 class VulkanExampleBase
 {

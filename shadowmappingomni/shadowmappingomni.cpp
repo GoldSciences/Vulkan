@@ -119,10 +119,7 @@ public:
 		// Note : Inherited destructor cleans up resources stored in base class
 
 		// Cube map
-		vkDestroyImageView				(device, shadowCubeMap.view			, nullptr);
-		vkDestroyImage					(device, shadowCubeMap.image		, nullptr);
-		vkDestroySampler				(device, shadowCubeMap.sampler		, nullptr);
-		vkFreeMemory					(device, shadowCubeMap.deviceMemory	, nullptr);
+		shadowCubeMap			.destroy();
 
 		// Frame buffer
 		offscreenPass.color		.destroy(device);

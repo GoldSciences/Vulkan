@@ -28,6 +28,14 @@ public:
 		VkImageView													view								= VK_NULL_HANDLE;
 		uint32_t													width, height;
 		uint32_t													mipLevels;
+
+		// Free all Vulkan resources used a texture object
+		void														destroy								(VkDevice device)												{
+			vkDestroyImageView	(device, view			, nullptr);
+			vkDestroyImage		(device, image			, nullptr);
+			vkDestroySampler	(device, sampler		, nullptr);
+			vkFreeMemory		(device, deviceMemory	, nullptr);
+		}
 	}															texture;
 
 	struct {
@@ -67,7 +75,7 @@ public:
 																~VulkanExample						()																{
 		// Clean up used Vulkan resources 
 		// Note : Inherited destructor cleans up resources stored in base class
-		destroyTextureImage(texture);
+		texture	.destroy(device);
 
 		vkDestroyPipeline			(device, pipelines.solid, nullptr);
 
@@ -369,14 +377,6 @@ public:
 		view.subresourceRange.levelCount							= (useStaging) ? texture.mipLevels : 1;	// Linear tiling usually won't support mip maps. Only set mip map count if optimal tiling is used
 		view.image													= texture.image;		// The view will be based on the texture's image
 		VK_CHECK_RESULT(vkCreateImageView(device, &view, nullptr, &texture.view));
-	}
-
-	// Free all Vulkan resources used a texture object
-	void														destroyTextureImage					(Texture texture_)												{
-		vkDestroyImageView	(device, texture_.view			, nullptr);
-		vkDestroyImage		(device, texture_.image			, nullptr);
-		vkDestroySampler	(device, texture_.sampler		, nullptr);
-		vkFreeMemory		(device, texture_.deviceMemory	, nullptr);
 	}
 
 	void														buildCommandBuffers					()																{

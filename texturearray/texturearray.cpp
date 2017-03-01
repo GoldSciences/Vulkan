@@ -67,10 +67,7 @@ public:
 		// Note : Inherited destructor cleans up resources stored in base class
 
 		// Clean up texture resources
-		vkDestroyImageView				(device, textureArray.view			, nullptr);
-		vkDestroyImage					(device, textureArray.image			, nullptr);
-		vkDestroySampler				(device, textureArray.sampler		, nullptr);
-		vkFreeMemory					(device, textureArray.deviceMemory	, nullptr);
+		textureArray	.destroy();
 
 		vkDestroyPipeline				(device, pipeline					, nullptr);
 
