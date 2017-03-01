@@ -493,14 +493,7 @@ public:
 	void														generateQuads							()																					{
 		// Setup vertices for multiple screen aligned quads
 		// Used for displaying final result and debug 
-		struct Vertex {
-			float														pos		[3];
-			float														uv		[2];
-			float														col		[3];
-			float														normal	[3];
-			float														tangent	[3];
-		};
-
+		typedef	VertexPUCNT												Vertex;		// Vertex layout used 
 		std::vector<Vertex>												vertexBuffer;
 
 		float															x											= 0.0f;

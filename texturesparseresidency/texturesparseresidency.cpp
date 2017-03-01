@@ -21,12 +21,7 @@
 #define VERTEX_BUFFER_BIND_ID	0
 #define ENABLE_VALIDATION		false
 
-// Vertex layout for this example
-struct Vertex {
-	float														pos		[3];
-	float														normal	[3];
-	float														uv		[2];
-};
+typedef VertexPNU											Vertex;		// Vertex layout used in this example
 
 // Virtual texture page as a part of the partially resident texture
 // Contains memory bindings, offsets and status information
@@ -597,9 +592,9 @@ public:
 		vertices.bindingDescriptions[0]								= vks::initializers::vertexInputBindingDescription(VERTEX_BUFFER_BIND_ID, sizeof(Vertex), VK_VERTEX_INPUT_RATE_VERTEX);
 
 		vertices.attributeDescriptions.resize(3);	// Attribute descriptions. Describes memory layout and shader positions
-		vertices.attributeDescriptions[0]							= vks::initializers::vertexInputAttributeDescription(VERTEX_BUFFER_BIND_ID, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(Vertex, pos));		// Location 0 : Position
-		vertices.attributeDescriptions[1]							= vks::initializers::vertexInputAttributeDescription(VERTEX_BUFFER_BIND_ID, 1, VK_FORMAT_R32G32B32_SFLOAT, offsetof(Vertex, normal));		// Location 1 : Vertex normal
-		vertices.attributeDescriptions[2]							= vks::initializers::vertexInputAttributeDescription(VERTEX_BUFFER_BIND_ID, 2, VK_FORMAT_R32G32_SFLOAT, offsetof(Vertex, uv));			// Location 1 : Texture coordinates
+		vertices.attributeDescriptions[0]							= vks::initializers::vertexInputAttributeDescription(VERTEX_BUFFER_BIND_ID, 0, VK_FORMAT_R32G32B32_SFLOAT	, offsetof(Vertex, position	));	// Location 0 : Position
+		vertices.attributeDescriptions[1]							= vks::initializers::vertexInputAttributeDescription(VERTEX_BUFFER_BIND_ID, 1, VK_FORMAT_R32G32B32_SFLOAT	, offsetof(Vertex, normal	));	// Location 1 : Vertex normal
+		vertices.attributeDescriptions[2]							= vks::initializers::vertexInputAttributeDescription(VERTEX_BUFFER_BIND_ID, 2, VK_FORMAT_R32G32_SFLOAT		, offsetof(Vertex, uv		));	// Location 1 : Texture coordinates
 
 		vertices.inputState											= vks::initializers::pipelineVertexInputStateCreateInfo();
 		vertices.inputState.vertexBindingDescriptionCount			= static_cast<uint32_t>(vertices.bindingDescriptions.size());

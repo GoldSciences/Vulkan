@@ -30,11 +30,7 @@ namespace vks
 		vks::Buffer								vertexBuffer;
 		vks::Buffer								indexBuffer;
 
-		struct Vertex {
-			glm::vec3								pos;
-			glm::vec3								normal;
-			glm::vec2								uv;
-		};
+		typedef VertexPNU						Vertex;		// Vertex layout used for the heightmap
 
 		size_t									vertexBufferSize		= 0;
 		size_t									indexBufferSize			= 0;
@@ -99,9 +95,9 @@ namespace vks
 				for (uint32_t y = 0; y < patchsize; y++)
 				{
 					uint32_t									index		= (x + y * patchsize);
-					vertices[index].pos[0]					= (x * wx + wx / 2.0f - (float)patchsize * wx / 2.0f) * scale_.x;
-					vertices[index].pos[1]					= -getHeight(x, y);
-					vertices[index].pos[2]					= (y * wy + wy / 2.0f - (float)patchsize * wy / 2.0f) * scale_.z;
+					vertices[index].position[0]				= (x * wx + wx / 2.0f - (float)patchsize * wx / 2.0f) * scale_.x;
+					vertices[index].position[1]				= -getHeight(x, y);
+					vertices[index].position[2]				= (y * wy + wy / 2.0f - (float)patchsize * wy / 2.0f) * scale_.z;
 					vertices[index].uv						= glm::vec2((float)x / patchsize, (float)y / patchsize) * uvScale;
 				}
 			}

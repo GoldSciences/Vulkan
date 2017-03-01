@@ -7,26 +7,12 @@
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 #pragma once
 #include "VulkanDevice.hpp"
+#include "vertex.h"
 
-#define GLM_FORCE_RADIANS
-#define GLM_FORCE_DEPTH_ZERO_TO_ONE
-#include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/matrix_inverse.hpp>
 
-struct Vertex
-{
-	float														pos			[3];
-	float														normal		[3];
-	float														color		[3];
-
-																Vertex						(const glm::vec3& p, const glm::vec3& n, const glm::vec3& c)							{
-		pos		[0] = p.x;	pos		[1] = p.y;	pos		[2] = p.z;
-		color	[0] = c.x;	color	[1] = c.y;	color	[2] = c.z;
-		normal	[0] = n.x;	normal	[1] = n.y;	normal	[2] = n.z;
-	}
-};
-
+typedef VertexPNC											Vertex;		// Vertex layout used in this example
 
 struct GearInfo {
 	float														innerRadius;
@@ -54,7 +40,7 @@ private:
 	vks::VulkanDevice											* vulkanDevice				= nullptr;
 
 	glm::vec3													color;
-	glm::vec3													pos;
+	glm::vec3													position;
 	float														rotSpeed;
 	float														rotOffset;
 

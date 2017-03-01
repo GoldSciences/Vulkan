@@ -17,11 +17,7 @@
 class VulkanExample : public VulkanExampleBase
 {
 public:
-	// Vertex layout used in this example
-	struct Vertex {
-		float														position	[3];
-		float														color		[3];
-	};
+	typedef VertexPC											Vertex;		// Vertex layout used in this example
 
 	// Vertex buffer and attributes
 	struct {
@@ -844,14 +840,13 @@ public:
 		// Attribute location 0: Position
 		vertexInputAttributs[0].binding								= 0;
 		vertexInputAttributs[0].location							= 0;
-		// Position attribute is three 32 bit signed (SFLOAT) floats (R32 G32 B32)
-		vertexInputAttributs[0].format								= VK_FORMAT_R32G32B32_SFLOAT;
+		vertexInputAttributs[0].format								= VK_FORMAT_R32G32B32_SFLOAT;	// Position attribute is three 32 bit signed (SFLOAT) floats (R32 G32 B32)
 		vertexInputAttributs[0].offset								= offsetof(Vertex, position);
+
 		// Attribute location 1: Color
 		vertexInputAttributs[1].binding								= 0;
 		vertexInputAttributs[1].location							= 1;
-		// Color attribute is three 32 bit signed (SFLOAT) floats (R32 G32 B32)
-		vertexInputAttributs[1].format								= VK_FORMAT_R32G32B32_SFLOAT;
+		vertexInputAttributs[1].format								= VK_FORMAT_R32G32B32_SFLOAT;	// Color attribute is three 32 bit signed (SFLOAT) floats (R32 G32 B32)
 		vertexInputAttributs[1].offset								= offsetof(Vertex, color);
 
 		// Vertex input state used for pipeline creation

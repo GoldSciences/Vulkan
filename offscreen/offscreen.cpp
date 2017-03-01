@@ -448,12 +448,7 @@ public:
 
 	void														generateQuad					()											{
 		// Setup vertices for a single uv-mapped quad				
-		struct Vertex {
-			float															pos		[3];
-			float															uv		[2];
-			float															col		[3];
-			float															normal	[3];
-		};
+		typedef VertexPUCN											Vertex;		// Vertex layout used in this example
 
 #define QUAD_COLOR_NORMAL { 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f, 1.0f }
 		std::vector<Vertex>												vertexBuffer					=

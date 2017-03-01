@@ -431,14 +431,7 @@ public:
 
 	// Create a single quad for fullscreen deferred pass and debug passes (debug pass uses instancing for light visualization) 
 	void														generateQuads							()													{
-		struct Vertex {
-			float															pos		[3];
-			float															uv		[2];
-			float															col		[3];
-			float															normal	[3];
-			float															tangent	[3];
-		};
-
+		typedef VertexPUCNT												Vertex;		// Vertex layout used in this example
 		std::vector<Vertex>												vertexBuffer;
 
 		vertexBuffer.push_back({ { 1.0f, 1.0f, 0.0f },{ 1.0f, 1.0f },{ 1.0f, 1.0f, 1.0f },{ 0.0f, 0.0f, 0.0f } });

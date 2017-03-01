@@ -22,11 +22,7 @@
 #define ENABLE_VALIDATION		false
 #define OBJECT_INSTANCES		125
 
-// Vertex layout for this example
-struct Vertex {
-	float														pos		[3];
-	float														color	[3];
-};
+typedef VertexPC											Vertex;		// Vertex layout used in this example
 
 // Wrapper functions for aligned memory allocation
 // There is currently no standard for this in C++ that works across all platforms and vendors, so we abstract this
@@ -213,8 +209,8 @@ public:
 
 		// Attribute descriptions
 		vertices.attributeDescriptions								= 
-			{	vks::initializers::vertexInputAttributeDescription(VERTEX_BUFFER_BIND_ID, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(Vertex, pos	))	// Location 0 : Position
-			,	vks::initializers::vertexInputAttributeDescription(VERTEX_BUFFER_BIND_ID, 1, VK_FORMAT_R32G32B32_SFLOAT, offsetof(Vertex, color	))	// Location 1 : Color
+			{	vks::initializers::vertexInputAttributeDescription(VERTEX_BUFFER_BIND_ID, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(Vertex, position	))	// Location 0 : Position
+			,	vks::initializers::vertexInputAttributeDescription(VERTEX_BUFFER_BIND_ID, 1, VK_FORMAT_R32G32B32_SFLOAT, offsetof(Vertex, color		))	// Location 1 : Color
 			};
 
 		vertices.inputState											= vks::initializers::pipelineVertexInputStateCreateInfo();

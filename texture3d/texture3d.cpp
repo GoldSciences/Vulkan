@@ -14,11 +14,7 @@
 #define ENABLE_VALIDATION		false
 
 // Vertex layout for this example
-struct Vertex {
-	float														pos				[3];
-	float														uv				[2];
-	float														normal			[3];
-};
+typedef VertexPUN											Vertex;		// Vertex layout used in this example
 
 // Translation of Ken Perlin's JAVA implementation (http://mrl.nyu.edu/~perlin/noise/)
 template <typename T>
@@ -483,9 +479,9 @@ public:
 
 		// Attribute descriptions. Describes memory layout and shader positions
 		vertices.inputAttributes.resize(3);
-		vertices.inputAttributes[0]									= vks::initializers::vertexInputAttributeDescription(VERTEX_BUFFER_BIND_ID, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(Vertex, pos));			// Location 0 : Position
-		vertices.inputAttributes[1]									= vks::initializers::vertexInputAttributeDescription(VERTEX_BUFFER_BIND_ID, 1, VK_FORMAT_R32G32_SFLOAT, offsetof(Vertex, uv));				// Location 1 : Texture coordinates
-		vertices.inputAttributes[2]									= vks::initializers::vertexInputAttributeDescription(VERTEX_BUFFER_BIND_ID, 2, VK_FORMAT_R32G32B32_SFLOAT, offsetof(Vertex, normal));		// Location 1 : Vertex normal
+		vertices.inputAttributes[0]									= vks::initializers::vertexInputAttributeDescription(VERTEX_BUFFER_BIND_ID, 0, VK_FORMAT_R32G32B32_SFLOAT	, offsetof(Vertex, position	));	// Location 0 : Position
+		vertices.inputAttributes[1]									= vks::initializers::vertexInputAttributeDescription(VERTEX_BUFFER_BIND_ID, 1, VK_FORMAT_R32G32_SFLOAT		, offsetof(Vertex, uv		));	// Location 1 : Texture coordinates
+		vertices.inputAttributes[2]									= vks::initializers::vertexInputAttributeDescription(VERTEX_BUFFER_BIND_ID, 2, VK_FORMAT_R32G32B32_SFLOAT	, offsetof(Vertex, normal	));	// Location 1 : Vertex normal
 
 		vertices.inputState											= vks::initializers::pipelineVertexInputStateCreateInfo();
 		vertices.inputState.vertexBindingDescriptionCount			= static_cast<uint32_t>(vertices.inputBinding.size());

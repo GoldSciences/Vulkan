@@ -33,13 +33,7 @@
 #define VERTEX_BUFFER_BIND_ID	0
 #define ENABLE_VALIDATION		false
 
-// Vertex layout used in this example
-struct Vertex {
-	glm::vec3													pos;
-	glm::vec3													normal;
-	glm::vec2													uv;
-	glm::vec3													color;
-};
+typedef VertexPNUC											Vertex;		// Vertex layout used in this example
 
 // Scene related structs
 
@@ -228,8 +222,8 @@ private:
 
 			for (uint32_t v = 0; v < aMesh->mNumVertices; v++) {
 				Vertex															vertex;
-				vertex.pos													= glm::make_vec3(&aMesh->mVertices[v].x);
-				vertex.pos.y												= -vertex.pos.y;
+				vertex.position												= glm::make_vec3(&aMesh->mVertices[v].x);
+				vertex.position.y											= -vertex.position.y;
 				vertex.uv													= hasUV ? glm::make_vec2(&aMesh->mTextureCoords[0][v].x) : glm::vec2(0.0f);
 				vertex.normal												= hasNormals ? glm::make_vec3(&aMesh->mNormals[v].x) : glm::vec3(0.0f);
 				vertex.normal.y												= -vertex.normal.y;

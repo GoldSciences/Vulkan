@@ -327,11 +327,7 @@ public:
 
 	// Generate a terrain quad patch for feeding to the tessellation control shader
 	void														generateTerrain						()													{
-		struct Vertex {
-			glm::vec3														pos;
-			glm::vec3														normal;
-			glm::vec2														uv;
-		};
+		typedef VertexPNU												Vertex;		// Vertex layout used in this example
 
 		#define PATCH_SIZE	64
 		#define UV_SCALE	1.0f
@@ -343,9 +339,9 @@ public:
 		for (auto x = 0; x < PATCH_SIZE; x++)
 			for (auto y = 0; y < PATCH_SIZE; y++) {
 				uint32_t														index								= (x + y * PATCH_SIZE);
-				_vertices[index].pos[0]										= x * wx + wx / 2.0f - (float)PATCH_SIZE * wx / 2.0f;
-				_vertices[index].pos[1]										= 0.0f;
-				_vertices[index].pos[2]										= y * wy + wy / 2.0f - (float)PATCH_SIZE * wy / 2.0f;
+				_vertices[index].position[0]								= x * wx + wx / 2.0f - (float)PATCH_SIZE * wx / 2.0f;
+				_vertices[index].position[1]								= 0.0f;
+				_vertices[index].position[2]								= y * wy + wy / 2.0f - (float)PATCH_SIZE * wy / 2.0f;
 				_vertices[index].uv											= glm::vec2((float)x / PATCH_SIZE, (float)y / PATCH_SIZE) * UV_SCALE;
 			}
 

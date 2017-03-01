@@ -8,7 +8,7 @@
 #include "vulkangear.h"
 
 int32_t VulkanGear::newVertex(std::vector<Vertex> *vBuffer, float x, float y, float z, const glm::vec3& normal)	{
-	Vertex v(glm::vec3(x, y, z), normal, color);
+	Vertex				v = {{x, y, z}, normal, color};
 	vBuffer->push_back(v);
 	return static_cast<int32_t>(vBuffer->size()) - 1;
 }
@@ -28,7 +28,7 @@ VulkanGear::~VulkanGear()	{
 
 void VulkanGear::generate(GearInfo *gearinfo, VkQueue queue)	{
 	this->color = gearinfo->color;
-	this->pos = gearinfo->pos;
+	this->position = gearinfo->position;
 	this->rotOffset = gearinfo->rotOffset;
 	this->rotSpeed = gearinfo->rotSpeed;
 
@@ -184,10 +184,10 @@ void VulkanGear::generate(GearInfo *gearinfo, VkQueue queue)	{
 
 		vulkanDevice->flushCommandBuffer(copyCmd, queue, true);
 
-		vkDestroyBuffer(vulkanDevice->logicalDevice, vertexStaging.buffer, nullptr);
-		vkFreeMemory(vulkanDevice->logicalDevice, vertexStaging.memory, nullptr);
-		vkDestroyBuffer(vulkanDevice->logicalDevice, indexStaging.buffer, nullptr);
-		vkFreeMemory(vulkanDevice->logicalDevice, indexStaging.memory, nullptr);
+		vkDestroyBuffer	(vulkanDevice->logicalDevice, vertexStaging.buffer, nullptr);
+		vkFreeMemory	(vulkanDevice->logicalDevice, vertexStaging.memory, nullptr);
+		vkDestroyBuffer	(vulkanDevice->logicalDevice, indexStaging.buffer, nullptr);
+		vkFreeMemory	(vulkanDevice->logicalDevice, indexStaging.memory, nullptr);
 	}
 	else {
 		vulkanDevice->createBuffer(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, &vertexBuffer, vertexBufferSize, vBuffer.data());	// Vertex buffer
@@ -219,7 +219,7 @@ void VulkanGear::updateUniformBuffer(glm::mat4 perspective, glm::vec3 rotation, 
 	ubo.view = glm::rotate(ubo.view, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
 
 	ubo.model = glm::mat4();
-	ubo.model = glm::translate(ubo.model, pos);
+	ubo.model = glm::translate(ubo.model, position);
 	rotation.z = (rotSpeed * timer) + rotOffset;
 	ubo.model = glm::rotate(ubo.model, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
 

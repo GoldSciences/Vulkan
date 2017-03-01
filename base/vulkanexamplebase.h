@@ -25,10 +25,6 @@
 #include <chrono>
 #include <sys/stat.h>
 
-#define GLM_FORCE_RADIANS
-#define GLM_FORCE_DEPTH_ZERO_TO_ONE
-#define GLM_ENABLE_EXPERIMENTAL
-#include <glm/glm.hpp>
 
 #include <string>
 #include <array>
@@ -40,6 +36,7 @@
 #include "vulkanswapchain.hpp"
 #include "vulkantextoverlay.hpp"
 #include "camera.hpp"
+#include "vertex.h"
 
 class VulkanExampleBase
 {

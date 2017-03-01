@@ -34,12 +34,7 @@ public:
 
 	// Vertex layout used in this example
 	// This must fit input locations of the vertex shader used to render the model
-	struct Vertex {
-		glm::vec3													pos;
-		glm::vec3													normal;
-		glm::vec2													uv;
-		glm::vec3													color;
-	};
+	typedef VertexPNUC											Vertex;		// Vertex layout used in this example
 
 	// Contains all Vulkan resources required to represent vertex and index buffers for a model
 	// This is for demonstration and learning purposes, the other examples use a model loader class for easy access
@@ -198,13 +193,13 @@ public:
 				Vertex															vertex;
 
 				// Use glm make_* functions to convert ASSIMP vectors to glm vectors
-				vertex.pos													= glm::make_vec3(&scene->mMeshes[m]->mVertices[v].x) * scale;
+				vertex.position												= glm::make_vec3(&scene->mMeshes[m]->mVertices[v].x) * scale;
 				vertex.normal												= glm::make_vec3(&scene->mMeshes[m]->mNormals[v].x);
 				
 				vertex.uv													= glm::make_vec2(&scene->mMeshes[m]->mTextureCoords[0][v].x);					// Texture coordinates and colors may have multiple channels, we only use the first [0] one
 				vertex.color												= (scene->mMeshes[m]->HasVertexColors(0)) ? glm::make_vec3(&scene->mMeshes[m]->mColors[0][v].r) : glm::vec3(1.0f);	// Mesh may not have vertex colors
 
-				vertex.pos.y												*= -1.0f;	// Vulkan uses a right-handed NDC (contrary to OpenGL), so simply flip Y-Axis
+				vertex.position.y											*= -1.0f;	// Vulkan uses a right-handed NDC (contrary to OpenGL), so simply flip Y-Axis
 
 				vertexBuffer.push_back(vertex);
 			}
@@ -272,10 +267,10 @@ public:
 		
 		// Attribute descriptions. Describes memory layout and shader positions
 		vertices.attributeDescriptions.resize(4);
-		vertices.attributeDescriptions[0]							= vks::initializers::vertexInputAttributeDescription(VERTEX_BUFFER_BIND_ID, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(Vertex, pos));		// Location 0 : Position
-		vertices.attributeDescriptions[1]							= vks::initializers::vertexInputAttributeDescription(VERTEX_BUFFER_BIND_ID, 1, VK_FORMAT_R32G32B32_SFLOAT, offsetof(Vertex, normal));		// Location 1 : Normal
-		vertices.attributeDescriptions[2]							= vks::initializers::vertexInputAttributeDescription(VERTEX_BUFFER_BIND_ID, 2, VK_FORMAT_R32G32_SFLOAT, offsetof(Vertex, uv));			// Location 2 : Texture coordinates
-		vertices.attributeDescriptions[3]							= vks::initializers::vertexInputAttributeDescription(VERTEX_BUFFER_BIND_ID, 3, VK_FORMAT_R32G32B32_SFLOAT, offsetof(Vertex, color));		// Location 3 : Color
+		vertices.attributeDescriptions[0]							= vks::initializers::vertexInputAttributeDescription(VERTEX_BUFFER_BIND_ID, 0, VK_FORMAT_R32G32B32_SFLOAT	, offsetof(Vertex, position));	// Location 0 : Position
+		vertices.attributeDescriptions[1]							= vks::initializers::vertexInputAttributeDescription(VERTEX_BUFFER_BIND_ID, 1, VK_FORMAT_R32G32B32_SFLOAT	, offsetof(Vertex, normal));	// Location 1 : Normal
+		vertices.attributeDescriptions[2]							= vks::initializers::vertexInputAttributeDescription(VERTEX_BUFFER_BIND_ID, 2, VK_FORMAT_R32G32_SFLOAT		, offsetof(Vertex, uv));		// Location 2 : Texture coordinates
+		vertices.attributeDescriptions[3]							= vks::initializers::vertexInputAttributeDescription(VERTEX_BUFFER_BIND_ID, 3, VK_FORMAT_R32G32B32_SFLOAT	, offsetof(Vertex, color));		// Location 3 : Color
 
 		vertices.inputState											= vks::initializers::pipelineVertexInputStateCreateInfo();
 		vertices.inputState.vertexBindingDescriptionCount			= static_cast<uint32_t>(vertices.bindingDescriptions.size());

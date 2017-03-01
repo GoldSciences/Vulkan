@@ -17,15 +17,7 @@
 #define VERTEX_BUFFER_BIND_ID	0
 #define ENABLE_VALIDATION		false
 
-// Vertex layout used in this example
-struct Vertex {
-	glm::vec3													pos;
-	glm::vec3													normal;
-	glm::vec2													uv;
-	glm::vec3													color;
-	float														boneWeights	[4];	// Max. four bones per vertex
-	uint32_t													boneIDs		[4];
-};
+typedef VertexPNUCWI										Vertex;		// Vertex layout used in this example. Max four bones per vertex.
 
 // Vertex layout for the models
 vks::VertexLayout											vertexLayout					= vks::VertexLayout(
@@ -457,7 +449,7 @@ public:
 			for (uint32_t v = 0; v < skinnedMesh->scene->mMeshes[m]->mNumVertices; v++) {
 				Vertex															vertex;
 
-				vertex.pos													= glm::make_vec3(&skinnedMesh->scene->mMeshes[m]->mVertices[v].x);
+				vertex.position												= glm::make_vec3(&skinnedMesh->scene->mMeshes[m]->mVertices[v].x);
 				vertex.normal												= glm::make_vec3(&skinnedMesh->scene->mMeshes[m]->mNormals[v].x);
 				vertex.uv													= glm::make_vec2(&skinnedMesh->scene->mMeshes[m]->mTextureCoords[0][v].x);
 				vertex.color												= (skinnedMesh->scene->mMeshes[m]->HasVertexColors(0)) ? glm::make_vec3(&skinnedMesh->scene->mMeshes[m]->mColors[0][v].r) : glm::vec3(1.0f);

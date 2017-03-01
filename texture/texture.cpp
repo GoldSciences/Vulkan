@@ -13,11 +13,7 @@
 #define ENABLE_VALIDATION		false
 
 // Vertex layout for this example
-struct Vertex {
-	float														pos		[3];
-	float														uv		[2];
-	float														normal	[3];
-};
+typedef VertexPUN											Vertex;		// Vertex layout used in this example
 
 class VulkanExample : public VulkanExampleBase
 {
@@ -454,8 +450,8 @@ public:
 
 		// Create buffers
 		// For the sake of simplicity we won't stage the vertex data to the gpu memory
-		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &vertexBuffer	, _vertices.size() * sizeof(Vertex), _vertices.data()));	// Vertex buffer
-		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_INDEX_BUFFER_BIT	, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &indexBuffer	, indices.size() * sizeof(uint32_t), indices.data()));	// Index buffer
+		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &vertexBuffer	, _vertices.size() * sizeof(Vertex), _vertices	.data()));	// Vertex buffer
+		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_INDEX_BUFFER_BIT	, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &indexBuffer	, indices.size() * sizeof(uint32_t), indices	.data()));	// Index buffer
 	}
 
 	void														setupVertexDescriptions				()																{
@@ -466,9 +462,9 @@ public:
 		// Attribute descriptions
 		// Describes memory layout and shader positions
 		vertices.attributeDescriptions.resize(3);
-		vertices.attributeDescriptions[0]							= vks::initializers::vertexInputAttributeDescription(VERTEX_BUFFER_BIND_ID, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(Vertex, pos));				// Location 0 : Position
-		vertices.attributeDescriptions[1]							= vks::initializers::vertexInputAttributeDescription(VERTEX_BUFFER_BIND_ID, 1, VK_FORMAT_R32G32_SFLOAT, offsetof(Vertex, uv));					// Location 1 : Texture coordinates
-		vertices.attributeDescriptions[2]							= vks::initializers::vertexInputAttributeDescription(VERTEX_BUFFER_BIND_ID, 2, VK_FORMAT_R32G32B32_SFLOAT, offsetof(Vertex, normal));				// Location 1? : Vertex normal
+		vertices.attributeDescriptions[0]							= vks::initializers::vertexInputAttributeDescription(VERTEX_BUFFER_BIND_ID, 0, VK_FORMAT_R32G32B32_SFLOAT	, offsetof(Vertex, position	));	// Location 0 : Position
+		vertices.attributeDescriptions[1]							= vks::initializers::vertexInputAttributeDescription(VERTEX_BUFFER_BIND_ID, 1, VK_FORMAT_R32G32_SFLOAT		, offsetof(Vertex, uv		));	// Location 1 : Texture coordinates
+		vertices.attributeDescriptions[2]							= vks::initializers::vertexInputAttributeDescription(VERTEX_BUFFER_BIND_ID, 2, VK_FORMAT_R32G32B32_SFLOAT	, offsetof(Vertex, normal	));	// Location 1? : Vertex normal
 
 		vertices.inputState											= vks::initializers::pipelineVertexInputStateCreateInfo();
 		vertices.inputState.vertexBindingDescriptionCount			= static_cast<uint32_t>(vertices.bindingDescriptions.size());
@@ -542,7 +538,7 @@ public:
 		shaderStages[0]												= loadShader(getAssetPath() + "shaders/texture/texture.vert.spv", VK_SHADER_STAGE_VERTEX_BIT);
 		shaderStages[1]												= loadShader(getAssetPath() + "shaders/texture/texture.frag.spv", VK_SHADER_STAGE_FRAGMENT_BIT);
 
-		VkGraphicsPipelineCreateInfo									pipelineCreateInfo					= vks::initializers::pipelineCreateInfo(pipelineLayout, renderPass, 0);
+		VkGraphicsPipelineCreateInfo									pipelineCreateInfo					= vks::initializers::pipelineCreateInfo						(pipelineLayout, renderPass, 0);
 		pipelineCreateInfo.pVertexInputState						= &vertices.inputState;
 		pipelineCreateInfo.pInputAssemblyState						= &inputAssemblyState;
 		pipelineCreateInfo.pRasterizationState						= &rasterizationState;

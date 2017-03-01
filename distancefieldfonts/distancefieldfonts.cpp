@@ -13,11 +13,7 @@
 #define VERTEX_BUFFER_BIND_ID	0
 #define ENABLE_VALIDATION		false
 
-// Vertex layout for this example
-struct Vertex {
-	float														pos	[3];
-	float														uv	[2];
-};
+typedef VertexPU											Vertex;		// Vertex layout used in this example
 
 // AngelCode .fnt format structs and classes
 struct bmchar {
@@ -283,8 +279,8 @@ public:
 
 		// Center
 		for (Vertex& v : _vertices)	{
-			v.pos[0]													-= posx / 2.0f;
-			v.pos[1]													-= 0.5f;
+			v.position[0]												-= posx / 2.0f;
+			v.position[1]												-= 0.5f;
 		}
 
 		// Generate host accesible buffers for the text vertices and indices and upload the data
