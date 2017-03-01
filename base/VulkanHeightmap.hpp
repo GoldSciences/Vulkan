@@ -160,7 +160,7 @@ namespace vks
 				for (uint32_t x = 0; x < w; x++)
 					for (uint32_t y = 0; y < w; y++)
 					{
-						uint32_t									index = (x + y * w) * 4;
+						uint32_t									index					= (x + y * w) * 4;
 						indices[index]							= (x + y * patchsize);
 						indices[index + 1]						= indices[index] + patchsize;
 						indices[index + 2]						= indices[index + 1] + 1;

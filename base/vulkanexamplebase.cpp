@@ -309,7 +309,7 @@ void										VulkanExampleBase::renderLoop						()																												{
 		frameTimer													= tDiff / 1000.0f;
 		camera.update(frameTimer);
 		if (camera.moving())
-			viewUpdated = true;
+			viewUpdated													= true;
 		// Convert to clamped timer value
 		if (!paused) {
 			timer														+= timerSpeed * frameTimer;
@@ -759,16 +759,12 @@ HWND										VulkanExampleBase::setupWindow						(HINSTANCE hinstance, WNDPROC 
 		dmScreenSettings.dmFields									= DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
 
 		if ((width != (uint32_t)screenWidth) && (height != (uint32_t)screenHeight))
-		{
-			if (ChangeDisplaySettings(&dmScreenSettings, CDS_FULLSCREEN) != DISP_CHANGE_SUCCESSFUL)
-			{
+			if (ChangeDisplaySettings(&dmScreenSettings, CDS_FULLSCREEN) != DISP_CHANGE_SUCCESSFUL) {
 				if (MessageBox(NULL, "Fullscreen Mode not supported!\n Switch to window mode?", "Error", MB_YESNO | MB_ICONEXCLAMATION) == IDYES)
-					settings.fullscreen = false;
+					settings.fullscreen											= false;
 				else
 					return false;
 			}
-		}
-
 	}
 
 	DWORD															dwExStyle;
@@ -792,14 +788,7 @@ HWND										VulkanExampleBase::setupWindow						(HINSTANCE hinstance, WNDPROC 
 	AdjustWindowRectEx(&windowRect, dwStyle, FALSE, dwExStyle);
 
 	std::string														windowTitle			= getWindowTitle();
-	window = CreateWindowEx(0,
-		name.c_str(),
-		windowTitle.c_str(),
-		dwStyle | WS_CLIPSIBLINGS | WS_CLIPCHILDREN,
-		0, 0,
-		windowRect.right - windowRect.left,
-		windowRect.bottom - windowRect.top,
-		NULL, NULL, hinstance, NULL);
+	window														= CreateWindowEx(0, name.c_str(), windowTitle.c_str(), dwStyle | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0, 0, windowRect.right - windowRect.left, windowRect.bottom - windowRect.top, NULL, NULL, hinstance, NULL);
 
 	if (!settings.fullscreen)	{ 
 		// Center on screen
@@ -833,7 +822,7 @@ void										VulkanExampleBase::handleMessages					(HWND hWnd, UINT uMsg, WPARA
 		break;
 	case WM_KEYDOWN	:
 		switch (wParam) {
-		case KEY_P		: paused = !paused;															break;
+		case KEY_P		: paused			= !paused;												break;
 		case KEY_F1		: if (enableTextOverlay) textOverlay->visible	= !textOverlay->visible;	break;
 		case KEY_ESCAPE	: PostQuitMessage(0);														break;
 		}
@@ -1062,12 +1051,12 @@ void										VulkanExampleBase::pointerButton					(struct wl_pointer *pointer, 
 }
 
 /*static*/void								VulkanExampleBase::pointerAxisCb					(void *data, wl_pointer *pointer, uint32_t time, uint32_t axis, wl_fixed_t value)								{
-	VulkanExampleBase *self = reinterpret_cast<VulkanExampleBase *>(data);
+	VulkanExampleBase												* self								= reinterpret_cast<VulkanExampleBase *>(data);
 	self->pointerAxis(pointer, time, axis, value);
 }
 
 void										VulkanExampleBase::pointerAxis						(wl_pointer *pointer, uint32_t time, uint32_t axis, wl_fixed_t value)											{
-	double															d		= wl_fixed_to_double(value);
+	double															d									= wl_fixed_to_double(value);
 	switch (axis)
 	{
 	case REL_X:

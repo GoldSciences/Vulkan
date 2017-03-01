@@ -202,7 +202,7 @@ public:
 			VK_CHECK_RESULT(vkBeginCommandBuffer(drawCmdBuffers[i], &cmdBufInfo));
 
 			// Image memory barrier to make sure that compute shader writes are finished before sampling from the texture
-			VkImageMemoryBarrier											imageMemoryBarrier = {};
+			VkImageMemoryBarrier											imageMemoryBarrier						= {};
 			imageMemoryBarrier.sType									= VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
 			// We won't be changing the layout of the image
 			imageMemoryBarrier.oldLayout								= VK_IMAGE_LAYOUT_GENERAL;
@@ -462,7 +462,7 @@ public:
 		}
 
 		// Separate command pool as queue family for compute may be different than graphics
-		VkCommandPoolCreateInfo											cmdPoolInfo = {};
+		VkCommandPoolCreateInfo											cmdPoolInfo								= {};
 		cmdPoolInfo.sType											= VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
 		cmdPoolInfo.queueFamilyIndex								= compute.queueFamilyIndex;
 		cmdPoolInfo.flags											= VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;

@@ -51,7 +51,7 @@ public:
 			struct {
 				glm::vec3													pos											= glm::vec3(0.0f, 0.0f, 4.0f);
 				glm::vec3													lookat										= glm::vec3(0.0f, 0.5f, 0.0f);
-				float														fov = 10.0f;
+				float														fov											= 10.0f;
 			}															camera;
 		}															ubo;
 	}															compute;
@@ -179,7 +179,7 @@ public:
 		tex->device													= vulkanDevice;
 	}
 
-	void														buildCommandBuffers						()																			{
+	void														buildCommandBuffers						()																		{
 		// Destroy command buffers if already present
 		if (!checkCommandBuffers()) {
 			destroyCommandBuffers();
@@ -240,17 +240,17 @@ public:
 
 	}
 
-	void														buildComputeCommandBuffer				()																				{
-		VkCommandBufferBeginInfo cmdBufInfo = vks::initializers::commandBufferBeginInfo();
+	void														buildComputeCommandBuffer				()																		{
+		VkCommandBufferBeginInfo										cmdBufInfo								= vks::initializers::commandBufferBeginInfo();
 
 		VK_CHECK_RESULT(vkBeginCommandBuffer(compute.commandBuffer, &cmdBufInfo));
 
-		vkCmdBindPipeline(compute.commandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, compute.pipeline);
-		vkCmdBindDescriptorSets(compute.commandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, compute.pipelineLayout, 0, 1, &compute.descriptorSet, 0, 0);
+		vkCmdBindPipeline		(compute.commandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, compute.pipeline);
+		vkCmdBindDescriptorSets	(compute.commandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, compute.pipelineLayout, 0, 1, &compute.descriptorSet, 0, 0);
 
-		vkCmdDispatch(compute.commandBuffer, textureComputeTarget.width / 16, textureComputeTarget.height / 16, 1);
+		vkCmdDispatch			(compute.commandBuffer, textureComputeTarget.width / 16, textureComputeTarget.height / 16, 1);
 
-		vkEndCommandBuffer(compute.commandBuffer);
+		vkEndCommandBuffer		(compute.commandBuffer);
 	}
 
 	uint32_t													currentId								= 0;	// Id used to identify objects by the ray tracing shader

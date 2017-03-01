@@ -881,7 +881,7 @@ public:
 	void														toggleObject							()									{
 		models.objectIndex++;
 		if (models.objectIndex >= static_cast<uint32_t>(models.objects.size()))
-			models.objectIndex = 0;
+			models.objectIndex											= 0;
 		reBuildCommandBuffers();
 	}
 

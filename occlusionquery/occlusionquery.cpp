@@ -104,11 +104,11 @@ public:
 	// Create a buffer for storing the query result
 	// Setup a query pool
 	void														setupQueryResultBuffer			()										{
-		uint32_t														bufSize				= 2 * sizeof(uint64_t);
+		uint32_t														bufSize							= 2 * sizeof(uint64_t);
 
 		VkMemoryRequirements											memReqs;
-		VkMemoryAllocateInfo											memAlloc			= vks::initializers::memoryAllocateInfo();
-		VkBufferCreateInfo												bufferCreateInfo	= vks::initializers::bufferCreateInfo(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, bufSize);
+		VkMemoryAllocateInfo											memAlloc						= vks::initializers::memoryAllocateInfo();
+		VkBufferCreateInfo												bufferCreateInfo				= vks::initializers::bufferCreateInfo(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, bufSize);
 
 		// Results are saved in a host visible buffer for easy access by the application
 		VK_CHECK_RESULT(vkCreateBuffer		(device, &bufferCreateInfo, nullptr, &queryResult.buffer));
@@ -119,7 +119,7 @@ public:
 		VK_CHECK_RESULT(vkBindBufferMemory	(device, queryResult.buffer, queryResult.memory, 0));
 
 		// Create query pool
-		VkQueryPoolCreateInfo											queryPoolInfo = {};
+		VkQueryPoolCreateInfo											queryPoolInfo					= {};
 		queryPoolInfo.sType											= VK_STRUCTURE_TYPE_QUERY_POOL_CREATE_INFO;
 		// Query pool will be created for occlusion queries
 		queryPoolInfo.queryType										= VK_QUERY_TYPE_OCCLUSION;
@@ -348,8 +348,8 @@ public:
 		// Load shaders
 		std::array<VkPipelineShaderStageCreateInfo, 2>					shaderStages					= {};
 
-		shaderStages[0] = loadShader(getAssetPath() + "shaders/occlusionquery/mesh.vert.spv", VK_SHADER_STAGE_VERTEX_BIT);
-		shaderStages[1] = loadShader(getAssetPath() + "shaders/occlusionquery/mesh.frag.spv", VK_SHADER_STAGE_FRAGMENT_BIT);
+		shaderStages[0]												= loadShader(getAssetPath() + "shaders/occlusionquery/mesh.vert.spv", VK_SHADER_STAGE_VERTEX_BIT);
+		shaderStages[1]												= loadShader(getAssetPath() + "shaders/occlusionquery/mesh.frag.spv", VK_SHADER_STAGE_FRAGMENT_BIT);
 
 		VkGraphicsPipelineCreateInfo									pipelineCreateInfo				= vks::initializers::pipelineCreateInfo(pipelineLayout, renderPass, 0);
 		pipelineCreateInfo.pVertexInputState						= &vertices.inputState;

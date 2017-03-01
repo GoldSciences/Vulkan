@@ -327,15 +327,15 @@ public:
 	virtual void												render								()									{ if (prepared) draw();		}
 	virtual void												viewChanged							()									{ updateUniformBuffers();	}
 	void														changeTessellationLevel				(float delta)						{
-		uboTessControl.tessLevel += delta;
-		uboTessControl.tessLevel = fmax(1.0f, fmin(uboTessControl.tessLevel, 32.0f));
+		uboTessControl.tessLevel									+= delta;
+		uboTessControl.tessLevel									= fmax(1.0f, fmin(uboTessControl.tessLevel, 32.0f));
 		updateUniformBuffers();
 		updateTextOverlay();
 	}
 
 	void														changeTessellationStrength			(float delta)						{
-		uboTessEval.tessStrength += delta;
-		uboTessEval.tessStrength = fmax(0.0f, fmin(uboTessEval.tessStrength, 1.0f));
+		uboTessEval.tessStrength									+= delta;
+		uboTessEval.tessStrength									= fmax(0.0f, fmin(uboTessEval.tessStrength, 1.0f));
 		updateUniformBuffers();
 		updateTextOverlay();
 	}

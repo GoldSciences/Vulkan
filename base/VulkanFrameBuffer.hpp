@@ -100,12 +100,12 @@ namespace vks
 
 			// Color attachment
 			if (createinfo.usage & VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT)
-				aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+				aspectMask								= VK_IMAGE_ASPECT_COLOR_BIT;
 
 			// Depth (and/or stencil) attachment
 			if (createinfo.usage & VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT) {
-				if (attachment.hasDepth())		aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
-				if (attachment.hasStencil())	aspectMask |= VK_IMAGE_ASPECT_STENCIL_BIT;
+				if (attachment.hasDepth())		aspectMask	= VK_IMAGE_ASPECT_DEPTH_BIT;
+				if (attachment.hasStencil())	aspectMask	|= VK_IMAGE_ASPECT_STENCIL_BIT;
 			}
 
 			assert(aspectMask > 0);
@@ -144,7 +144,7 @@ namespace vks
 			imageView.subresourceRange				= attachment.subresourceRange;
 			//todo: workaround for depth+stencil attachments
 			imageView.subresourceRange.aspectMask	= (attachment.hasDepth()) ? VK_IMAGE_ASPECT_DEPTH_BIT : aspectMask;
-			imageView.image = attachment.image;
+			imageView.image							= attachment.image;
 			VK_CHECK_RESULT(vkCreateImageView(vulkanDevice->logicalDevice, &imageView, nullptr, &attachment.view));
 
 			// Fill attachment description
@@ -270,7 +270,7 @@ namespace vks
 			uint32_t									maxLayers			= 0;
 			for (auto attachment : attachments) {
 				if (attachment.subresourceRange.layerCount > maxLayers)
-					maxLayers = attachment.subresourceRange.layerCount;
+					maxLayers								= attachment.subresourceRange.layerCount;
 			}
 
 			VkFramebufferCreateInfo						framebufferInfo		= {};

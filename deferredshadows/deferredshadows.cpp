@@ -45,8 +45,8 @@ public:
 	float														lightFOV								= 100.0f;
 
 	// Depth bias (and slope) are used to avoid shadowing artefacts
-	float depthBiasConstant = 1.25f;
-	float depthBiasSlope = 1.75f;
+	float														depthBiasConstant						= 1.25f;
+	float														depthBiasSlope							= 1.75f;
 
 	struct {
 		struct {

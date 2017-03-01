@@ -51,7 +51,7 @@ namespace vks
 
 		// Flush a memory range of the buffer to make it visible to the device. Only required for non-coherent memory. Returns VkResult of the flush call. Pass VK_WHOLE_SIZE to flush the complete buffer range.
 		VkResult												flush					(VkDeviceSize size_ = VK_WHOLE_SIZE, VkDeviceSize offset = 0)	{
-			VkMappedMemoryRange											mappedRange = {};
+			VkMappedMemoryRange											mappedRange				= {};
 			mappedRange.sType										= VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
 			mappedRange.memory										= memory;
 			mappedRange.offset										= offset;
@@ -61,7 +61,7 @@ namespace vks
 
 		// Invalidate a memory range of the buffer to make it visible to the host. Only required for non-coherent memory. Returns VkResult of the invalidate call. Pass VK_WHOLE_SIZE to invalidate the complete buffer range.
 		VkResult												invalidate				(VkDeviceSize size_ = VK_WHOLE_SIZE, VkDeviceSize offset = 0)	{
-			VkMappedMemoryRange											mappedRange = {};
+			VkMappedMemoryRange											mappedRange				= {};
 			mappedRange.sType										= VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
 			mappedRange.memory										= memory;
 			mappedRange.offset										= offset;

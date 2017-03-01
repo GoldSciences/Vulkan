@@ -217,7 +217,7 @@ public:
 			samplerInfo.anisotropyEnable								= VK_TRUE;
 		}
 		VK_CHECK_RESULT(vkCreateSampler(device, &samplerInfo, nullptr, &textures.terrainArray.sampler));
-		textures.terrainArray.descriptor.sampler = textures.terrainArray.sampler;
+		textures.terrainArray.descriptor.sampler					= textures.terrainArray.sampler;
 	}
 
 	void														reBuildCommandBuffers				()													{
@@ -248,15 +248,15 @@ public:
 		for (size_t i = 0; i < drawCmdBuffers.size(); ++i) {
 			renderPassBeginInfo.framebuffer								= frameBuffers[i];
 			VK_CHECK_RESULT(vkBeginCommandBuffer(drawCmdBuffers[i], &cmdBufInfo));
-			vkCmdResetQueryPool	(drawCmdBuffers[i], queryPool, 0, 2);
-			vkCmdBeginRenderPass(drawCmdBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
+			vkCmdResetQueryPool		(drawCmdBuffers[i], queryPool, 0, 2);
+			vkCmdBeginRenderPass	(drawCmdBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 
 			VkViewport														viewport							= vks::initializers::viewport((float)width, (float)height, 0.0f, 1.0f);
-			vkCmdSetViewport(drawCmdBuffers[i], 0, 1, &viewport);
+			vkCmdSetViewport		(drawCmdBuffers[i], 0, 1, &viewport);
 
 			VkRect2D														scissor								= vks::initializers::rect2D(width, height, 0, 0);
-			vkCmdSetScissor(drawCmdBuffers[i], 0, 1, &scissor);
-			vkCmdSetLineWidth(drawCmdBuffers[i], 1.0f);
+			vkCmdSetScissor			(drawCmdBuffers[i], 0, 1, &scissor);
+			vkCmdSetLineWidth		(drawCmdBuffers[i], 1.0f);
 
 			VkDeviceSize													offsets[1]							= { 0 };
 
@@ -367,7 +367,7 @@ public:
 				glm::vec3														normal;
 				normal.x													= heights[0][0] - heights[2][0] + 2.0f * heights[0][1] - 2.0f * heights[2][1] + heights[0][2] - heights[2][2];	// Gx sobel filter
 				normal.z													= heights[0][0] + 2.0f * heights[1][0] + heights[2][0] - heights[0][2] - 2.0f * heights[1][2] - heights[2][2];	// Gy sobel filter
-				normal.y = 0.25f * sqrt( 1.0f - normal.x * normal.x - normal.z * normal.z);	// Calculate missing up component of the normal using the filtered x and y axis. The first value controls the bump strength
+				normal.y													= 0.25f * sqrt( 1.0f - normal.x * normal.x - normal.z * normal.z);	// Calculate missing up component of the normal using the filtered x and y axis. The first value controls the bump strength
 
 				_vertices[x + y * PATCH_SIZE].normal = glm::normalize(normal * glm::vec3(2.0f, 1.0f, 2.0f));
 			}
@@ -444,7 +444,7 @@ public:
 			,	vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER	, 3)
 			};
 
-		VkDescriptorPoolCreateInfo descriptorPoolInfo = vks::initializers::descriptorPoolCreateInfo(static_cast<uint32_t>(poolSizes.size()), poolSizes.data(), 2);
+		VkDescriptorPoolCreateInfo										descriptorPoolInfo					= vks::initializers::descriptorPoolCreateInfo(static_cast<uint32_t>(poolSizes.size()), poolSizes.data(), 2);
 		VK_CHECK_RESULT(vkCreateDescriptorPool(device, &descriptorPoolInfo, nullptr, &descriptorPool));
 	}
 
@@ -524,10 +524,10 @@ public:
 		std::array<VkPipelineShaderStageCreateInfo, 4>					shaderStages;
 
 		// Terrain tessellation pipeline
-		shaderStages[0] = loadShader(getAssetPath() + "shaders/terraintessellation/terrain.vert.spv", VK_SHADER_STAGE_VERTEX_BIT);
-		shaderStages[1] = loadShader(getAssetPath() + "shaders/terraintessellation/terrain.frag.spv", VK_SHADER_STAGE_FRAGMENT_BIT);
-		shaderStages[2] = loadShader(getAssetPath() + "shaders/terraintessellation/terrain.tesc.spv", VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT);
-		shaderStages[3] = loadShader(getAssetPath() + "shaders/terraintessellation/terrain.tese.spv", VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT);
+		shaderStages[0]												= loadShader(getAssetPath() + "shaders/terraintessellation/terrain.vert.spv", VK_SHADER_STAGE_VERTEX_BIT);
+		shaderStages[1]												= loadShader(getAssetPath() + "shaders/terraintessellation/terrain.frag.spv", VK_SHADER_STAGE_FRAGMENT_BIT);
+		shaderStages[2]												= loadShader(getAssetPath() + "shaders/terraintessellation/terrain.tesc.spv", VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT);
+		shaderStages[3]												= loadShader(getAssetPath() + "shaders/terraintessellation/terrain.tese.spv", VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT);
 
 		VkGraphicsPipelineCreateInfo									pipelineCreateInfo					= vks::initializers::pipelineCreateInfo(pipelineLayouts.terrain, renderPass, 0);
 		pipelineCreateInfo.pVertexInputState						= &vertices.inputState;
@@ -585,7 +585,7 @@ public:
 
 		float															savedFactor							= uboTess.tessellationFactor;
 		if (!tessellation)
-			uboTess.tessellationFactor									 = 0.0f;	// Setting this to zero sets all tessellation factors to 1.0 in the shader
+			uboTess.tessellationFactor									= 0.0f;	// Setting this to zero sets all tessellation factors to 1.0 in the shader
 
 		memcpy(uniformBuffers.terrainTessellation.mapped, &uboTess, sizeof(uboTess));
 

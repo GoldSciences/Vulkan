@@ -365,12 +365,12 @@ public:
 		attachments[1].finalLayout						= VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 
 		VkAttachmentReference								colorReference				= {};
-		colorReference.attachment = 0;
-		colorReference.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+		colorReference.attachment						= 0;
+		colorReference.layout							= VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 
 		VkAttachmentReference								depthReference				= {};
-		depthReference.attachment = 1;
-		depthReference.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+		depthReference.attachment						= 1;
+		depthReference.layout							= VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 
 		VkSubpassDependency									subpassDependencies[2]		= {};
 
@@ -441,8 +441,8 @@ public:
 
 		float												fbW						= (float)*frameBufferWidth;
 		float												fbH						= (float)*frameBufferHeight;
-		x = (x / fbW * 2.0f) - 1.0f;
-		y = (y / fbH * 2.0f) - 1.0f;
+		x												= (x / fbW * 2.0f) - 1.0f;
+		y												= (y / fbH * 2.0f) - 1.0f;
 
 		// Calculate text width
 		float												textWidth				= 0;
@@ -515,24 +515,24 @@ public:
 			if (vks::debugmarker::active)
 				vks::debugmarker::beginRegion(cmdBuffers[i], "Text overlay", glm::vec4(1.0f, 0.94f, 0.3f, 1.0f));
 
-			vkCmdBeginRenderPass(cmdBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
+			vkCmdBeginRenderPass	(cmdBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 
 			VkViewport											viewport					= vks::initializers::viewport((float)*frameBufferWidth, (float)*frameBufferHeight, 0.0f, 1.0f);
-			vkCmdSetViewport(cmdBuffers[i], 0, 1, &viewport);
+			vkCmdSetViewport		(cmdBuffers[i], 0, 1, &viewport);
 
 			VkRect2D											scissor						= vks::initializers::rect2D(*frameBufferWidth, *frameBufferHeight, 0, 0);
-			vkCmdSetScissor(cmdBuffers[i], 0, 1, &scissor);
+			vkCmdSetScissor			(cmdBuffers[i], 0, 1, &scissor);
 			
-			vkCmdBindPipeline(cmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
-			vkCmdBindDescriptorSets(cmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSet, 0, NULL);
+			vkCmdBindPipeline		(cmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
+			vkCmdBindDescriptorSets	(cmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSet, 0, NULL);
 
 			VkDeviceSize										offsets						= 0;
-			vkCmdBindVertexBuffers(cmdBuffers[i], 0, 1, &vertexBuffer.buffer, &offsets);
-			vkCmdBindVertexBuffers(cmdBuffers[i], 1, 1, &vertexBuffer.buffer, &offsets);
+			vkCmdBindVertexBuffers	(cmdBuffers[i], 0, 1, &vertexBuffer.buffer, &offsets);
+			vkCmdBindVertexBuffers	(cmdBuffers[i], 1, 1, &vertexBuffer.buffer, &offsets);
 			for (uint32_t j = 0; j < numLetters; j++)
-				vkCmdDraw(cmdBuffers[i], 4, 1, j * 4, 0);
+				vkCmdDraw				(cmdBuffers[i], 4, 1, j * 4, 0);
 
-			vkCmdEndRenderPass(cmdBuffers[i]);
+			vkCmdEndRenderPass		(cmdBuffers[i]);
 
 			if (vks::debugmarker::active)
 				vks::debugmarker::endRegion(cmdBuffers[i]);

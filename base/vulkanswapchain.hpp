@@ -32,9 +32,7 @@
 {                                                                       \
 	fp##entrypoint = reinterpret_cast<PFN_vk##entrypoint>(vkGetInstanceProcAddr(inst, "vk"#entrypoint)); \
 	if (fp##entrypoint == NULL)                                         \
-	{																    \
 		exit(1);                                                        \
-	}                                                                   \
 }
 
 // Macro to get a procedure address based on a vulkan device
@@ -42,9 +40,7 @@
 {                                                                       \
 	fp##entrypoint = reinterpret_cast<PFN_vk##entrypoint>(vkGetDeviceProcAddr(dev, "vk"#entrypoint));   \
 	if (fp##entrypoint == NULL)                                         \
-	{																    \
 		exit(1);                                                        \
-	}                                                                   \
 }
 
 typedef struct _SwapChainBuffers {
@@ -536,7 +532,7 @@ public:
 			bestPlaneIndex										= UINT32_MAX;
 			for(uint32_t j = 0; j < displayCount; j++) {
 				if(display == pDisplays[j]) {
-					bestPlaneIndex = i;
+					bestPlaneIndex										= i;
 					break;
 				}
 			}

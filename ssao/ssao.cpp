@@ -715,7 +715,7 @@ public:
 		VK_CHECK_RESULT(vkCreatePipelineLayout		(device, &pipelineLayoutCreateInfo, nullptr, &pipelineLayouts.ssao));
 		descriptorAllocInfo.pSetLayouts								= &descriptorSetLayouts.ssao;
 		VK_CHECK_RESULT(vkAllocateDescriptorSets	(device, &descriptorAllocInfo, &descriptorSets.ssao));
-		imageDescriptors = 
+		imageDescriptors											= 
 			{	vks::initializers::descriptorImageInfo(colorSampler, frameBuffers.offscreen.position.view, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
 			,	vks::initializers::descriptorImageInfo(colorSampler, frameBuffers.offscreen.normal.view, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
 			};
@@ -762,7 +762,7 @@ public:
 		VK_CHECK_RESULT(vkCreatePipelineLayout		(device, &pipelineLayoutCreateInfo, nullptr, &pipelineLayouts.composition));
 		descriptorAllocInfo.pSetLayouts								= &descriptorSetLayouts.composition;
 		VK_CHECK_RESULT(vkAllocateDescriptorSets	(device, &descriptorAllocInfo, &descriptorSets.composition));
-		imageDescriptors = 
+		imageDescriptors											= 
 			{	vks::initializers::descriptorImageInfo(colorSampler, frameBuffers.offscreen.position.view, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
 			,	vks::initializers::descriptorImageInfo(colorSampler, frameBuffers.offscreen.normal	.view, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
 			,	vks::initializers::descriptorImageInfo(colorSampler, frameBuffers.offscreen.albedo	.view, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
@@ -856,11 +856,11 @@ public:
 		// Blend attachment states required for all color attachments
 		// This is important, as color write mask will otherwise be 0x0 and you
 		// won't see anything rendered to the attachment
-		std::array<VkPipelineColorBlendAttachmentState, 3>			blendAttachmentStates = 
-		{	vks::initializers::pipelineColorBlendAttachmentState(0xf, VK_FALSE)
-		,	vks::initializers::pipelineColorBlendAttachmentState(0xf, VK_FALSE)
-		,	vks::initializers::pipelineColorBlendAttachmentState(0xf, VK_FALSE)
-		};
+		std::array<VkPipelineColorBlendAttachmentState, 3>			blendAttachmentStates							= 
+			{	vks::initializers::pipelineColorBlendAttachmentState(0xf, VK_FALSE)
+			,	vks::initializers::pipelineColorBlendAttachmentState(0xf, VK_FALSE)
+			,	vks::initializers::pipelineColorBlendAttachmentState(0xf, VK_FALSE)
+			};
 		colorBlendState.attachmentCount								= static_cast<uint32_t>(blendAttachmentStates.size());
 		colorBlendState.pAttachments								= blendAttachmentStates.data();
 		VK_CHECK_RESULT(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipelines.offscreen));

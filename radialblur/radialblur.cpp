@@ -222,7 +222,7 @@ public:
 		VK_CHECK_RESULT(vkBindImageMemory	(device, offscreenPass.depth.image, offscreenPass.depth.mem, 0));
 
 		VkImageViewCreateInfo											depthStencilView								= vks::initializers::imageViewCreateInfo();
-		depthStencilView.viewType = VK_IMAGE_VIEW_TYPE_2D;
+		depthStencilView.viewType									= VK_IMAGE_VIEW_TYPE_2D;
 		depthStencilView.format										= fbDepthFormat;
 		depthStencilView.flags										= 0;
 		depthStencilView.subresourceRange							= {};

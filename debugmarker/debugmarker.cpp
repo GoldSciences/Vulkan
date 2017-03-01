@@ -63,7 +63,7 @@ namespace DebugMarker
 	void														setObjectName							(VkDevice device, uint64_t object, VkDebugReportObjectTypeEXT objectType, const char *name)									{
 		// Check for valid function pointer (may not be present if not running in a debugging application)
 		if (active) {
-			VkDebugMarkerObjectNameInfoEXT									nameInfo = {};
+			VkDebugMarkerObjectNameInfoEXT									nameInfo							= {};
 			nameInfo.sType												= VK_STRUCTURE_TYPE_DEBUG_MARKER_OBJECT_NAME_INFO_EXT;
 			nameInfo.objectType											= objectType;
 			nameInfo.object												= object;
@@ -76,7 +76,7 @@ namespace DebugMarker
 	void														setObjectTag							(VkDevice device, uint64_t object, VkDebugReportObjectTypeEXT objectType, uint64_t name, size_t tagSize, const void* tag)	{
 		// Check for valid function pointer (may not be present if not running in a debugging application)
 		if (active) {
-			VkDebugMarkerObjectTagInfoEXT									tagInfo = {};
+			VkDebugMarkerObjectTagInfoEXT									tagInfo								= {};
 			tagInfo.sType												= VK_STRUCTURE_TYPE_DEBUG_MARKER_OBJECT_TAG_INFO_EXT;
 			tagInfo.objectType											= objectType;
 			tagInfo.object												= object;
@@ -91,7 +91,7 @@ namespace DebugMarker
 	void														beginRegion								(VkCommandBuffer cmdbuffer, const char* pMarkerName, glm::vec4 color)		{
 		// Check for valid function pointer (may not be present if not running in a debugging application)
 		if (active) {
-			VkDebugMarkerMarkerInfoEXT										markerInfo = {};
+			VkDebugMarkerMarkerInfoEXT										markerInfo							= {};
 			markerInfo.sType											= VK_STRUCTURE_TYPE_DEBUG_MARKER_MARKER_INFO_EXT;
 			memcpy(markerInfo.color, &color[0], sizeof(float) * 4);
 			markerInfo.pMarkerName										= pMarkerName;
@@ -103,7 +103,7 @@ namespace DebugMarker
 	void														insert									(VkCommandBuffer cmdbuffer, std::string markerName, glm::vec4 color)		{
 		// Check for valid function pointer (may not be present if not running in a debugging application)
 		if (active) {
-			VkDebugMarkerMarkerInfoEXT										markerInfo = {};
+			VkDebugMarkerMarkerInfoEXT										markerInfo							= {};
 			markerInfo.sType											= VK_STRUCTURE_TYPE_DEBUG_MARKER_MARKER_INFO_EXT;
 			memcpy(markerInfo.color, &color[0], sizeof(float) * 4);
 			markerInfo.pMarkerName										= markerName.c_str();
@@ -478,19 +478,19 @@ public:
 		// Name the meshes
 		// ASSIMP does not load mesh names from the COLLADA file used in this example so we need to set them manually
 		// These names are used in command buffer creation for setting debug markers
-		std::vector<std::string> names = { "hill", "crystals", "rocks", "cave", "tree", "mushroom stems", "blue mushroom caps", "red mushroom caps", "grass blades", "chest box", "chest fittings" };
+		std::vector<std::string>									names										= { "hill", "crystals", "rocks", "cave", "tree", "mushroom stems", "blue mushroom caps", "red mushroom caps", "grass blades", "chest box", "chest fittings" };
 		for (size_t i = 0; i < names.size(); i++) {
-			scene.modelPartNames.push_back(names[i]);
-			sceneGlow.modelPartNames.push_back(names[i]);
+			scene		.modelPartNames.push_back(names[i]);
+			sceneGlow	.modelPartNames.push_back(names[i]);
 		}
 
 		// Name the buffers for debugging
 		// Scene
-		DebugMarker::setObjectName(device, (uint64_t)scene.model.vertices.buffer, VK_DEBUG_REPORT_OBJECT_TYPE_BUFFER_EXT, "Scene vertex buffer");
-		DebugMarker::setObjectName(device, (uint64_t)scene.model.indices.buffer, VK_DEBUG_REPORT_OBJECT_TYPE_BUFFER_EXT, "Scene index buffer");
+		DebugMarker::setObjectName(device, (uint64_t)scene		.model.vertices	.buffer, VK_DEBUG_REPORT_OBJECT_TYPE_BUFFER_EXT, "Scene vertex buffer");
+		DebugMarker::setObjectName(device, (uint64_t)scene		.model.indices	.buffer, VK_DEBUG_REPORT_OBJECT_TYPE_BUFFER_EXT, "Scene index buffer");
 		// Glow
-		DebugMarker::setObjectName(device, (uint64_t)sceneGlow.model.vertices.buffer, VK_DEBUG_REPORT_OBJECT_TYPE_BUFFER_EXT, "Glow vertex buffer");
-		DebugMarker::setObjectName(device, (uint64_t)sceneGlow.model.indices.buffer, VK_DEBUG_REPORT_OBJECT_TYPE_BUFFER_EXT, "Glow index buffer");
+		DebugMarker::setObjectName(device, (uint64_t)sceneGlow	.model.vertices	.buffer, VK_DEBUG_REPORT_OBJECT_TYPE_BUFFER_EXT, "Glow vertex buffer");
+		DebugMarker::setObjectName(device, (uint64_t)sceneGlow	.model.indices	.buffer, VK_DEBUG_REPORT_OBJECT_TYPE_BUFFER_EXT, "Glow index buffer");
 	}
 
 	void														reBuildCommandBuffers					()									{

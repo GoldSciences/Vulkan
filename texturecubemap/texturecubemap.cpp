@@ -244,7 +244,7 @@ public:
 		view.subresourceRange										= { VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1 };
 		view.subresourceRange.layerCount							= 6;					// 6 array layers (faces)
 		view.subresourceRange.levelCount							= cubeMap.mipLevels;	// Set number of mip levels
-		view.image = cubeMap.image;
+		view.image													= cubeMap.image;
 		VK_CHECK_RESULT(vkCreateImageView(device, &view, nullptr, &cubeMap.view));
 
 		// Clean up staging resources
@@ -284,7 +284,7 @@ public:
 
 			vkCmdBeginRenderPass(drawCmdBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 
-			VkViewport														viewport								 = vks::initializers::viewport((float)width,	(float)height, 0.0f, 1.0f);
+			VkViewport														viewport								= vks::initializers::viewport((float)width,	(float)height, 0.0f, 1.0f);
 			vkCmdSetViewport(drawCmdBuffers[i], 0, 1, &viewport);
 
 			VkRect2D														scissor									= vks::initializers::rect2D(width,	height,	0, 0);
@@ -407,8 +407,8 @@ public:
 		// Skybox pipeline (background cube)
 		std::array<VkPipelineShaderStageCreateInfo,2>					shaderStages;
 
-		shaderStages[0] = loadShader(getAssetPath() + "shaders/cubemap/skybox.vert.spv", VK_SHADER_STAGE_VERTEX_BIT);
-		shaderStages[1] = loadShader(getAssetPath() + "shaders/cubemap/skybox.frag.spv", VK_SHADER_STAGE_FRAGMENT_BIT);
+		shaderStages[0]												= loadShader(getAssetPath() + "shaders/cubemap/skybox.vert.spv", VK_SHADER_STAGE_VERTEX_BIT);
+		shaderStages[1]												= loadShader(getAssetPath() + "shaders/cubemap/skybox.frag.spv", VK_SHADER_STAGE_FRAGMENT_BIT);
 
 		VkGraphicsPipelineCreateInfo									pipelineCreateInfo						= vks::initializers::pipelineCreateInfo(pipelineLayout, renderPass, 0);
 
@@ -431,8 +431,8 @@ public:
 		// Enable depth test and write
 		depthStencilState.depthWriteEnable							= VK_TRUE;
 		depthStencilState.depthTestEnable							= VK_TRUE;
-		// Flip cull mode
-		rasterizationState.cullMode = VK_CULL_MODE_FRONT_BIT;
+	
+		rasterizationState.cullMode									= VK_CULL_MODE_FRONT_BIT;	// Flip cull mode
 		VK_CHECK_RESULT(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipelines.reflect));
 	}
 
@@ -450,27 +450,27 @@ public:
 
 	void														updateUniformBuffers					()																{
 		// 3D object
-		glm::mat4 viewMatrix = glm::mat4();
-		uboVS.projection = glm::perspective(glm::radians(60.0f), (float)width / (float)height, 0.001f, 256.0f);
-		viewMatrix = glm::translate(viewMatrix, glm::vec3(0.0f, 0.0f, zoom));
+		glm::mat4														viewMatrix								= glm::mat4();
+		uboVS.projection											= glm::perspective(glm::radians(60.0f), (float)width / (float)height, 0.001f, 256.0f);
+		viewMatrix													= glm::translate(viewMatrix, glm::vec3(0.0f, 0.0f, zoom));
 
-		uboVS.model = glm::mat4();
-		uboVS.model = viewMatrix * glm::translate(uboVS.model, cameraPos);
-		uboVS.model = glm::rotate(uboVS.model, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
-		uboVS.model = glm::rotate(uboVS.model, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
-		uboVS.model = glm::rotate(uboVS.model, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+		uboVS.model													= glm::mat4();
+		uboVS.model													= viewMatrix * glm::translate(uboVS.model, cameraPos);
+		uboVS.model													= glm::rotate(uboVS.model, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+		uboVS.model													= glm::rotate(uboVS.model, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+		uboVS.model													= glm::rotate(uboVS.model, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
 
 		memcpy(uniformBuffers.object.mapped, &uboVS, sizeof(uboVS));
 
 		// Skybox
-		viewMatrix = glm::mat4();
-		uboVS.projection = glm::perspective(glm::radians(60.0f), (float)width / (float)height, 0.001f, 256.0f);
+		viewMatrix													= glm::mat4();
+		uboVS.projection											= glm::perspective(glm::radians(60.0f), (float)width / (float)height, 0.001f, 256.0f);
 
-		uboVS.model = glm::mat4();
-		uboVS.model = viewMatrix * glm::translate(uboVS.model, glm::vec3(0, 0, 0));
-		uboVS.model = glm::rotate(uboVS.model, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
-		uboVS.model = glm::rotate(uboVS.model, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
-		uboVS.model = glm::rotate(uboVS.model, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+		uboVS.model													= glm::mat4();
+		uboVS.model													= viewMatrix * glm::translate(uboVS.model, glm::vec3(0, 0, 0));
+		uboVS.model													= glm::rotate(uboVS.model, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+		uboVS.model													= glm::rotate(uboVS.model, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+		uboVS.model													= glm::rotate(uboVS.model, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
 
 		memcpy(uniformBuffers.skybox.mapped, &uboVS, sizeof(uboVS));
 	}
@@ -486,16 +486,16 @@ public:
 	}
 
 	void														prepare									()																{
-		VulkanExampleBase::prepare();
-		loadMeshes();
-		setupVertexDescriptions();
-		prepareUniformBuffers();
+		VulkanExampleBase::prepare	();
+		loadMeshes					();
+		setupVertexDescriptions		();
+		prepareUniformBuffers		();
 		loadCubemap(getAssetPath() + "textures/cubemap_yokohama.ktx", VK_FORMAT_BC3_UNORM_BLOCK, false);
-		setupDescriptorSetLayout();
-		preparePipelines();
-		setupDescriptorPool();
-		setupDescriptorSets();
-		buildCommandBuffers();
+		setupDescriptorSetLayout	();
+		preparePipelines			();
+		setupDescriptorPool			();
+		setupDescriptorSets			();
+		buildCommandBuffers			();
 		prepared													= true;
 	}
 
@@ -505,18 +505,18 @@ public:
 	void														toggleObject							()																{
 		models.objectIndex++;
 		if (models.objectIndex >= static_cast<uint32_t>(models.objects.size()))
-			models.objectIndex = 0;
+			models.objectIndex											= 0;
 
 		reBuildCommandBuffers();
 	}
 
 	void														changeLodBias							(float delta)													{
-		uboVS.lodBias += delta;
+		uboVS.lodBias												+= delta;
 		if (uboVS.lodBias < 0.0f)
-			uboVS.lodBias = 0.0f;
+			uboVS.lodBias												= 0.0f;
 
 		if (uboVS.lodBias > cubeMap.mipLevels)
-			uboVS.lodBias = (float)cubeMap.mipLevels;
+			uboVS.lodBias												= (float)cubeMap.mipLevels;
 
 		updateUniformBuffers();
 		updateTextOverlay();

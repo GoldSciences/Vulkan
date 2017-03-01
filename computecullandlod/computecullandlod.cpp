@@ -488,10 +488,10 @@ public:
 
 	void														updateUniformBuffer						(bool viewChanged)					{
 		if (viewChanged) {
-			uboScene.projection = camera.matrices.perspective;
-			uboScene.modelview = camera.matrices.view;
+			uboScene.projection										= camera.matrices.perspective;
+			uboScene.modelview										= camera.matrices.view;
 			if (!fixedFrustum) {
-				uboScene.cameraPos = glm::vec4(camera.position, 1.0f) * -1.0f;
+				uboScene.cameraPos										= glm::vec4(camera.position, 1.0f) * -1.0f;
 				frustum.update(uboScene.projection * uboScene.modelview);
 				memcpy(uboScene.frustumPlanes, frustum.planes.data(), sizeof(glm::vec4) * 6);
 			}

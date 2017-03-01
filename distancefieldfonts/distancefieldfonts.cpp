@@ -476,14 +476,9 @@ public:
 		vkDeviceWaitIdle(device);
 	}
 
-	virtual void												viewChanged								()									{ updateUniformBuffers();								}
-	void														toggleFontOutline						()									{ uboFS.outline = !uboFS.outline; updateFontSettings(); }
-	void														toggleSplitScreen						()									{
-		splitScreen = !splitScreen;
-		reBuildCommandBuffers();
-		updateUniformBuffers();
-	}
-
+	virtual void												viewChanged								()									{ updateUniformBuffers();															}
+	void														toggleFontOutline						()									{ uboFS.outline = !uboFS.outline; updateFontSettings();								}
+	void														toggleSplitScreen						()									{ splitScreen	= !splitScreen; reBuildCommandBuffers(); updateUniformBuffers();	}
 	virtual void												keyPressed								(uint32_t keyCode)					{
 		switch (keyCode) {
 		case KEY_S				:

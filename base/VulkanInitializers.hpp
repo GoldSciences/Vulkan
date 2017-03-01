@@ -133,12 +133,12 @@ namespace initializers
 
 	inline VkDescriptorImageInfo					descriptorImageInfo						(VkSampler sampler, VkImageView imageView, VkImageLayout imageLayout)									{ return {sampler, imageView, imageLayout};										}
 	inline VkWriteDescriptorSet						writeDescriptorSet					
-	(	VkDescriptorSet			dstSet
-	,	VkDescriptorType		type
-	,	uint32_t				binding
-	,	VkDescriptorBufferInfo	* bufferInfo
-	,	uint32_t				descriptorCount = 1
-	)
+		(	VkDescriptorSet			dstSet
+		,	VkDescriptorType		type
+		,	uint32_t				binding
+		,	VkDescriptorBufferInfo	* bufferInfo
+		,	uint32_t				descriptorCount = 1
+		)
 	{
 		VkWriteDescriptorSet											writeDescriptorSet {};
 		writeDescriptorSet.sType									= VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -151,12 +151,12 @@ namespace initializers
 	}
 
 	inline VkWriteDescriptorSet						writeDescriptorSet						
-	(	VkDescriptorSet			dstSet
-	,	VkDescriptorType		type
-	,	uint32_t				binding
-	,	VkDescriptorImageInfo	* imageInfo
-	,	uint32_t				descriptorCount = 1
-	)
+		(	VkDescriptorSet			dstSet
+		,	VkDescriptorType		type
+		,	uint32_t				binding
+		,	VkDescriptorImageInfo	* imageInfo
+		,	uint32_t				descriptorCount = 1
+		)
 	{
 		VkWriteDescriptorSet											writeDescriptorSet {};
 		writeDescriptorSet.sType									= VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -181,11 +181,11 @@ namespace initializers
 	}
 
 	inline VkPipelineRasterizationStateCreateInfo	pipelineRasterizationStateCreateInfo	
-	(	VkPolygonMode							polygonMode
-	,	VkCullModeFlags							cullMode
-	,	VkFrontFace								frontFace
-	,	VkPipelineRasterizationStateCreateFlags	flags = 0
-	) 
+		(	VkPolygonMode							polygonMode
+		,	VkCullModeFlags							cullMode
+		,	VkFrontFace								frontFace
+		,	VkPipelineRasterizationStateCreateFlags	flags = 0
+		) 
 	{
 		VkPipelineRasterizationStateCreateInfo							pipelineRasterizationStateCreateInfo {};
 		pipelineRasterizationStateCreateInfo.sType					= VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;

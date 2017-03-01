@@ -311,7 +311,7 @@ public:
 		attachments[2]												= multisampleTarget.depth.view;
 		attachments[3]												= depthStencil.view;
 
-		VkFramebufferCreateInfo											frameBufferCreateInfo = {};
+		VkFramebufferCreateInfo											frameBufferCreateInfo							= {};
 		frameBufferCreateInfo.sType									= VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
 		frameBufferCreateInfo.pNext									= NULL;
 		frameBufferCreateInfo.renderPass							= renderPass;

@@ -73,31 +73,27 @@ namespace vks
 		// (Optional) memTypeFound	: Pointer to a bool that is set to true if a matching memory type has been found
 		// 
 		// Returns index of the requested memory type. Throws an exception if memTypeFound is null and no memory type could be found that supports the requested properties.
-		uint32_t									getMemoryType			(uint32_t typeBits, VkMemoryPropertyFlags properties_, VkBool32 *memTypeFound = nullptr)		{
-			for (uint32_t i = 0; i < memoryProperties.memoryTypeCount; i++)
-			{
+		uint32_t									getMemoryType			(uint32_t typeBits, VkMemoryPropertyFlags properties_, VkBool32 *memTypeFound = nullptr)	{
+			for (uint32_t i = 0; i < memoryProperties.memoryTypeCount; i++) {
 				if ((typeBits & 1) == 1)
-				{
-					if ((memoryProperties.memoryTypes[i].propertyFlags & properties_) == properties_)
-					{
+					if ((memoryProperties.memoryTypes[i].propertyFlags & properties_) == properties_) {
 						if (memTypeFound)
-							*memTypeFound = true;
+							*memTypeFound															= true;
 
 						return i;
 					}
-				}
 				typeBits >>= 1;
 			}
 
 #if defined(__ANDROID__)
 			//todo : Exceptions are disabled by default on Android (need to add LOCAL_CPP_FEATURES += exceptions to Android.mk), so for now just return zero
 			if (memTypeFound)
-				*memTypeFound = false;
+				*memTypeFound															= false;
 
 			return 0;
 #else
 			if (memTypeFound) {
-				*memTypeFound = false;
+				*memTypeFound															= false;
 				return 0;
 			}
 			else {
@@ -111,30 +107,20 @@ namespace vks
 			// Dedicated queue for compute
 			// Try to find a queue family index that supports compute but not graphics
 			if (queueFlags & VK_QUEUE_COMPUTE_BIT)
-			{
 				for (uint32_t i = 0; i < static_cast<uint32_t>(queueFamilyProperties.size()); i++)
-				{
 					if ((queueFamilyProperties[i].queueFlags & queueFlags) && ((queueFamilyProperties[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) == 0))
 						return i;
-				}
-			}
 
 			// Dedicated queue for transfer.  Try to find a queue family index that supports transfer but not graphics and compute
 			if (queueFlags & VK_QUEUE_TRANSFER_BIT)
-			{
 				for (uint32_t i = 0; i < static_cast<uint32_t>(queueFamilyProperties.size()); i++)
-				{
 					if ((queueFamilyProperties[i].queueFlags & queueFlags) && ((queueFamilyProperties[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) == 0) && ((queueFamilyProperties[i].queueFlags & VK_QUEUE_COMPUTE_BIT) == 0))
 						return i;
-				}
-			}
 
 			// For other queue types or if no separate compute queue is present, return the first one to support the requested flags
 			for (uint32_t i = 0; i < static_cast<uint32_t>(queueFamilyProperties.size()); i++)
-			{
 				if (queueFamilyProperties[i].queueFlags & queueFlags)
 					return i;
-			}
 
 #if defined(__ANDROID__)
 			//todo : Exceptions are disabled by default on Android (need to add LOCAL_CPP_FEATURES += exceptions to Android.mk), so for now just return zero
@@ -171,7 +157,7 @@ namespace vks
 				queueCreateInfos.push_back(queueInfo);
 			}
 			else {
-				queueFamilyIndices.graphics = VK_NULL_HANDLE;
+				queueFamilyIndices.graphics					= VK_NULL_HANDLE;
 			}
 
 			// Dedicated compute queue
@@ -213,7 +199,7 @@ namespace vks
 			}
 
 			// Create the logical device representation
-			std::vector<const char*>						deviceExtensions(enabledExtensions);
+			std::vector<const char*>						deviceExtensions		(enabledExtensions);
 			if (useSwapChain)	{	// If the device will be used for presenting to a display via a swapchain we need to request the swapchain extension
 				deviceExtensions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
 			}
@@ -238,7 +224,7 @@ namespace vks
 			VkResult										result					= vkCreateDevice(physicalDevice, &deviceCreateInfo, nullptr, &logicalDevice);
 
 			if (result == VK_SUCCESS)
-				commandPool = createCommandPool(queueFamilyIndices.graphics);	// Create a default command pool for graphics command buffers
+				commandPool								= createCommandPool(queueFamilyIndices.graphics);	// Create a default command pool for graphics command buffers
 
 			return result;
 		}

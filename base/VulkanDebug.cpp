@@ -91,7 +91,7 @@ namespace vks
 		void									setObjectName					(VkDevice device, uint64_t object, VkDebugReportObjectTypeEXT objectType, const char *name)			{
 			// Check for valid function pointer (may not be present if not running in a debugging application)
 			if (pfnDebugMarkerSetObjectName) {
-				VkDebugMarkerObjectNameInfoEXT			nameInfo = {};
+				VkDebugMarkerObjectNameInfoEXT			nameInfo						= {};
 				nameInfo.sType						= VK_STRUCTURE_TYPE_DEBUG_MARKER_OBJECT_NAME_INFO_EXT;
 				nameInfo.objectType					= objectType;
 				nameInfo.object						= object;
@@ -103,7 +103,7 @@ namespace vks
 		void									setObjectTag					(VkDevice device, uint64_t object, VkDebugReportObjectTypeEXT objectType, uint64_t name, size_t tagSize, const void* tag)	{
 			// Check for valid function pointer (may not be present if not running in a debugging application)
 			if (pfnDebugMarkerSetObjectTag) {
-				VkDebugMarkerObjectTagInfoEXT			tagInfo = {};
+				VkDebugMarkerObjectTagInfoEXT			tagInfo							= {};
 				tagInfo.sType						= VK_STRUCTURE_TYPE_DEBUG_MARKER_OBJECT_TAG_INFO_EXT;
 				tagInfo.objectType					= objectType;
 				tagInfo.object						= object;
@@ -117,7 +117,7 @@ namespace vks
 		void									beginRegion						(VkCommandBuffer cmdbuffer, const char* pMarkerName, glm::vec4 color)								{
 			// Check for valid function pointer (may not be present if not running in a debugging application)
 			if (pfnCmdDebugMarkerBegin) {
-				VkDebugMarkerMarkerInfoEXT				markerInfo = {};
+				VkDebugMarkerMarkerInfoEXT				markerInfo						= {};
 				markerInfo.sType					= VK_STRUCTURE_TYPE_DEBUG_MARKER_MARKER_INFO_EXT;
 				memcpy(markerInfo.color, &color[0], sizeof(float) * 4);
 				markerInfo.pMarkerName				= pMarkerName;
@@ -128,7 +128,7 @@ namespace vks
 		void									insert							(VkCommandBuffer cmdbuffer, std::string markerName, glm::vec4 color)								{
 			// Check for valid function pointer (may not be present if not running in a debugging application)
 			if (pfnCmdDebugMarkerInsert) {
-				VkDebugMarkerMarkerInfoEXT				markerInfo = {};
+				VkDebugMarkerMarkerInfoEXT				markerInfo						= {};
 				markerInfo.sType					= VK_STRUCTURE_TYPE_DEBUG_MARKER_MARKER_INFO_EXT;
 				memcpy(markerInfo.color, &color[0], sizeof(float) * 4);
 				markerInfo.pMarkerName				= markerName.c_str();

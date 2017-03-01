@@ -42,13 +42,13 @@ public:
 		// Generate random lookup for permutations containing all numbers from 0..255
 		std::vector<uint8_t>											plookup;
 		plookup.resize(256);
-		std::iota(plookup.begin(), plookup.end(), 0);
+		std::iota	(plookup.begin(), plookup.end(), 0);
 		
 		std::default_random_engine										rndEngine(std::random_device{}());
 		std::shuffle(plookup.begin(), plookup.end(), rndEngine);
 
 		for (uint32_t i = 0; i < 256; i++)
-			permutations[i] = permutations[256 + i] = plookup[i];
+			permutations[i]												= permutations[256 + i] = plookup[i];
 	}
 
 	T															noise									(T x, T y, T z)											{

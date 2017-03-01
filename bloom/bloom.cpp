@@ -315,7 +315,7 @@ public:
 		dependencies[1].dependencyFlags								= VK_DEPENDENCY_BY_REGION_BIT;
 
 		// Create the actual renderpass
-		VkRenderPassCreateInfo											renderPassInfo = {};
+		VkRenderPassCreateInfo											renderPassInfo							= {};
 		renderPassInfo.sType										= VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
 		renderPassInfo.attachmentCount								= static_cast<uint32_t>(attchmentDescriptions.size());
 		renderPassInfo.pAttachments									= attchmentDescriptions.data();
@@ -327,7 +327,7 @@ public:
 		VK_CHECK_RESULT(vkCreateRenderPass(device, &renderPassInfo, nullptr, &offscreenPass.renderPass));
 
 		// Create sampler to sample from the color attachments
-		VkSamplerCreateInfo												sampler = vks::initializers::samplerCreateInfo();
+		VkSamplerCreateInfo												sampler									= vks::initializers::samplerCreateInfo();
 		sampler.magFilter											= VK_FILTER_LINEAR;
 		sampler.minFilter											= VK_FILTER_LINEAR;
 		sampler.mipmapMode											= VK_SAMPLER_MIPMAP_MODE_LINEAR;
@@ -620,7 +620,7 @@ public:
 		shaderStages[0]												= loadShader(getAssetPath() + "shaders/bloom/gaussblur.vert.spv", VK_SHADER_STAGE_VERTEX_BIT);
 		shaderStages[1]												= loadShader(getAssetPath() + "shaders/bloom/gaussblur.frag.spv", VK_SHADER_STAGE_FRAGMENT_BIT);
 		// Empty vertex input state
-		VkPipelineVertexInputStateCreateInfo							emptyInputState = vks::initializers::pipelineVertexInputStateCreateInfo();
+		VkPipelineVertexInputStateCreateInfo							emptyInputState							= vks::initializers::pipelineVertexInputStateCreateInfo();
 		pipelineCreateInfo.pVertexInputState						= &emptyInputState;
 		pipelineCreateInfo.layout									= pipelineLayouts.blur;
 		// Additive blending
@@ -662,7 +662,7 @@ public:
 		// Color only pass (offscreen blur base)
 		shaderStages[0]												= loadShader(getAssetPath() + "shaders/bloom/colorpass.vert.spv", VK_SHADER_STAGE_VERTEX_BIT);
 		shaderStages[1]												= loadShader(getAssetPath() + "shaders/bloom/colorpass.frag.spv", VK_SHADER_STAGE_FRAGMENT_BIT);
-		pipelineCreateInfo.renderPass = offscreenPass.renderPass;
+		pipelineCreateInfo.renderPass								= offscreenPass.renderPass;
 		VK_CHECK_RESULT(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipelines.glowPass));
 
 		// Skybox (cubemap)

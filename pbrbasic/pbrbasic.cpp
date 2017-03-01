@@ -215,8 +215,8 @@ public:
 			,	vks::initializers::pushConstantRange(VK_SHADER_STAGE_FRAGMENT_BIT, sizeof(Material), sizeof(glm::vec3))
 			};
 
-		pipelineLayoutCreateInfo.pushConstantRangeCount = 2;
-		pipelineLayoutCreateInfo.pPushConstantRanges = pushConstantRanges.data();
+		pipelineLayoutCreateInfo.pushConstantRangeCount				= 2;
+		pipelineLayoutCreateInfo.pPushConstantRanges				= pushConstantRanges.data();
 
 		VK_CHECK_RESULT(vkCreatePipelineLayout(device, &pipelineLayoutCreateInfo, nullptr, &pipelineLayout));
 	}
@@ -382,7 +382,7 @@ public:
 	void														toggleObject							()											{
 		models.objectIndex++;
 		if (models.objectIndex >= static_cast<uint32_t>(models.objects.size()))
-			models.objectIndex = 0;
+			models.objectIndex											= 0;
 
 		updateUniformBuffers();
 		reBuildCommandBuffers();

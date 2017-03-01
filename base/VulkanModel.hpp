@@ -44,22 +44,19 @@ namespace vks
 
 	// Stores vertex layout components for model loading and Vulkan vertex input and atribute bindings 
 	struct VertexLayout {
-		std::vector<Component>			components;		// Components used to generate vertices from
+		std::vector<Component>			components;				// Components used to generate vertices from
 
-										VertexLayout	(std::vector<Component> components)		{ this->components = std::move(components); }
-		uint32_t						stride			()
+										VertexLayout			(std::vector<Component> components)															{ this->components = std::move(components); }
+		uint32_t						stride					()
 		{
-			uint32_t			res = 0;
+			uint32_t							res						= 0;
 			for (auto& component : components)
-			{
-				switch (component)
-				{
-				case VERTEX_COMPONENT_UV			: res += 2 * sizeof(float);		break;
-				case VERTEX_COMPONENT_DUMMY_FLOAT	: res += sizeof(float);			break;
-				case VERTEX_COMPONENT_DUMMY_VEC4	: res += 4 * sizeof(float);		break;
-				default								: res += 3 * sizeof(float);		break;	// All components except the ones listed above are made up of 3 floats
+				switch (component) {
+				case VERTEX_COMPONENT_UV			: res += 2 * sizeof(float); break;
+				case VERTEX_COMPONENT_DUMMY_FLOAT	: res +=     sizeof(float); break;
+				case VERTEX_COMPONENT_DUMMY_VEC4	: res += 4 * sizeof(float); break;
+				default								: res += 3 * sizeof(float); break;	// All components except the ones listed above are made up of 3 floats
 				}
-			}
 			return res;
 		}
 	};
