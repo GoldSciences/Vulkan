@@ -131,7 +131,7 @@ public:
 		readNodeHierarchy(AnimationTime, scene->mRootNode, identity);
 
 		for (uint32_t i = 0; i < boneTransforms.size(); i++)
-			boneTransforms[i] = boneInfo[i].finalTransformation;
+			boneTransforms[i]											= boneInfo[i].finalTransformation;
 	}
 
 																~SkinnedMesh					()																					{
@@ -161,7 +161,7 @@ private:
 			uint32_t														frameIndex						= 0;
 			for (uint32_t i = 0; i < pNodeAnim->mNumPositionKeys - 1; i++)
 				if (time < (float)pNodeAnim->mPositionKeys[i + 1].mTime) {
-					frameIndex = i;
+					frameIndex													= i;
 					break;
 				}
 
@@ -192,7 +192,7 @@ private:
 			uint32_t														frameIndex						= 0;
 			for (uint32_t i = 0; i < pNodeAnim->mNumRotationKeys - 1; i++)
 				if (time < (float)pNodeAnim->mRotationKeys[i + 1].mTime) {
-					frameIndex = i;
+					frameIndex													= i;
 					break;
 				}
 
@@ -224,7 +224,7 @@ private:
 			uint32_t														frameIndex						= 0;
 			for (uint32_t i = 0; i < pNodeAnim->mNumScalingKeys - 1; i++) {
 				if (time < (float)pNodeAnim->mScalingKeys[i + 1].mTime) {
-					frameIndex = i;
+					frameIndex													= i;
 					break;
 				}
 			}
@@ -443,7 +443,7 @@ public:
 		// Load bones (weights and IDs)
 		uint32_t														vertexBase						= 0;
 		for (uint32_t m = 0; m < skinnedMesh->scene->mNumMeshes; m++) {
-			aiMesh															* paiMesh = skinnedMesh->scene->mMeshes[m];
+			aiMesh															* paiMesh					= skinnedMesh->scene->mMeshes[m];
 			if (paiMesh->mNumBones > 0)
 				skinnedMesh->loadBones(paiMesh, vertexBase, skinnedMesh->bones);
 			vertexBase													+= skinnedMesh->scene->mMeshes[m]->mNumVertices;

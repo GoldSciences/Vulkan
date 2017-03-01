@@ -200,7 +200,7 @@ public:
 		VkPipelineViewportStateCreateInfo								viewportState									= vks::initializers::pipelineViewportStateCreateInfo(1, 1, 0);
 		VkPipelineMultisampleStateCreateInfo							multisampleState								= vks::initializers::pipelineMultisampleStateCreateInfo(VK_SAMPLE_COUNT_1_BIT, 0);
 
-		std::vector<VkDynamicState> dynamicStateEnables = 
+		std::vector<VkDynamicState>										dynamicStateEnables								= 
 			{	VK_DYNAMIC_STATE_VIEWPORT
 			,	VK_DYNAMIC_STATE_SCISSOR
 			,	VK_DYNAMIC_STATE_LINE_WIDTH

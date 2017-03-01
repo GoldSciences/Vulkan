@@ -369,7 +369,7 @@ public:
 				normal.z													= heights[0][0] + 2.0f * heights[1][0] + heights[2][0] - heights[0][2] - 2.0f * heights[1][2] - heights[2][2];	// Gy sobel filter
 				normal.y													= 0.25f * sqrt( 1.0f - normal.x * normal.x - normal.z * normal.z);	// Calculate missing up component of the normal using the filtered x and y axis. The first value controls the bump strength
 
-				_vertices[x + y * PATCH_SIZE].normal = glm::normalize(normal * glm::vec3(2.0f, 1.0f, 2.0f));
+				_vertices[x + y * PATCH_SIZE].normal						= glm::normalize(normal * glm::vec3(2.0f, 1.0f, 2.0f));
 			}
 
 		// Indices

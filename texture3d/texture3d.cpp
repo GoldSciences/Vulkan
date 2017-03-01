@@ -57,8 +57,10 @@ public:
 		int32_t															Y										= (int32_t)floor(y) & 255;
 		int32_t															Z										= (int32_t)floor(z) & 255;
 		
-		x															-= floor(x); y -= floor(y); z -= floor(z);		// Find relative x,y,z of point in cube
-		T																u										= fade(x); T v = fade(y); T w = fade(z);		// Compute fade curves for each of x,y,z
+		x -= floor(x); y -= floor(y); z -= floor(z);	// Find relative x,y,z of point in cube
+		T																u = fade(x); 
+		T																v = fade(y); 
+		T																w = fade(z);		// Compute fade curves for each of x,y,z
 
 		// Hash coordinates of the 8 cube corners
 		uint32_t														A										= permutations[X] + Y;

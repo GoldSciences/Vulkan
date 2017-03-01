@@ -954,9 +954,9 @@ void										VulkanExampleBase::handleAppCommand					(android_app * app, int32_
 	case APP_CMD_SAVE_STATE:
 		LOGD("APP_CMD_SAVE_STATE");
 		/*
-		vulkanExample->app->savedState = malloc(sizeof(struct saved_state));
-		*((struct saved_state*)vulkanExample->app->savedState) = vulkanExample->state;
-		vulkanExample->app->savedStateSize = sizeof(struct saved_state);
+		vulkanExample->app->savedState								= malloc(sizeof(struct saved_state));
+		*((struct saved_state*)vulkanExample->app->savedState)		= vulkanExample->state;
+		vulkanExample->app->savedStateSize							= sizeof(struct saved_state);
 		*/
 		break;
 	case APP_CMD_INIT_WINDOW:

@@ -241,7 +241,7 @@ public:
 			VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, indexBufferSize, &model.indices.buffer, &model.indices.memory));		// Index buffer
 
 			// Copy from staging buffers
-			VkCommandBuffer													copyCmd = VulkanExampleBase::createCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY, true);
+			VkCommandBuffer													copyCmd											= VulkanExampleBase::createCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY, true);
 
 			VkBufferCopy													copyRegion										= {};
 			copyRegion.size												= vertexBufferSize	; vkCmdCopyBuffer(copyCmd, vertexStaging.buffer	, model.vertices.buffer	, 1, &copyRegion);
@@ -370,7 +370,7 @@ public:
 
 	void														updateUniformBuffers							()									{
 		uboVS.projection											= glm::perspective(glm::radians(60.0f), (float)width / (float)height, 0.1f, 256.0f);
-		glm::mat4														viewMatrix = glm::translate(glm::mat4(), glm::vec3(0.0f, 0.0f, zoom));
+		glm::mat4														viewMatrix										= glm::translate(glm::mat4(), glm::vec3(0.0f, 0.0f, zoom));
 
 		uboVS.model													= viewMatrix * glm::translate(glm::mat4(), cameraPos);
 		uboVS.model													= glm::rotate(uboVS.model, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));

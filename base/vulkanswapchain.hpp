@@ -437,7 +437,7 @@ public:
 	// imageIndex				: Index of the swapchain image to queue for presentation
 	// waitSemaphore (Optional) : Semaphore that is waited on before the image is presented (only used if != VK_NULL_HANDLE)
 	VkResult											queuePresent								(VkQueue queue, uint32_t imageIndex, VkSemaphore waitSemaphore = VK_NULL_HANDLE)	{
-		VkPresentInfoKHR										presentInfo = {};
+		VkPresentInfoKHR										presentInfo									= {};
 		presentInfo.sType									= VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
 		presentInfo.pNext									= NULL;
 		presentInfo.swapchainCount							= 1;

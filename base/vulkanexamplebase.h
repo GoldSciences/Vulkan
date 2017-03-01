@@ -90,7 +90,7 @@ protected:
 	}									semaphores;																		// Synchronization semaphores
 	
 	// Simple texture loader
-	//vks::tools::VulkanTextureLoader *textureLoader = nullptr;
+	//vks::tools::VulkanTextureLoader	* textureLoader				= nullptr;
 
 	// Returns the base asset path (for shaders, models, textures) depending on the os
 	const std::string					getAssetPath				();

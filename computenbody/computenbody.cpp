@@ -267,7 +267,7 @@ public:
 					glm::vec3														angular									= glm::vec3(0.5f, 1.5f, 0.5f) * (((i % 2) == 0) ? 1.0f : -1.0f);
 					glm::vec3														velocity								= glm::cross((position - attractors[i]), angular) + glm::vec3(rndDist(rndGen), rndDist(rndGen), rndDist(rndGen) * 0.025f);
 
-					float															mass = (rndDist(rndGen) * 0.5f + 0.5f) * 75.0f;
+					float															mass									= (rndDist(rndGen) * 0.5f + 0.5f) * 75.0f;
 					particle.pos												= glm::vec4(position, mass);
 					particle.vel												= glm::vec4(velocity, 0.0f);
 				}
@@ -476,7 +476,7 @@ public:
 		specializationData.soften									= 0.05f;
 
 		VkSpecializationInfo											specializationInfo						= vks::initializers::specializationInfo(static_cast<uint32_t>(specializationMapEntries.size()), specializationMapEntries.data(), sizeof(specializationData), &specializationData);
-		computePipelineCreateInfo.stage.pSpecializationInfo = &specializationInfo;
+		computePipelineCreateInfo.stage.pSpecializationInfo			= &specializationInfo;
 
 		VK_CHECK_RESULT(vkCreateComputePipelines(device, pipelineCache, 1, &computePipelineCreateInfo, nullptr, &compute.pipelineCalculate));
 

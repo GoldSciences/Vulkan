@@ -28,7 +28,7 @@ namespace vks
 
 		// Map a memory range of this buffer. Takes an optional byte offset. If successful, mapped points to the specified buffer range. Returns VkResult of the buffer mapping call. 
 		// Pass VK_WHOLE_SIZE to map the complete buffer range. 
-		VkResult												map						(VkDeviceSize size_ = VK_WHOLE_SIZE, VkDeviceSize offset = 0)	{ return vkMapMemory(device, memory, offset, size_, 0, &mapped);		}
+		VkResult												map						(VkDeviceSize size_ = VK_WHOLE_SIZE, VkDeviceSize offset = 0)	{ return vkMapMemory(device, memory, offset, size_, 0, &mapped);	}
 		
 		// Unmap a mapped memory range. Does not return a result as vkUnmapMemory can't fail
 		void													unmap					()																{ if (mapped) { vkUnmapMemory(device, memory); mapped = nullptr; }	}	

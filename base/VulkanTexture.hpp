@@ -75,7 +75,7 @@ namespace vks
 			// So they need to be loaded via the asset manager
 			AAsset*													asset							= AAssetManager_open(androidApp->activity->assetManager, filename.c_str(), AASSET_MODE_STREAMING);
 			assert(asset);
-			size_t size = AAsset_getLength(asset);
+			size_t													size							= AAsset_getLength(asset);
 			assert(size > 0);
 
 			void													* textureData					= malloc(size);
@@ -621,12 +621,12 @@ namespace vks
 	public:
 		// Load a cubemap texture including all mip levels from a single file
 		void												loadFromFile
-			(	std::string			filename												// File to load (supports .ktx and .dds)
-			,	VkFormat			format													// Vulkan format of the image data stored in the file
-			,	vks::VulkanDevice	* device_												// Vulkan device to create the texture on
-			,	VkQueue				copyQueue												// Queue used for the texture staging copy commands (must support transfer)
-			,	VkImageUsageFlags	imageUsageFlags = VK_IMAGE_USAGE_SAMPLED_BIT			// Usage flags for the texture's image (defaults to VK_IMAGE_USAGE_SAMPLED_BIT)
-			,	VkImageLayout		imageLayout_ = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL	// Usage layout for the texture (defaults VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
+			(	std::string			filename													// File to load (supports .ktx and .dds)
+			,	VkFormat			format														// Vulkan format of the image data stored in the file
+			,	vks::VulkanDevice	* device_													// Vulkan device to create the texture on
+			,	VkQueue				copyQueue													// Queue used for the texture staging copy commands (must support transfer)
+			,	VkImageUsageFlags	imageUsageFlags	= VK_IMAGE_USAGE_SAMPLED_BIT				// Usage flags for the texture's image (defaults to VK_IMAGE_USAGE_SAMPLED_BIT)
+			,	VkImageLayout		imageLayout_	= VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL	// Usage layout for the texture (defaults VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
 			)
 		{
 #if defined(__ANDROID__)

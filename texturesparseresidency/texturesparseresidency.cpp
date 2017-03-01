@@ -116,8 +116,8 @@ struct VirtualTexture
 		// Update sparse bind info
 		bindSparseInfo												= vks::initializers::bindSparseInfo();
 		// todo: Semaphore for queue submission
-		// bindSparseInfo.signalSemaphoreCount = 1;
-		// bindSparseInfo.pSignalSemaphores = &bindSparseSemaphore;
+		// bindSparseInfo.signalSemaphoreCount						= 1;
+		// bindSparseInfo.pSignalSemaphores							= &bindSparseSemaphore;
 
 		// Image memory binds
 		imageMemoryBindInfo.image									= image;
