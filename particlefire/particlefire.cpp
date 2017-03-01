@@ -107,12 +107,12 @@ public:
 	std::vector<Particle>										particleBuffer;
 
 																VulkanExample									()												: VulkanExampleBase(ENABLE_VALIDATION)	{
-		zoom				= -75.0f;
-		rotation			= { -15.0f, 45.0f, 0.0f };
-		enableTextOverlay	= true;
-		title				= "Vulkan Example - Particle system";
-		zoomSpeed			*= 1.5f;
-		timerSpeed			*= 8.0f;
+		zoom														= -75.0f;
+		rotation													= { -15.0f, 45.0f, 0.0f };
+		enableTextOverlay											= true;
+		title														= "Vulkan Example - Particle system";
+		zoomSpeed													*= 1.5f;
+		timerSpeed													*= 8.0f;
 		srand((unsigned int)time(NULL));
 	}
 
@@ -502,10 +502,10 @@ public:
 		memcpy(uniformBuffers.fire.mapped, &uboVS, sizeof(uboVS));
 
 		// Environment
-		uboEnv.projection = uboVS.projection;
-		uboEnv.model = uboVS.model;
-		uboEnv.normal = glm::inverseTranspose(uboEnv.model);
-		uboEnv.cameraPos = glm::vec4(0.0, 0.0, zoom, 0.0);
+		uboEnv.projection											= uboVS.projection;
+		uboEnv.model												= uboVS.model;
+		uboEnv.normal												= glm::inverseTranspose(uboEnv.model);
+		uboEnv.cameraPos											= glm::vec4(0.0, 0.0, zoom, 0.0);
 		memcpy(uniformBuffers.environment.mapped, &uboEnv, sizeof(uboEnv));
 	}
 
@@ -539,8 +539,7 @@ public:
 		if (!prepared)
 			return;
 		draw();
-		if (!paused)
-		{
+		if (!paused) {
 			updateUniformBufferLight();
 			updateParticles();
 		}

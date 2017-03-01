@@ -24,11 +24,11 @@ public:
 
 	// Vertex layout for the models
 	vks::VertexLayout											vertexLayout							= vks::VertexLayout(
-	{	vks::VERTEX_COMPONENT_POSITION
-	,	vks::VERTEX_COMPONENT_COLOR
-	,	vks::VERTEX_COMPONENT_NORMAL
-	,	vks::VERTEX_COMPONENT_UV
-	});
+		{	vks::VERTEX_COMPONENT_POSITION
+		,	vks::VERTEX_COMPONENT_COLOR
+		,	vks::VERTEX_COMPONENT_NORMAL
+		,	vks::VERTEX_COMPONENT_UV
+		});
 
 	struct {
 		vks::Model													scene;
@@ -139,11 +139,11 @@ public:
 		vkDestroyDescriptorSetLayout	(device, descriptorSetLayouts.composition	, nullptr);
 		vkDestroyDescriptorSetLayout	(device, descriptorSetLayouts.transparent	, nullptr);
 
-		textures.glass.destroy();
-		models.scene.destroy();
-		models.transparent.destroy();
-		uniformBuffers.GBuffer.destroy();
-		uniformBuffers.lights.destroy();
+		textures.glass			.destroy();
+		models.scene			.destroy();
+		models.transparent		.destroy();
+		uniformBuffers.GBuffer	.destroy();
+		uniformBuffers.lights	.destroy();
 	}
 
 	// Create a frame buffer attachment

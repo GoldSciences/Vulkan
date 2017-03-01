@@ -43,11 +43,11 @@ public:
 
 	// Vertex layout for the models
 	vks::VertexLayout											vertexLayout						= vks::VertexLayout(
-	{	vks::VERTEX_COMPONENT_POSITION
-	,	vks::VERTEX_COMPONENT_UV
-	,	vks::VERTEX_COMPONENT_COLOR
-	,	vks::VERTEX_COMPONENT_NORMAL
-	});
+		{	vks::VERTEX_COMPONENT_POSITION
+		,	vks::VERTEX_COMPONENT_UV
+		,	vks::VERTEX_COMPONENT_COLOR
+		,	vks::VERTEX_COMPONENT_NORMAL
+		});
 
 	struct {
 		vks::Model													scene;
@@ -134,38 +134,38 @@ public:
 		// Note : Inherited destructor cleans up resources stored in base class
 
 		// Frame buffer
-		vkDestroySampler(device, offscreenPass.depthSampler, nullptr);
+		vkDestroySampler				(device, offscreenPass.depthSampler	, nullptr);
 
 		// Depth attachment
-		vkDestroyImageView(device, offscreenPass.depth.view, nullptr);
-		vkDestroyImage(device, offscreenPass.depth.image, nullptr);
-		vkFreeMemory(device, offscreenPass.depth.mem, nullptr);
+		vkDestroyImageView				(device, offscreenPass.depth.view	, nullptr);
+		vkDestroyImage					(device, offscreenPass.depth.image	, nullptr);
+		vkFreeMemory					(device, offscreenPass.depth.mem	, nullptr);
 
-		vkDestroyFramebuffer(device, offscreenPass.frameBuffer, nullptr);
+		vkDestroyFramebuffer			(device, offscreenPass.frameBuffer	, nullptr);
 
-		vkDestroyRenderPass(device, offscreenPass.renderPass, nullptr);
+		vkDestroyRenderPass				(device, offscreenPass.renderPass	, nullptr);
 
-		vkDestroyPipeline(device, pipelines.quad, nullptr);
-		vkDestroyPipeline(device, pipelines.offscreen, nullptr);
-		vkDestroyPipeline(device, pipelines.sceneShadow, nullptr);
-		vkDestroyPipeline(device, pipelines.sceneShadowPCF, nullptr);
+		vkDestroyPipeline				(device, pipelines.quad				, nullptr);
+		vkDestroyPipeline				(device, pipelines.offscreen		, nullptr);
+		vkDestroyPipeline				(device, pipelines.sceneShadow		, nullptr);
+		vkDestroyPipeline				(device, pipelines.sceneShadowPCF	, nullptr);
 
-		vkDestroyPipelineLayout(device, pipelineLayouts.quad, nullptr);
-		vkDestroyPipelineLayout(device, pipelineLayouts.offscreen, nullptr);
+		vkDestroyPipelineLayout			(device, pipelineLayouts.quad		, nullptr);
+		vkDestroyPipelineLayout			(device, pipelineLayouts.offscreen	, nullptr);
 
-		vkDestroyDescriptorSetLayout(device, descriptorSetLayout, nullptr);
+		vkDestroyDescriptorSetLayout	(device, descriptorSetLayout		, nullptr);
 
 		// Meshes
-		models.scene.destroy();
-		models.quad.destroy();
+		models.scene				.destroy();
+		models.quad					.destroy();
 
 		// Uniform buffers
-		uniformBuffers.offscreen.destroy();
-		uniformBuffers.scene.destroy();
-		uniformBuffers.debug.destroy();
+		uniformBuffers.offscreen	.destroy();
+		uniformBuffers.scene		.destroy();
+		uniformBuffers.debug		.destroy();
 
-		vkFreeCommandBuffers(device, cmdPool, 1, &offscreenPass.commandBuffer);
-		vkDestroySemaphore(device, offscreenPass.semaphore, nullptr);
+		vkFreeCommandBuffers			(device, cmdPool, 1, &offscreenPass.commandBuffer);
+		vkDestroySemaphore				(device, offscreenPass.semaphore	, nullptr);
 	}
 
 	// Set up a separate render pass for the offscreen frame buffer
@@ -237,15 +237,15 @@ public:
 		image.tiling												= VK_IMAGE_TILING_OPTIMAL;
 		image.format												= DEPTH_FORMAT;																// Depth stencil attachment
 		image.usage													= VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;		// We will sample directly from the depth attachment for the shadow mapping
-		VK_CHECK_RESULT(vkCreateImage(device, &image, nullptr, &offscreenPass.depth.image));
+		VK_CHECK_RESULT(vkCreateImage		(device, &image, nullptr, &offscreenPass.depth.image));
 
-		VkMemoryAllocateInfo											memAlloc							= vks::initializers::memoryAllocateInfo();
-		VkMemoryRequirements											memReqs;
-		vkGetImageMemoryRequirements(device, offscreenPass.depth.image, &memReqs);
-		memAlloc.allocationSize										= memReqs.size;
-		memAlloc.memoryTypeIndex									= vulkanDevice->getMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-		VK_CHECK_RESULT(vkAllocateMemory(device, &memAlloc, nullptr, &offscreenPass.depth.mem));
-		VK_CHECK_RESULT(vkBindImageMemory(device, offscreenPass.depth.image, offscreenPass.depth.mem, 0));
+		VkMemoryAllocateInfo												memAlloc							= vks::initializers::memoryAllocateInfo();
+		VkMemoryRequirements												memReqs;
+		vkGetImageMemoryRequirements		(device, offscreenPass.depth.image, &memReqs);
+		memAlloc.allocationSize											= memReqs.size;
+		memAlloc.memoryTypeIndex										= vulkanDevice->getMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+		VK_CHECK_RESULT(vkAllocateMemory	(device, &memAlloc, nullptr, &offscreenPass.depth.mem));
+		VK_CHECK_RESULT(vkBindImageMemory	(device, offscreenPass.depth.image, offscreenPass.depth.mem, 0));
 
 		VkImageViewCreateInfo											depthStencilView					= vks::initializers::imageViewCreateInfo();
 		depthStencilView.viewType									= VK_IMAGE_VIEW_TYPE_2D;
@@ -257,7 +257,7 @@ public:
 		depthStencilView.subresourceRange.baseArrayLayer			= 0;
 		depthStencilView.subresourceRange.layerCount			= 1;
 		depthStencilView.image = offscreenPass.depth.image;
-		VK_CHECK_RESULT(vkCreateImageView(device, &depthStencilView, nullptr, &offscreenPass.depth.view));
+		VK_CHECK_RESULT(vkCreateImageView	(device, &depthStencilView, nullptr, &offscreenPass.depth.view));
 
 		// Create sampler to sample from to depth attachment 
 		// Used to sample in the fragment shader for shadowed rendering
@@ -273,7 +273,7 @@ public:
 		sampler.minLod												= 0.0f;
 		sampler.maxLod												= 1.0f;
 		sampler.borderColor											= VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
-		VK_CHECK_RESULT(vkCreateSampler(device, &sampler, nullptr, &offscreenPass.depthSampler));
+		VK_CHECK_RESULT(vkCreateSampler		(device, &sampler, nullptr, &offscreenPass.depthSampler));
 
 		prepareOffscreenRenderpass();
 
@@ -286,7 +286,7 @@ public:
 		fbufCreateInfo.height										= offscreenPass.height;
 		fbufCreateInfo.layers										= 1;
 
-		VK_CHECK_RESULT(vkCreateFramebuffer(device, &fbufCreateInfo, nullptr, &offscreenPass.frameBuffer));
+		VK_CHECK_RESULT(vkCreateFramebuffer	(device, &fbufCreateInfo, nullptr, &offscreenPass.frameBuffer));
 	}
 
 	void														buildOffscreenCommandBuffer			()											{
@@ -317,25 +317,25 @@ public:
 		VK_CHECK_RESULT(vkBeginCommandBuffer(offscreenPass.commandBuffer, &cmdBufInfo));
 
 		VkViewport														viewport							= vks::initializers::viewport((float)offscreenPass.width, (float)offscreenPass.height, 0.0f, 1.0f);
-		vkCmdSetViewport(offscreenPass.commandBuffer, 0, 1, &viewport);
+		vkCmdSetViewport		(offscreenPass.commandBuffer, 0, 1, &viewport);
 
 		VkRect2D														scissor								= vks::initializers::rect2D(offscreenPass.width, offscreenPass.height, 0, 0);
-		vkCmdSetScissor(offscreenPass.commandBuffer, 0, 1, &scissor);
+		vkCmdSetScissor			(offscreenPass.commandBuffer, 0, 1, &scissor);
 
 		// Set depth bias (aka "Polygon offset"). Required to avoid shadow mapping artefacts
-		vkCmdSetDepthBias(offscreenPass.commandBuffer, depthBiasConstant, 0.0f, depthBiasSlope);
+		vkCmdSetDepthBias		(offscreenPass.commandBuffer, depthBiasConstant, 0.0f, depthBiasSlope);
 
-		vkCmdBeginRenderPass(offscreenPass.commandBuffer, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
+		vkCmdBeginRenderPass	(offscreenPass.commandBuffer, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 
-		vkCmdBindPipeline(offscreenPass.commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines.offscreen);
-		vkCmdBindDescriptorSets(offscreenPass.commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayouts.offscreen, 0, 1, &descriptorSets.offscreen, 0, NULL);
+		vkCmdBindPipeline		(offscreenPass.commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines.offscreen);
+		vkCmdBindDescriptorSets	(offscreenPass.commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayouts.offscreen, 0, 1, &descriptorSets.offscreen, 0, NULL);
 
 		VkDeviceSize													offsets	[1]							= { 0 };
-		vkCmdBindVertexBuffers(offscreenPass.commandBuffer, VERTEX_BUFFER_BIND_ID, 1, &models.scene.vertices.buffer, offsets);
-		vkCmdBindIndexBuffer(offscreenPass.commandBuffer, models.scene.indices.buffer, 0, VK_INDEX_TYPE_UINT32);
-		vkCmdDrawIndexed(offscreenPass.commandBuffer, models.scene.indexCount, 1, 0, 0, 0);
+		vkCmdBindVertexBuffers	(offscreenPass.commandBuffer, VERTEX_BUFFER_BIND_ID, 1, &models.scene.vertices.buffer, offsets);
+		vkCmdBindIndexBuffer	(offscreenPass.commandBuffer, models.scene.indices.buffer, 0, VK_INDEX_TYPE_UINT32);
+		vkCmdDrawIndexed		(offscreenPass.commandBuffer, models.scene.indexCount, 1, 0, 0, 0);
 
-		vkCmdEndRenderPass(offscreenPass.commandBuffer);
+		vkCmdEndRenderPass		(offscreenPass.commandBuffer);
 
 		VK_CHECK_RESULT(vkEndCommandBuffer(offscreenPass.commandBuffer));
 	}
@@ -546,8 +546,8 @@ public:
 		VK_CHECK_RESULT(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipelines.sceneShadowPCF));	// PCF filtering
 
 		// Offscreen pipeline
-		shaderStages[0] = loadShader(getAssetPath() + "shaders/shadowmapping/offscreen.vert.spv", VK_SHADER_STAGE_VERTEX_BIT);
-		shaderStages[1] = loadShader(getAssetPath() + "shaders/shadowmapping/offscreen.frag.spv", VK_SHADER_STAGE_FRAGMENT_BIT);
+		shaderStages[0]												= loadShader(getAssetPath() + "shaders/shadowmapping/offscreen.vert.spv", VK_SHADER_STAGE_VERTEX_BIT);
+		shaderStages[1]												= loadShader(getAssetPath() + "shaders/shadowmapping/offscreen.frag.spv", VK_SHADER_STAGE_FRAGMENT_BIT);
 		// No blend attachment states (no color attachments used)
 		colorBlendState.attachmentCount								= 0;
 		
@@ -563,9 +563,9 @@ public:
 
 	// Prepare and initialize uniform buffer containing shader uniforms
 	void														prepareUniformBuffers				()											{
-		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBuffers.debug		, sizeof(uboVSscene)));			// Debug quad vertex shader uniform buffer block
-		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBuffers.offscreen	, sizeof(uboOffscreenVS)));		// Offscreen vertex shader uniform buffer block
-		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBuffers.scene		, sizeof(uboVSscene)));			// Scene vertex shader uniform buffer block 
+		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBuffers.debug		, sizeof(uboVSscene		)));	// Debug quad vertex shader uniform buffer block
+		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBuffers.offscreen	, sizeof(uboOffscreenVS	)));	// Offscreen vertex shader uniform buffer block
+		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBuffers.scene		, sizeof(uboVSscene		)));	// Scene vertex shader uniform buffer block 
 
 		// Map persistent
 		VK_CHECK_RESULT(uniformBuffers.debug		.map());

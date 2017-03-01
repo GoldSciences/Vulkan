@@ -62,14 +62,14 @@ public:
 	// Clean up used Vulkan resources 
 	// Note : Inherited destructor cleans up resources stored in base class
 																~VulkanExample									()							{
-		vkDestroyPipeline				(device, pipelines.phong, nullptr);
+		vkDestroyPipeline				(device, pipelines.phong		, nullptr);
 		if (deviceFeatures.fillModeNonSolid)
-			vkDestroyPipeline				(device, pipelines.wireframe, nullptr);
+			vkDestroyPipeline				(device, pipelines.wireframe	, nullptr);
 
-		vkDestroyPipeline				(device, pipelines.toon, nullptr);
+		vkDestroyPipeline				(device, pipelines.toon			, nullptr);
 		
-		vkDestroyPipelineLayout			(device, pipelineLayout, nullptr);
-		vkDestroyDescriptorSetLayout	(device, descriptorSetLayout, nullptr);
+		vkDestroyPipelineLayout			(device, pipelineLayout			, nullptr);
+		vkDestroyDescriptorSetLayout	(device, descriptorSetLayout	, nullptr);
 
 		models.cube		.destroy();
 		uniformBuffer	.destroy();
@@ -279,8 +279,8 @@ public:
 	void														draw											()									{
 		VulkanExampleBase::prepareFrame();
 
-		submitInfo.commandBufferCount									= 1;
-		submitInfo.pCommandBuffers										= &drawCmdBuffers[currentBuffer];
+		submitInfo.commandBufferCount								= 1;
+		submitInfo.pCommandBuffers									= &drawCmdBuffers[currentBuffer];
 		VK_CHECK_RESULT(vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE));
 
 		VulkanExampleBase::submitFrame();

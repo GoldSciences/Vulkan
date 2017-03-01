@@ -30,8 +30,8 @@
 
 #include <glm/gtc/type_ptr.hpp>
 
-#define VERTEX_BUFFER_BIND_ID 0
-#define ENABLE_VALIDATION false
+#define VERTEX_BUFFER_BIND_ID	0
+#define ENABLE_VALIDATION		false
 
 // Vertex layout used in this example
 struct Vertex {
@@ -151,7 +151,7 @@ private:
 
 		VkDescriptorPoolCreateInfo										descriptorPoolInfo				= vks::initializers::descriptorPoolCreateInfo(static_cast<uint32_t>(poolSizes.size()), poolSizes.data(), static_cast<uint32_t>(materials.size()) + 1);
 
-		VK_CHECK_RESULT(vkCreateDescriptorPool(vulkanDevice->logicalDevice, &descriptorPoolInfo, nullptr, &descriptorPool));
+		VK_CHECK_RESULT(vkCreateDescriptorPool		(vulkanDevice->logicalDevice, &descriptorPoolInfo, nullptr, &descriptorPool));
 
 		// Descriptor set and pipeline layouts
 		std::vector<VkDescriptorSetLayoutBinding>						setLayoutBindings;
@@ -160,16 +160,16 @@ private:
 		// Set 0: Scene matrices
 		setLayoutBindings.push_back(vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT, 0));
 		descriptorLayout											= vks::initializers::descriptorSetLayoutCreateInfo(setLayoutBindings.data(), static_cast<uint32_t>(setLayoutBindings.size()));
-		VK_CHECK_RESULT(vkCreateDescriptorSetLayout(vulkanDevice->logicalDevice, &descriptorLayout, nullptr, &descriptorSetLayouts.scene));
+		VK_CHECK_RESULT(vkCreateDescriptorSetLayout	(vulkanDevice->logicalDevice, &descriptorLayout, nullptr, &descriptorSetLayouts.scene));
 
 		// Set 1: Material data
 		setLayoutBindings.clear();
 		setLayoutBindings.push_back(vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, 0));
-		VK_CHECK_RESULT(vkCreateDescriptorSetLayout(vulkanDevice->logicalDevice, &descriptorLayout, nullptr, &descriptorSetLayouts.material));
+		VK_CHECK_RESULT(vkCreateDescriptorSetLayout	(vulkanDevice->logicalDevice, &descriptorLayout, nullptr, &descriptorSetLayouts.material));
 
 		// Setup pipeline layout
 		std::array<VkDescriptorSetLayout, 2>							setLayouts						= { descriptorSetLayouts.scene, descriptorSetLayouts.material };
-		VkPipelineLayoutCreateInfo pipelineLayoutCreateInfo = vks::initializers::pipelineLayoutCreateInfo(setLayouts.data(), static_cast<uint32_t>(setLayouts.size()));
+		VkPipelineLayoutCreateInfo										pipelineLayoutCreateInfo		= vks::initializers::pipelineLayoutCreateInfo(setLayouts.data(), static_cast<uint32_t>(setLayouts.size()));
 
 		// We will be using a push constant block to pass material properties to the fragment shaders
 		VkPushConstantRange												pushConstantRange				= vks::initializers::pushConstantRange(VK_SHADER_STAGE_FRAGMENT_BIT, sizeof(SceneMaterialProperites), 0);
@@ -193,7 +193,7 @@ private:
 		}
 
 		// Scene descriptor set
-		VkDescriptorSetAllocateInfo allocInfo = vks::initializers::descriptorSetAllocateInfo(descriptorPool, &descriptorSetLayouts.scene, 1);
+		VkDescriptorSetAllocateInfo										allocInfo						= vks::initializers::descriptorSetAllocateInfo(descriptorPool, &descriptorSetLayouts.scene, 1);
 		VK_CHECK_RESULT(vkAllocateDescriptorSets(vulkanDevice->logicalDevice, &allocInfo, &descriptorSetScene));
 
 		std::vector<VkWriteDescriptorSet>								writeDescriptorSets;
@@ -521,8 +521,8 @@ public:
 		std::array<VkPipelineShaderStageCreateInfo, 2>					shaderStages					= {};
 
 		// Solid rendering pipeline
-		shaderStages[0] = loadShader(getAssetPath() + "shaders/scenerendering/scene.vert.spv", VK_SHADER_STAGE_VERTEX_BIT);
-		shaderStages[1] = loadShader(getAssetPath() + "shaders/scenerendering/scene.frag.spv", VK_SHADER_STAGE_FRAGMENT_BIT);
+		shaderStages[0]												= loadShader(getAssetPath() + "shaders/scenerendering/scene.vert.spv", VK_SHADER_STAGE_VERTEX_BIT);
+		shaderStages[1]												= loadShader(getAssetPath() + "shaders/scenerendering/scene.frag.spv", VK_SHADER_STAGE_FRAGMENT_BIT);
 
 		VkGraphicsPipelineCreateInfo									pipelineCreateInfo				= vks::initializers::pipelineCreateInfo(scene->pipelineLayout, renderPass, 0);
 		pipelineCreateInfo.pVertexInputState						= &vertices.inputState;

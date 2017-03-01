@@ -132,16 +132,8 @@ public:
 		vkFreeMemory					(device, shadowCubeMap.deviceMemory	, nullptr);
 
 		// Frame buffer
-
-		// Color attachment
-		vkDestroyImageView				(device, offscreenPass.color.view	, nullptr);
-		vkDestroyImage					(device, offscreenPass.color.image	, nullptr);
-		vkFreeMemory					(device, offscreenPass.color.mem	, nullptr);
-
-		// Depth attachment
-		vkDestroyImageView				(device, offscreenPass.depth.view	, nullptr);
-		vkDestroyImage					(device, offscreenPass.depth.image	, nullptr);
-		vkFreeMemory					(device, offscreenPass.depth.mem	, nullptr);
+		vkDestroyImageView				(device, offscreenPass.color.view	, nullptr);		vkDestroyImage		(device, offscreenPass.color.image	, nullptr);	vkFreeMemory		(device, offscreenPass.color.mem	, nullptr);	// Color attachment
+		vkDestroyImageView				(device, offscreenPass.depth.view	, nullptr);		vkDestroyImage		(device, offscreenPass.depth.image	, nullptr);	vkFreeMemory		(device, offscreenPass.depth.mem	, nullptr);	// Depth attachment
 
 		vkDestroyFramebuffer			(device, offscreenPass.frameBuffer	, nullptr);
 

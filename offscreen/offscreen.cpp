@@ -7,12 +7,12 @@
 #include "VulkanTexture.hpp"
 #include "VulkanModel.hpp"
 
-#define VERTEX_BUFFER_BIND_ID 0
-#define ENABLE_VALIDATION false
+#define VERTEX_BUFFER_BIND_ID	0
+#define ENABLE_VALIDATION		false
 
 // Offscreen frame buffer properties
-#define FB_DIM 512
-#define FB_COLOR_FORMAT VK_FORMAT_R8G8B8A8_UNORM
+#define FB_DIM					512
+#define FB_COLOR_FORMAT			VK_FORMAT_R8G8B8A8_UNORM
 
 class VulkanExample : public VulkanExampleBase
 {
@@ -119,45 +119,37 @@ public:
 		textures.colorMap.destroy();
 
 		// Frame buffer
+		vkDestroyImageView				(device, offscreenPass.color.view		, nullptr);		vkDestroyImage(device, offscreenPass.color.image, nullptr);		vkFreeMemory(device, offscreenPass.color.mem, nullptr);	// Color attachment
+		vkDestroyImageView				(device, offscreenPass.depth.view		, nullptr);		vkDestroyImage(device, offscreenPass.depth.image, nullptr);		vkFreeMemory(device, offscreenPass.depth.mem, nullptr);	// Depth attachment
 
-		// Color attachment
-		vkDestroyImageView(device, offscreenPass.color.view, nullptr);
-		vkDestroyImage(device, offscreenPass.color.image, nullptr);
-		vkFreeMemory(device, offscreenPass.color.mem, nullptr);
+		vkDestroyRenderPass				(device, offscreenPass.renderPass		, nullptr);
+		vkDestroySampler				(device, offscreenPass.sampler			, nullptr);
+		vkDestroyFramebuffer			(device, offscreenPass.frameBuffer		, nullptr);
 
-		// Depth attachment
-		vkDestroyImageView(device, offscreenPass.depth.view, nullptr);
-		vkDestroyImage(device, offscreenPass.depth.image, nullptr);
-		vkFreeMemory(device, offscreenPass.depth.mem, nullptr);
+		vkDestroyPipeline				(device, pipelines.debug				, nullptr);
+		vkDestroyPipeline				(device, pipelines.shaded				, nullptr);
+		vkDestroyPipeline				(device, pipelines.shadedOffscreen		, nullptr);
+		vkDestroyPipeline				(device, pipelines.mirror				, nullptr);
 
-		vkDestroyRenderPass(device, offscreenPass.renderPass, nullptr);
-		vkDestroySampler(device, offscreenPass.sampler, nullptr);
-		vkDestroyFramebuffer(device, offscreenPass.frameBuffer, nullptr);
+		vkDestroyPipelineLayout			(device, pipelineLayouts.textured		, nullptr);
+		vkDestroyPipelineLayout			(device, pipelineLayouts.shaded			, nullptr);
 
-		vkDestroyPipeline(device, pipelines.debug, nullptr);
-		vkDestroyPipeline(device, pipelines.shaded, nullptr);
-		vkDestroyPipeline(device, pipelines.shadedOffscreen, nullptr);
-		vkDestroyPipeline(device, pipelines.mirror, nullptr);
-
-		vkDestroyPipelineLayout(device, pipelineLayouts.textured, nullptr);
-		vkDestroyPipelineLayout(device, pipelineLayouts.shaded, nullptr);
-
-		vkDestroyDescriptorSetLayout(device, descriptorSetLayouts.shaded, nullptr);
-		vkDestroyDescriptorSetLayout(device, descriptorSetLayouts.textured, nullptr);
+		vkDestroyDescriptorSetLayout	(device, descriptorSetLayouts.shaded	, nullptr);
+		vkDestroyDescriptorSetLayout	(device, descriptorSetLayouts.textured	, nullptr);
 
 		// Models
-		models.example.destroy();
-		models.quad.destroy();
-		models.plane.destroy();
+		models.example				.destroy();
+		models.quad					.destroy();
+		models.plane				.destroy();
 
 		// Uniform buffers
-		uniformBuffers.vsShared.destroy();
-		uniformBuffers.vsMirror.destroy();
-		uniformBuffers.vsOffScreen.destroy();
-		uniformBuffers.vsDebugQuad.destroy();
+		uniformBuffers.vsShared		.destroy();
+		uniformBuffers.vsMirror		.destroy();
+		uniformBuffers.vsOffScreen	.destroy();
+		uniformBuffers.vsDebugQuad	.destroy();
 
-		vkFreeCommandBuffers(device, cmdPool, 1, &offscreenPass.commandBuffer);
-		vkDestroySemaphore(device, offscreenPass.semaphore, nullptr);
+		vkFreeCommandBuffers			(device, cmdPool, 1, &offscreenPass.commandBuffer);
+		vkDestroySemaphore				(device, offscreenPass.semaphore, nullptr);
 	}
 
 	// Setup the offscreen framebuffer for rendering the mirrored scene
@@ -585,8 +577,8 @@ public:
 		VK_CHECK_RESULT(vkAllocateDescriptorSets(device, &allocInfo, &descriptorSets.offscreen));
 
 		std::vector<VkWriteDescriptorSet>								offScreenWriteDescriptorSets	=
-		{	vks::initializers::writeDescriptorSet(descriptorSets.offscreen, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 0, &uniformBuffers.vsOffScreen.descriptor)		// Binding 0 : Vertex shader uniform buffer
-		};
+			{	vks::initializers::writeDescriptorSet(descriptorSets.offscreen, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 0, &uniformBuffers.vsOffScreen.descriptor)		// Binding 0 : Vertex shader uniform buffer
+			};
 		vkUpdateDescriptorSets(device, static_cast<uint32_t>(offScreenWriteDescriptorSets.size()), offScreenWriteDescriptorSets.data(), 0, NULL);
 	}
 
@@ -723,7 +715,7 @@ public:
 
 		// Offscreen rendering
 		submitInfo.pWaitSemaphores									= &semaphores.presentComplete;		// Wait for swap chain presentation to finish
-		submitInfo.pSignalSemaphores								= &offscreenPass.semaphore;		// Signal ready with offscreen semaphore
+		submitInfo.pSignalSemaphores								= &offscreenPass.semaphore;			// Signal ready with offscreen semaphore
 
 		// Submit work
 		submitInfo.commandBufferCount								= 1;
@@ -782,9 +774,9 @@ public:
 
 	virtual void												getOverlayText					(VulkanTextOverlay *textOverlay_)		{
 #if defined(__ANDROID__)
-		textOverlay_->addText("Press \"Button A\" to display offscreen target", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
+		textOverlay_->addText("Press \"Button A\" to display offscreen target"	, 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
 #else
-		textOverlay_->addText("Press \"d\" to display offscreen target", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
+		textOverlay_->addText("Press \"d\" to display offscreen target"			, 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
 #endif
 	}
 	void														toggleDebugDisplay				()										{ debugDisplay = !debugDisplay; reBuildCommandBuffers(); }

@@ -342,13 +342,13 @@ public:
 		vkDestroyPipelineLayout			(device, pipelineLayout			, nullptr);
 		vkDestroyDescriptorSetLayout	(device, descriptorSetLayout	, nullptr);
 
-		textures.colorMap.destroy();
-		textures.floor.destroy();
+		textures.colorMap		.destroy();
+		textures.floor			.destroy();
 
-		uniformBuffers.mesh.destroy();
-		uniformBuffers.floor.destroy();
+		uniformBuffers.mesh		.destroy();
+		uniformBuffers.floor	.destroy();
 
-		models.floor.destroy();
+		models.floor			.destroy();
 		delete(skinnedMesh);
 	}
 

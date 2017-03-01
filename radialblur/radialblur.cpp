@@ -17,15 +17,15 @@
 class VulkanExample : public VulkanExampleBase
 {
 public:
-	bool														blur									= true;
-	bool														displayTexture							= false;
+	bool														blur											= true;
+	bool														displayTexture									= false;
 
 	struct {
 		vks::Texture2D												gradient;
 	}															textures;
 
 	// Vertex layout for the models
-	vks::VertexLayout											vertexLayout							= vks::VertexLayout(
+	vks::VertexLayout											vertexLayout									= vks::VertexLayout(
 	{	vks::VERTEX_COMPONENT_POSITION
 	,	vks::VERTEX_COMPONENT_UV
 	,	vks::VERTEX_COMPONENT_COLOR
@@ -50,13 +50,13 @@ public:
 	struct UboVS {
 		glm::mat4													projection;
 		glm::mat4													model;
-		float														gradientPos									= 0.0f;
+		float														gradientPos										= 0.0f;
 	}															uboScene;
 
 	struct UboBlurParams {
-		float														radialBlurScale								= 0.35f;
-		float														radialBlurStrength							= 0.75f;
-		glm::vec2													radialOrigin								= glm::vec2(0.5f, 0.5f);
+		float														radialBlurScale									= 0.35f;
+		float														radialBlurStrength								= 0.75f;
+		glm::vec2													radialOrigin									= glm::vec2(0.5f, 0.5f);
 	}															uboBlurParams;
 
 	struct {
@@ -83,20 +83,20 @@ public:
 
 	// Framebuffer for offscreen rendering
 	struct FrameBufferAttachment {
-		VkImage														image										= VK_NULL_HANDLE;
-		VkDeviceMemory												mem											= VK_NULL_HANDLE;
-		VkImageView													view										= VK_NULL_HANDLE;
+		VkImage														image											= VK_NULL_HANDLE;
+		VkDeviceMemory												mem												= VK_NULL_HANDLE;
+		VkImageView													view											= VK_NULL_HANDLE;
 	};
 	struct OffscreenPass {
 		int32_t														width, height;
-		VkFramebuffer												frameBuffer									= VK_NULL_HANDLE;
+		VkFramebuffer												frameBuffer										= VK_NULL_HANDLE;
 		FrameBufferAttachment										color, depth;
-		VkRenderPass												renderPass									= VK_NULL_HANDLE;
+		VkRenderPass												renderPass										= VK_NULL_HANDLE;
 		VkSampler													sampler;
-		VkDescriptorImageInfo										descriptor									= {};
-		VkCommandBuffer												commandBuffer								= VK_NULL_HANDLE;
+		VkDescriptorImageInfo										descriptor										= {};
+		VkCommandBuffer												commandBuffer									= VK_NULL_HANDLE;
 		// Semaphore used to synchronize between offscreen and final scene render pass
-		VkSemaphore													semaphore									= VK_NULL_HANDLE;
+		VkSemaphore													semaphore										= VK_NULL_HANDLE;
 	}															offscreenPass;
 
 																VulkanExample									()										: VulkanExampleBase(ENABLE_VALIDATION) {

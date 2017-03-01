@@ -112,7 +112,7 @@ public:
 			};
 
 		VkDescriptorPoolCreateInfo										descriptorPoolInfo		= vks::initializers::descriptorPoolCreateInfo(static_cast<uint32_t>(poolSizes.size()), poolSizes.data(), 2);
-		VK_CHECK_RESULT(vkCreateDescriptorPool(device, &descriptorPoolInfo, nullptr, &descriptorPool));
+		VK_CHECK_RESULT(vkCreateDescriptorPool		(device, &descriptorPoolInfo, nullptr, &descriptorPool));
 	}
 
 	void														setupDescriptorSetLayout	()									{
@@ -121,21 +121,21 @@ public:
 			};
 
 		VkDescriptorSetLayoutCreateInfo									descriptorLayout			= vks::initializers::descriptorSetLayoutCreateInfo(setLayoutBindings.data(), static_cast<uint32_t>(setLayoutBindings.size()));
-		VK_CHECK_RESULT(vkCreateDescriptorSetLayout(device, &descriptorLayout, nullptr, &descriptorSetLayout));
+		VK_CHECK_RESULT(vkCreateDescriptorSetLayout	(device, &descriptorLayout, nullptr, &descriptorSetLayout));
 
 		VkPipelineLayoutCreateInfo										pPipelineLayoutCreateInfo	= vks::initializers::pipelineLayoutCreateInfo(&descriptorSetLayout, 1);
-		VK_CHECK_RESULT(vkCreatePipelineLayout(device, &pPipelineLayoutCreateInfo, nullptr, &pipelineLayout));
+		VK_CHECK_RESULT(vkCreatePipelineLayout		(device, &pPipelineLayoutCreateInfo, nullptr, &pipelineLayout));
 	}
 
 	void														setupDescriptorSet			()									{
 		VkDescriptorSetAllocateInfo										allocInfo					= vks::initializers::descriptorSetAllocateInfo(descriptorPool, &descriptorSetLayout, 1);
-		VK_CHECK_RESULT(vkAllocateDescriptorSets(device, &allocInfo, &descriptorSet));
+		VK_CHECK_RESULT(vkAllocateDescriptorSets	(device, &allocInfo, &descriptorSet));
 
-		std::vector<VkWriteDescriptorSet> writeDescriptorSets = 
+		std::vector<VkWriteDescriptorSet>								writeDescriptorSets			= 
 			{	vks::initializers::writeDescriptorSet(descriptorSet, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 0, &uniformBuffer.descriptor)	// Binding 0 : Vertex shader uniform buffer
 			};
 
-		vkUpdateDescriptorSets(device, static_cast<uint32_t>(writeDescriptorSets.size()), writeDescriptorSets.data(), 0, NULL);
+		vkUpdateDescriptorSets						(device, static_cast<uint32_t>(writeDescriptorSets.size()), writeDescriptorSets.data(), 0, NULL);
 	}
 
 	void														preparePipelines			()									{
@@ -251,7 +251,7 @@ public:
 		VK_CHECK_RESULT(vkCreateImage(device, &imgCreateInfo, nullptr, &dstImage));
 		// Create memory to back up the image
 		VkMemoryRequirements											memRequirements;
-		VkMemoryAllocateInfo											memAllocInfo(vks::initializers::memoryAllocateInfo());
+		VkMemoryAllocateInfo											memAllocInfo				(vks::initializers::memoryAllocateInfo());
 		VkDeviceMemory													dstImageMemory;
 		vkGetImageMemoryRequirements(device, dstImage, &memRequirements);
 		memAllocInfo.allocationSize									= memRequirements.size;
@@ -293,30 +293,30 @@ public:
 		// If source and destination support blit we'll blit as this also does automatic format conversion (e.g. from BGR to RGB)
 		if (supportsBlit) {
 			// Define the region to blit (we will blit the whole swapchain image)
-			VkOffset3D blitSize;
-			blitSize.x = width;
-			blitSize.y = height;
-			blitSize.z = 1;
-			VkImageBlit imageBlitRegion{};
-			imageBlitRegion.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-			imageBlitRegion.srcSubresource.layerCount = 1;
-			imageBlitRegion.srcOffsets[1] = blitSize;
-			imageBlitRegion.dstSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-			imageBlitRegion.dstSubresource.layerCount = 1;
-			imageBlitRegion.dstOffsets[1] = blitSize;
+			VkOffset3D														blitSize;
+			blitSize.x													= width;
+			blitSize.y													= height;
+			blitSize.z													= 1;
+			VkImageBlit														imageBlitRegion{};
+			imageBlitRegion.srcSubresource.aspectMask					= VK_IMAGE_ASPECT_COLOR_BIT;
+			imageBlitRegion.srcSubresource.layerCount					= 1;
+			imageBlitRegion.srcOffsets[1]								= blitSize;
+			imageBlitRegion.dstSubresource.aspectMask					= VK_IMAGE_ASPECT_COLOR_BIT;
+			imageBlitRegion.dstSubresource.layerCount					= 1;
+			imageBlitRegion.dstOffsets[1]								= blitSize;
 
 			// Issue the blit command
 			vkCmdBlitImage(copyCmd, srcImage, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, dstImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &imageBlitRegion, VK_FILTER_NEAREST);
 		}
 		else {	// Otherwise use image copy (requires us to manually flip components)
-			VkImageCopy imageCopyRegion{};
-			imageCopyRegion.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-			imageCopyRegion.srcSubresource.layerCount = 1;
-			imageCopyRegion.dstSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-			imageCopyRegion.dstSubresource.layerCount = 1;
-			imageCopyRegion.extent.width = width;
-			imageCopyRegion.extent.height = height;
-			imageCopyRegion.extent.depth = 1;
+			VkImageCopy														imageCopyRegion{};
+			imageCopyRegion.srcSubresource.aspectMask					= VK_IMAGE_ASPECT_COLOR_BIT;
+			imageCopyRegion.srcSubresource.layerCount					= 1;
+			imageCopyRegion.dstSubresource.aspectMask					= VK_IMAGE_ASPECT_COLOR_BIT;
+			imageCopyRegion.dstSubresource.layerCount					= 1;
+			imageCopyRegion.extent.width								= width;
+			imageCopyRegion.extent.height								= height;
+			imageCopyRegion.extent.depth								= 1;
 
 			// Issue the copy command
 			vkCmdCopyImage(copyCmd, srcImage, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, dstImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &imageCopyRegion);
@@ -351,36 +351,34 @@ public:
 		vulkanDevice->flushCommandBuffer(copyCmd, queue);
 
 		// Get layout of the image (including row pitch)
-		VkImageSubresource subResource{};
-		subResource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-		VkSubresourceLayout subResourceLayout;
+		VkImageSubresource												subResource{};
+		subResource.aspectMask										= VK_IMAGE_ASPECT_COLOR_BIT;
+		VkSubresourceLayout												subResourceLayout;
 
 		vkGetImageSubresourceLayout(device, dstImage, &subResource, &subResourceLayout);
 
 		// Map image memory so we can start copying from it
-		const char* data;
+		const char														* data;
 		vkMapMemory(device, dstImageMemory, 0, VK_WHOLE_SIZE, 0, (void**)&data);
-		data += subResourceLayout.offset;
+		data														+= subResourceLayout.offset;
 
-		std::ofstream file(filename, std::ios::out | std::ios::binary);
+		std::ofstream													file						(filename, std::ios::out | std::ios::binary);
 
 		// ppm header
 		file << "P6\n" << width << "\n" << height << "\n" << 255 << "\n";
 
 		// If source is BGR (destination is always RGB) and we can't use blit (which does automatic conversion), we'll have to manually swizzle color components
-		bool colorSwizzle = false;
+		bool															colorSwizzle				= false;
 		// Check if source is BGR 
 		// Note: Not complete, only contains most common and basic BGR surface formats for demonstation purposes
-		if (!supportsBlit)
-		{
-			std::vector<VkFormat> formatsBGR = { VK_FORMAT_B8G8R8A8_SRGB, VK_FORMAT_B8G8R8A8_UNORM, VK_FORMAT_B8G8R8A8_SNORM };
-			colorSwizzle = (std::find(formatsBGR.begin(), formatsBGR.end(), swapChain.colorFormat) != formatsBGR.end());
+		if (!supportsBlit) {
+			std::vector<VkFormat>											formatsBGR					= { VK_FORMAT_B8G8R8A8_SRGB, VK_FORMAT_B8G8R8A8_UNORM, VK_FORMAT_B8G8R8A8_SNORM };
+			colorSwizzle												= (std::find(formatsBGR.begin(), formatsBGR.end(), swapChain.colorFormat) != formatsBGR.end());
 		}
 
 		// ppm binary pixel data
-		for (uint32_t y = 0; y < height; y++) 
-		{
-			unsigned int *row = (unsigned int*)data;
+		for (uint32_t y = 0; y < height; y++) {
+			unsigned int														* row = (unsigned int*)data;
 			for (uint32_t x = 0; x < width; x++) 
 			{
 				if (colorSwizzle) { 
@@ -393,16 +391,16 @@ public:
 
 				row++;
 			}
-			data += subResourceLayout.rowPitch;
+			data															+= subResourceLayout.rowPitch;
 		}
 		file.close();
 
 		std::cout << "Screenshot saved to disk" << std::endl;
 
 		// Clean up resources
-		vkUnmapMemory(device, dstImageMemory);
-		vkFreeMemory(device, dstImageMemory, nullptr);
-		vkDestroyImage(device, dstImage, nullptr);
+		vkUnmapMemory	(device, dstImageMemory);
+		vkFreeMemory	(device, dstImageMemory, nullptr);
+		vkDestroyImage	(device, dstImage, nullptr);
 	}
 
 	void														draw						()									{

@@ -10,8 +10,8 @@
 
 #include <glm/gtc/matrix_inverse.hpp>
 
-#define VERTEX_BUFFER_BIND_ID 0
-#define ENABLE_VALIDATION false
+#define VERTEX_BUFFER_BIND_ID	0
+#define ENABLE_VALIDATION		false
 
 class VulkanExample : public VulkanExampleBase
 {
@@ -360,13 +360,13 @@ public:
 
 	virtual void												getOverlayText				(VulkanTextOverlay *textOverlay_)	{
 #if defined(__ANDROID__)
-		textOverlay_->addText("Press \"Button A\" to toggle parallax", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
-		textOverlay_->addText("Press \"Button X\" to toggle normals", 5.0f, 100.0f, VulkanTextOverlay::alignLeft);
-		textOverlay_->addText("Press \"Button Y\" to toggle splitscreen", 5.0f, 115.0f, VulkanTextOverlay::alignLeft);
+		textOverlay_->addText("Press \"Button A\" to toggle parallax"		, 5.0f,  85.0f, VulkanTextOverlay::alignLeft);
+		textOverlay_->addText("Press \"Button X\" to toggle normals"		, 5.0f, 100.0f, VulkanTextOverlay::alignLeft);
+		textOverlay_->addText("Press \"Button Y\" to toggle splitscreen"	, 5.0f, 115.0f, VulkanTextOverlay::alignLeft);
 #else
-		textOverlay_->addText("Press \"o\" to toggle parallax", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
-		textOverlay_->addText("Press \"n\" to toggle normals", 5.0f, 100.0f, VulkanTextOverlay::alignLeft);
-		textOverlay_->addText("Press \"s\" to toggle splitscreen", 5.0f, 115.0f, VulkanTextOverlay::alignLeft);
+		textOverlay_->addText("Press \"o\" to toggle parallax"				, 5.0f,  85.0f, VulkanTextOverlay::alignLeft);
+		textOverlay_->addText("Press \"n\" to toggle normals"				, 5.0f, 100.0f, VulkanTextOverlay::alignLeft);
+		textOverlay_->addText("Press \"s\" to toggle splitscreen"			, 5.0f, 115.0f, VulkanTextOverlay::alignLeft);
 #endif
 	}
 };
