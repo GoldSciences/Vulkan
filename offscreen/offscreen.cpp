@@ -57,34 +57,34 @@ public:
 	}															uboShared;
 
 	struct {
-		VkPipeline													debug;
-		VkPipeline													shaded;
-		VkPipeline													shadedOffscreen;
-		VkPipeline													mirror;
+		VkPipeline													debug							= VK_NULL_HANDLE;
+		VkPipeline													shaded							= VK_NULL_HANDLE;
+		VkPipeline													shadedOffscreen					= VK_NULL_HANDLE;
+		VkPipeline													mirror							= VK_NULL_HANDLE;
 	}															pipelines;
 
 	struct {
-		VkPipelineLayout											textured;
-		VkPipelineLayout											shaded;
+		VkPipelineLayout											textured						= VK_NULL_HANDLE;
+		VkPipelineLayout											shaded							= VK_NULL_HANDLE;
 	}															pipelineLayouts;
 
 	struct {
-		VkDescriptorSet												offscreen;
-		VkDescriptorSet												mirror;
-		VkDescriptorSet												model;
-		VkDescriptorSet												debugQuad;
+		VkDescriptorSet												offscreen						= VK_NULL_HANDLE;
+		VkDescriptorSet												mirror							= VK_NULL_HANDLE;
+		VkDescriptorSet												model							= VK_NULL_HANDLE;
+		VkDescriptorSet												debugQuad						= VK_NULL_HANDLE;
 	}															descriptorSets;
 
 	struct {
-		VkDescriptorSetLayout										textured;
-		VkDescriptorSetLayout										shaded;
+		VkDescriptorSetLayout										textured						= VK_NULL_HANDLE;
+		VkDescriptorSetLayout										shaded							= VK_NULL_HANDLE;
 	}															descriptorSetLayouts;
 
 	// Framebuffer for offscreen rendering
 	struct FrameBufferAttachment {
-		VkImage														image;
-		VkDeviceMemory												mem;
-		VkImageView													view;
+		VkImage														image							= VK_NULL_HANDLE;
+		VkDeviceMemory												mem								= VK_NULL_HANDLE;
+		VkImageView													view							= VK_NULL_HANDLE;
 	};
 	struct OffscreenPass {
 		int32_t														width, height;
@@ -434,7 +434,7 @@ public:
 			vkCmdBindIndexBuffer	(drawCmdBuffers[i], models.example.indices.buffer, 0, VK_INDEX_TYPE_UINT32);
 			vkCmdDrawIndexed		(drawCmdBuffers[i], models.example.indexCount, 1, 0, 0, 0);
 
-			vkCmdEndRenderPass(drawCmdBuffers[i]);
+			vkCmdEndRenderPass		(drawCmdBuffers[i]);
 
 			VK_CHECK_RESULT(vkEndCommandBuffer(drawCmdBuffers[i]));
 		}

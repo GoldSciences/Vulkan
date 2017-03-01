@@ -55,14 +55,14 @@ public:
 		VkDescriptorSet												sphere							= VK_NULL_HANDLE;
 	}															descriptorSets;
 
-	VkPipelineLayout											pipelineLayout;
-	VkDescriptorSet												descriptorSet;
-	VkDescriptorSetLayout										descriptorSetLayout;
+	VkPipelineLayout											pipelineLayout					= VK_NULL_HANDLE;
+	VkDescriptorSet												descriptorSet					= VK_NULL_HANDLE;
+	VkDescriptorSetLayout										descriptorSetLayout				= VK_NULL_HANDLE;
 
 	// Stores occlusion query results
 	struct {
-		VkBuffer													buffer;
-		VkDeviceMemory												memory;
+		VkBuffer													buffer							= VK_NULL_HANDLE;
+		VkDeviceMemory												memory							= VK_NULL_HANDLE;
 	}															queryResult;
 
 	VkQueryPool													queryPool						= VK_NULL_HANDLE;	// Pool that stores all occlusion queries
