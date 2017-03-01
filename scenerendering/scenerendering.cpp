@@ -617,7 +617,7 @@ public:
 			updateTextOverlay();
 			break;
 		case KEY_KPADD:
-			scene->scenePartIndex										= (scene->scenePartIndex < static_cast<uint32_t>(scene->meshes.size())) ? scene->scenePartIndex + 1 : 0;
+			scene->scenePartIndex										= (scene->scenePartIndex < static_cast<uint32_t>(scene->meshes.size()-1)) ? scene->scenePartIndex + 1 : 0;
 			reBuildCommandBuffers();
 			updateTextOverlay();
 			break;

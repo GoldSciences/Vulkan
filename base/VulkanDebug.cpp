@@ -34,11 +34,11 @@ namespace vks
 		{
 			std::string									prefix("");												// Select prefix depending on flags passed to the callback. Note that multiple flags may be set for a single validation message
 			
-			if (flags & VK_DEBUG_REPORT_ERROR_BIT_EXT)					{ prefix += "ERROR:"		; }		// Error that may result in undefined behaviour
-			if (flags & VK_DEBUG_REPORT_WARNING_BIT_EXT)				{ prefix += "WARNING:"		; }		// Warnings may hint at unexpected / non-spec API usage
-			if (flags & VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT)	{ prefix += "PERFORMANCE:"	; }		// May indicate sub-optimal usage of the API
-			if (flags & VK_DEBUG_REPORT_INFORMATION_BIT_EXT)			{ prefix += "INFO:"			; }		// Informal messages that may become handy during debugging
-			if (flags & VK_DEBUG_REPORT_DEBUG_BIT_EXT)					{ prefix += "DEBUG:"		; }		// Diagnostic info from the Vulkan loader and layers. Usually not helpful in terms of API usage, but may help to debug layer and loader problems 
+			if (flags & VK_DEBUG_REPORT_ERROR_BIT_EXT)					prefix += "ERROR:"		;	// Error that may result in undefined behaviour
+			if (flags & VK_DEBUG_REPORT_WARNING_BIT_EXT)				prefix += "WARNING:"	;	// Warnings may hint at unexpected / non-spec API usage
+			if (flags & VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT)	prefix += "PERFORMANCE:";	// May indicate sub-optimal usage of the API
+			if (flags & VK_DEBUG_REPORT_INFORMATION_BIT_EXT)			prefix += "INFO:"		;	// Informal messages that may become handy during debugging
+			if (flags & VK_DEBUG_REPORT_DEBUG_BIT_EXT)					prefix += "DEBUG:"		;	// Diagnostic info from the Vulkan loader and layers. Usually not helpful in terms of API usage, but may help to debug layer and loader problems 
 			
 			std::cout << prefix << " [" << pLayerPrefix << "] Code " << msgCode << " : " << pMsg << "\n";	// Display message to default output (console if activated)
 

@@ -19,8 +19,8 @@ class VulkanExample : public VulkanExampleBase
 public:
 	// Vertex layout used in this example
 	struct Vertex {
-		float														position[3];
-		float														color[3];
+		float														position	[3];
+		float														color		[3];
 	};
 
 	// Vertex buffer and attributes
