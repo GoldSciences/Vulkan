@@ -87,16 +87,16 @@ public:
 
 	// Resources for the compute part of the example
 	struct {
-		vks::Buffer													lodLevelsBuffers;		// Contains index start and counts for the different lod levels
-		VkQueue														queue;					// Separate queue for compute commands (queue family may differ from the one used for graphics)
-		VkCommandPool												commandPool;			// Use a separate command pool (queue family may differ from the one used for graphics)
-		VkCommandBuffer												commandBuffer;			// Command buffer storing the dispatch commands and barriers
-		VkFence														fence;					// Synchronization fence to avoid rewriting compute CB if still in use
-		VkSemaphore													semaphore;				// Used as a wait semaphore for graphics submission
-		VkDescriptorSetLayout										descriptorSetLayout;	// Compute shader binding layout
-		VkDescriptorSet												descriptorSet;			// Compute shader bindings
-		VkPipelineLayout											pipelineLayout;			// Layout of the compute pipeline
-		VkPipeline													pipeline;				// Compute pipeline for updating particle positions
+		vks::Buffer													lodLevelsBuffers;											// Contains index start and counts for the different lod levels
+		VkQueue														queue									= VK_NULL_HANDLE;	// Separate queue for compute commands (queue family may differ from the one used for graphics)
+		VkCommandPool												commandPool								= VK_NULL_HANDLE;	// Use a separate command pool (queue family may differ from the one used for graphics)
+		VkCommandBuffer												commandBuffer							= VK_NULL_HANDLE;	// Command buffer storing the dispatch commands and barriers
+		VkFence														fence									= VK_NULL_HANDLE;	// Synchronization fence to avoid rewriting compute CB if still in use
+		VkSemaphore													semaphore								= VK_NULL_HANDLE;	// Used as a wait semaphore for graphics submission
+		VkDescriptorSetLayout										descriptorSetLayout						= VK_NULL_HANDLE;	// Compute shader binding layout
+		VkDescriptorSet												descriptorSet							= VK_NULL_HANDLE;	// Compute shader bindings
+		VkPipelineLayout											pipelineLayout							= VK_NULL_HANDLE;	// Layout of the compute pipeline
+		VkPipeline													pipeline								= VK_NULL_HANDLE;	// Compute pipeline for updating particle positions
 	}															compute;
 
 	// View frustum for culling invisible objects

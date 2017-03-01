@@ -62,9 +62,9 @@ public:
 		VkPipeline													skybox									= VK_NULL_HANDLE;
 	} pipelines;
 
-	VkPipelineLayout											pipelineLayout;
-	VkDescriptorSet												descriptorSet;
-	VkDescriptorSetLayout										descriptorSetLayout;
+	VkPipelineLayout											pipelineLayout							= VK_NULL_HANDLE;
+	VkDescriptorSet												descriptorSet							= VK_NULL_HANDLE;
+	VkDescriptorSetLayout										descriptorSetLayout						= VK_NULL_HANDLE;
 
 	glm::vec4													lightPos								= glm::vec4(1.0f, 2.0f, 0.0f, 0.0f);
 

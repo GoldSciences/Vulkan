@@ -44,13 +44,13 @@ public:
 		glm::mat4													model;
 		glm::mat4													normal;
 		glm::mat4													view;
-		int32_t														texIndex							= 0;
+		int32_t														texIndex								= 0;
 	}															uboVS;
 
-	VkPipeline													pipeline;
-	VkPipelineLayout											pipelineLayout;
-	VkDescriptorSet												descriptorSet;
-	VkDescriptorSetLayout										descriptorSetLayout;
+	VkPipeline													pipeline								= VK_NULL_HANDLE;
+	VkPipelineLayout											pipelineLayout							= VK_NULL_HANDLE;
+	VkDescriptorSet												descriptorSet							= VK_NULL_HANDLE;
+	VkDescriptorSetLayout										descriptorSetLayout						= VK_NULL_HANDLE;
 
 																VulkanExample							()										: VulkanExampleBase(ENABLE_VALIDATION) {
 		zoom														= -0.9f;

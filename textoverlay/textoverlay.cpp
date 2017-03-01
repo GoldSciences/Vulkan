@@ -598,16 +598,16 @@ public:
 	}															uboVS;
 
 	struct {
-		VkPipeline													solid;
-		VkPipeline													background;
+		VkPipeline													solid						= VK_NULL_HANDLE;
+		VkPipeline													background					= VK_NULL_HANDLE;
 	}															pipelines;
 
-	VkPipelineLayout											pipelineLayout;
-	VkDescriptorSetLayout										descriptorSetLayout;
+	VkPipelineLayout											pipelineLayout					= VK_NULL_HANDLE;
+	VkDescriptorSetLayout										descriptorSetLayout				= VK_NULL_HANDLE;
 
 	struct {
-		VkDescriptorSet												background;
-		VkDescriptorSet												cube;
+		VkDescriptorSet												background					= VK_NULL_HANDLE;
+		VkDescriptorSet												cube						= VK_NULL_HANDLE;
 	}															descriptorSets;
 
 

@@ -25,11 +25,11 @@ public:
 	// Contains all Vulkan objects that are required to store and use a texture
 	// Note that this repository contains a texture class (VulkanTexture.hpp) that encapsulates texture loading functionality in a class that is used in subsequent demos
 	struct Texture {
-		VkSampler													sampler;
-		VkImage														image;
-		VkImageLayout												imageLayout;
-		VkDeviceMemory												deviceMemory;
-		VkImageView													view;
+		VkSampler													sampler								= VK_NULL_HANDLE;
+		VkImage														image								= VK_NULL_HANDLE;
+		VkImageLayout												imageLayout							= VK_IMAGE_LAYOUT_UNDEFINED;
+		VkDeviceMemory												deviceMemory						= VK_NULL_HANDLE;
+		VkImageView													view								= VK_NULL_HANDLE;
 		uint32_t													width, height;
 		uint32_t													mipLevels;
 	}															texture;

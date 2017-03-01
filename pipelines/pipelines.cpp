@@ -39,14 +39,14 @@ public:
 		glm::vec4												lightPos											= glm::vec4(0.0f, 2.0f, 1.0f, 0.0f);
 	}															uboVS;
 
-	VkPipelineLayout											pipelineLayout;
-	VkDescriptorSet												descriptorSet;
-	VkDescriptorSetLayout										descriptorSetLayout;
+	VkPipelineLayout											pipelineLayout									= VK_NULL_HANDLE;
+	VkDescriptorSet												descriptorSet									= VK_NULL_HANDLE;
+	VkDescriptorSetLayout										descriptorSetLayout								= VK_NULL_HANDLE;
 
 	struct {
-		VkPipeline													phong;
-		VkPipeline													wireframe;
-		VkPipeline													toon;
+		VkPipeline													phong											= VK_NULL_HANDLE;
+		VkPipeline													wireframe										= VK_NULL_HANDLE;
+		VkPipeline													toon											= VK_NULL_HANDLE;
 	}															pipelines;
 
 																VulkanExample									()							: VulkanExampleBase(ENABLE_VALIDATION)	{

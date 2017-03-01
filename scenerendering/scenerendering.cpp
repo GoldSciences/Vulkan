@@ -57,10 +57,10 @@ struct SceneMaterialProperites
 struct SceneMaterial
 {
 	std::string													name;
-	SceneMaterialProperites										properties;		// Material properties
-	vks::Texture2D												diffuse;		// The example only uses a diffuse channel
-	VkDescriptorSet												descriptorSet;	// The material's descriptor contains the material descriptors
-	VkPipeline													* pipeline;		// Pointer to the pipeline used by this material
+	SceneMaterialProperites										properties;							// Material properties
+	vks::Texture2D												diffuse;							// The example only uses a diffuse channel
+	VkDescriptorSet												descriptorSet					= VK_NULL_HANDLE;	// The material's descriptor contains the material descriptors
+	VkPipeline													* pipeline						= nullptr;			// Pointer to the pipeline used by this material
 };
 
 // Stores per-mesh Vulkan resources
@@ -68,7 +68,7 @@ struct ScenePart
 {
 	uint32_t													indexBase;		// Index of first index in the scene buffer
 	uint32_t													indexCount;
-	SceneMaterial												* material;		// Pointer to the material used by this mesh
+	SceneMaterial												* material						= nullptr;		// Pointer to the material used by this mesh
 };
 
 // Class for loading the scene and generating all Vulkan resources
@@ -76,14 +76,14 @@ class Scene
 {
 private:
 	vks::VulkanDevice											* vulkanDevice;
-	VkQueue														queue;
-	VkDescriptorPool											descriptorPool;
+	VkQueue														queue							= VK_NULL_HANDLE;
+	VkDescriptorPool											descriptorPool					= VK_NULL_HANDLE;
 
 	// We will be using separate descriptor sets (and bindings)
 	// for material and scene related uniforms
 	struct {
-		VkDescriptorSetLayout										material;
-		VkDescriptorSetLayout										scene;
+		VkDescriptorSetLayout										material						= VK_NULL_HANDLE;
+		VkDescriptorSetLayout										scene							= VK_NULL_HANDLE;
 	}															descriptorSetLayouts;
 
 	// We will be using one single index and vertex buffer
@@ -92,7 +92,7 @@ private:
 	vks::Buffer													vertexBuffer;
 	vks::Buffer													indexBuffer;
 
-	VkDescriptorSet												descriptorSetScene;
+	VkDescriptorSet												descriptorSetScene				= VK_NULL_HANDLE;
 
 	const aiScene												* aScene;
 
@@ -291,8 +291,7 @@ public:
 	std::vector<SceneMaterial>									materials;
 	std::vector<ScenePart>										meshes;
 
-	// Shared ubo containing matrices used by all
-	// materials and meshes
+	// Shared ubo containing matrices used by all materials and meshes
 	vks::Buffer													uniformBuffer;
 	struct UniformData {
 		glm::mat4													projection;

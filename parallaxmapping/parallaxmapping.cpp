@@ -67,13 +67,13 @@ public:
 	}															ubos;
 
 	struct {
-		VkPipeline													parallaxMapping;
-		VkPipeline													normalMapping;
+		VkPipeline													parallaxMapping				= VK_NULL_HANDLE;
+		VkPipeline													normalMapping				= VK_NULL_HANDLE;
 	}															pipelines;
 
-	VkPipelineLayout											pipelineLayout;
-	VkDescriptorSet												descriptorSet;
-	VkDescriptorSetLayout										descriptorSetLayout;
+	VkPipelineLayout											pipelineLayout				= VK_NULL_HANDLE;
+	VkDescriptorSet												descriptorSet				= VK_NULL_HANDLE;
+	VkDescriptorSetLayout										descriptorSetLayout			= VK_NULL_HANDLE;
 
 																VulkanExample				()									: VulkanExampleBase(ENABLE_VALIDATION)	{
 		zoom														= -2.7f;

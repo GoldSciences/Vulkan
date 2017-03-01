@@ -81,8 +81,8 @@ public:
 	// Synchronization primitives. Synchronization is an important concept of Vulkan that OpenGL mostly hid away. Getting this right is crucial to using Vulkan.
 
 	// Semaphores. Used to coordinate operations within the graphics queue and ensure correct command ordering
-	VkSemaphore													presentCompleteSemaphore;
-	VkSemaphore													renderCompleteSemaphore;
+	VkSemaphore													presentCompleteSemaphore				= VK_NULL_HANDLE;
+	VkSemaphore													renderCompleteSemaphore					= VK_NULL_HANDLE;
 
 	std::vector<VkFence>										waitFences;					// Fences. Used to check the completion of queue operations (e.g. command buffer execution)
 

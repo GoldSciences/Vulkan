@@ -125,11 +125,11 @@ public:
 	struct Texture {
 		VkSampler													sampler									= VK_NULL_HANDLE;
 		VkImage														image									= VK_NULL_HANDLE;
-		VkImageLayout												imageLayout;
+		VkImageLayout												imageLayout								= VK_IMAGE_LAYOUT_UNDEFINED;
 		VkDeviceMemory												deviceMemory							= VK_NULL_HANDLE;
 		VkImageView													view									= VK_NULL_HANDLE;
 		VkDescriptorImageInfo										descriptor								= {};
-		VkFormat													format;
+		VkFormat													format									= VK_FORMAT_UNDEFINED;
 		uint32_t													width, height, depth;
 		uint32_t													mipLevels;
 	}															texture;

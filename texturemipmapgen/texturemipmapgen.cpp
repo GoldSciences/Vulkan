@@ -20,7 +20,7 @@ class VulkanExample : public VulkanExampleBase
 public:
 	struct Texture {
 		VkImage														image					= VK_NULL_HANDLE;
-		VkImageLayout												imageLayout				;
+		VkImageLayout												imageLayout				= VK_IMAGE_LAYOUT_UNDEFINED;
 		VkDeviceMemory												deviceMemory			= VK_NULL_HANDLE;
 		VkImageView													view					= VK_NULL_HANDLE;
 		uint32_t													width, height;
@@ -82,12 +82,14 @@ public:
 
 																~VulkanExample				()																	{
 		destroyTextureImage(texture);
-		vkDestroyPipeline(device, pipelines.solid, nullptr);
-		vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
+		vkDestroyPipeline			(device, pipelines.solid, nullptr);
+		vkDestroyPipelineLayout		(device, pipelineLayout, nullptr);
 		vkDestroyDescriptorSetLayout(device, descriptorSetLayout, nullptr);
+
 		uniformBufferVS.destroy();
+
 		for (VkSampler& sampler : samplers)
-			vkDestroySampler(device, sampler, nullptr);
+			vkDestroySampler			(device, sampler, nullptr);
 
 		models.tunnel.destroy();
 	}

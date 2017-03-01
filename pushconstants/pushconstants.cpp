@@ -39,12 +39,12 @@ public:
 	}															uboVS;
 
 	struct {
-		VkPipeline													solid;
+		VkPipeline													solid											= VK_NULL_HANDLE;
 	}															pipelines;
 
-	VkPipelineLayout											pipelineLayout;
-	VkDescriptorSet												descriptorSet;
-	VkDescriptorSetLayout										descriptorSetLayout;
+	VkPipelineLayout											pipelineLayout									= VK_NULL_HANDLE;
+	VkDescriptorSet												descriptorSet									= VK_NULL_HANDLE;
+	VkDescriptorSetLayout										descriptorSetLayout								= VK_NULL_HANDLE;
 
 	// This array holds the light positions
 	// and will be updated via a push constant

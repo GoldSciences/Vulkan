@@ -39,7 +39,7 @@ public:
 		struct {
 			vks::Texture2D												smoke;
 			vks::Texture2D												fire;
-			VkSampler													sampler;	// Use a custom sampler to change sampler attributes required for rotating the uvs in the shader for alpha blended textures
+			VkSampler													sampler											= VK_NULL_HANDLE;	// Use a custom sampler to change sampler attributes required for rotating the uvs in the shader for alpha blended textures
 		}															particles;
 		struct {
 			vks::Texture2D												colorMap;
@@ -92,16 +92,16 @@ public:
 	}															uboEnv;
 
 	struct {
-		VkPipeline													particles;
-		VkPipeline													environment;
+		VkPipeline													particles										= VK_NULL_HANDLE;
+		VkPipeline													environment										= VK_NULL_HANDLE;
 	}															pipelines;
 
-	VkPipelineLayout											pipelineLayout;
-	VkDescriptorSetLayout										descriptorSetLayout;
+	VkPipelineLayout											pipelineLayout									= VK_NULL_HANDLE;
+	VkDescriptorSetLayout										descriptorSetLayout								= VK_NULL_HANDLE;
 
 	struct {
-		VkDescriptorSet												particles;
-		VkDescriptorSet												environment;
+		VkDescriptorSet												particles										= VK_NULL_HANDLE;
+		VkDescriptorSet												environment										= VK_NULL_HANDLE;
 	}															descriptorSets;
 
 	std::vector<Particle>										particleBuffer;
@@ -468,8 +468,8 @@ public:
 
 	// Prepare and initialize uniform buffer containing shader uniforms
 	void														prepareUniformBuffers							()												{		
-		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBuffers.fire, sizeof(uboVS)));			// Vertex shader uniform buffer block
-		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBuffers.environment, sizeof(uboEnv)));	// Vertex shader uniform buffer block
+		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBuffers.fire			, sizeof(uboVS	)));	// Vertex shader uniform buffer block
+		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBuffers.environment	, sizeof(uboEnv	)));	// Vertex shader uniform buffer block
 
 		// Map persistent
 		VK_CHECK_RESULT(uniformBuffers.fire.map());

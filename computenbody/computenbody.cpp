@@ -35,11 +35,11 @@ public:
 
 	// Resources for the graphics part of the example
 	struct {
-		vks::Buffer													uniformBuffer;			// Contains scene matrices
-		VkDescriptorSetLayout										descriptorSetLayout;	// Particle system rendering shader binding layout
-		VkDescriptorSet												descriptorSet;			// Particle system rendering shader bindings
-		VkPipelineLayout											pipelineLayout;			// Layout of the graphics pipeline
-		VkPipeline													pipeline;				// Particle rendering pipeline
+		vks::Buffer													uniformBuffer;											// Contains scene matrices
+		VkDescriptorSetLayout										descriptorSetLayout						= VK_NULL_HANDLE;	// Particle system rendering shader binding layout
+		VkDescriptorSet												descriptorSet							= VK_NULL_HANDLE;	// Particle system rendering shader bindings
+		VkPipelineLayout											pipelineLayout							= VK_NULL_HANDLE;	// Layout of the graphics pipeline
+		VkPipeline													pipeline								= VK_NULL_HANDLE;	// Particle rendering pipeline
 		struct {
 			glm::mat4													projection;
 			glm::mat4													view;
@@ -49,21 +49,21 @@ public:
 
 	// Resources for the compute part of the example
 	struct {
-		vks::Buffer													storageBuffer;				// (Shader) storage buffer object containing the particles
-		vks::Buffer													uniformBuffer;				// Uniform buffer object containing particle system parameters
-		VkQueue														queue;						// Separate queue for compute commands (queue family may differ from the one used for graphics)
-		VkCommandPool												commandPool;				// Use a separate command pool (queue family may differ from the one used for graphics)
-		VkCommandBuffer												commandBuffer;				// Command buffer storing the dispatch commands and barriers
-		VkFence														fence;						// Synchronization fence to avoid rewriting compute CB if still in use
-		VkDescriptorSetLayout										descriptorSetLayout;		// Compute shader binding layout
-		VkDescriptorSet												descriptorSet;				// Compute shader bindings
-		VkPipelineLayout											pipelineLayout;				// Layout of the compute pipeline
-		VkPipeline													pipelineCalculate;			// Compute pipeline for N-Body velocity calculation (1st pass)
-		VkPipeline													pipelineIntegrate;			// Compute pipeline for euler integration (2nd pass)
-		VkPipeline													blur;
-		VkPipelineLayout											pipelineLayoutBlur;
-		VkDescriptorSetLayout										descriptorSetLayoutBlur;
-		VkDescriptorSet												descriptorSetBlur;
+		vks::Buffer													storageBuffer;												// (Shader) storage buffer object containing the particles
+		vks::Buffer													uniformBuffer;												// Uniform buffer object containing particle system parameters
+		VkQueue														queue									= VK_NULL_HANDLE;	// Separate queue for compute commands (queue family may differ from the one used for graphics)
+		VkCommandPool												commandPool								= VK_NULL_HANDLE;	// Use a separate command pool (queue family may differ from the one used for graphics)
+		VkCommandBuffer												commandBuffer							= VK_NULL_HANDLE;	// Command buffer storing the dispatch commands and barriers
+		VkFence														fence									= VK_NULL_HANDLE;	// Synchronization fence to avoid rewriting compute CB if still in use
+		VkDescriptorSetLayout										descriptorSetLayout						= VK_NULL_HANDLE;	// Compute shader binding layout
+		VkDescriptorSet												descriptorSet							= VK_NULL_HANDLE;	// Compute shader bindings
+		VkPipelineLayout											pipelineLayout							= VK_NULL_HANDLE;	// Layout of the compute pipeline
+		VkPipeline													pipelineCalculate						= VK_NULL_HANDLE;	// Compute pipeline for N-Body velocity calculation (1st pass)
+		VkPipeline													pipelineIntegrate						= VK_NULL_HANDLE;	// Compute pipeline for euler integration (2nd pass)
+		VkPipeline													blur									= VK_NULL_HANDLE;
+		VkPipelineLayout											pipelineLayoutBlur						= VK_NULL_HANDLE;
+		VkDescriptorSetLayout										descriptorSetLayoutBlur					= VK_NULL_HANDLE;
+		VkDescriptorSet												descriptorSetBlur						= VK_NULL_HANDLE;
 		struct computeUBO {								// Compute shader uniform block object
 			float														deltaT;					//		Frame delta time
 			float														destX;					//		x position of the attractor

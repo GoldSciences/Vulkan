@@ -152,11 +152,11 @@ class VulkanExample : public VulkanExampleBase
 public:
 	//todo: comments
 	struct SparseTexture : VirtualTexture {
-		VkSampler													sampler;
-		VkImageLayout												imageLayout;
+		VkSampler													sampler									= VK_NULL_HANDLE;
+		VkImageLayout												imageLayout								= VK_NULL_HANDLE;
 		VkImageView													view									= VK_NULL_HANDLE;
-		VkDescriptorImageInfo										descriptor;
-		VkFormat													format;
+		VkDescriptorImageInfo										descriptor								= {};
+		VkFormat													format									= VK_FORMAT_UNDEFINED;
 		uint32_t													width, height;
 		uint32_t													mipLevels;
 		uint32_t													layerCount;
@@ -185,12 +185,12 @@ public:
 	}															uboVS;
 
 	struct {
-		VkPipeline													solid;
+		VkPipeline													solid									= VK_NULL_HANDLE;
 	}															pipelines;
 
-	VkPipelineLayout											pipelineLayout;
-	VkDescriptorSet												descriptorSet;
-	VkDescriptorSetLayout										descriptorSetLayout;
+	VkPipelineLayout											pipelineLayout							= VK_NULL_HANDLE;
+	VkDescriptorSet												descriptorSet							= VK_NULL_HANDLE;
+	VkDescriptorSetLayout										descriptorSetLayout						= VK_NULL_HANDLE;
 
 	//todo: comment
 	VkSemaphore													bindSparseSemaphore						= VK_NULL_HANDLE;

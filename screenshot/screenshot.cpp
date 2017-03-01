@@ -32,10 +32,10 @@ public:
 		int32_t														texIndex					= 0;
 	}															uboVS;
 
-	VkPipelineLayout											pipelineLayout;
-	VkPipeline													pipeline;
-	VkDescriptorSetLayout										descriptorSetLayout;
-	VkDescriptorSet												descriptorSet;
+	VkPipelineLayout											pipelineLayout				= VK_NULL_HANDLE;
+	VkPipeline													pipeline					= VK_NULL_HANDLE;
+	VkDescriptorSetLayout										descriptorSetLayout			= VK_NULL_HANDLE;
+	VkDescriptorSet												descriptorSet				= VK_NULL_HANDLE;
 
 																VulkanExample				()									: VulkanExampleBase(ENABLE_VALIDATION) {
 		title														= "Vulkan Example - Screenshot";

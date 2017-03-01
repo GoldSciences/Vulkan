@@ -41,8 +41,8 @@ public:
 	}															matrices;
 
 	struct {
-		VkPipeline													phong;
-		VkPipeline													starsphere;
+		VkPipeline													phong											= VK_NULL_HANDLE;
+		VkPipeline													starsphere										= VK_NULL_HANDLE;
 	}															pipelines;
 
 	VkPipelineLayout											pipelineLayout									= VK_NULL_HANDLE;

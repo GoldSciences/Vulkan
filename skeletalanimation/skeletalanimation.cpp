@@ -89,8 +89,7 @@ public:
 	const aiScene												* scene							= nullptr;
 
 	// Set active animation by index
-	void														setAnimation					(uint32_t animationIndex)
-	{
+	void														setAnimation					(uint32_t animationIndex)															{
 		assert(animationIndex < scene->mNumAnimations);
 		pAnimation													= scene->mAnimations[animationIndex];
 	}

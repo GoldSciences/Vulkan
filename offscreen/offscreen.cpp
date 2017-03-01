@@ -88,10 +88,10 @@ public:
 	};
 	struct OffscreenPass {
 		int32_t														width, height;
-		VkFramebuffer												frameBuffer;		
+		VkFramebuffer												frameBuffer						= VK_NULL_HANDLE;		
 		FrameBufferAttachment										color, depth;
-		VkRenderPass												renderPass;
-		VkSampler													sampler;
+		VkRenderPass												renderPass						= VK_NULL_HANDLE;
+		VkSampler													sampler							= VK_NULL_HANDLE;
 		VkDescriptorImageInfo										descriptor;
 		VkCommandBuffer												commandBuffer					= VK_NULL_HANDLE;
 		// Semaphore used to synchronize between offscreen and final scene render pass

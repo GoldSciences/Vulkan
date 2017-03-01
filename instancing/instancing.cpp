@@ -62,7 +62,7 @@ public:
 		vks::Buffer													scene;
 	}															uniformBuffers;
 
-	VkPipelineLayout											pipelineLayout;
+	VkPipelineLayout											pipelineLayout									= VK_NULL_HANDLE;
 	struct {
 		VkPipeline													instancedRocks									= VK_NULL_HANDLE;
 		VkPipeline													planet											= VK_NULL_HANDLE;

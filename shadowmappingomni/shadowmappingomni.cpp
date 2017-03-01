@@ -31,30 +31,30 @@ public:
 		VkPipelineVertexInputStateCreateInfo						inputState;
 		std::vector<VkVertexInputBindingDescription>				bindingDescriptions;
 		std::vector<VkVertexInputAttributeDescription>				attributeDescriptions;
-	} vertices;
+	}															vertices;
 
 	// Vertex layout for the models
 	vks::VertexLayout											vertexLayout					= vks::VertexLayout(
-	{	vks::VERTEX_COMPONENT_POSITION
-	,	vks::VERTEX_COMPONENT_UV
-	,	vks::VERTEX_COMPONENT_COLOR
-	,	vks::VERTEX_COMPONENT_NORMAL
-	});
+		{	vks::VERTEX_COMPONENT_POSITION
+		,	vks::VERTEX_COMPONENT_UV
+		,	vks::VERTEX_COMPONENT_COLOR
+		,	vks::VERTEX_COMPONENT_NORMAL
+		});
 
 	struct {
 		vks::Model													skybox;
 		vks::Model													scene;
-	} models;
+	}															models;
 
 	struct {
 		vks::Buffer													scene;
 		vks::Buffer													offscreen;
-	} uniformBuffers;
+	}															uniformBuffers;
 
 	struct {
 		glm::mat4													projection;
 		glm::mat4													model;
-	} uboVSquad;
+	}															uboVSquad;
 
 	glm::vec4													lightPos						= glm::vec4(0.0f, -25.0f, 0.0f, 1.0); 
 

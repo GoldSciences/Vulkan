@@ -52,9 +52,9 @@ public:
 	VkDescriptorSetLayout										descriptorSetLayout			= VK_NULL_HANDLE;
 
 	struct {
-		VkPipeline													phong;
-		VkPipeline													toon;
-		VkPipeline													textured;
+		VkPipeline													phong						= VK_NULL_HANDLE;
+		VkPipeline													toon						= VK_NULL_HANDLE;
+		VkPipeline													textured					= VK_NULL_HANDLE;
 	}															pipelines;
 
 																VulkanExample				()			: VulkanExampleBase(ENABLE_VALIDATION)	{
