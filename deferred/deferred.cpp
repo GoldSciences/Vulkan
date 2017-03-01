@@ -102,7 +102,7 @@ public:
 		VkImage														image									= VK_NULL_HANDLE;
 		VkDeviceMemory												mem										= VK_NULL_HANDLE;
 		VkImageView													view									= VK_NULL_HANDLE;
-		VkFormat													format									;
+		VkFormat													format									= VK_FORMAT_UNDEFINED;
 	};
 	struct FrameBuffer {
 		int32_t														width, height;

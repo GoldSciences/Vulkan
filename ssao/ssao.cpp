@@ -30,11 +30,11 @@ public:
 
 	// Vertex layout for the models
 	vks::VertexLayout											vertexLayout										= vks::VertexLayout(
-	{	vks::VERTEX_COMPONENT_POSITION
-	,	vks::VERTEX_COMPONENT_UV
-	,	vks::VERTEX_COMPONENT_COLOR
-	,	vks::VERTEX_COMPONENT_NORMAL
-	});
+		{	vks::VERTEX_COMPONENT_POSITION
+		,	vks::VERTEX_COMPONENT_UV
+		,	vks::VERTEX_COMPONENT_COLOR
+		,	vks::VERTEX_COMPONENT_NORMAL
+		});
 
 	struct {
 		vks::Model													scene;
@@ -60,33 +60,33 @@ public:
 	}															uboSSAOParams;
 
 	struct {
-		VkPipeline													offscreen;
-		VkPipeline													composition;
-		VkPipeline													ssao;
-		VkPipeline													ssaoBlur;
+		VkPipeline													offscreen											= VK_NULL_HANDLE;
+		VkPipeline													composition											= VK_NULL_HANDLE;
+		VkPipeline													ssao												= VK_NULL_HANDLE;
+		VkPipeline													ssaoBlur											= VK_NULL_HANDLE;
 	}															pipelines;
 
 	struct {
-		VkPipelineLayout											gBuffer;
-		VkPipelineLayout											ssao;
-		VkPipelineLayout											ssaoBlur;
-		VkPipelineLayout											composition;
+		VkPipelineLayout											gBuffer												= VK_NULL_HANDLE;
+		VkPipelineLayout											ssao												= VK_NULL_HANDLE;
+		VkPipelineLayout											ssaoBlur											= VK_NULL_HANDLE;
+		VkPipelineLayout											composition											= VK_NULL_HANDLE;
 	}															pipelineLayouts;
 
 	struct {
 		const uint32_t												count												= 5;
-		VkDescriptorSet												model;
-		VkDescriptorSet												floor;
-		VkDescriptorSet												ssao;
-		VkDescriptorSet												ssaoBlur;
-		VkDescriptorSet												composition;
+		VkDescriptorSet												model												= VK_NULL_HANDLE;
+		VkDescriptorSet												floor												= VK_NULL_HANDLE;
+		VkDescriptorSet												ssao												= VK_NULL_HANDLE;
+		VkDescriptorSet												ssaoBlur											= VK_NULL_HANDLE;
+		VkDescriptorSet												composition											= VK_NULL_HANDLE;
 	}															descriptorSets;
 
 	struct {
-		VkDescriptorSetLayout										gBuffer;
-		VkDescriptorSetLayout										ssao;
-		VkDescriptorSetLayout										ssaoBlur;
-		VkDescriptorSetLayout										composition;
+		VkDescriptorSetLayout										gBuffer												= VK_NULL_HANDLE;
+		VkDescriptorSetLayout										ssao												= VK_NULL_HANDLE;
+		VkDescriptorSetLayout										ssaoBlur											= VK_NULL_HANDLE;
+		VkDescriptorSetLayout										composition											= VK_NULL_HANDLE;
 	}															descriptorSetLayouts;
 
 	struct {
@@ -97,10 +97,11 @@ public:
 
 	// Framebuffer for offscreen rendering
 	struct FrameBufferAttachment {
-		VkImage														image;
-		VkDeviceMemory												mem;
-		VkImageView													view;
-		VkFormat													format;
+		VkImage														image												= VK_NULL_HANDLE;
+		VkDeviceMemory												mem													= VK_NULL_HANDLE;
+		VkImageView													view												= VK_NULL_HANDLE;
+		VkFormat													format												= VK_FORMAT_UNDEFINED;
+
 		void														destroy												(VkDevice device_)				{
 			vkDestroyImage			(device_, image	, nullptr);
 			vkDestroyImageView		(device_, view	, nullptr);
@@ -108,9 +109,12 @@ public:
 		}
 	};
 	struct FrameBuffer {
-		int32_t														width, height;
-		VkFramebuffer												frameBuffer;		
-		VkRenderPass												renderPass;
+		int32_t														width												= 0
+			,														height												= 0
+			;
+		VkFramebuffer												frameBuffer											= VK_NULL_HANDLE;		
+		VkRenderPass												renderPass											= VK_NULL_HANDLE;
+
 		void														setSize												(int32_t w, int32_t h)			{
 			this->width													= w;
 			this->height												= h;

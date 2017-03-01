@@ -253,8 +253,8 @@ public:
 		depthStencilView.subresourceRange.baseMipLevel				= 0;
 		depthStencilView.subresourceRange.levelCount				= 1;
 		depthStencilView.subresourceRange.baseArrayLayer			= 0;
-		depthStencilView.subresourceRange.layerCount			= 1;
-		depthStencilView.image = offscreenPass.depth.image;
+		depthStencilView.subresourceRange.layerCount				= 1;
+		depthStencilView.image										= offscreenPass.depth.image;
 		VK_CHECK_RESULT(vkCreateImageView	(device, &depthStencilView, nullptr, &offscreenPass.depth.view));
 
 		// Create sampler to sample from to depth attachment 
@@ -416,7 +416,7 @@ public:
 		models.quad.indexCount										= static_cast<uint32_t>(indexBuffer.size());
 		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, indexBuffer.size() * sizeof(uint32_t), &models.quad.indices.buffer, &models.quad.indices.memory, indexBuffer.data()));
 
-		models.quad.device = device;
+		models.quad.device											= device;
 	}
 
 	void														setupVertexDescriptions				()											{

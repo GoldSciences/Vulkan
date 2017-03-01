@@ -47,37 +47,38 @@ public:
 	}															uboParams;
 
 	struct {
-		VkPipeline													skybox;
-		VkPipeline													reflect;
-		VkPipeline													composition;
-		VkPipeline													bloom[2];
+		VkPipeline													skybox									= VK_NULL_HANDLE;	
+		VkPipeline													reflect									= VK_NULL_HANDLE;
+		VkPipeline													composition								= VK_NULL_HANDLE;
+		VkPipeline													bloom[2]								= {VK_NULL_HANDLE, VK_NULL_HANDLE};
 	}															pipelines;
 
 	struct {
-		VkPipelineLayout											models;
-		VkPipelineLayout											composition;
-		VkPipelineLayout											bloomFilter;
+		VkPipelineLayout											models									= VK_NULL_HANDLE;
+		VkPipelineLayout											composition								= VK_NULL_HANDLE;
+		VkPipelineLayout											bloomFilter								= VK_NULL_HANDLE;
 	}															pipelineLayouts;
 
 	struct {
-		VkDescriptorSet												object;
-		VkDescriptorSet												skybox;
-		VkDescriptorSet												composition;
-		VkDescriptorSet												bloomFilter;
+		VkDescriptorSet												object									= VK_NULL_HANDLE;
+		VkDescriptorSet												skybox									= VK_NULL_HANDLE;
+		VkDescriptorSet												composition								= VK_NULL_HANDLE;
+		VkDescriptorSet												bloomFilter								= VK_NULL_HANDLE;
 	}															descriptorSets;
 
 	struct {
-		VkDescriptorSetLayout										models;
-		VkDescriptorSetLayout										composition;
-		VkDescriptorSetLayout										bloomFilter;
+		VkDescriptorSetLayout										models									= VK_NULL_HANDLE;
+		VkDescriptorSetLayout										composition								= VK_NULL_HANDLE;
+		VkDescriptorSetLayout										bloomFilter								= VK_NULL_HANDLE;
 	}															descriptorSetLayouts;
 
 	// Framebuffer for offscreen rendering
 	struct FrameBufferAttachment {
-		VkImage														image;
-		VkDeviceMemory												mem;
-		VkImageView													view;
-		VkFormat													format;
+		VkImage														image									= VK_NULL_HANDLE;
+		VkDeviceMemory												mem										= VK_NULL_HANDLE;
+		VkImageView													view									= VK_NULL_HANDLE;
+		VkFormat													format									= VK_FORMAT_UNDEFINED;
+
 		void														destroy									(VkDevice device_)					{
 			vkDestroyImageView	(device_, view	, nullptr);
 			vkDestroyImage		(device_, image	, nullptr);
@@ -86,21 +87,21 @@ public:
 	};
 	struct FrameBuffer {
 		int32_t														width, height;
-		VkFramebuffer												frameBuffer;
+		VkFramebuffer												frameBuffer								= VK_NULL_HANDLE;
 		FrameBufferAttachment										color[2];
 		FrameBufferAttachment										depth;
-		VkRenderPass												renderPass;
-		VkSampler													sampler;
+		VkRenderPass												renderPass								= VK_NULL_HANDLE;
+		VkSampler													sampler									= VK_NULL_HANDLE;
 		VkCommandBuffer												cmdBuffer								= VK_NULL_HANDLE;
 		VkSemaphore													semaphore								= VK_NULL_HANDLE;
 	}															offscreen;
 
 	struct {
 		int32_t														width, height;
-		VkFramebuffer												frameBuffer;
+		VkFramebuffer												frameBuffer								= VK_NULL_HANDLE;
 		FrameBufferAttachment										color[1];
-		VkRenderPass												renderPass;
-		VkSampler													sampler;
+		VkRenderPass												renderPass								= VK_NULL_HANDLE;
+		VkSampler													sampler									= VK_NULL_HANDLE;
 	}															filterPass;
 
 																VulkanExample							()									: VulkanExampleBase(ENABLE_VALIDATION)	{

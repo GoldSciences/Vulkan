@@ -107,8 +107,7 @@ public:
 		VkRenderPass												renderPass										= VK_NULL_HANDLE;
 		VkSampler													sampler											= VK_NULL_HANDLE;
 		VkCommandBuffer												commandBuffer									= VK_NULL_HANDLE;
-		// Semaphore used to synchronize between offscreen and final scene rendering								
-		VkSemaphore													semaphore										= VK_NULL_HANDLE;
+		VkSemaphore													semaphore										= VK_NULL_HANDLE;	// Semaphore used to synchronize between offscreen and final scene rendering	
 		std::array<FrameBuffer, 2>									framebuffers;
 	}															offscreenPass;
 
@@ -764,17 +763,9 @@ public:
 			updateUniformBuffersScene();
 	}
 
-	virtual void												viewChanged								()																				{ updateUniformBuffersScene(); }
-	void														changeBlurScale							(float delta)																	{
-		ubos.blurParams.blurScale									+= delta;
-		updateUniformBuffersBlur();
-	}
-
-	void														toggleBloom								()																				{
-		bloom														= !bloom;
-		reBuildCommandBuffers();
-	}
-
+	virtual void												viewChanged								()																				{ updateUniformBuffersScene();										}
+	inline	void												changeBlurScale							(float delta)																	{ ubos.blurParams.blurScale	+= delta; updateUniformBuffersBlur	();	}
+	inline	void												toggleBloom								()																				{ bloom						= !bloom; reBuildCommandBuffers		();	}
 	virtual void												keyPressed								(uint32_t keyCode)																{
 		switch (keyCode)	{
 		case KEY_KPADD			:

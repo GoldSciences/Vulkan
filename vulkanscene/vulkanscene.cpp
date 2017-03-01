@@ -30,7 +30,7 @@ public:
 		VkPipeline													* pipeline								= VK_NULL_HANDLE;
 
 		void														draw									(VkCommandBuffer cmdBuffer)			{
-			VkDeviceSize offsets[1] = { 0 };
+			VkDeviceSize													offsets	[1]								= { 0 };
 			vkCmdBindPipeline		(cmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, *pipeline);
 			vkCmdBindVertexBuffers	(cmdBuffer, VERTEX_BUFFER_BIND_ID, 1, &model.vertices.buffer, offsets);
 			vkCmdBindIndexBuffer	(cmdBuffer, model.indices.buffer, 0, VK_INDEX_TYPE_UINT32);
@@ -52,8 +52,7 @@ public:
 		glm::vec4													lightPos;
 	}															uboVS;
 
-	struct
-	{
+	struct {
 		vks::TextureCubeMap											skybox;
 	}															textures;
 
@@ -157,7 +156,7 @@ public:
 			};
 
 		VkDescriptorPoolCreateInfo										descriptorPoolInfo						= vks::initializers::descriptorPoolCreateInfo(static_cast<uint32_t>(poolSizes.size()), poolSizes.data(), 2);
-		VK_CHECK_RESULT(vkCreateDescriptorPool(device, &descriptorPoolInfo, nullptr, &descriptorPool));
+		VK_CHECK_RESULT(vkCreateDescriptorPool		(device, &descriptorPoolInfo, nullptr, &descriptorPool));
 	}
 
 	void														setupDescriptorSetLayout				()									{
@@ -167,15 +166,15 @@ public:
 			};
 
 		VkDescriptorSetLayoutCreateInfo									descriptorLayout						= vks::initializers::descriptorSetLayoutCreateInfo(setLayoutBindings.data(), static_cast<uint32_t>(setLayoutBindings.size()));
-		VK_CHECK_RESULT(vkCreateDescriptorSetLayout(device, &descriptorLayout, nullptr, &descriptorSetLayout));
+		VK_CHECK_RESULT(vkCreateDescriptorSetLayout	(device, &descriptorLayout, nullptr, &descriptorSetLayout));
 
 		VkPipelineLayoutCreateInfo										pPipelineLayoutCreateInfo				= vks::initializers::pipelineLayoutCreateInfo(&descriptorSetLayout, 1);
-		VK_CHECK_RESULT(vkCreatePipelineLayout(device, &pPipelineLayoutCreateInfo, nullptr, &pipelineLayout));
+		VK_CHECK_RESULT(vkCreatePipelineLayout		(device, &pPipelineLayoutCreateInfo, nullptr, &pipelineLayout));
 	}
 
 	void														setupDescriptorSet						()									{
 		VkDescriptorSetAllocateInfo										allocInfo								= vks::initializers::descriptorSetAllocateInfo(descriptorPool, &descriptorSetLayout, 1);
-		VK_CHECK_RESULT(vkAllocateDescriptorSets(device, &allocInfo, &descriptorSet));
+		VK_CHECK_RESULT(vkAllocateDescriptorSets	(device, &allocInfo, &descriptorSet));
 
 		// Cube map image descriptor
 		VkDescriptorImageInfo											texDescriptorCubeMap					= vks::initializers::descriptorImageInfo(textures.skybox.sampler, textures.skybox.view, VK_IMAGE_LAYOUT_GENERAL);

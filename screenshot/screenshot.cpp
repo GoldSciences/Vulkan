@@ -379,8 +379,7 @@ public:
 		// ppm binary pixel data
 		for (uint32_t y = 0; y < height; y++) {
 			unsigned int														* row = (unsigned int*)data;
-			for (uint32_t x = 0; x < width; x++) 
-			{
+			for (uint32_t x = 0; x < width; x++)  {
 				if (colorSwizzle) { 
 					file.write((char*)row+2, 1);
 					file.write((char*)row+1, 1);

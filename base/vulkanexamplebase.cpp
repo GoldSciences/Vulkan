@@ -497,12 +497,12 @@ void										VulkanExampleBase::submitFrame						()																												
 		if ((args[i] == std::string("-w")) || (args[i] == std::string("-width"))) {
 			char															* endptr								= nullptr;
 			uint32_t														w										= strtol(args[i + 1], &endptr, 10);
-			if (endptr != args[i + 1]) { width = w; };
+			if (endptr != args[i + 1]) { width = w; }
 		}
 		if ((args[i] == std::string("-h")) || (args[i] == std::string("-height"))) {
 			char															* endptr								= nullptr;
 			uint32_t														h										= strtol(args[i + 1], &endptr, 10);
-			if (endptr != args[i + 1]) { height = h; };
+			if (endptr != args[i + 1]) { height = h; }
 		}
 	}
 	
@@ -563,23 +563,23 @@ void										VulkanExampleBase::submitFrame						()																												
 #if defined(_DIRECT2DISPLAY)
 
 #elif defined(VK_USE_PLATFORM_WAYLAND_KHR)
-	wl_shell_surface_destroy(shell_surface);
-	wl_surface_destroy(surface);
+	wl_shell_surface_destroy	(shell_surface);
+	wl_surface_destroy			(surface);
 	if (keyboard)
-		wl_keyboard_destroy(keyboard);
+		wl_keyboard_destroy			(keyboard);
 	if (pointer)
-		wl_pointer_destroy(pointer);
-	wl_seat_destroy(seat);
-	wl_shell_destroy(shell);
-	wl_compositor_destroy(compositor);
-	wl_registry_destroy(registry);
-	wl_display_disconnect(display);
+		wl_pointer_destroy			(pointer);
+	wl_seat_destroy				(seat);
+	wl_shell_destroy			(shell);
+	wl_compositor_destroy		(compositor);
+	wl_registry_destroy			(registry);
+	wl_display_disconnect		(display);
 #elif defined(__linux)
 #if defined(__ANDROID__)
 	// todo : android cleanup (if required)
 #else
-	xcb_destroy_window(connection, window);
-	xcb_disconnect(connection);
+	xcb_destroy_window			(connection, window);
+	xcb_disconnect				(connection);
 #endif
 #endif
 }
@@ -628,8 +628,7 @@ void										VulkanExampleBase::initVulkan						()																												{
 		{
 			char															* endptr						= nullptr;
 			uint32_t														index							= strtol(args[i + 1], &endptr, 10);
-			if (endptr != args[i + 1]) 
-			{ 
+			if (endptr != args[i + 1])  { 
 				if (index > gpuCount - 1)
 					std::cerr << "Selected device index " << index << " is out of range, reverting to device 0 (use -listgpus to show available Vulkan devices)" << std::endl;
 				else
@@ -637,7 +636,7 @@ void										VulkanExampleBase::initVulkan						()																												{
 					std::cout << "Selected Vulkan device " << index << std::endl;
 					selectedDevice												= index;
 				}
-			};
+			}
 			break;
 		}
 		// List available GPUs
@@ -704,12 +703,12 @@ void										VulkanExampleBase::initVulkan						()																												{
 	// Set up submit info structure
 	// Semaphores will stay the same during application lifetime
 	// Command buffer submission info is set by each example
-	submitInfo											= vks::initializers::submitInfo();
-	submitInfo.pWaitDstStageMask						= &submitPipelineStages;
-	submitInfo.waitSemaphoreCount						= 1;
-	submitInfo.pWaitSemaphores							= &semaphores.presentComplete;
-	submitInfo.signalSemaphoreCount						= 1;
-	submitInfo.pSignalSemaphores						= &semaphores.renderComplete;
+	submitInfo													= vks::initializers::submitInfo();
+	submitInfo.pWaitDstStageMask								= &submitPipelineStages;
+	submitInfo.waitSemaphoreCount								= 1;
+	submitInfo.pWaitSemaphores									= &semaphores.presentComplete;
+	submitInfo.signalSemaphoreCount								= 1;
+	submitInfo.pSignalSemaphores								= &semaphores.renderComplete;
 }
 
 #if defined(_WIN32)
@@ -1029,7 +1028,7 @@ void										VulkanExampleBase::pointerMotion					(wl_pointer *pointer, uint32_
 		rotation.x													+= dy * 1.25f * rotationSpeed;
 		rotation.y													-= dx * 1.25f * rotationSpeed;
 		camera.rotate(glm::vec3(
-				dy  * camera.rotationSpeed,
+				 dy * camera.rotationSpeed,
 				-dx * camera.rotationSpeed,
 				0.0f));
 		viewUpdated													= true;
@@ -1135,9 +1134,9 @@ void										VulkanExampleBase::seatCapabilities					(wl_seat *seat, uint32_t c
 }
 
 void										VulkanExampleBase::registryGlobal					(wl_registry *registry, uint32_t name, const char *interface, uint32_t version)									{
-	if (strcmp(interface, "wl_compositor") == 0)	{ compositor	= (wl_compositor *) wl_registry_bind(registry, name, &wl_compositor_interface, 3);	}
-	else if (strcmp(interface, "wl_shell") == 0)	{ shell			= (wl_shell *) wl_registry_bind(registry, name, &wl_shell_interface, 1);			}
-	else if (strcmp(interface, "wl_seat") == 0)		{ seat			= (wl_seat *) wl_registry_bind(registry, name, &wl_seat_interface, 1);
+		 if (strcmp(interface, "wl_compositor"	) == 0)	{ compositor	= (wl_compositor *)		wl_registry_bind(registry, name, &wl_compositor_interface, 3);	}
+	else if (strcmp(interface, "wl_shell"		) == 0)	{ shell			= (wl_shell *)			wl_registry_bind(registry, name, &wl_shell_interface, 1);		}
+	else if (strcmp(interface, "wl_seat"		) == 0)	{ seat			= (wl_seat *)			wl_registry_bind(registry, name, &wl_seat_interface, 1);
 		static const struct wl_seat_listener							seat_listener						= { seatCapabilitiesCb, };
 		wl_seat_add_listener(seat, &seat_listener, this);
 	}
@@ -1230,14 +1229,11 @@ xcb_window_t								VulkanExampleBase::setupWindow						()																						
 	xcb_change_property(connection, XCB_PROP_MODE_REPLACE, window, (*reply).atom, 4, 32, 1, &(*atom_wm_delete_window).atom);
 
 	std::string														windowTitle							= getWindowTitle();
-	xcb_change_property(connection, XCB_PROP_MODE_REPLACE,
-		window, XCB_ATOM_WM_NAME, XCB_ATOM_STRING, 8,
-		title.size(), windowTitle.c_str());
+	xcb_change_property(connection, XCB_PROP_MODE_REPLACE, window, XCB_ATOM_WM_NAME, XCB_ATOM_STRING, 8, title.size(), windowTitle.c_str());
 
 	free(reply);
 
-	if (settings.fullscreen)
-	{
+	if (settings.fullscreen) {
 		xcb_intern_atom_reply_t		* atom_wm_state					= intern_atom_helper(connection, false, "_NET_WM_STATE");
 		xcb_intern_atom_reply_t		* atom_wm_fullscreen			= intern_atom_helper(connection, false, "_NET_WM_STATE_FULLSCREEN");
 		xcb_change_property(connection, XCB_PROP_MODE_REPLACE, window, atom_wm_state->atom, XCB_ATOM_ATOM, 32, 1, &(atom_wm_fullscreen->atom));
@@ -1276,33 +1272,30 @@ void										VulkanExampleBase::handleEvent						(const xcb_generic_event_t *ev
 	case XCB_CLIENT_MESSAGE:
 		if ((*(xcb_client_message_event_t*)event).data.data32[0] ==
 			(*atom_wm_delete_window).atom) {
-			quit														= true;
+			quit															= true;
 		}
 		break;
 	case XCB_MOTION_NOTIFY:
 	{
-		xcb_motion_notify_event_t *motion = (xcb_motion_notify_event_t *)event;
-		if (mouseButtons.left)
-		{
-			rotation.x													+= (mousePos.y - (float)motion->event_y) * 1.25f;
-			rotation.y													-= (mousePos.x - (float)motion->event_x) * 1.25f;
+		xcb_motion_notify_event_t										* motion						= (xcb_motion_notify_event_t *)event;
+		if (mouseButtons.left) {
+			rotation.x														+= (mousePos.y - (float)motion->event_y) * 1.25f;
+			rotation.y														-= (mousePos.x - (float)motion->event_x) * 1.25f;
 			camera.rotate(glm::vec3((mousePos.y - (float)motion->event_y) * camera.rotationSpeed, -(mousePos.x - (float)motion->event_x) * camera.rotationSpeed, 0.0f));
-			viewUpdated													= true;
+			viewUpdated														= true;
 		}
-		if (mouseButtons.right)
-		{
-			zoom														+= (mousePos.y - (float)motion->event_y) * .005f;
+		if (mouseButtons.right) {
+			zoom															+= (mousePos.y - (float)motion->event_y) * .005f;
 			camera.translate(glm::vec3(-0.0f, 0.0f, (mousePos.y - (float)motion->event_y) * .005f * zoomSpeed));
-			viewUpdated													= true;
+			viewUpdated														= true;
 		}
-		if (mouseButtons.middle)
-		{
-			cameraPos.x													-= (mousePos.x - (float)motion->event_x) * 0.01f;
-			cameraPos.y													-= (mousePos.y - (float)motion->event_y) * 0.01f;
+		if (mouseButtons.middle) {
+			cameraPos.x														-= (mousePos.x - (float)motion->event_x) * 0.01f;
+			cameraPos.y														-= (mousePos.y - (float)motion->event_y) * 0.01f;
 			camera.translate(glm::vec3(-(mousePos.x - (float)(float)motion->event_x) * 0.01f, -(mousePos.y - (float)motion->event_y) * 0.01f, 0.0f));
-			viewUpdated													= true;
-			mousePos.x													= (float)motion->event_x;
-			mousePos.y													= (float)motion->event_y;
+			viewUpdated														= true;
+			mousePos.x														= (float)motion->event_x;
+			mousePos.y														= (float)motion->event_y;
 		}
 		mousePos													= glm::vec2((float)motion->event_x, (float)motion->event_y);
 	}
@@ -1327,15 +1320,14 @@ void										VulkanExampleBase::handleEvent						(const xcb_generic_event_t *ev
 	{
 		const xcb_key_release_event_t								* keyEvent								= (const xcb_key_release_event_t *)event;
 		switch (keyEvent->detail) {
-			case KEY_W	: camera.keys.up	= true; break;
-			case KEY_S	: camera.keys.down	= true; break;
-			case KEY_A	: camera.keys.left	= true; break;
-			case KEY_D	: camera.keys.right	= true; break;
-			case KEY_P	: paused			= !paused; break;
+			case KEY_W	: camera.keys.up		= true		; break;
+			case KEY_S	: camera.keys.down		= true		; break;
+			case KEY_A	: camera.keys.left		= true		; break;
+			case KEY_D	: camera.keys.right		= true		; break;
+			case KEY_P	: paused				= !paused	; break;
 			case KEY_F1	:
-				if (enableTextOverlay) {
+				if (enableTextOverlay)
 					textOverlay->visible		= !textOverlay->visible;
-				}
 				break;				
 		}
 	}
@@ -1343,25 +1335,23 @@ void										VulkanExampleBase::handleEvent						(const xcb_generic_event_t *ev
 	case XCB_KEY_RELEASE:
 	{
 		const xcb_key_release_event_t								* keyEvent								= (const xcb_key_release_event_t *)event;
-		switch (keyEvent->detail)
-		{
-			case KEY_W		: camera.keys.up	= false; break;
-			case KEY_S		: camera.keys.down	= false; break;
-			case KEY_A		: camera.keys.left	= false; break;
-			case KEY_D		: camera.keys.right	= false; break;			
-			case KEY_ESCAPE	: quit				= true;
-				break;
+		switch (keyEvent->detail) {
+			case KEY_W		: camera.keys.up	= false	; break;
+			case KEY_S		: camera.keys.down	= false	; break;
+			case KEY_A		: camera.keys.left	= false	; break;
+			case KEY_D		: camera.keys.right	= false	; break;			
+			case KEY_ESCAPE	: quit				= true	; break;
 		}
 		keyPressed(keyEvent->detail);
 	}
 	break;
-	case XCB_DESTROY_NOTIFY		: quit	= true;		break;
+	case XCB_DESTROY_NOTIFY		: quit			= true	; break;
 	case XCB_CONFIGURE_NOTIFY	:
 	{
 		const xcb_configure_notify_event_t							* cfgEvent								= (const xcb_configure_notify_event_t *)event;
 		if ((prepared) && ((cfgEvent->width != width) || (cfgEvent->height != height))) {
-				destWidth = cfgEvent->width;
-				destHeight = cfgEvent->height;
+				destWidth											= cfgEvent->width;
+				destHeight											= cfgEvent->height;
 				if ((destWidth > 0) && (destHeight > 0))
 					windowResize();
 		}
@@ -1554,7 +1544,7 @@ void										VulkanExampleBase::windowResize						()																											
 	createCommandBuffers	();
 	buildCommandBuffers		();
 
-	vkDeviceWaitIdle(device);
+	vkDeviceWaitIdle		(device);
 
 	if (enableTextOverlay) {
 		textOverlay->reallocateCommandBuffers();
@@ -1605,11 +1595,11 @@ int WINAPI									WinMain
 {					
 	for (size_t i = 0; i < (size_t)__argc; i++) { VulkanExampleBase::args.push_back(__argv[i]); }
 	createVulkanExample(&vulkanExample);			
-	vulkanExample->initVulkan();					
-	vulkanExample->setupWindow(hInstance, WndProc);	
+	vulkanExample->initVulkan	();					
+	vulkanExample->setupWindow	(hInstance, WndProc);	
 	vulkanExample->initSwapchain();					
-	vulkanExample->prepare();						
-	vulkanExample->renderLoop();					
+	vulkanExample->prepare		();						
+	vulkanExample->renderLoop	();					
 	deleteVulkanExample(&vulkanExample);			
 	return 0;
 }			
@@ -1619,10 +1609,10 @@ int WINAPI									WinMain
 void										android_main										(android_app* state)																							{
 	app_dummy();	
 	createVulkanExample(&vulkanExample);					
-	state->userData			= VulkanExampleBase;					
-	state->onAppCmd			= VulkanExampleBase::handleAppCommand;	
-	state->onInputEvent		= VulkanExampleBase::handleAppInput;
-	androidApp				= state;
+	state->userData								= VulkanExampleBase;					
+	state->onAppCmd								= VulkanExampleBase::handleAppCommand;	
+	state->onInputEvent							= VulkanExampleBase::handleAppInput;
+	androidApp									= state;
 	vulkanExample->renderLoop();							
 	deleteVulkanExample(&vulkanExample);					
 }
@@ -1632,41 +1622,41 @@ static void									handleEvent											()																												{}
 int											main												(const int argc, const char *argv[])																			{					
 	for (size_t i = 0; i < argc; i++) { VulkanExample::args.push_back(argv[i]); }
 	createVulkanExample(&vulkanExample);					
-	vulkanExample->initVulkan();							
+	vulkanExample->initVulkan	();							
 	vulkanExample->initSwapchain();							
-	vulkanExample->prepare();								
-	vulkanExample->renderLoop();							
+	vulkanExample->prepare		();								
+	vulkanExample->renderLoop	();							
 	deleteVulkanExample(&vulkanExample);					
 	return 0;		
 }
 #elif defined(VK_USE_PLATFORM_WAYLAND_KHR)
 int											main												(const int argc, const char *argv[])																			{					
 	for (size_t i = 0; i < argc; i++) { VulkanExample::args.push_back(argv[i]); }
-	createVulkanExample(&vulkanExample);					
-	vulkanExample->initVulkan();							
-	vulkanExample->setupWindow();							
-	vulkanExample->initSwapchain();							
-	vulkanExample->prepare();								
-	vulkanExample->renderLoop();							
-	deleteVulkanExample(&vulkanExample);					
+	createVulkanExample(&vulkanExample);	
+	vulkanExample->initVulkan	();			
+	vulkanExample->setupWindow	();			
+	vulkanExample->initSwapchain();			
+	vulkanExample->prepare		();			
+	vulkanExample->renderLoop	();			
+	deleteVulkanExample(&vulkanExample);	
 	return 0;		
 }
 #elif defined(__linux__)
 // Linux entry point
 static void									handleEvent											(const xcb_generic_event_t *event)																				{
-	if (vulkanExample != NULL)													
-		vulkanExample->handleEvent(event);										
+	if (vulkanExample != NULL)				
+		vulkanExample->handleEvent(event);	
 }					
 
 int											main												(const int argc, const char *argv[])																			{
 	for (size_t i = 0; i < argc; i++) { VulkanExample::args.push_back(argv[i]); }
-	createVulkanExample(&vulkanExample);					
-	vulkanExample->initVulkan();							
-	vulkanExample->setupWindow();					 		
-	vulkanExample->initSwapchain();							
-	vulkanExample->prepare();								
-	vulkanExample->renderLoop();							
-	deleteVulkanExample(&vulkanExample);					
+	createVulkanExample(&vulkanExample);	
+	vulkanExample->initVulkan	();			
+	vulkanExample->setupWindow	();			
+	vulkanExample->initSwapchain();			
+	vulkanExample->prepare		();			
+	vulkanExample->renderLoop	();			
+	deleteVulkanExample(&vulkanExample);	
 	return 0;		
 }
 #endif

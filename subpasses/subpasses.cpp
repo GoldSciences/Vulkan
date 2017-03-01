@@ -63,35 +63,35 @@ public:
 	}															uniformBuffers;
 
 	struct {
-		VkPipeline													offscreen;
-		VkPipeline													composition;
-		VkPipeline													transparent;
+		VkPipeline													offscreen								= VK_NULL_HANDLE;
+		VkPipeline													composition								= VK_NULL_HANDLE;
+		VkPipeline													transparent								= VK_NULL_HANDLE;
 	}															pipelines;
 
 	struct {
-		VkPipelineLayout											offscreen;
-		VkPipelineLayout											composition;
-		VkPipelineLayout											transparent;
+		VkPipelineLayout											offscreen								= VK_NULL_HANDLE;
+		VkPipelineLayout											composition								= VK_NULL_HANDLE;
+		VkPipelineLayout											transparent								= VK_NULL_HANDLE;
 	}															pipelineLayouts;
 
 	struct {
-		VkDescriptorSet												scene;
-		VkDescriptorSet												composition;
-		VkDescriptorSet												transparent;
+		VkDescriptorSet												scene									= VK_NULL_HANDLE;
+		VkDescriptorSet												composition								= VK_NULL_HANDLE;
+		VkDescriptorSet												transparent								= VK_NULL_HANDLE;
 	}															descriptorSets;
 
 	struct {
-		VkDescriptorSetLayout										scene;
-		VkDescriptorSetLayout										composition;
-		VkDescriptorSetLayout										transparent;
+		VkDescriptorSetLayout										scene									= VK_NULL_HANDLE;
+		VkDescriptorSetLayout										composition								= VK_NULL_HANDLE;
+		VkDescriptorSetLayout										transparent								= VK_NULL_HANDLE;
 	}															descriptorSetLayouts;
 
 	// G-Buffer framebuffer attachments
 	struct FrameBufferAttachment {
-		VkImage														image;
-		VkDeviceMemory												mem;
-		VkImageView													view;
-		VkFormat													format;
+		VkImage														image									= VK_NULL_HANDLE;
+		VkDeviceMemory												mem										= VK_NULL_HANDLE;
+		VkImageView													view									= VK_NULL_HANDLE;
+		VkFormat													format									= VK_FORMAT_UNDEFINED;
 	};
 	struct Attachments {
 		FrameBufferAttachment										position, normal, albedo;
@@ -608,9 +608,8 @@ public:
 		VkPipelineDynamicStateCreateInfo								dynamicState				= vks::initializers::pipelineDynamicStateCreateInfo(dynamicStateEnables.data(), static_cast<uint32_t>(dynamicStateEnables.size()), 0);
 
 		std::array<VkPipelineShaderStageCreateInfo, 2>					shaderStages				= {};
-		
-		shaderStages[0] = loadShader(getAssetPath() + "shaders/subpasses/composition.vert.spv", VK_SHADER_STAGE_VERTEX_BIT);
-		shaderStages[1] = loadShader(getAssetPath() + "shaders/subpasses/composition.frag.spv", VK_SHADER_STAGE_FRAGMENT_BIT);
+		shaderStages[0]												= loadShader(getAssetPath() + "shaders/subpasses/composition.vert.spv", VK_SHADER_STAGE_VERTEX_BIT);
+		shaderStages[1]												= loadShader(getAssetPath() + "shaders/subpasses/composition.frag.spv", VK_SHADER_STAGE_FRAGMENT_BIT);
 
 		// Use specialization constants to pass number of lights to the shader
 		VkSpecializationMapEntry										specializationEntry{};
