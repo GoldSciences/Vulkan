@@ -7,12 +7,12 @@
 #include "VulkanTexture.hpp"
 #include "VulkanModel.hpp"
 
-#define VERTEX_BUFFER_BIND_ID 0
-#define ENABLE_VALIDATION false
+#define VERTEX_BUFFER_BIND_ID	0
+#define ENABLE_VALIDATION		false
 
 // Offscreen frame buffer properties
-#define FB_DIM 512
-#define FB_COLOR_FORMAT VK_FORMAT_R8G8B8A8_UNORM
+#define FB_DIM					512
+#define FB_COLOR_FORMAT			VK_FORMAT_R8G8B8A8_UNORM
 
 class VulkanExample : public VulkanExampleBase
 {

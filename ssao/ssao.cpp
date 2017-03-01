@@ -9,16 +9,16 @@
 
 #include <random>
 
-#define VERTEX_BUFFER_BIND_ID 0
-#define ENABLE_VALIDATION false
+#define VERTEX_BUFFER_BIND_ID	0
+#define ENABLE_VALIDATION		false
 
-#define SSAO_KERNEL_SIZE 32
-#define SSAO_RADIUS 0.5f
+#define SSAO_KERNEL_SIZE		32
+#define SSAO_RADIUS				0.5f
 
 #if defined(__ANDROID__)
-#define SSAO_NOISE_DIM 8
+#define SSAO_NOISE_DIM			8
 #else
-#define SSAO_NOISE_DIM 4
+#define SSAO_NOISE_DIM			4
 #endif
 
 class VulkanExample : public VulkanExampleBase

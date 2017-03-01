@@ -8,10 +8,10 @@
 
 #include <gli/gli.hpp>
 
-#define VERTEX_BUFFER_BIND_ID 0
-#define ENABLE_VALIDATION false
-#define GRID_DIM 7
-#define OBJ_DIM 0.05f
+#define VERTEX_BUFFER_BIND_ID	0
+#define ENABLE_VALIDATION		false
+#define GRID_DIM				7
+#define OBJ_DIM					0.05f
 
 struct Material {
 	float														roughness;

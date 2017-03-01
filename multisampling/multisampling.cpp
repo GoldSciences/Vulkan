@@ -7,9 +7,9 @@
 #include "VulkanTexture.hpp"
 #include "VulkanModel.hpp"
 
-#define VERTEX_BUFFER_BIND_ID 0
-#define ENABLE_VALIDATION false
-#define SAMPLE_COUNT VK_SAMPLE_COUNT_4_BIT
+#define VERTEX_BUFFER_BIND_ID	0
+#define ENABLE_VALIDATION		false
+#define SAMPLE_COUNT			VK_SAMPLE_COUNT_4_BIT
 
 struct {
 	struct {

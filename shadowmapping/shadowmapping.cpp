@@ -6,22 +6,20 @@
 #include "vulkanexamplebase.h"
 #include "VulkanModel.hpp"
 
-#define VERTEX_BUFFER_BIND_ID 0
-#define ENABLE_VALIDATION false
+#define VERTEX_BUFFER_BIND_ID	0
+#define ENABLE_VALIDATION		false
 
-// 16 bits of depth is enough for such a small scene
-#define DEPTH_FORMAT VK_FORMAT_D16_UNORM
+#define DEPTH_FORMAT			VK_FORMAT_D16_UNORM			// 16 bits of depth is enough for such a small scene
 
 // Shadowmap properties
 #if defined(__ANDROID__)
-#define SHADOWMAP_DIM 1024
+#define SHADOWMAP_DIM			1024
 #else
-#define SHADOWMAP_DIM 2048
+#define SHADOWMAP_DIM			2048
 #endif
-#define SHADOWMAP_FILTER VK_FILTER_LINEAR
+#define SHADOWMAP_FILTER		VK_FILTER_LINEAR
 
-// Offscreen frame buffer properties
-#define FB_COLOR_FORMAT VK_FORMAT_R8G8B8A8_UNORM
+#define FB_COLOR_FORMAT			VK_FORMAT_R8G8B8A8_UNORM	// Offscreen frame buffer properties
 
 class VulkanExample : public VulkanExampleBase
 {

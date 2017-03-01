@@ -3,17 +3,16 @@
 // Copyright (C) 2016 by Sascha Willems - www.saschawillems.de
 // 
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
-
 #include "vulkanexamplebase.h"
 #include "VulkanTexture.hpp"
 #include "VulkanModel.hpp"
 
 #include <random>
 
-#define VERTEX_BUFFER_BIND_ID 0
-#define ENABLE_VALIDATION false
+#define VERTEX_BUFFER_BIND_ID	 0
+#define ENABLE_VALIDATION		false
 
-#define NUM_LIGHTS 64
+#define NUM_LIGHTS				64
 
 class VulkanExample : public VulkanExampleBase
 {

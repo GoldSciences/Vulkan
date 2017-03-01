@@ -84,7 +84,6 @@ protected:
 	VulkanSwapChain						swapChain					;													// Wraps the swap chain to present images (framebuffers) to the windowing system
 
 	struct {
-		
 		VkSemaphore							presentComplete				= VK_NULL_HANDLE;								// Swap chain image presentation
 		VkSemaphore							renderComplete				= VK_NULL_HANDLE;								// Command buffer submission and execution
 		VkSemaphore							textOverlayComplete			= VK_NULL_HANDLE;								// Text overlay submission and execution

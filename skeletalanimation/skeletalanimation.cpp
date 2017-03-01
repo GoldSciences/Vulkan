@@ -14,8 +14,8 @@
 #include <assimp/postprocess.h>
 #include <assimp/cimport.h>
 
-#define VERTEX_BUFFER_BIND_ID 0
-#define ENABLE_VALIDATION false
+#define VERTEX_BUFFER_BIND_ID	0
+#define ENABLE_VALIDATION		false
 
 // Vertex layout used in this example
 struct Vertex {
