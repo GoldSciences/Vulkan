@@ -153,7 +153,7 @@ public:
 	//todo: comments
 	struct SparseTexture : VirtualTexture {
 		VkSampler													sampler									= VK_NULL_HANDLE;
-		VkImageLayout												imageLayout								= VK_NULL_HANDLE;
+		VkImageLayout												imageLayout								= VK_IMAGE_LAYOUT_UNDEFINED;
 		VkImageView													view									= VK_NULL_HANDLE;
 		VkDescriptorImageInfo										descriptor								= {};
 		VkFormat													format									= VK_FORMAT_UNDEFINED;
