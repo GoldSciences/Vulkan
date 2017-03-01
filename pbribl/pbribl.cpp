@@ -66,17 +66,17 @@ public:
 	}															uboParams;
 
 	struct {
-		VkPipeline													skybox;
-		VkPipeline													pbr;
+		VkPipeline													skybox									= VK_NULL_HANDLE;
+		VkPipeline													pbr										= VK_NULL_HANDLE;
 	}															pipelines;
 
 	struct {
-		VkDescriptorSet												object;
-		VkDescriptorSet												skybox;
+		VkDescriptorSet												object									= VK_NULL_HANDLE;
+		VkDescriptorSet												skybox									= VK_NULL_HANDLE;
 	}															descriptorSets;
 
-	VkPipelineLayout											pipelineLayout;
-	VkDescriptorSetLayout										descriptorSetLayout;
+	VkPipelineLayout											pipelineLayout							= VK_NULL_HANDLE;
+	VkDescriptorSetLayout										descriptorSetLayout						= VK_NULL_HANDLE;
 
 	// Default materials to select from
 	std::vector<Material>										materials;

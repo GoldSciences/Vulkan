@@ -163,18 +163,18 @@ public:
 	}															uboVS;
 
 	struct {
-		VkPipeline													toonshading;
-		VkPipeline													color;
-		VkPipeline													wireframe;
-		VkPipeline													postprocess;
+		VkPipeline													toonshading								= VK_NULL_HANDLE;
+		VkPipeline													color									= VK_NULL_HANDLE;
+		VkPipeline													wireframe								= VK_NULL_HANDLE;
+		VkPipeline													postprocess								= VK_NULL_HANDLE;
 	}															pipelines;
 
-	VkPipelineLayout											pipelineLayout;
-	VkDescriptorSetLayout										descriptorSetLayout;
+	VkPipelineLayout											pipelineLayout							= VK_NULL_HANDLE;
+	VkDescriptorSetLayout										descriptorSetLayout						= VK_NULL_HANDLE;
 
 	struct {
-		VkDescriptorSet												scene;
-		VkDescriptorSet												fullscreen;
+		VkDescriptorSet												scene									= VK_NULL_HANDLE;
+		VkDescriptorSet												fullscreen								= VK_NULL_HANDLE;
 	}															descriptorSets;
 
 	// Framebuffer for offscreen rendering

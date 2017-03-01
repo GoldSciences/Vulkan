@@ -12,8 +12,8 @@
 
 #include <algorithm>
 
-#define VERTEX_BUFFER_BIND_ID 0
-#define ENABLE_VALIDATION false
+#define VERTEX_BUFFER_BIND_ID	0
+#define ENABLE_VALIDATION		false
 
 class VulkanExample : public VulkanExampleBase
 {

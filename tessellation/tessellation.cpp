@@ -65,9 +65,9 @@ public:
 	VkPipeline													* pipelineLeft						= &pipelines.wirePassThrough;
 	VkPipeline													* pipelineRight						= &pipelines.wire;
 	
-	VkPipelineLayout											pipelineLayout;
-	VkDescriptorSet												descriptorSet;
-	VkDescriptorSetLayout										descriptorSetLayout;				
+	VkPipelineLayout											pipelineLayout						= VK_NULL_HANDLE;
+	VkDescriptorSet												descriptorSet						= VK_NULL_HANDLE;
+	VkDescriptorSetLayout										descriptorSetLayout					= VK_NULL_HANDLE;				
 
 																VulkanExample						() : VulkanExampleBase(ENABLE_VALIDATION)			{
 		zoom														= -6.5f;
@@ -76,10 +76,9 @@ public:
 		title														= "Vulkan Example - Tessellation shader (PN Triangles)";
 		enableTextOverlay											= true;
 		// Enable physical device features required for this example				
-		// Tell the driver that we are going to use geometry shaders
-		enabledFeatures.tessellationShader							= VK_TRUE;
-		// Example also uses a wireframe pipeline, enable non-solid fill modes
-		enabledFeatures.fillModeNonSolid							= VK_TRUE;
+		
+		enabledFeatures.tessellationShader							= VK_TRUE;	// Tell the driver that we are going to use geometry shaders
+		enabledFeatures.fillModeNonSolid							= VK_TRUE;	// Example also uses a wireframe pipeline, enable non-solid fill modes
 	}
 
 																~VulkanExample						()													{

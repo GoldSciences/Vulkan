@@ -6,13 +6,13 @@
 #include "vulkanexamplebase.h"
 #include "VulkanTexture.hpp"
 
-#define VERTEX_BUFFER_BIND_ID 0
-#define ENABLE_VALIDATION false
+#define VERTEX_BUFFER_BIND_ID	0
+#define ENABLE_VALIDATION		false
 
 #if defined(__ANDROID__)
-#define TEX_DIM 1024
+#define TEX_DIM					1024
 #else
-#define TEX_DIM 2048
+#define TEX_DIM					2048
 #endif
 
 class VulkanExample : public VulkanExampleBase
@@ -32,18 +32,18 @@ public:
 	// Resources for the compute part of the example
 	struct {
 		struct {
-			vks::Buffer													spheres;				// (Shader) storage buffer object with scene spheres
-			vks::Buffer													planes;					// (Shader) storage buffer object with scene planes
-		}															storageBuffers;				//
-		vks::Buffer													uniformBuffer;				// Uniform buffer object containing scene data
-		VkQueue														queue;						// Separate queue for compute commands (queue family may differ from the one used for graphics)
-		VkCommandPool												commandPool;				// Use a separate command pool (queue family may differ from the one used for graphics)
-		VkCommandBuffer												commandBuffer;				// Command buffer storing the dispatch commands and barriers
-		VkFence														fence;						// Synchronization fence to avoid rewriting compute CB if still in use
-		VkDescriptorSetLayout										descriptorSetLayout;		// Compute shader binding layout
-		VkDescriptorSet												descriptorSet;				// Compute shader bindings
-		VkPipelineLayout											pipelineLayout;				// Layout of the compute pipeline
-		VkPipeline													pipeline;					// Compute raytracing pipeline
+			vks::Buffer													spheres;											// (Shader) storage buffer object with scene spheres
+			vks::Buffer													planes;												// (Shader) storage buffer object with scene planes
+		}															storageBuffers;												
+		vks::Buffer													uniformBuffer;												// Uniform buffer object containing scene data
+		VkQueue														queue									= VK_NULL_HANDLE;	// Separate queue for compute commands (queue family may differ from the one used for graphics)
+		VkCommandPool												commandPool								= VK_NULL_HANDLE;	// Use a separate command pool (queue family may differ from the one used for graphics)
+		VkCommandBuffer												commandBuffer							= VK_NULL_HANDLE;	// Command buffer storing the dispatch commands and barriers
+		VkFence														fence									= VK_NULL_HANDLE;	// Synchronization fence to avoid rewriting compute CB if still in use
+		VkDescriptorSetLayout										descriptorSetLayout						= VK_NULL_HANDLE;	// Compute shader binding layout
+		VkDescriptorSet												descriptorSet							= VK_NULL_HANDLE;	// Compute shader bindings
+		VkPipelineLayout											pipelineLayout							= VK_NULL_HANDLE;	// Layout of the compute pipeline
+		VkPipeline													pipeline								= VK_NULL_HANDLE;	// Compute raytracing pipeline
 		struct UBOCompute {		// Compute shader uniform block object
 			glm::vec3													lightPos;
 			float														aspectRatio;		// Aspect ratio of the viewport

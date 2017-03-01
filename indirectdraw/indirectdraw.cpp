@@ -111,19 +111,19 @@ public:
 	}
 
 																~VulkanExample							()									{
-		vkDestroyPipeline(device, pipelines.plants, nullptr);
-		vkDestroyPipeline(device, pipelines.ground, nullptr);
-		vkDestroyPipeline(device, pipelines.skysphere, nullptr);
-		vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
-		vkDestroyDescriptorSetLayout(device, descriptorSetLayout, nullptr);
-		models.plants.destroy();
-		models.ground.destroy();
-		models.skysphere.destroy();
-		textures.plants.destroy();
-		textures.ground.destroy();
-		instanceBuffer.destroy();
-		indirectCommandsBuffer.destroy();
-		uniformData.scene.destroy();
+		vkDestroyPipeline				(device, pipelines.plants, nullptr);
+		vkDestroyPipeline				(device, pipelines.ground, nullptr);
+		vkDestroyPipeline				(device, pipelines.skysphere, nullptr);
+		vkDestroyPipelineLayout			(device, pipelineLayout, nullptr);
+		vkDestroyDescriptorSetLayout	(device, descriptorSetLayout, nullptr);
+		models.plants			.destroy();
+		models.ground			.destroy();
+		models.skysphere		.destroy();
+		textures.plants			.destroy();
+		textures.ground			.destroy();
+		instanceBuffer			.destroy();
+		indirectCommandsBuffer	.destroy();
+		uniformData.scene		.destroy();
 	}
 
 	void														reBuildCommandBuffers					()									{
@@ -181,17 +181,17 @@ public:
 			}
 
 			// Ground
-			vkCmdBindPipeline(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines.ground);
-			vkCmdBindVertexBuffers(drawCmdBuffers[i], VERTEX_BUFFER_BIND_ID, 1, &models.ground.vertices.buffer, offsets);
-			vkCmdBindIndexBuffer(drawCmdBuffers[i], models.ground.indices.buffer, 0, VK_INDEX_TYPE_UINT32);
-			vkCmdDrawIndexed(drawCmdBuffers[i], models.ground.indexCount, 1, 0, 0, 0);
+			vkCmdBindPipeline			(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines.ground);
+			vkCmdBindVertexBuffers		(drawCmdBuffers[i], VERTEX_BUFFER_BIND_ID, 1, &models.ground.vertices.buffer, offsets);
+			vkCmdBindIndexBuffer		(drawCmdBuffers[i], models.ground.indices.buffer, 0, VK_INDEX_TYPE_UINT32);
+			vkCmdDrawIndexed			(drawCmdBuffers[i], models.ground.indexCount, 1, 0, 0, 0);
 			// Skysphere
-			vkCmdBindPipeline(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines.skysphere);
-			vkCmdBindVertexBuffers(drawCmdBuffers[i], VERTEX_BUFFER_BIND_ID, 1, &models.skysphere.vertices.buffer, offsets);
-			vkCmdBindIndexBuffer(drawCmdBuffers[i], models.skysphere.indices.buffer, 0, VK_INDEX_TYPE_UINT32);
-			vkCmdDrawIndexed(drawCmdBuffers[i], models.skysphere.indexCount, 1, 0, 0, 0);
+			vkCmdBindPipeline			(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines.skysphere);
+			vkCmdBindVertexBuffers		(drawCmdBuffers[i], VERTEX_BUFFER_BIND_ID, 1, &models.skysphere.vertices.buffer, offsets);
+			vkCmdBindIndexBuffer		(drawCmdBuffers[i], models.skysphere.indices.buffer, 0, VK_INDEX_TYPE_UINT32);
+			vkCmdDrawIndexed			(drawCmdBuffers[i], models.skysphere.indexCount, 1, 0, 0, 0);
 
-			vkCmdEndRenderPass(drawCmdBuffers[i]);
+			vkCmdEndRenderPass			(drawCmdBuffers[i]);
 
 			VK_CHECK_RESULT(vkEndCommandBuffer(drawCmdBuffers[i]));
 		}

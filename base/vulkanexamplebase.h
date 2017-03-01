@@ -35,10 +35,8 @@
 #include <vulkan/vulkan.h>
 
 #include "keycodes.hpp"
-#include "VulkanTools.h"
 #include "VulkanDebug.h"
 
-#include "VulkanInitializers.hpp"
 #include "VulkanDevice.hpp"
 #include "vulkanswapchain.hpp"
 #include "vulkantextoverlay.hpp"
@@ -77,12 +75,12 @@ protected:
 	VkPipelineStageFlags				submitPipelineStages		= VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;	// Pipeline stages used to wait at for graphics queue submissions
 	VkSubmitInfo						submitInfo;																		// Contains command buffers and semaphores to be presented to the queue
 	std::vector<VkCommandBuffer>		drawCmdBuffers;																	// Command buffers used for rendering
-	VkRenderPass						renderPass;																		// Global render pass for frame buffer writes
+	VkRenderPass						renderPass					= VK_NULL_HANDLE;									// Global render pass for frame buffer writes
 	std::vector<VkFramebuffer>			frameBuffers;																	// List of available frame buffers (same as number of swap chain images)
 	uint32_t							currentBuffer				= 0;												// Active frame buffer index
 	VkDescriptorPool					descriptorPool				= VK_NULL_HANDLE;									// Descriptor set pool
 	std::vector<VkShaderModule>			shaderModules;																	// List of shader modules created (stored for cleanup)
-	VkPipelineCache						pipelineCache				;													// Pipeline cache object
+	VkPipelineCache						pipelineCache				= VK_NULL_HANDLE;									// Pipeline cache object
 	VulkanSwapChain						swapChain					;													// Wraps the swap chain to present images (framebuffers) to the windowing system
 
 	struct {
@@ -147,8 +145,8 @@ public:
 
 	// OS specific 
 #if defined(_WIN32)
-	HWND								window;
-	HINSTANCE							windowInstance;
+	HWND								window						= NULL;
+	HINSTANCE							windowInstance				= NULL;
 #elif defined(__ANDROID__)
 	
 	bool								focused						= false;		// true if application has focused, false if moved to background
@@ -224,39 +222,39 @@ public:
 	void								handleEvent					(const xcb_generic_event_t *event);
 #endif
 	
-	virtual VkResult					createInstance				(bool enableValidation);																							// Create the application wide Vulkan instance: note: Virtual, can be overriden by derived example class for custom instance creation
-	virtual void						render						()															= 0;													// Pure virtual render function (override in derived class)
-	virtual void						viewChanged					()															{}														// Called when view change occurs. Can be overriden in derived class to e.g. update uniform buffers. Containing view dependant matrices
-	virtual void						keyPressed					(uint32_t)													{}														// Called if a key is pressed. Can be overriden in derived class to do custom key handling
-	virtual void						windowResized				()															{}														// Called when the window has been resized. Can be overriden in derived class to recreate or rebuild resources attached to the frame buffer / swapchain
-	virtual void						buildCommandBuffers			()															{}														// Pure virtual function to be overriden by the dervice class. Called in case of an event where e.g. the framebuffer has to be rebuild and thus all command buffers that may reference this
+	virtual VkResult					createInstance				(bool enableValidation);											// Create the application wide Vulkan instance: note: Virtual, can be overriden by derived example class for custom instance creation
+	virtual void						render						()															= 0;	// Pure virtual render function (override in derived class)
+	virtual void						viewChanged					()															{}		// Called when view change occurs. Can be overriden in derived class to e.g. update uniform buffers. Containing view dependant matrices
+	virtual void						keyPressed					(uint32_t)													{}		// Called if a key is pressed. Can be overriden in derived class to do custom key handling
+	virtual void						windowResized				()															{}		// Called when the window has been resized. Can be overriden in derived class to recreate or rebuild resources attached to the frame buffer / swapchain
+	virtual void						buildCommandBuffers			()															{}		// Pure virtual function to be overriden by the dervice class. Called in case of an event where e.g. the framebuffer has to be rebuild and thus all command buffers that may reference this
 
-	void								createCommandPool			();																													// Creates a new (graphics) command pool object storing command buffers
-	virtual void						setupDepthStencil			();																													// Setup default depth and stencil views
-	virtual void						setupFrameBuffer			();																													// Create framebuffers for all requested swap chain images. Can be overriden in derived class to setup a custom framebuffer (e.g. for MSAA)
-	virtual void						setupRenderPass				();																													// Setup a default render pass. Can be overriden in derived class to setup a custom render pass (e.g. for MSAA)
-	void								initSwapchain				();																													// Connect and prepare the swap chain
+	void								createCommandPool			();																	// Creates a new (graphics) command pool object storing command buffers
+	virtual void						setupDepthStencil			();																	// Setup default depth and stencil views
+	virtual void						setupFrameBuffer			();																	// Create framebuffers for all requested swap chain images. Can be overriden in derived class to setup a custom framebuffer (e.g. for MSAA)
+	virtual void						setupRenderPass				();																	// Setup a default render pass. Can be overriden in derived class to setup a custom render pass (e.g. for MSAA)
+	void								initSwapchain				();																	// Connect and prepare the swap chain
 	inline void							setupSwapChain				()															{ swapChain.create(&width, &height, settings.vsync); }	// Create swap chain images
-	bool								checkCommandBuffers			();																													// Check if command buffers are valid (!= VK_NULL_HANDLE)
-	void								createCommandBuffers		();																													// Create command buffers for drawing commands
-	void								destroyCommandBuffers		();																													// Destroy all command buffers and set their handles to VK_NULL_HANDLE. May be necessary during runtime if options are toggled 
-	VkCommandBuffer						createCommandBuffer			(VkCommandBufferLevel level, bool begin);																			// Command buffer creation. Creates and returns a new command buffer
-	void								flushCommandBuffer			(VkCommandBuffer commandBuffer, VkQueue queue, bool free);															// End the command buffer, submit it to the queue and free (if requested). Note: Waits for the queue to become idle
-	void								createPipelineCache			();																													// Create a cache pool for rendering pipelines
-	virtual void						prepare						();																													// Prepare commonly used Vulkan functions
+	bool								checkCommandBuffers			();																	// Check if command buffers are valid (!= VK_NULL_HANDLE)
+	void								createCommandBuffers		();																	// Create command buffers for drawing commands
+	void								destroyCommandBuffers		();																	// Destroy all command buffers and set their handles to VK_NULL_HANDLE. May be necessary during runtime if options are toggled 
+	VkCommandBuffer						createCommandBuffer			(VkCommandBufferLevel level, bool begin);							// Command buffer creation. Creates and returns a new command buffer
+	void								flushCommandBuffer			(VkCommandBuffer commandBuffer, VkQueue queue, bool free);			// End the command buffer, submit it to the queue and free (if requested). Note: Waits for the queue to become idle
+	void								createPipelineCache			();																	// Create a cache pool for rendering pipelines
+	virtual void						prepare						();																	// Prepare commonly used Vulkan functions
 
 	
-	VkPipelineShaderStageCreateInfo		loadShader					(std::string fileName, VkShaderStageFlagBits stage);																// Load a SPIR-V shader
-	void								renderLoop					();																													// Start the main render loop
+	VkPipelineShaderStageCreateInfo		loadShader					(std::string fileName, VkShaderStageFlagBits stage);				// Load a SPIR-V shader
+	void								renderLoop					();																	// Start the main render loop
 	void								updateTextOverlay			();
-	virtual void						getOverlayText				(VulkanTextOverlay *)										{}														// Called when the text overlay is updating. Can be overriden in derived class to add custom text to the overlay
+	virtual void						getOverlayText				(VulkanTextOverlay *)										{}		// Called when the text overlay is updating. Can be overriden in derived class to add custom text to the overlay
 
 	// Prepare the frame for workload submission
 	// - Acquires the next image from the swap chain 
 	// - Sets the default wait and signal semaphores
 	void								prepareFrame				();
 
-	void								submitFrame					();																													// Submit the frames' workload. Submits the text overlay (if enabled)
+	void								submitFrame					();																	// Submit the frames' workload. Submits the text overlay (if enabled)
 
 };
 

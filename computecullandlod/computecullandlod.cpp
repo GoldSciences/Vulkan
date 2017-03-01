@@ -78,12 +78,12 @@ public:
 	}															uniformData;
 
 	struct {
-		VkPipeline													plants;
+		VkPipeline													plants										= VK_NULL_HANDLE;
 	}															pipelines;
 
-	VkPipelineLayout											pipelineLayout;
-	VkDescriptorSet												descriptorSet;
-	VkDescriptorSetLayout										descriptorSetLayout;
+	VkPipelineLayout											pipelineLayout								= VK_NULL_HANDLE;
+	VkDescriptorSet												descriptorSet								= VK_NULL_HANDLE;
+	VkDescriptorSetLayout										descriptorSetLayout							= VK_NULL_HANDLE;
 
 	// Resources for the compute part of the example
 	struct {

@@ -7,8 +7,8 @@
 #include "VulkanTexture.hpp"
 #include "VulkanBuffer.hpp"
 
-#define VERTEX_BUFFER_BIND_ID 0
-#define ENABLE_VALIDATION false
+#define VERTEX_BUFFER_BIND_ID	0
+#define ENABLE_VALIDATION		false
 
 // Vertex layout for this example
 struct Vertex {
@@ -30,25 +30,25 @@ public:
 
 	// Resources for the graphics part of the example
 	struct {
-		VkDescriptorSetLayout										descriptorSetLayout;							// Image display shader binding layout
-		VkDescriptorSet												descriptorSetPreCompute;						// Image display shader bindings before compute shader image manipulation
-		VkDescriptorSet												descriptorSetPostCompute;						// Image display shader bindings after compute shader image manipulation
-		VkPipeline													pipeline;										// Image display pipeline
-		VkPipelineLayout											pipelineLayout;									// Layout of the graphics pipeline
+		VkDescriptorSetLayout										descriptorSetLayout						= VK_NULL_HANDLE;	// Image display shader binding layout
+		VkDescriptorSet												descriptorSetPreCompute					= VK_NULL_HANDLE;	// Image display shader bindings before compute shader image manipulation
+		VkDescriptorSet												descriptorSetPostCompute				= VK_NULL_HANDLE;	// Image display shader bindings after compute shader image manipulation
+		VkPipeline													pipeline								= VK_NULL_HANDLE;	// Image display pipeline
+		VkPipelineLayout											pipelineLayout							= VK_NULL_HANDLE;	// Layout of the graphics pipeline
 	}															graphics;
 
 	// Resources for the compute part of the example
 	struct Compute {
-		VkQueue														queue;											// Separate queue for compute commands (queue family may differ from the one used for graphics)
-		VkCommandPool												commandPool;									// Use a separate command pool (queue family may differ from the one used for graphics)
-		VkCommandBuffer												commandBuffer;									// Command buffer storing the dispatch commands and barriers
-		VkFence														fence;											// Synchronization fence to avoid rewriting compute CB if still in use
-		VkDescriptorSetLayout										descriptorSetLayout;							// Compute shader binding layout
-		VkDescriptorSet												descriptorSet;									// Compute shader bindings
-		VkPipelineLayout											pipelineLayout;									// Layout of the compute pipeline
-		std::vector<VkPipeline>										pipelines;										// Compute pipelines for image filters
-		uint32_t													pipelineIndex							= 0;	// Current image filtering compute pipeline index
-		uint32_t													queueFamilyIndex;								// Family index of the graphics queue, used for barriers
+		VkQueue														queue									= VK_NULL_HANDLE;	// Separate queue for compute commands (queue family may differ from the one used for graphics)
+		VkCommandPool												commandPool								= VK_NULL_HANDLE;	// Use a separate command pool (queue family may differ from the one used for graphics)
+		VkCommandBuffer												commandBuffer							= VK_NULL_HANDLE;	// Command buffer storing the dispatch commands and barriers
+		VkFence														fence									= VK_NULL_HANDLE;	// Synchronization fence to avoid rewriting compute CB if still in use
+		VkDescriptorSetLayout										descriptorSetLayout						= VK_NULL_HANDLE;	// Compute shader binding layout
+		VkDescriptorSet												descriptorSet							= VK_NULL_HANDLE;	// Compute shader bindings
+		VkPipelineLayout											pipelineLayout							= VK_NULL_HANDLE;	// Layout of the compute pipeline
+		std::vector<VkPipeline>										pipelines								;					// Compute pipelines for image filters
+		uint32_t													pipelineIndex							= 0;				// Current image filtering compute pipeline index
+		uint32_t													queueFamilyIndex						;					// Family index of the graphics queue, used for barriers
 	}															compute;
 
 	vks::Buffer														vertexBuffer;
@@ -65,7 +65,7 @@ public:
 	struct {
 	}															pipelines;
 
-	int vertexBufferSize;
+	int															vertexBufferSize;
 
 																VulkanExample							()																			: VulkanExampleBase(ENABLE_VALIDATION)	{
 		zoom														= -2.0f;

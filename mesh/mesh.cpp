@@ -14,8 +14,8 @@
 #include <assimp/cimport.h>
 
 
-#define VERTEX_BUFFER_BIND_ID 0
-#define ENABLE_VALIDATION false
+#define VERTEX_BUFFER_BIND_ID	0
+#define ENABLE_VALIDATION		false
 
 class VulkanExample : public VulkanExampleBase
 {
@@ -95,16 +95,16 @@ public:
 																~VulkanExample									()									{
 		// Clean up used Vulkan resources 
 		// Note : Inherited destructor cleans up resources stored in base class
-		vkDestroyPipeline(device, pipelines.solid, nullptr);
-		vkDestroyPipeline(device, pipelines.wireframe, nullptr);
+		vkDestroyPipeline				(device, pipelines.solid		, nullptr);
+		vkDestroyPipeline				(device, pipelines.wireframe	, nullptr);
 
-		vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
-		vkDestroyDescriptorSetLayout(device, descriptorSetLayout, nullptr);
+		vkDestroyPipelineLayout			(device, pipelineLayout			, nullptr);
+		vkDestroyDescriptorSetLayout	(device, descriptorSetLayout	, nullptr);
 
-		model.destroy(device);
+		model					.destroy(device);
 
-		textures.colorMap.destroy();
-		uniformBuffers.scene.destroy();
+		textures.colorMap		.destroy();
+		uniformBuffers.scene	.destroy();
 	}
 
 	void														reBuildCommandBuffers							()									{

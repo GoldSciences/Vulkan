@@ -10,14 +10,14 @@
 
 #include <random>
 
-#define VERTEX_BUFFER_BIND_ID 0
-#define ENABLE_VALIDATION false
+#define VERTEX_BUFFER_BIND_ID	0
+#define ENABLE_VALIDATION		false
 
 class VulkanExample : public VulkanExampleBase
 {
 public:
 	// Vertex layout for the models
-	vks::VertexLayout											vertexLayout						= vks::VertexLayout(
+	vks::VertexLayout											vertexLayout									= vks::VertexLayout(
 		{	vks::VERTEX_COMPONENT_POSITION
 		,	vks::VERTEX_COMPONENT_NORMAL
 		,	vks::VERTEX_COMPONENT_COLOR
@@ -45,10 +45,10 @@ public:
 		VkPipeline													starsphere;
 	}															pipelines;
 
-	VkPipelineLayout											pipelineLayout;
+	VkPipelineLayout											pipelineLayout									= VK_NULL_HANDLE;
 
-	VkCommandBuffer												primaryCommandBuffer;
-	VkCommandBuffer												secondaryCommandBuffer;
+	VkCommandBuffer												primaryCommandBuffer							= VK_NULL_HANDLE;
+	VkCommandBuffer												secondaryCommandBuffer							= VK_NULL_HANDLE;
 
 	// Number of animated objects to be renderer
 	// by using threads and secondary command buffers
@@ -72,8 +72,8 @@ public:
 		float														rotationSpeed;
 		float														scale;
 		float														deltaT;
-		float														stateT									= 0;
-		bool														visible									= true;
+		float														stateT											= 0;
+		bool														visible											= true;
 	};
 
 	struct ThreadData {
@@ -84,13 +84,13 @@ public:
 	};
 	std::vector<ThreadData>										threadData;
 	vks::ThreadPool												threadPool;
-	VkFence														renderFence								= {};	// Fence to wait for all command buffers to finish before presenting to the swap chain
+	VkFence														renderFence										= {};	// Fence to wait for all command buffers to finish before presenting to the swap chain
 	float														objectSphereDim;	// Max. dimension of the ufo mesh for use as the sphere radius for frustum culling
 
 	// View frustum for culling invisible objects
 	vks::Frustum												frustum;
 
-																VulkanExample							()															: VulkanExampleBase(ENABLE_VALIDATION)	{
+																VulkanExample									()															: VulkanExampleBase(ENABLE_VALIDATION)	{
 		zoom														= -32.5f;
 		zoomSpeed													= 2.5f;
 		rotationSpeed												= 0.5f;

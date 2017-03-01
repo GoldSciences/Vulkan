@@ -8,7 +8,6 @@
 #include <exception>
 #include <algorithm>
 #include "vulkan/vulkan.h"
-#include "VulkanTools.h"
 #include "VulkanBuffer.hpp"
 
 namespace vks

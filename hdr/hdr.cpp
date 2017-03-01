@@ -7,7 +7,7 @@
 #include "VulkanModel.hpp"
 #include "VulkanTexture.hpp"
 
-#define ENABLE_VALIDATION false
+#define ENABLE_VALIDATION	false
 
 class VulkanExample : public VulkanExampleBase
 {

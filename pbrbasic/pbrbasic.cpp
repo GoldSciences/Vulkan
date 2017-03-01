@@ -27,10 +27,10 @@ class VulkanExample : public VulkanExampleBase
 public:
 	// Vertex layout for the models
 	vks::VertexLayout											vertexLayout							= vks::VertexLayout(
-	{	vks::VERTEX_COMPONENT_POSITION
-	,	vks::VERTEX_COMPONENT_NORMAL
-	,	vks::VERTEX_COMPONENT_UV
-	});
+		{	vks::VERTEX_COMPONENT_POSITION
+		,	vks::VERTEX_COMPONENT_NORMAL
+		,	vks::VERTEX_COMPONENT_UV
+		});
 
 	struct Meshes {
 		vks::Model													skybox;
