@@ -16,72 +16,69 @@
 
 struct Vertex
 {
-	float	pos			[3];
-	float	normal		[3];
-	float	color		[3];
+	float														pos			[3];
+	float														normal		[3];
+	float														color		[3];
 
-			Vertex(const glm::vec3& p, const glm::vec3& n, const glm::vec3& c)	{
+																Vertex						(const glm::vec3& p, const glm::vec3& n, const glm::vec3& c)							{
 		pos		[0] = p.x;	pos		[1] = p.y;	pos		[2] = p.z;
 		color	[0] = c.x;	color	[1] = c.y;	color	[2] = c.z;
 		normal	[0] = n.x;	normal	[1] = n.y;	normal	[2] = n.z;
 	}
 };
 
-struct GearInfo
-{
-	float innerRadius;
-	float outerRadius;
-	float width;
-	int numTeeth;
-	float toothDepth;
-	glm::vec3 color;
-	glm::vec3 pos;
-	float rotSpeed;
-	float rotOffset;
+
+struct GearInfo {
+	float														innerRadius;
+	float														outerRadius;
+	float														width;
+	int															numTeeth;
+	float														toothDepth;
+	glm::vec3													color;
+	glm::vec3													position;
+	float														rotSpeed;
+	float														rotOffset;
 };
 
 class VulkanGear
 {
 private:
-	struct UBO
-	{
-		glm::mat4 projection;
-		glm::mat4 model;
-		glm::mat4 normal;
-		glm::mat4 view;
-		glm::vec3 lightPos;
+	struct UBO {
+		glm::mat4													projection;
+		glm::mat4													model;
+		glm::mat4													normal;
+		glm::mat4													view;
+		glm::vec3													lightPos;
 	};
 
-	vks::VulkanDevice *vulkanDevice;
+	vks::VulkanDevice											* vulkanDevice				= nullptr;
 
-	glm::vec3 color;
-	glm::vec3 pos;
-	float rotSpeed;
-	float rotOffset;
+	glm::vec3													color;
+	glm::vec3													pos;
+	float														rotSpeed;
+	float														rotOffset;
 
-	vks::Buffer vertexBuffer;
-	vks::Buffer indexBuffer;
-	uint32_t indexCount;
+	vks::Buffer													vertexBuffer;
+	vks::Buffer													indexBuffer;
+	uint32_t													indexCount;
 
 	UBO ubo;
-	vks::Buffer uniformBuffer;
+	vks::Buffer													uniformBuffer;
 
-	int32_t newVertex(std::vector<Vertex> *vBuffer, float x, float y, float z, const glm::vec3& normal);
-	void newFace(std::vector<uint32_t> *iBuffer, int a, int b, int c);
+	int32_t														newVertex					(std::vector<Vertex> *vBuffer, float x, float y, float z, const glm::vec3& normal);
+	void														newFace						(std::vector<uint32_t> *iBuffer, int a, int b, int c);
 
-	void prepareUniformBuffer();
+	void														prepareUniformBuffer		();
 public:
-	VkDescriptorSet descriptorSet;
+	VkDescriptorSet												descriptorSet				= VK_NULL_HANDLE;
 
-	void draw(VkCommandBuffer cmdbuffer, VkPipelineLayout pipelineLayout);
-	void updateUniformBuffer(glm::mat4 perspective, glm::vec3 rotation, float zoom, float timer);
+																VulkanGear					(vks::VulkanDevice *vulkanDevice)														: vulkanDevice(vulkanDevice) {};
+																~VulkanGear					();
 
-	void setupDescriptorSet(VkDescriptorPool pool, VkDescriptorSetLayout descriptorSetLayout);
-
-	VulkanGear(vks::VulkanDevice *vulkanDevice) : vulkanDevice(vulkanDevice) {};
-	~VulkanGear();
-
-	void generate(GearInfo *gearinfo, VkQueue queue);
+	void														draw						(VkCommandBuffer cmdbuffer, VkPipelineLayout pipelineLayout);
+	void														updateUniformBuffer			(glm::mat4 perspective, glm::vec3 rotation, float zoom, float timer);
+	void														setupDescriptorSet			(VkDescriptorPool pool, VkDescriptorSetLayout descriptorSetLayout);
+	void														generate					(GearInfo *gearinfo, VkQueue queue);
 
 };
 
