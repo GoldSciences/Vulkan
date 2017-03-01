@@ -51,18 +51,18 @@ namespace initializers
 		return bufferMemoryBarrier;
 	}
 
-	inline VkMemoryBarrier							memoryBarrier							()																													{ return {VK_STRUCTURE_TYPE_MEMORY_BARRIER			,				};	}
-	inline VkImageCreateInfo						imageCreateInfo							()																													{ return {VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO		,				};	}
-	inline VkSamplerCreateInfo						samplerCreateInfo						()																													{ return {VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO		,				};	}
-	inline VkImageViewCreateInfo					imageViewCreateInfo						()																													{ return {VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO	,				};	}
-	inline VkFramebufferCreateInfo					framebufferCreateInfo					()																													{ return {VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO	,				};	}
-	inline VkSemaphoreCreateInfo					semaphoreCreateInfo						()																													{ return {VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO	,				};	}
-	inline VkFenceCreateInfo						fenceCreateInfo							(VkFenceCreateFlags flags = 0)																						{ return {VK_STRUCTURE_TYPE_FENCE_CREATE_INFO		, 0, flags		};	}
-	inline VkEventCreateInfo						eventCreateInfo							()																													{ return {VK_STRUCTURE_TYPE_EVENT_CREATE_INFO		,				};	}
-	inline VkSubmitInfo								submitInfo								()																													{ return {VK_STRUCTURE_TYPE_SUBMIT_INFO				,				};	}
-	inline VkViewport								viewport								(float width, float height, float minDepth, float maxDepth)															{ return {0, 0, width, height, minDepth, maxDepth					};	}
-	inline VkRect2D									rect2D									(int32_t width, int32_t height, int32_t offsetX, int32_t offsetY)													{ return { {offsetX, offsetY}, {(uint32_t)width, (uint32_t)height}	};	}
-	inline VkBufferCreateInfo						bufferCreateInfo						()																													{ return {VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO		,				};	}
+	inline constexpr	VkMemoryBarrier							memoryBarrier							()																													{ return {VK_STRUCTURE_TYPE_MEMORY_BARRIER			,				};	}
+	inline constexpr	VkImageCreateInfo						imageCreateInfo							()																													{ return {VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO		,				};	}
+	inline constexpr	VkSamplerCreateInfo						samplerCreateInfo						()																													{ return {VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO		,				};	}
+	inline constexpr	VkImageViewCreateInfo					imageViewCreateInfo						()																													{ return {VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO	,				};	}
+	inline constexpr	VkFramebufferCreateInfo					framebufferCreateInfo					()																													{ return {VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO	,				};	}
+	inline constexpr	VkSemaphoreCreateInfo					semaphoreCreateInfo						()																													{ return {VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO	,				};	}
+	inline constexpr	VkFenceCreateInfo						fenceCreateInfo							(VkFenceCreateFlags flags = 0)																						{ return {VK_STRUCTURE_TYPE_FENCE_CREATE_INFO		, 0, flags		};	}
+	inline constexpr	VkEventCreateInfo						eventCreateInfo							()																													{ return {VK_STRUCTURE_TYPE_EVENT_CREATE_INFO		,				};	}
+	inline constexpr	VkSubmitInfo								submitInfo								()																													{ return {VK_STRUCTURE_TYPE_SUBMIT_INFO				,				};	}
+	inline constexpr	VkViewport								viewport								(float width, float height, float minDepth, float maxDepth)															{ return {0, 0, width, height, minDepth, maxDepth					};	}
+	inline constexpr	VkRect2D									rect2D									(int32_t width, int32_t height, int32_t offsetX, int32_t offsetY)													{ return { {offsetX, offsetY}, {(uint32_t)width, (uint32_t)height}	};	}
+	inline constexpr	VkBufferCreateInfo						bufferCreateInfo						()																													{ return {VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO		,				};	}
 	inline VkBufferCreateInfo						bufferCreateInfo						(VkBufferUsageFlags usage, VkDeviceSize size)																		{
 		VkBufferCreateInfo												bufCreateInfo {};
 		bufCreateInfo.sType											= VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
@@ -181,10 +181,10 @@ namespace initializers
 	}
 
 	inline VkPipelineRasterizationStateCreateInfo	pipelineRasterizationStateCreateInfo	
-		(	VkPolygonMode							polygonMode
-		,	VkCullModeFlags							cullMode
-		,	VkFrontFace								frontFace
-		,	VkPipelineRasterizationStateCreateFlags	flags = 0
+		(	VkPolygonMode								polygonMode
+		,	VkCullModeFlags								cullMode
+		,	VkFrontFace									frontFace
+		,	VkPipelineRasterizationStateCreateFlags		flags = 0
 		) 
 	{
 		VkPipelineRasterizationStateCreateInfo							pipelineRasterizationStateCreateInfo {};

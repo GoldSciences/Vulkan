@@ -114,7 +114,7 @@ public:
 			gearInfo.numTeeth											= toothCount[i];
 			gearInfo.toothDepth											= toothDepth[i];
 			gearInfo.color												= colors[i];
-			gearInfo.pos												= positions[i];
+			gearInfo.position											= positions[i];
 			gearInfo.rotSpeed											= rotationSpeeds[i];
 			gearInfo.rotOffset											= rotationOffsets[i];
 

@@ -28,7 +28,7 @@ VulkanGear::~VulkanGear()	{
 
 void VulkanGear::generate(GearInfo *gearinfo, VkQueue queue)	{
 	this->color = gearinfo->color;
-	this->pos = gearinfo->pos;
+	this->pos = gearinfo->position;
 	this->rotOffset = gearinfo->rotOffset;
 	this->rotSpeed = gearinfo->rotSpeed;
 
