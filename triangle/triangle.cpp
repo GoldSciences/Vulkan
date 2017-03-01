@@ -12,7 +12,7 @@
 
 #define ENABLE_VALIDATION	false		// Set to "true" to enable Vulkan's validation layers (see vulkandebug.cpp for details)
 #define USE_STAGING			true		// Set to "true" to use staging buffers for uploading vertex and index data to device local memory
-										// See "prepareVertices" for details on what's staging and on why to use it
+										// - See "prepareVertices" for details on what's staging and on why to use it
 
 class VulkanExample : public VulkanExampleBase
 {
@@ -75,8 +75,8 @@ public:
 	// The descriptor set layout describes the shader binding layout (without actually referencing descriptor)
 	// Like the pipeline layout it's pretty much a blueprint and can be used with different descriptor sets as long as their layout matches
 	VkDescriptorSetLayout										descriptorSetLayout						= VK_NULL_HANDLE;
-	VkDescriptorSet												descriptorSet							= VK_NULL_HANDLE;	// The descriptor set stores the resources bound to the binding points in a shader. It connects the binding points of the different shaders with the buffers and images used for those bindings
-
+	VkDescriptorSet												descriptorSet							= VK_NULL_HANDLE;	// The descriptor set stores the resources bound to the binding points in a shader. 
+																															// It connects the binding points of the different shaders with the buffers and images used for those bindings
 
 	// Synchronization primitives. Synchronization is an important concept of Vulkan that OpenGL mostly hid away. Getting this right is crucial to using Vulkan.
 
@@ -100,14 +100,9 @@ public:
 		vkDestroyPipelineLayout			(device, pipelineLayout				, nullptr);
 		vkDestroyDescriptorSetLayout	(device, descriptorSetLayout		, nullptr);
 
-		vkDestroyBuffer					(device, vertices.buffer			, nullptr);
-		vkFreeMemory					(device, vertices.memory			, nullptr);
-
-		vkDestroyBuffer					(device, indices.buffer				, nullptr);
-		vkFreeMemory					(device, indices.memory				, nullptr);
-
-		vkDestroyBuffer					(device, uniformBufferVS.buffer		, nullptr);
-		vkFreeMemory					(device, uniformBufferVS.memory		, nullptr);
+		vkDestroyBuffer					(device, vertices			.buffer, nullptr);		vkFreeMemory	(device, vertices			.memory, nullptr);
+		vkDestroyBuffer					(device, indices			.buffer, nullptr);		vkFreeMemory	(device, indices			.memory, nullptr);
+		vkDestroyBuffer					(device, uniformBufferVS	.buffer, nullptr);		vkFreeMemory	(device, uniformBufferVS	.memory, nullptr);
 
 		vkDestroySemaphore				(device, presentCompleteSemaphore	, nullptr);
 		vkDestroySemaphore				(device, renderCompleteSemaphore	, nullptr);
@@ -227,8 +222,7 @@ public:
 		renderPassBeginInfo.clearValueCount							= 2;
 		renderPassBeginInfo.pClearValues							= clearValues;
 	
-		for (size_t i = 0; i < drawCmdBuffers.size(); ++i)
-		{
+		for (size_t i = 0; i < drawCmdBuffers.size(); ++i) {
 			// Set target frame buffer
 			renderPassBeginInfo.framebuffer								= frameBuffers[i];
 
@@ -333,7 +327,6 @@ public:
 			// - Copy the data from the host to the device using a command buffer
 			// - Delete the host visible (staging) buffer
 			// - Use the device local buffers for rendering
-
 			struct StagingBuffer {
 				VkDeviceMemory													memory;
 				VkBuffer														buffer;
@@ -349,13 +342,13 @@ public:
 			vertexBufferInfo.sType										= VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
 			vertexBufferInfo.size										= vertexBufferSize;
 			vertexBufferInfo.usage										= VK_BUFFER_USAGE_TRANSFER_SRC_BIT;						// Buffer is used as the copy source
-			VK_CHECK_RESULT(vkCreateBuffer(device, &vertexBufferInfo, nullptr, &stagingBuffers.vertices.buffer));	// Create a host-visible buffer to copy the vertex data to (staging buffer)
-			vkGetBufferMemoryRequirements(device, stagingBuffers.vertices.buffer, &memReqs);
+			VK_CHECK_RESULT(vkCreateBuffer		(device, &vertexBufferInfo, nullptr, &stagingBuffers.vertices.buffer));	// Create a host-visible buffer to copy the vertex data to (staging buffer)
+			vkGetBufferMemoryRequirements		(device, stagingBuffers.vertices.buffer, &memReqs);
 			memAlloc.allocationSize										= memReqs.size;
 
 			// Request a host visible memory type that can be used to copy our data do. Also request it to be coherent, so that writes are visible to the GPU right after unmapping the buffer
 			memAlloc.memoryTypeIndex									= getMemoryTypeIndex(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-			VK_CHECK_RESULT(vkAllocateMemory(device, &memAlloc, nullptr, &stagingBuffers.vertices.memory));
+			VK_CHECK_RESULT(vkAllocateMemory	(device, &memAlloc, nullptr, &stagingBuffers.vertices.memory));
 			
 			// Map and copy
 			VK_CHECK_RESULT(vkMapMemory			(device, stagingBuffers.vertices.memory, 0, memAlloc.allocationSize, 0, &data));
@@ -432,15 +425,15 @@ public:
 			vertexBufferInfo.usage										= VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
 
 			// Copy vertex data to a buffer visible to the host
-			VK_CHECK_RESULT(vkCreateBuffer(device, &vertexBufferInfo, nullptr, &vertices.buffer));
-			vkGetBufferMemoryRequirements(device, vertices.buffer, &memReqs);
+			VK_CHECK_RESULT(vkCreateBuffer		(device, &vertexBufferInfo, nullptr, &vertices.buffer));
+			vkGetBufferMemoryRequirements		(device, vertices.buffer, &memReqs);
 			memAlloc.allocationSize										= memReqs.size;
 			memAlloc.memoryTypeIndex									= getMemoryTypeIndex(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
-			VK_CHECK_RESULT(vkAllocateMemory(device, &memAlloc, nullptr, &vertices.memory));
-			VK_CHECK_RESULT(vkMapMemory(device, vertices.memory, 0, memAlloc.allocationSize, 0, &data));
+			VK_CHECK_RESULT(vkAllocateMemory	(device, &memAlloc, nullptr, &vertices.memory));
+			VK_CHECK_RESULT(vkMapMemory			(device, vertices.memory, 0, memAlloc.allocationSize, 0, &data));
 			memcpy(data, vertexBuffer.data(), vertexBufferSize);
-			vkUnmapMemory(device, vertices.memory);
-			VK_CHECK_RESULT(vkBindBufferMemory(device, vertices.buffer, vertices.memory, 0));
+			vkUnmapMemory						(device, vertices.memory);
+			VK_CHECK_RESULT(vkBindBufferMemory	(device, vertices.buffer, vertices.memory, 0));
 
 			// Index buffer
 			VkBufferCreateInfo												indexbufferInfo							= {};
