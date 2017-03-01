@@ -31,10 +31,10 @@ public:
 
 		// Free all Vulkan resources used a texture object
 		void														destroy								(VkDevice device)												{
-			vkDestroyImageView	(device, view			, nullptr);
-			vkDestroyImage		(device, image			, nullptr);
-			vkDestroySampler	(device, sampler		, nullptr);
-			vkFreeMemory		(device, deviceMemory	, nullptr);
+			if(VK_NULL_HANDLE != view			)	vkDestroyImageView	(device, view			, nullptr);
+			if(VK_NULL_HANDLE != image			)	vkDestroyImage		(device, image			, nullptr);
+			if(VK_NULL_HANDLE != sampler		)	vkDestroySampler	(device, sampler		, nullptr);
+			if(VK_NULL_HANDLE != deviceMemory	)	vkFreeMemory		(device, deviceMemory	, nullptr);
 		}
 	}															texture;
 

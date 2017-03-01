@@ -39,9 +39,9 @@ public:
 	}															uboVS;
 
 	struct {
-		VkPipelineVertexInputStateCreateInfo						inputState;
-		std::vector<VkVertexInputBindingDescription>				bindingDescriptions;
-		std::vector<VkVertexInputAttributeDescription>				attributeDescriptions;
+		VkPipelineVertexInputStateCreateInfo						inputState						= {};
+		std::vector<VkVertexInputBindingDescription>				bindingDescriptions				;
+		std::vector<VkVertexInputAttributeDescription>				attributeDescriptions			;
 	}															vertices;
 
 	struct {

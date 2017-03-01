@@ -39,21 +39,13 @@ public:
 	// Contains all Vulkan resources required to represent vertex and index buffers for a model
 	// This is for demonstration and learning purposes, the other examples use a model loader class for easy access
 	struct Model {
-		struct {
-			VkBuffer													buffer											= VK_NULL_HANDLE;
-			VkDeviceMemory												memory											= VK_NULL_HANDLE;
-		}															vertices;
-		struct {
-			int															count											= 0;
-			VkBuffer													buffer											= VK_NULL_HANDLE;
-			VkDeviceMemory												memory											= VK_NULL_HANDLE;
-		}															indices;
+		vks::VertexBuffer											vertices;
+		vks::IndexBuffer											indices;
+
 		// Destroys all Vulkan resources created for this model
 		void														destroy											(VkDevice device_)					{
-			vkDestroyBuffer	(device_, vertices.buffer, nullptr);
-			vkFreeMemory	(device_, vertices.memory, nullptr);
-			vkDestroyBuffer	(device_, indices.buffer, nullptr);
-			vkFreeMemory	(device_, indices.memory, nullptr);
+			vertices	.destroy(device_);
+			indices		.destroy(device_);
 		}
 	}															model;
 

@@ -17,28 +17,11 @@
 class VulkanExample : public VulkanExampleBase
 {
 public:
-	typedef VertexPC											Vertex;		// Vertex layout used in this example
+	typedef VertexPC											Vertex;				// Vertex layout used in this example
 
-	// Vertex buffer and attributes
-	struct {
-		VkDeviceMemory												memory									= VK_NULL_HANDLE;	// Handle to the device memory for this buffer
-		VkBuffer													buffer									= VK_NULL_HANDLE;	// Handle to the Vulkan buffer object that the memory is bound to
-	}															vertices;
-
-	// Index buffer
-	struct 
-	{
-		VkDeviceMemory												memory									= VK_NULL_HANDLE;		
-		VkBuffer													buffer									= VK_NULL_HANDLE;			
-		uint32_t													count									= 0;
-	}															indices;
-
-	// Uniform buffer block object
-	struct {
-		VkDeviceMemory												memory									= VK_NULL_HANDLE;		
-		VkBuffer													buffer									= VK_NULL_HANDLE;			
-		VkDescriptorBufferInfo										descriptor								= {};
-	}															uniformBufferVS;
+	vks::VertexBuffer											vertices;			// Vertex buffer and attributes
+	vks::IndexBuffer											indices;			// Index buffer
+	vks::UniformBuffer											uniformBufferVS;
 
 	// For simplicity we use the same uniform block layout as in the shader:
 	//

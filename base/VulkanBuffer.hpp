@@ -12,6 +12,19 @@
 
 namespace vks
 {	
+	struct VertexBuffer	{
+		VkBuffer												buffer					= VK_NULL_HANDLE;	// Handle to the device memory for this buffer
+		VkDeviceMemory											memory					= VK_NULL_HANDLE;	// Handle to the Vulkan buffer object that the memory is bound to
+		// Destroys all Vulkan resources 
+		void													destroy					(VkDevice device_)												{
+			if(VK_NULL_HANDLE != buffer)	vkDestroyBuffer	(device_, buffer, nullptr);
+			if(VK_NULL_HANDLE != memory)	vkFreeMemory	(device_, memory, nullptr);
+		}
+	};
+
+	struct IndexBuffer		: public VertexBuffer {	int						count				= 0;	};		
+	struct UniformBuffer	: public VertexBuffer {	VkDescriptorBufferInfo	descriptor			= {};	};	
+
 	// Encapsulates access to a Vulkan buffer backed up by device memory. To be filled by an external source like the VulkanDevice.
 	struct Buffer
 	{

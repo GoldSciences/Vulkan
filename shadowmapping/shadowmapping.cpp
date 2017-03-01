@@ -56,7 +56,7 @@ public:
 		VkPipelineVertexInputStateCreateInfo						inputState							= {};
 		std::vector<VkVertexInputBindingDescription>				bindingDescriptions;
 		std::vector<VkVertexInputAttributeDescription>				attributeDescriptions;
-	}																vertices;
+	}															vertices;
 
 	struct {
 		vks::Buffer													scene;
@@ -103,15 +103,14 @@ public:
 
 	// Framebuffer for offscreen rendering
 	struct OffscreenPass {
-		int32_t														width, height						;
+		int32_t														width = 0, height					= 0;
 		VkFramebuffer												frameBuffer							= VK_NULL_HANDLE;
-		vks::FrameBufferAttachmentSmall								depth								= {};	
+		vks::FrameBufferAttachmentSmall								depth								;	
 		VkRenderPass												renderPass							= VK_NULL_HANDLE;
 		VkSampler													depthSampler						= VK_NULL_HANDLE;
 		VkDescriptorImageInfo										descriptor							= {};
 		VkCommandBuffer												commandBuffer						= VK_NULL_HANDLE;
-		// Semaphore used to synchronize between offscreen and final scene render pass	
-		VkSemaphore													semaphore							= VK_NULL_HANDLE;
+		VkSemaphore													semaphore							= VK_NULL_HANDLE;	// Semaphore used to synchronize between offscreen and final scene render pass	
 	}															offscreenPass;
 
 																VulkanExample						()											: VulkanExampleBase(ENABLE_VALIDATION)	{

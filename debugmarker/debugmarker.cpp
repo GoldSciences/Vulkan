@@ -178,17 +178,7 @@ public:
 	}															descriptorSets;
 
 	// Framebuffer for offscreen rendering
-	struct OffscreenPass {
-		int32_t														width, height;
-		VkFramebuffer												frameBuffer								= VK_NULL_HANDLE;
-		vks::FrameBufferAttachmentSmall								color, depth;	
-		VkRenderPass												renderPass								= VK_NULL_HANDLE;
-		VkSampler													sampler									= VK_NULL_HANDLE;
-		VkDescriptorImageInfo										descriptor								= {};
-		VkCommandBuffer												commandBuffer							= VK_NULL_HANDLE;
-		// Semaphore used to synchronize between offscreen and final scene render pass
-		VkSemaphore													semaphore								= VK_NULL_HANDLE;
-	}															offscreenPass;
+	vks::OffscreenPass											offscreenPass;
 
 	// Random tag data
 	struct DemoTag {

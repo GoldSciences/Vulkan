@@ -80,18 +80,7 @@ public:
 		VkDescriptorSetLayout										shaded							= VK_NULL_HANDLE;
 	}															descriptorSetLayouts;
 
-	// Framebuffer for offscreen rendering
-	struct OffscreenPass {
-		int32_t														width, height;
-		VkFramebuffer												frameBuffer						= VK_NULL_HANDLE;		
-		vks::FrameBufferAttachmentSmall								color, depth;		
-		VkRenderPass												renderPass						= VK_NULL_HANDLE;
-		VkSampler													sampler							= VK_NULL_HANDLE;
-		VkDescriptorImageInfo										descriptor;
-		VkCommandBuffer												commandBuffer					= VK_NULL_HANDLE;
-		// Semaphore used to synchronize between offscreen and final scene render pass
-		VkSemaphore													semaphore						= VK_NULL_HANDLE;
-	}															offscreenPass;
+	vks::OffscreenPass											offscreenPass;	
 
 	glm::vec3													meshPos							= glm::vec3(0.0f, -1.5f, 0.0f);
 	glm::vec3													meshRot							= glm::vec3(0.0f);

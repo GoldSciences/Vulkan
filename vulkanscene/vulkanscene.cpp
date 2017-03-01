@@ -24,8 +24,7 @@ public:
 		,	vks::VERTEX_COMPONENT_COLOR
 		});
 
-	struct DemoModel
-	{
+	struct DemoModel {
 		vks::Model													model;
 		VkPipeline													* pipeline								= VK_NULL_HANDLE;
 
@@ -60,7 +59,7 @@ public:
 		VkPipeline													logos									= VK_NULL_HANDLE;
 		VkPipeline													models									= VK_NULL_HANDLE;
 		VkPipeline													skybox									= VK_NULL_HANDLE;
-	} pipelines;
+	}															pipelines;
 
 	VkPipelineLayout											pipelineLayout							= VK_NULL_HANDLE;
 	VkDescriptorSet												descriptorSet							= VK_NULL_HANDLE;

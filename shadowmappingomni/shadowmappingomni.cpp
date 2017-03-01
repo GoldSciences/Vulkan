@@ -87,21 +87,7 @@ public:
 	VkDescriptorSetLayout										descriptorSetLayout;
 	vks::Texture												shadowCubeMap;
 
-	// Framebuffer for offscreen rendering
-	struct OffscreenPass {
-		int32_t														width							= 0
-			,														height							= 0
-			;
-		VkFramebuffer												frameBuffer						= VK_NULL_HANDLE;
-		vks::FrameBufferAttachmentSmall								color		
-			,														depth
-			;
-		VkRenderPass												renderPass						= VK_NULL_HANDLE;
-		VkSampler													sampler							= VK_NULL_HANDLE;
-		VkDescriptorImageInfo										descriptor						= {};
-		VkCommandBuffer												commandBuffer					= VK_NULL_HANDLE;
-		VkSemaphore													semaphore						= VK_NULL_HANDLE;		// Semaphore used to synchronize between offscreen and final scene render pass
-	}															offscreenPass;
+	vks::OffscreenPass											offscreenPass;
 
 	VkFormat													fbDepthFormat;
 

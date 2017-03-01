@@ -53,8 +53,7 @@ struct VertexBoneData
 };
 
 // Stores information on a single bone
-struct BoneInfo
-{
+struct BoneInfo {
 	aiMatrix4x4													offset							= aiMatrix4x4();
 	aiMatrix4x4													finalTransformation				= aiMatrix4x4();
 };
