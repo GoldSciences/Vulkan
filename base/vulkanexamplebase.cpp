@@ -1178,7 +1178,7 @@ wl_shell_surface *							VulkanExampleBase::setupWindow						()																	
 #elif defined(__linux__)
 
 static inline xcb_intern_atom_reply_t*		intern_atom_helper									(xcb_connection_t *conn, bool only_if_exists, const char *str)													{
-	xcb_intern_atom_cookie_t cookie = xcb_intern_atom(conn, only_if_exists, strlen(str), str);
+	xcb_intern_atom_cookie_t cookie				= xcb_intern_atom(conn, only_if_exists, strlen(str), str);
 	return xcb_intern_atom_reply(conn, cookie, NULL);
 }
 

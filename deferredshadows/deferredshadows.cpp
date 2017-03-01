@@ -429,7 +429,7 @@ public:
 		}
 	}
 
-	/** @brief Create a single quad for fullscreen deferred pass and debug passes (debug pass uses instancing for light visualization) */
+	// Create a single quad for fullscreen deferred pass and debug passes (debug pass uses instancing for light visualization) 
 	void														generateQuads							()													{
 		struct Vertex {
 			float															pos		[3];

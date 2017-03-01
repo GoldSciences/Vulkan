@@ -1,4 +1,3 @@
-// 
 // Vulkan Example - Omni directional shadows using a dynamic cube map
 // 
 // Copyright (C) 2016 by Sascha Willems - www.saschawillems.de

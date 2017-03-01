@@ -32,10 +32,8 @@
 // Max. number of chars the text overlay buffer can hold
 #define MAX_CHAR_COUNT 1024
 
-/**
-* @brief Mostly self-contained text overlay class
-* @note Will only work with compatible render passes
-*/ 
+// Mostly self-contained text overlay class
+// Note: Will only work with compatible render passes
 class VulkanTextOverlay
 {
 private:

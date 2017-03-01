@@ -47,7 +47,7 @@ namespace vks
 			descriptor.imageLayout								= imageLayout;
 		}
 
-		// @brief Release all Vulkan resources held by this texture
+		// Release all Vulkan resources held by this texture
 		void												destroy				()										{
 			vkDestroyImageView	(device->logicalDevice, view, nullptr);
 			vkDestroyImage		(device->logicalDevice, image, nullptr);

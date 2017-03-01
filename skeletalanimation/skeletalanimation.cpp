@@ -370,13 +370,13 @@ public:
 		for (size_t i = 0; i < drawCmdBuffers.size(); ++i) {
 			renderPassBeginInfo.framebuffer								= frameBuffers[i];
 			VK_CHECK_RESULT(vkBeginCommandBuffer(drawCmdBuffers[i], &cmdBufInfo));
-			vkCmdBeginRenderPass(drawCmdBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
+			vkCmdBeginRenderPass	(drawCmdBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 
 			VkViewport														viewport						= vks::initializers::viewport((float)width, (float)height, 0.0f, 1.0f);
-			vkCmdSetViewport(drawCmdBuffers[i], 0, 1, &viewport);
+			vkCmdSetViewport		(drawCmdBuffers[i], 0, 1, &viewport);
 
 			VkRect2D														scissor							= vks::initializers::rect2D(width, height, 0, 0);
-			vkCmdSetScissor(drawCmdBuffers[i], 0, 1, &scissor);
+			vkCmdSetScissor			(drawCmdBuffers[i], 0, 1, &scissor);
 
 			VkDeviceSize													offsets[1]						= { 0 };
 
