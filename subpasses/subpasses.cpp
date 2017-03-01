@@ -87,14 +87,8 @@ public:
 	}															descriptorSetLayouts;
 
 	// G-Buffer framebuffer attachments
-	struct FrameBufferAttachment {
-		VkImage														image									= VK_NULL_HANDLE;
-		VkDeviceMemory												mem										= VK_NULL_HANDLE;
-		VkImageView													view									= VK_NULL_HANDLE;
-		VkFormat													format									= VK_FORMAT_UNDEFINED;
-	};
 	struct Attachments {
-		FrameBufferAttachment										position, normal, albedo;
+		vks::FrameBufferAttachmentWithFormat						position, normal, albedo;
 	}															attachments;
 	
 																VulkanExample							()																					: VulkanExampleBase(ENABLE_VALIDATION) {
@@ -113,18 +107,9 @@ public:
 																~VulkanExample							()																					{
 		// Clean up used Vulkan resources 
 		// Note : Inherited destructor cleans up resources stored in base class
-
-		vkDestroyImageView				(device, attachments.position.view			, nullptr);
-		vkDestroyImage					(device, attachments.position.image			, nullptr);
-		vkFreeMemory					(device, attachments.position.mem			, nullptr);
-
-		vkDestroyImageView				(device, attachments.normal.view			, nullptr);
-		vkDestroyImage					(device, attachments.normal.image			, nullptr);
-		vkFreeMemory					(device, attachments.normal.mem				, nullptr);
-
-		vkDestroyImageView				(device, attachments.albedo.view			, nullptr);
-		vkDestroyImage					(device, attachments.albedo.image			, nullptr);
-		vkFreeMemory					(device, attachments.albedo.mem				, nullptr);
+		attachments.position	.destroy(device);
+		attachments.normal		.destroy(device);
+		attachments.albedo		.destroy(device);
 
 		vkDestroyPipeline				(device, pipelines.offscreen				, nullptr);
 		vkDestroyPipeline				(device, pipelines.composition				, nullptr);
@@ -146,7 +131,7 @@ public:
 	}
 
 	// Create a frame buffer attachment
-	void														createAttachment						(VkFormat format, VkImageUsageFlags usage, FrameBufferAttachment *attachment)		{
+	void														createAttachment						(VkFormat format, VkImageUsageFlags usage, vks::FrameBufferAttachmentWithFormat *attachment)		{
 		VkImageAspectFlags												aspectMask					= 0;
 		VkImageLayout													imageLayout;
 
@@ -183,8 +168,8 @@ public:
 		vkGetImageMemoryRequirements(device, attachment->image, &memReqs);
 		memAlloc.allocationSize										= memReqs.size;
 		memAlloc.memoryTypeIndex									= vulkanDevice->getMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-		VK_CHECK_RESULT(vkAllocateMemory(device, &memAlloc, nullptr, &attachment->mem));
-		VK_CHECK_RESULT(vkBindImageMemory(device, attachment->image, attachment->mem, 0));
+		VK_CHECK_RESULT(vkAllocateMemory(device, &memAlloc, nullptr, &attachment->memory));
+		VK_CHECK_RESULT(vkBindImageMemory(device, attachment->image, attachment->memory, 0));
 
 		VkImageViewCreateInfo											imageView					= vks::initializers::imageViewCreateInfo();
 		imageView.viewType											= VK_IMAGE_VIEW_TYPE_2D;

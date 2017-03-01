@@ -178,15 +178,10 @@ public:
 	}															descriptorSets;
 
 	// Framebuffer for offscreen rendering
-	struct FrameBufferAttachment {
-		VkImage														image									= VK_NULL_HANDLE;
-		VkDeviceMemory												mem										= VK_NULL_HANDLE;
-		VkImageView													view									= VK_NULL_HANDLE;
-	};
 	struct OffscreenPass {
 		int32_t														width, height;
 		VkFramebuffer												frameBuffer								= VK_NULL_HANDLE;
-		FrameBufferAttachment										color, depth;
+		vks::FrameBufferAttachmentSmall								color, depth;	
 		VkRenderPass												renderPass								= VK_NULL_HANDLE;
 		VkSampler													sampler									= VK_NULL_HANDLE;
 		VkDescriptorImageInfo										descriptor								= {};
@@ -231,15 +226,8 @@ public:
 		uniformBuffer		.destroy();
 
 		// Offscreen
-		// Color attachment
-		vkDestroyImageView				(device, offscreenPass.color.view	, nullptr);
-		vkDestroyImage					(device, offscreenPass.color.image	, nullptr);
-		vkFreeMemory					(device, offscreenPass.color.mem	, nullptr);
-
-		// Depth attachment
-		vkDestroyImageView				(device, offscreenPass.depth.view	, nullptr);
-		vkDestroyImage					(device, offscreenPass.depth.image	, nullptr);
-		vkFreeMemory					(device, offscreenPass.depth.mem	, nullptr);
+		offscreenPass.color.	destroy(device);	// Color attachment
+		offscreenPass.depth.	destroy(device);	// Depth attachment
 
 		vkDestroyRenderPass				(device, offscreenPass.renderPass	, nullptr);
 		vkDestroySampler				(device, offscreenPass.sampler		, nullptr);
@@ -279,8 +267,8 @@ public:
 		vkGetImageMemoryRequirements(device, offscreenPass.color.image, &memReqs);
 		memAlloc.allocationSize										= memReqs.size;
 		memAlloc.memoryTypeIndex									= vulkanDevice->getMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-		VK_CHECK_RESULT(vkAllocateMemory(device, &memAlloc, nullptr, &offscreenPass.color.mem));
-		VK_CHECK_RESULT(vkBindImageMemory(device, offscreenPass.color.image, offscreenPass.color.mem, 0));
+		VK_CHECK_RESULT(vkAllocateMemory(device, &memAlloc, nullptr, &offscreenPass.color.memory));
+		VK_CHECK_RESULT(vkBindImageMemory(device, offscreenPass.color.image, offscreenPass.color.memory, 0));
 
 		VkImageViewCreateInfo											colorImageView							= vks::initializers::imageViewCreateInfo();
 		colorImageView.viewType										= VK_IMAGE_VIEW_TYPE_2D;
@@ -317,8 +305,8 @@ public:
 		vkGetImageMemoryRequirements		(device, offscreenPass.depth.image, &memReqs);
 		memAlloc.allocationSize										= memReqs.size;
 		memAlloc.memoryTypeIndex									= vulkanDevice->getMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-		VK_CHECK_RESULT(vkAllocateMemory	(device, &memAlloc, nullptr, &offscreenPass.depth.mem));
-		VK_CHECK_RESULT(vkBindImageMemory	(device, offscreenPass.depth.image, offscreenPass.depth.mem, 0));
+		VK_CHECK_RESULT(vkAllocateMemory	(device, &memAlloc, nullptr, &offscreenPass.depth.memory));
+		VK_CHECK_RESULT(vkBindImageMemory	(device, offscreenPass.depth.image, offscreenPass.depth.memory, 0));
 
 		VkImageViewCreateInfo											depthStencilView						= vks::initializers::imageViewCreateInfo();
 		depthStencilView.viewType									= VK_IMAGE_VIEW_TYPE_2D;

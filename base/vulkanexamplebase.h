@@ -36,7 +36,9 @@
 #include "vulkanswapchain.hpp"
 #include "vulkantextoverlay.hpp"
 #include "camera.hpp"
+
 #include "vertex.h"
+#include "helper_types.h"
 
 class VulkanExampleBase
 {
@@ -124,12 +126,7 @@ public:
 	std::string							title						= "Vulkan Example";
 	std::string							name						= "vulkanExample";
 
-	struct 
-	{
-		VkImage								image						= VK_NULL_HANDLE;
-		VkDeviceMemory						mem							= VK_NULL_HANDLE;
-		VkImageView							view						= VK_NULL_HANDLE;
-	}									depthStencil;
+	vks::FrameBufferAttachmentSmall		depthStencil;
 
 	// Gamepad state (only one pad supported)
 	struct

@@ -92,14 +92,9 @@ public:
 	}															descriptorSetLayouts;
 
 	// Framebuffer for offscreen rendering
-	struct FrameBufferAttachment {
-		VkImage														image											= VK_NULL_HANDLE;
-		VkDeviceMemory												mem												= VK_NULL_HANDLE;
-		VkImageView													view											= VK_NULL_HANDLE;
-	};
 	struct FrameBuffer {
 		VkFramebuffer												framebuffer										= VK_NULL_HANDLE;
-		FrameBufferAttachment										color, depth;
+		vks::FrameBufferAttachmentSmall								color, depth;			
 		VkDescriptorImageInfo										descriptor										= {};
 	};
 	struct OffscreenPass {
@@ -130,12 +125,8 @@ public:
 		// Frame buffer
 		for (auto& framebuffer : offscreenPass.framebuffers) {
 			// Attachments
-			vkDestroyImageView				(device, framebuffer.color.view			, nullptr);
-			vkDestroyImage					(device, framebuffer.color.image		, nullptr);
-			vkFreeMemory					(device, framebuffer.color.mem			, nullptr);
-			vkDestroyImageView				(device, framebuffer.depth.view			, nullptr);
-			vkDestroyImage					(device, framebuffer.depth.image		, nullptr);
-			vkFreeMemory					(device, framebuffer.depth.mem			, nullptr);
+			framebuffer.color.destroy(device);
+			framebuffer.depth.destroy(device);
 
 			vkDestroyFramebuffer			(device, framebuffer.framebuffer		, nullptr);
 		}
@@ -203,8 +194,8 @@ public:
 		vkGetImageMemoryRequirements		(device, frameBuf->color.image, &memReqs);
 		memAlloc.allocationSize										= memReqs.size;
 		memAlloc.memoryTypeIndex									= vulkanDevice->getMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-		VK_CHECK_RESULT(vkAllocateMemory	(device, &memAlloc, nullptr, &frameBuf->color.mem));
-		VK_CHECK_RESULT(vkBindImageMemory	(device, frameBuf->color.image, frameBuf->color.mem, 0));
+		VK_CHECK_RESULT(vkAllocateMemory	(device, &memAlloc, nullptr, &frameBuf->color.memory));
+		VK_CHECK_RESULT(vkBindImageMemory	(device, frameBuf->color.image, frameBuf->color.memory, 0));
 
 		colorImageView.image										= frameBuf->color.image;
 		VK_CHECK_RESULT(vkCreateImageView(device, &colorImageView, nullptr, &frameBuf->color.view));
@@ -228,8 +219,8 @@ public:
 		vkGetImageMemoryRequirements(device, frameBuf->depth.image, &memReqs);
 		memAlloc.allocationSize										= memReqs.size;
 		memAlloc.memoryTypeIndex									= vulkanDevice->getMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-		VK_CHECK_RESULT(vkAllocateMemory	(device, &memAlloc, nullptr, &frameBuf->depth.mem));
-		VK_CHECK_RESULT(vkBindImageMemory	(device, frameBuf->depth.image, frameBuf->depth.mem, 0));
+		VK_CHECK_RESULT(vkAllocateMemory	(device, &memAlloc, nullptr, &frameBuf->depth.memory));
+		VK_CHECK_RESULT(vkBindImageMemory	(device, frameBuf->depth.image, frameBuf->depth.memory, 0));
 
 		depthStencilView.image										= frameBuf->depth.image;
 		VK_CHECK_RESULT(vkCreateImageView	(device, &depthStencilView, nullptr, &frameBuf->depth.view));

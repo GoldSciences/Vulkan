@@ -421,15 +421,15 @@ public:
 			vertexBufferInfo.usage										= VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
 
 			// Copy vertex data to a buffer visible to the host
-			VK_CHECK_RESULT(vkCreateBuffer		(device, &vertexBufferInfo, nullptr, &vertices.buffer));
-			vkGetBufferMemoryRequirements		(device, vertices.buffer, &memReqs);
+			VK_CHECK_RESULT(vkCreateBuffer			(device, &vertexBufferInfo, nullptr, &vertices.buffer));
+			vkGetBufferMemoryRequirements			(device, vertices.buffer, &memReqs);
 			memAlloc.allocationSize										= memReqs.size;
 			memAlloc.memoryTypeIndex									= getMemoryTypeIndex(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
-			VK_CHECK_RESULT(vkAllocateMemory	(device, &memAlloc, nullptr, &vertices.memory));
-			VK_CHECK_RESULT(vkMapMemory			(device, vertices.memory, 0, memAlloc.allocationSize, 0, &data));
+			VK_CHECK_RESULT(vkAllocateMemory		(device, &memAlloc, nullptr, &vertices.memory));
+			VK_CHECK_RESULT(vkMapMemory				(device, vertices.memory, 0, memAlloc.allocationSize, 0, &data));
 			memcpy(data, vertexBuffer.data(), vertexBufferSize);
-			vkUnmapMemory						(device, vertices.memory);
-			VK_CHECK_RESULT(vkBindBufferMemory	(device, vertices.buffer, vertices.memory, 0));
+			vkUnmapMemory							(device, vertices.memory);
+			VK_CHECK_RESULT(vkBindBufferMemory		(device, vertices.buffer, vertices.memory, 0));
 
 			// Index buffer
 			VkBufferCreateInfo												indexbufferInfo							= {};
@@ -438,15 +438,15 @@ public:
 			indexbufferInfo.usage										= VK_BUFFER_USAGE_INDEX_BUFFER_BIT;
 
 			// Copy index data to a buffer visible to the host
-			VK_CHECK_RESULT(vkCreateBuffer		(device, &indexbufferInfo, nullptr, &indices.buffer));
-			vkGetBufferMemoryRequirements		(device, indices.buffer, &memReqs);
+			VK_CHECK_RESULT(vkCreateBuffer			(device, &indexbufferInfo, nullptr, &indices.buffer));
+			vkGetBufferMemoryRequirements			(device, indices.buffer, &memReqs);
 			memAlloc.allocationSize										= memReqs.size;
 			memAlloc.memoryTypeIndex									= getMemoryTypeIndex(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
-			VK_CHECK_RESULT(vkAllocateMemory	(device, &memAlloc, nullptr, &indices.memory));
-			VK_CHECK_RESULT(vkMapMemory			(device, indices.memory, 0, indexBufferSize, 0, &data));
+			VK_CHECK_RESULT(vkAllocateMemory		(device, &memAlloc, nullptr, &indices.memory));
+			VK_CHECK_RESULT(vkMapMemory				(device, indices.memory, 0, indexBufferSize, 0, &data));
 			memcpy(data, indexBuffer.data(), indexBufferSize);
-			vkUnmapMemory						(device, indices.memory);
-			VK_CHECK_RESULT(vkBindBufferMemory	(device, indices.buffer, indices.memory, 0));
+			vkUnmapMemory							(device, indices.memory);
+			VK_CHECK_RESULT(vkBindBufferMemory		(device, indices.buffer, indices.memory, 0));
 		}
 	}
 
@@ -471,7 +471,7 @@ public:
 		// Set the max. number of descriptor sets that can be requested from this pool (requesting beyond this limit will result in an error)
 		descriptorPoolInfo.maxSets									= 1;
 
-		VK_CHECK_RESULT(vkCreateDescriptorPool(device, &descriptorPoolInfo, nullptr, &descriptorPool));
+		VK_CHECK_RESULT(vkCreateDescriptorPool		(device, &descriptorPoolInfo, nullptr, &descriptorPool));
 	}
 
 	void														setupDescriptorSetLayout				()																{
@@ -492,7 +492,7 @@ public:
 		descriptorLayout.bindingCount								= 1;
 		descriptorLayout.pBindings									= &layoutBinding;
 
-		VK_CHECK_RESULT(vkCreateDescriptorSetLayout(device, &descriptorLayout, nullptr, &descriptorSetLayout));
+		VK_CHECK_RESULT(vkCreateDescriptorSetLayout	(device, &descriptorLayout, nullptr, &descriptorSetLayout));
 
 		// Create the pipeline layout that is used to generate the rendering pipelines that are based on this descriptor set layout
 		// In a more complex scenario you would have different pipeline layouts for different descriptor set layouts that could be reused
@@ -502,7 +502,7 @@ public:
 		pPipelineLayoutCreateInfo.setLayoutCount					= 1;
 		pPipelineLayoutCreateInfo.pSetLayouts						= &descriptorSetLayout;
 
-		VK_CHECK_RESULT(vkCreatePipelineLayout(device, &pPipelineLayoutCreateInfo, nullptr, &pipelineLayout));
+		VK_CHECK_RESULT(vkCreatePipelineLayout		(device, &pPipelineLayoutCreateInfo, nullptr, &pipelineLayout));
 	}
 
 	void														setupDescriptorSet						()																{
@@ -513,7 +513,7 @@ public:
 		allocInfo.descriptorSetCount								= 1;
 		allocInfo.pSetLayouts										= &descriptorSetLayout;
 
-		VK_CHECK_RESULT(vkAllocateDescriptorSets(device, &allocInfo, &descriptorSet));
+		VK_CHECK_RESULT(vkAllocateDescriptorSets	(device, &allocInfo, &descriptorSet));
 
 		// Update the descriptor set determining the shader binding points
 		// For every binding point used in a shader there needs to be one
@@ -530,7 +530,7 @@ public:
 		// Binds this uniform buffer to binding point 0
 		writeDescriptorSet.dstBinding								= 0;
 
-		vkUpdateDescriptorSets(device, 1, &writeDescriptorSet, 0, nullptr);
+		vkUpdateDescriptorSets						(device, 1, &writeDescriptorSet, 0, nullptr);
 	}
 
 	// Create the depth (and stencil) buffer attachments used by our framebuffers
@@ -548,17 +548,17 @@ public:
 		image.tiling												= VK_IMAGE_TILING_OPTIMAL;
 		image.usage													= VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
 		image.initialLayout											= VK_IMAGE_LAYOUT_UNDEFINED;
-		VK_CHECK_RESULT(vkCreateImage(device, &image, nullptr, &depthStencil.image));
+		VK_CHECK_RESULT(vkCreateImage				(device, &image, nullptr, &depthStencil.image));
 
 		// Allocate memory for the image (device local) and bind it to our image
 		VkMemoryAllocateInfo											memAlloc								= {};
 		memAlloc.sType												= VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 		VkMemoryRequirements											 memReqs;
-		vkGetImageMemoryRequirements(device, depthStencil.image, &memReqs);
+		vkGetImageMemoryRequirements				(device, depthStencil.image, &memReqs);
 		memAlloc.allocationSize										= memReqs.size;
 		memAlloc.memoryTypeIndex									= getMemoryTypeIndex(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-		VK_CHECK_RESULT(vkAllocateMemory(device, &memAlloc, nullptr, &depthStencil.mem));
-		VK_CHECK_RESULT(vkBindImageMemory(device, depthStencil.image, depthStencil.mem, 0));
+		VK_CHECK_RESULT(vkAllocateMemory			(device, &memAlloc, nullptr, &depthStencil.memory));
+		VK_CHECK_RESULT(vkBindImageMemory			(device, depthStencil.image, depthStencil.memory, 0));
 
 		// Create a view for the depth stencil image
 		// Images aren't directly accessed in Vulkan, but rather through views described by a subresource range
@@ -574,7 +574,7 @@ public:
 		depthStencilView.subresourceRange.baseArrayLayer			= 0;
 		depthStencilView.subresourceRange.layerCount				= 1;
 		depthStencilView.image										= depthStencil.image;
-		VK_CHECK_RESULT(vkCreateImageView(device, &depthStencilView, nullptr, &depthStencil.view));
+		VK_CHECK_RESULT(vkCreateImageView			(device, &depthStencilView, nullptr, &depthStencil.view));
 	}
 
 	// Create a frame buffer for each swap chain image
@@ -596,7 +596,7 @@ public:
 			frameBufferCreateInfo.height								= height;
 			frameBufferCreateInfo.layers								= 1;
 			// Create the framebuffer
-			VK_CHECK_RESULT(vkCreateFramebuffer(device, &frameBufferCreateInfo, nullptr, &frameBuffers[i]));
+			VK_CHECK_RESULT(vkCreateFramebuffer		(device, &frameBufferCreateInfo, nullptr, &frameBuffers[i]));
 		}
 	}
 
@@ -689,7 +689,7 @@ public:
 		renderPassInfo.dependencyCount								= static_cast<uint32_t>(dependencies.size());		// Number of subpass dependencies
 		renderPassInfo.pDependencies								= dependencies.data();								// Subpass dependencies used by the render pass
 
-		VK_CHECK_RESULT(vkCreateRenderPass(device, &renderPassInfo, nullptr, &renderPass));
+		VK_CHECK_RESULT(vkCreateRenderPass			(device, &renderPassInfo, nullptr, &renderPass));
 	}
 
 	// Vulkan loads it's shaders from an immediate binary representation called SPIR-V
@@ -730,7 +730,7 @@ public:
 			moduleCreateInfo.pCode										= (uint32_t*)shaderCode;
 
 			VkShaderModule													shaderModule							= VK_NULL_HANDLE;
-			VK_CHECK_RESULT(vkCreateShaderModule(device, &moduleCreateInfo, NULL, &shaderModule));
+			VK_CHECK_RESULT(vkCreateShaderModule		(device, &moduleCreateInfo, NULL, &shaderModule));
 
 			delete[] shaderCode;
 
@@ -890,7 +890,7 @@ public:
 		pipelineCreateInfo.pDynamicState							= &dynamicState;
 
 		// Create rendering pipeline using the specified states
-		VK_CHECK_RESULT(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipeline));
+		VK_CHECK_RESULT(vkCreateGraphicsPipelines	(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipeline));
 
 		// Shader modules are no longer needed once the graphics pipeline has been created
 		vkDestroyShaderModule(device, shaderStages[0].module, nullptr);
@@ -914,8 +914,8 @@ public:
 		bufferInfo.size												= sizeof(uboVS);
 		bufferInfo.usage											= VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;			// This buffer will be used as a uniform buffer
 
-		VK_CHECK_RESULT(vkCreateBuffer		(device, &bufferInfo, nullptr, &uniformBufferVS.buffer));			// Create a new buffer
-		vkGetBufferMemoryRequirements		(device, uniformBufferVS.buffer, &memReqs);							// Get memory requirements including size, alignment and memory type 
+		VK_CHECK_RESULT(vkCreateBuffer			(device, &bufferInfo, nullptr, &uniformBufferVS.buffer));			// Create a new buffer
+		vkGetBufferMemoryRequirements			(device, uniformBufferVS.buffer, &memReqs);							// Get memory requirements including size, alignment and memory type 
 		allocInfo.allocationSize									= memReqs.size;
 
 		// Get the memory type index that supports host visibile memory access
@@ -924,8 +924,8 @@ public:
 		// Note: This may affect performance so you might not want to do this in a real world application that updates buffers on a regular base
 		allocInfo.memoryTypeIndex									= getMemoryTypeIndex(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 		
-		VK_CHECK_RESULT(vkAllocateMemory	(device, &allocInfo, nullptr, &(uniformBufferVS.memory)));			// Allocate memory for the uniform buffer
-		VK_CHECK_RESULT(vkBindBufferMemory	(device, uniformBufferVS.buffer, uniformBufferVS.memory, 0));		// Bind memory to buffer
+		VK_CHECK_RESULT(vkAllocateMemory		(device, &allocInfo, nullptr, &(uniformBufferVS.memory)));			// Allocate memory for the uniform buffer
+		VK_CHECK_RESULT(vkBindBufferMemory		(device, uniformBufferVS.buffer, uniformBufferVS.memory, 0));		// Bind memory to buffer
 		
 		// Store information in the uniform's descriptor that is used by the descriptor set
 		uniformBufferVS.descriptor.buffer							= uniformBufferVS.buffer;
@@ -948,11 +948,11 @@ public:
 
 		// Map uniform buffer and update it
 		uint8_t															* pData									= nullptr;
-		VK_CHECK_RESULT(vkMapMemory(device, uniformBufferVS.memory, 0, sizeof(uboVS), 0, (void **)&pData));
+		VK_CHECK_RESULT(vkMapMemory				(device, uniformBufferVS.memory, 0, sizeof(uboVS), 0, (void **)&pData));
 		memcpy(pData, &uboVS, sizeof(uboVS));
 		// Unmap after data has been copied
 		// Note: Since we requested a host coherent memory type for the uniform buffer, the write is instantly visible to the GPU
-		vkUnmapMemory(device, uniformBufferVS.memory);
+		vkUnmapMemory							(device, uniformBufferVS.memory);
 	}
 
 	void														prepare									()																{

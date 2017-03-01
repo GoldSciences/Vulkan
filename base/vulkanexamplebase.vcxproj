@@ -170,6 +170,7 @@
   <ItemGroup>
     <ClInclude Include="camera.hpp" />
     <ClInclude Include="frustum.hpp" />
+    <ClInclude Include="helper_types.h" />
     <ClInclude Include="keycodes.hpp" />
     <ClInclude Include="threadpool.hpp" />
     <ClInclude Include="vertex.h" />

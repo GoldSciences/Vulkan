@@ -98,17 +98,11 @@ public:
 	VkDescriptorSetLayout										descriptorSetLayout						= VK_NULL_HANDLE;
 
 	// Framebuffer for offscreen rendering
-	struct FrameBufferAttachment {
-		VkImage														image									= VK_NULL_HANDLE;
-		VkDeviceMemory												mem										= VK_NULL_HANDLE;
-		VkImageView													view									= VK_NULL_HANDLE;
-		VkFormat													format									= VK_FORMAT_UNDEFINED;
-	};
 	struct FrameBuffer {
 		int32_t														width, height;
 		VkFramebuffer												frameBuffer								= VK_NULL_HANDLE;		
-		FrameBufferAttachment										position, normal, albedo;
-		FrameBufferAttachment										depth;
+		vks::FrameBufferAttachmentWithFormat						position, normal, albedo;	
+		vks::FrameBufferAttachmentWithFormat						depth;
 		VkRenderPass												renderPass								= VK_NULL_HANDLE;
 	}															offScreenFrameBuf;
 	
@@ -141,25 +135,25 @@ public:
 		// Frame buffer
 
 		// Color attachments
-		vkDestroyImageView(device, offScreenFrameBuf.position.view, nullptr);	vkDestroyImage(device, offScreenFrameBuf.position.image, nullptr);	vkFreeMemory(device, offScreenFrameBuf.position.mem, nullptr);
-		vkDestroyImageView(device, offScreenFrameBuf.normal.view, nullptr);		vkDestroyImage(device, offScreenFrameBuf.normal.image, nullptr);	vkFreeMemory(device, offScreenFrameBuf.normal.mem, nullptr);
-		vkDestroyImageView(device, offScreenFrameBuf.albedo.view, nullptr);		vkDestroyImage(device, offScreenFrameBuf.albedo.image, nullptr);	vkFreeMemory(device, offScreenFrameBuf.albedo.mem, nullptr);
+		offScreenFrameBuf.position	.destroy(device);
+		offScreenFrameBuf.normal	.destroy(device);
+		offScreenFrameBuf.albedo	.destroy(device);
 
 		// Depth attachment
-		vkDestroyImageView(device, offScreenFrameBuf.depth.view, nullptr);		vkDestroyImage(device, offScreenFrameBuf.depth.image, nullptr);		vkFreeMemory(device, offScreenFrameBuf.depth.mem, nullptr);
+		offScreenFrameBuf.depth		.destroy(device);
 
-		vkDestroyFramebuffer(device, offScreenFrameBuf.frameBuffer, nullptr);
+		vkDestroyFramebuffer			(device, offScreenFrameBuf.frameBuffer, nullptr);
 
-		vkDestroyPipeline(device, pipelines.deferred, nullptr);
-		vkDestroyPipeline(device, pipelines.deferredNoMSAA, nullptr);
-		vkDestroyPipeline(device, pipelines.offscreen, nullptr);
-		vkDestroyPipeline(device, pipelines.offscreenSampleShading, nullptr);
-		vkDestroyPipeline(device, pipelines.debug, nullptr);
+		vkDestroyPipeline				(device, pipelines.deferred					, nullptr);
+		vkDestroyPipeline				(device, pipelines.deferredNoMSAA			, nullptr);
+		vkDestroyPipeline				(device, pipelines.offscreen				, nullptr);
+		vkDestroyPipeline				(device, pipelines.offscreenSampleShading	, nullptr);
+		vkDestroyPipeline				(device, pipelines.debug					, nullptr);
 
-		vkDestroyPipelineLayout(device, pipelineLayouts.deferred, nullptr);
-		vkDestroyPipelineLayout(device, pipelineLayouts.offscreen, nullptr);
+		vkDestroyPipelineLayout			(device, pipelineLayouts.deferred			, nullptr);
+		vkDestroyPipelineLayout			(device, pipelineLayouts.offscreen			, nullptr);
 
-		vkDestroyDescriptorSetLayout(device, descriptorSetLayout, nullptr);
+		vkDestroyDescriptorSetLayout	(device, descriptorSetLayout				, nullptr);
 
 		// Meshes
 		models.model.destroy();
@@ -183,7 +177,7 @@ public:
 	}
 
 	// Create a frame buffer attachment
-	void														createAttachment						(VkFormat format,  VkImageUsageFlagBits usage, FrameBufferAttachment *attachment, VkCommandBuffer layoutCmd)	{
+	void														createAttachment						(VkFormat format,  VkImageUsageFlagBits usage, vks::FrameBufferAttachmentWithFormat *attachment, VkCommandBuffer layoutCmd)	{
 		VkImageAspectFlags												aspectMask								= 0;
 		VkImageLayout													imageLayout;
 
@@ -219,8 +213,8 @@ public:
 		vkGetImageMemoryRequirements		(device, attachment->image, &memReqs);
 		memAlloc.allocationSize										= memReqs.size;
 		memAlloc.memoryTypeIndex									= vulkanDevice->getMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-		VK_CHECK_RESULT(vkAllocateMemory	(device, &memAlloc, nullptr, &attachment->mem));
-		VK_CHECK_RESULT(vkBindImageMemory	(device, attachment->image, attachment->mem, 0));
+		VK_CHECK_RESULT(vkAllocateMemory	(device, &memAlloc, nullptr, &attachment->memory));
+		VK_CHECK_RESULT(vkBindImageMemory	(device, attachment->image, attachment->memory, 0));
 		
 		VkImageViewCreateInfo											imageView								= vks::initializers::imageViewCreateInfo();
 		imageView.viewType											= VK_IMAGE_VIEW_TYPE_2D;

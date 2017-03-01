@@ -88,18 +88,12 @@ public:
 	vks::Texture												shadowCubeMap;
 
 	// Framebuffer for offscreen rendering
-	struct FrameBufferAttachment {
-		VkImage														image							= VK_NULL_HANDLE;
-		VkDeviceMemory												mem								= VK_NULL_HANDLE;
-		VkImageView													view							= VK_NULL_HANDLE;
-	};
-
 	struct OffscreenPass {
 		int32_t														width							= 0
 			,														height							= 0
 			;
 		VkFramebuffer												frameBuffer						= VK_NULL_HANDLE;
-		FrameBufferAttachment										color
+		vks::FrameBufferAttachmentSmall								color		
 			,														depth
 			;
 		VkRenderPass												renderPass						= VK_NULL_HANDLE;
@@ -131,8 +125,8 @@ public:
 		vkFreeMemory					(device, shadowCubeMap.deviceMemory	, nullptr);
 
 		// Frame buffer
-		vkDestroyImageView				(device, offscreenPass.color.view	, nullptr);		vkDestroyImage		(device, offscreenPass.color.image	, nullptr);	vkFreeMemory		(device, offscreenPass.color.mem	, nullptr);	// Color attachment
-		vkDestroyImageView				(device, offscreenPass.depth.view	, nullptr);		vkDestroyImage		(device, offscreenPass.depth.image	, nullptr);	vkFreeMemory		(device, offscreenPass.depth.mem	, nullptr);	// Depth attachment
+		offscreenPass.color		.destroy(device);
+		offscreenPass.depth		.destroy(device);
 
 		vkDestroyFramebuffer			(device, offscreenPass.frameBuffer	, nullptr);
 
@@ -276,8 +270,8 @@ public:
 		vkGetImageMemoryRequirements		(device, offscreenPass.color.image, &memReqs);
 		memAlloc.allocationSize										= memReqs.size;
 		memAlloc.memoryTypeIndex									= vulkanDevice->getMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-		VK_CHECK_RESULT(vkAllocateMemory	(device, &memAlloc, nullptr, &offscreenPass.color.mem));
-		VK_CHECK_RESULT(vkBindImageMemory	(device, offscreenPass.color.image, offscreenPass.color.mem, 0));
+		VK_CHECK_RESULT(vkAllocateMemory	(device, &memAlloc, nullptr, &offscreenPass.color.memory));
+		VK_CHECK_RESULT(vkBindImageMemory	(device, offscreenPass.color.image, offscreenPass.color.memory, 0));
 
 		VkCommandBuffer													layoutCmd							= VulkanExampleBase::createCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY, true);
 
@@ -305,8 +299,8 @@ public:
 		vkGetImageMemoryRequirements		(device, offscreenPass.depth.image, &memReqs);
 		memAlloc.allocationSize										= memReqs.size;
 		memAlloc.memoryTypeIndex									= vulkanDevice->getMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-		VK_CHECK_RESULT(vkAllocateMemory	(device, &memAlloc, nullptr, &offscreenPass.depth.mem));
-		VK_CHECK_RESULT(vkBindImageMemory	(device, offscreenPass.depth.image, offscreenPass.depth.mem, 0));
+		VK_CHECK_RESULT(vkAllocateMemory	(device, &memAlloc, nullptr, &offscreenPass.depth.memory));
+		VK_CHECK_RESULT(vkBindImageMemory	(device, offscreenPass.depth.image, offscreenPass.depth.memory, 0));
 
 		vks::tools::setImageLayout(layoutCmd, offscreenPass.depth.image, VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
 

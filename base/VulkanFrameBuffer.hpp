@@ -17,12 +17,18 @@ namespace vks
 	// Encapsulates a single frame buffer attachment 
 	struct FramebufferAttachment
 	{
-		VkImage									image;
-		VkDeviceMemory							memory;
-		VkImageView								view;
-		VkFormat								format;
-		VkImageSubresourceRange					subresourceRange;
-		VkAttachmentDescription					description;
+		VkImage									image				= VK_NULL_HANDLE;
+		VkDeviceMemory							memory				= VK_NULL_HANDLE;
+		VkImageView								view				= VK_NULL_HANDLE;
+		VkFormat								format				= VK_FORMAT_UNDEFINED;
+		VkImageSubresourceRange					subresourceRange	= {};
+		VkAttachmentDescription					description			= {};
+
+		void									destroy				(VkDevice device_)															{
+			vkDestroyImage			(device_, image	, nullptr);
+			vkDestroyImageView		(device_, view	, nullptr);
+			vkFreeMemory			(device_, memory, nullptr);
+		}
 
 		// Returns true if the attachment has a depth component
 		bool									hasDepth			()																			{
@@ -77,11 +83,9 @@ namespace vks
 												~Framebuffer		()																			{
 			// Destroy and free Vulkan resources used for the framebuffer and all of it's attachments
 			assert(vulkanDevice);
-			for (auto attachment : attachments)		{
-				vkDestroyImage			(vulkanDevice->logicalDevice, attachment.image	, nullptr);
-				vkDestroyImageView		(vulkanDevice->logicalDevice, attachment.view	, nullptr);
-				vkFreeMemory			(vulkanDevice->logicalDevice, attachment.memory	, nullptr);
-			}
+			for (auto& attachment : attachments)	
+				attachment	.destroy(vulkanDevice->logicalDevice);
+
 			vkDestroySampler		(vulkanDevice->logicalDevice, sampler			, nullptr);
 			vkDestroyRenderPass		(vulkanDevice->logicalDevice, renderPass		, nullptr);
 			vkDestroyFramebuffer	(vulkanDevice->logicalDevice, framebuffer		, nullptr);

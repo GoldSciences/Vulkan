@@ -531,21 +531,19 @@ void										VulkanExampleBase::submitFrame						()																												
 	// Clean up Vulkan resources
 	swapChain.cleanup		();
 	if (descriptorPool != VK_NULL_HANDLE)
-		vkDestroyDescriptorPool	(device, descriptorPool	, nullptr);
+		vkDestroyDescriptorPool	(device, descriptorPool					, nullptr);
 
 	destroyCommandBuffers	();
-	vkDestroyRenderPass		(device, renderPass			, nullptr);
+	vkDestroyRenderPass		(device, renderPass						, nullptr);
 	for (uint32_t i = 0; i < frameBuffers.size(); i++)
-		vkDestroyFramebuffer	(device, frameBuffers[i]	, nullptr);
+		vkDestroyFramebuffer	(device, frameBuffers[i]				, nullptr);
 
 	for (auto& shaderModule : shaderModules)
-		vkDestroyShaderModule	(device, shaderModule		, nullptr);
+		vkDestroyShaderModule	(device, shaderModule					, nullptr);
 
-	vkDestroyImageView		(device, depthStencil.view	, nullptr);
-	vkDestroyImage			(device, depthStencil.image	, nullptr);
-	vkFreeMemory			(device, depthStencil.mem	, nullptr);
-	vkDestroyPipelineCache	(device, pipelineCache		, nullptr);
-	vkDestroyCommandPool	(device, cmdPool			, nullptr);
+	depthStencil	.destroy(device);
+	vkDestroyPipelineCache	(device, pipelineCache					, nullptr);
+	vkDestroyCommandPool	(device, cmdPool						, nullptr);
 
 	vkDestroySemaphore		(device, semaphores.presentComplete		, nullptr);
 	vkDestroySemaphore		(device, semaphores.renderComplete		, nullptr);
@@ -1395,15 +1393,15 @@ void										VulkanExampleBase::setupDepthStencil				()																								
 
 	VkMemoryRequirements											memReqs;
 
-	VK_CHECK_RESULT(vkCreateImage(device, &image, nullptr, &depthStencil.image));
-	vkGetImageMemoryRequirements(device, depthStencil.image, &memReqs);
+	VK_CHECK_RESULT(vkCreateImage		(device, &image, nullptr, &depthStencil.image));
+	vkGetImageMemoryRequirements		(device, depthStencil.image, &memReqs);
 	mem_alloc.allocationSize									= memReqs.size;
 	mem_alloc.memoryTypeIndex									= vulkanDevice->getMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-	VK_CHECK_RESULT(vkAllocateMemory(device, &mem_alloc, nullptr, &depthStencil.mem));
-	VK_CHECK_RESULT(vkBindImageMemory(device, depthStencil.image, depthStencil.mem, 0));
+	VK_CHECK_RESULT(vkAllocateMemory	(device, &mem_alloc, nullptr, &depthStencil.memory));
+	VK_CHECK_RESULT(vkBindImageMemory	(device, depthStencil.image, depthStencil.memory, 0));
 
 	depthStencilView.image										= depthStencil.image;
-	VK_CHECK_RESULT(vkCreateImageView(device, &depthStencilView, nullptr, &depthStencil.view));
+	VK_CHECK_RESULT(vkCreateImageView	(device, &depthStencilView, nullptr, &depthStencil.view));
 }
 
 void										VulkanExampleBase::setupFrameBuffer					()																												{
@@ -1426,7 +1424,7 @@ void										VulkanExampleBase::setupFrameBuffer					()																								
 	frameBuffers.resize(swapChain.imageCount);
 	for (uint32_t i = 0; i < frameBuffers.size(); i++) {
 		attachments[0]												= swapChain.buffers[i].view;
-		VK_CHECK_RESULT(vkCreateFramebuffer(device, &frameBufferCreateInfo, nullptr, &frameBuffers[i]));
+		VK_CHECK_RESULT(vkCreateFramebuffer	(device, &frameBufferCreateInfo, nullptr, &frameBuffers[i]));
 	}
 }
 
@@ -1498,7 +1496,7 @@ void										VulkanExampleBase::setupRenderPass					()																									
 	renderPassInfo.dependencyCount								= static_cast<uint32_t>(dependencies.size());
 	renderPassInfo.pDependencies								= dependencies.data();
 
-	VK_CHECK_RESULT(vkCreateRenderPass(device, &renderPassInfo, nullptr, &renderPass));
+	VK_CHECK_RESULT(vkCreateRenderPass	(device, &renderPassInfo, nullptr, &renderPass));
 }
 														
 void										VulkanExampleBase::windowResize						()																												{
@@ -1516,10 +1514,7 @@ void										VulkanExampleBase::windowResize						()																											
 	setupSwapChain();
 
 	// Recreate the frame buffers
-
-	vkDestroyImageView		(device, depthStencil.view	, nullptr);
-	vkDestroyImage			(device, depthStencil.image	, nullptr);
-	vkFreeMemory			(device, depthStencil.mem	, nullptr);
+	depthStencil.destroy	(device);
 	setupDepthStencil();
 	
 	for (uint32_t i = 0; i < frameBuffers.size(); i++)

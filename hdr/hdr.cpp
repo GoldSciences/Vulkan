@@ -73,23 +73,11 @@ public:
 	}															descriptorSetLayouts;
 
 	// Framebuffer for offscreen rendering
-	struct FrameBufferAttachment {
-		VkImage														image									= VK_NULL_HANDLE;
-		VkDeviceMemory												mem										= VK_NULL_HANDLE;
-		VkImageView													view									= VK_NULL_HANDLE;
-		VkFormat													format									= VK_FORMAT_UNDEFINED;
-
-		void														destroy									(VkDevice device_)					{
-			vkDestroyImageView	(device_, view	, nullptr);
-			vkDestroyImage		(device_, image	, nullptr);
-			vkFreeMemory		(device_, mem	, nullptr);
-		}
-	};
 	struct FrameBuffer {
 		int32_t														width, height;
 		VkFramebuffer												frameBuffer								= VK_NULL_HANDLE;
-		FrameBufferAttachment										color[2];
-		FrameBufferAttachment										depth;
+		vks::FrameBufferAttachmentWithFormat						color[2];
+		vks::FrameBufferAttachmentWithFormat						depth;
 		VkRenderPass												renderPass								= VK_NULL_HANDLE;
 		VkSampler													sampler									= VK_NULL_HANDLE;
 		VkCommandBuffer												cmdBuffer								= VK_NULL_HANDLE;
@@ -99,7 +87,7 @@ public:
 	struct {
 		int32_t														width, height;
 		VkFramebuffer												frameBuffer								= VK_NULL_HANDLE;
-		FrameBufferAttachment										color[1];
+		vks::FrameBufferAttachmentWithFormat						color[1];
 		VkRenderPass												renderPass								= VK_NULL_HANDLE;
 		VkSampler													sampler									= VK_NULL_HANDLE;
 	}															filterPass;
@@ -145,7 +133,7 @@ public:
 
 		filterPass.color[0]			.destroy(device);
 
-		for (auto& model : models.objects)
+		for (vks::Model& model : models.objects)
 			model						.destroy();
 
 		models.skybox				.destroy();
@@ -239,7 +227,7 @@ public:
 		}
 	}
 
-	void														createAttachment						(VkFormat format, VkImageUsageFlagBits usage, FrameBufferAttachment *attachment)	{
+	void														createAttachment						(VkFormat format, VkImageUsageFlagBits usage, vks::FrameBufferAttachmentWithFormat *attachment)	{
 		VkImageAspectFlags												aspectMask								= 0;
 		VkImageLayout													imageLayout;
 
@@ -271,12 +259,12 @@ public:
 		VkMemoryAllocateInfo											memAlloc								= vks::initializers::memoryAllocateInfo();
 		VkMemoryRequirements											memReqs;
 
-		VK_CHECK_RESULT(vkCreateImage(device, &image, nullptr, &attachment->image));
-		vkGetImageMemoryRequirements(device, attachment->image, &memReqs);
+		VK_CHECK_RESULT(vkCreateImage		(device, &image, nullptr, &attachment->image));
+		vkGetImageMemoryRequirements		(device, attachment->image, &memReqs);
 		memAlloc.allocationSize										= memReqs.size;
 		memAlloc.memoryTypeIndex									= vulkanDevice->getMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-		VK_CHECK_RESULT(vkAllocateMemory(device, &memAlloc, nullptr, &attachment->mem));
-		VK_CHECK_RESULT(vkBindImageMemory(device, attachment->image, attachment->mem, 0));
+		VK_CHECK_RESULT(vkAllocateMemory	(device, &memAlloc, nullptr, &attachment->memory));
+		VK_CHECK_RESULT(vkBindImageMemory	(device, attachment->image, attachment->memory, 0));
 
 		VkImageViewCreateInfo											imageView								= vks::initializers::imageViewCreateInfo();
 		imageView.viewType											= VK_IMAGE_VIEW_TYPE_2D;
@@ -288,7 +276,7 @@ public:
 		imageView.subresourceRange.baseArrayLayer					= 0;
 		imageView.subresourceRange.layerCount						= 1;
 		imageView.image												= attachment->image;
-		VK_CHECK_RESULT(vkCreateImageView(device, &imageView, nullptr, &attachment->view));
+		VK_CHECK_RESULT(vkCreateImageView	(device, &imageView, nullptr, &attachment->view));
 	}
 
 	// Prepare a new framebuffer and attachments for offscreen rendering (G-Buffer)
