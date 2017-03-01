@@ -14,7 +14,7 @@
 #define ENABLE_VALIDATION		false
 
 // Vertex layout for this example
-typedef VertexPUN											Vertex;		// Vertex layout used in this example
+typedef vks::VertexPUN										Vertex;		// Vertex layout used in this example
 
 // Translation of Ken Perlin's JAVA implementation (http://mrl.nyu.edu/~perlin/noise/)
 template <typename T>
@@ -146,11 +146,7 @@ public:
 		vks::Model													cube;
 	}															models;
 
-	struct {
-		VkPipelineVertexInputStateCreateInfo						inputState;
-		std::vector<VkVertexInputBindingDescription>				inputBinding;
-		std::vector<VkVertexInputAttributeDescription>				inputAttributes;
-	}															vertices;
+	vks::VertexInputStateAndDescriptions						vertices;
 
 	vks::Buffer													vertexBuffer;
 	vks::Buffer													indexBuffer;
@@ -475,20 +471,20 @@ public:
 
 	void														setupVertexDescriptions					()														{
 		// Binding description
-		vertices.inputBinding.resize(1);
-		vertices.inputBinding[0]									= vks::initializers::vertexInputBindingDescription(VERTEX_BUFFER_BIND_ID, sizeof(Vertex), VK_VERTEX_INPUT_RATE_VERTEX);
+		vertices.bindingDescriptions.resize(1);
+		vertices.bindingDescriptions[0]									= vks::initializers::vertexInputBindingDescription(VERTEX_BUFFER_BIND_ID, sizeof(Vertex), VK_VERTEX_INPUT_RATE_VERTEX);
 
 		// Attribute descriptions. Describes memory layout and shader positions
-		vertices.inputAttributes.resize(3);
-		vertices.inputAttributes[0]									= vks::initializers::vertexInputAttributeDescription(VERTEX_BUFFER_BIND_ID, 0, VK_FORMAT_R32G32B32_SFLOAT	, offsetof(Vertex, position	));	// Location 0 : Position
-		vertices.inputAttributes[1]									= vks::initializers::vertexInputAttributeDescription(VERTEX_BUFFER_BIND_ID, 1, VK_FORMAT_R32G32_SFLOAT		, offsetof(Vertex, uv		));	// Location 1 : Texture coordinates
-		vertices.inputAttributes[2]									= vks::initializers::vertexInputAttributeDescription(VERTEX_BUFFER_BIND_ID, 2, VK_FORMAT_R32G32B32_SFLOAT	, offsetof(Vertex, normal	));	// Location 1 : Vertex normal
+		vertices.attributeDescriptions.resize(3);
+		vertices.attributeDescriptions[0]									= vks::initializers::vertexInputAttributeDescription(VERTEX_BUFFER_BIND_ID, 0, VK_FORMAT_R32G32B32_SFLOAT	, offsetof(Vertex, position	));	// Location 0 : Position
+		vertices.attributeDescriptions[1]									= vks::initializers::vertexInputAttributeDescription(VERTEX_BUFFER_BIND_ID, 1, VK_FORMAT_R32G32_SFLOAT		, offsetof(Vertex, uv		));	// Location 1 : Texture coordinates
+		vertices.attributeDescriptions[2]									= vks::initializers::vertexInputAttributeDescription(VERTEX_BUFFER_BIND_ID, 2, VK_FORMAT_R32G32B32_SFLOAT	, offsetof(Vertex, normal	));	// Location 1 : Vertex normal
 
 		vertices.inputState											= vks::initializers::pipelineVertexInputStateCreateInfo();
-		vertices.inputState.vertexBindingDescriptionCount			= static_cast<uint32_t>(vertices.inputBinding.size());
-		vertices.inputState.pVertexBindingDescriptions				= vertices.inputBinding.data();
-		vertices.inputState.vertexAttributeDescriptionCount			= static_cast<uint32_t>(vertices.inputAttributes.size());
-		vertices.inputState.pVertexAttributeDescriptions			= vertices.inputAttributes.data();
+		vertices.inputState.vertexBindingDescriptionCount			= static_cast<uint32_t>(vertices.bindingDescriptions.size());
+		vertices.inputState.pVertexBindingDescriptions				= vertices.bindingDescriptions.data();
+		vertices.inputState.vertexAttributeDescriptionCount			= static_cast<uint32_t>(vertices.attributeDescriptions.size());
+		vertices.inputState.pVertexAttributeDescriptions			= vertices.attributeDescriptions.data();
 	}
 
 	void														setupDescriptorPool						()														{

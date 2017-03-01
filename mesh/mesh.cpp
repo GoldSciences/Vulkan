@@ -26,15 +26,11 @@ public:
 		vks::Texture2D												colorMap;
 	}															textures;
 
-	struct {
-		VkPipelineVertexInputStateCreateInfo						inputState;
-		std::vector<VkVertexInputBindingDescription>				bindingDescriptions;
-		std::vector<VkVertexInputAttributeDescription>				attributeDescriptions;
-	}															vertices;
+	vks::VertexInputStateAndDescriptions						vertices;
 
 	// Vertex layout used in this example
 	// This must fit input locations of the vertex shader used to render the model
-	typedef VertexPNUC											Vertex;		// Vertex layout used in this example
+	typedef vks::VertexPNUC										Vertex;		// Vertex layout used in this example
 
 	// Contains all Vulkan resources required to represent vertex and index buffers for a model
 	// This is for demonstration and learning purposes, the other examples use a model loader class for easy access

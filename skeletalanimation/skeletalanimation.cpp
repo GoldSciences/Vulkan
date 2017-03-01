@@ -17,7 +17,7 @@
 #define VERTEX_BUFFER_BIND_ID	0
 #define ENABLE_VALIDATION		false
 
-typedef VertexPNUCWI										Vertex;		// Vertex layout used in this example. Max four bones per vertex.
+typedef vks::VertexPNUCWI									Vertex;		// Vertex layout used in this example. Max four bones per vertex.
 
 // Vertex layout for the models
 vks::VertexLayout											vertexLayout					= vks::VertexLayout(

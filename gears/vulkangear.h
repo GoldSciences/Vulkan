@@ -12,7 +12,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/matrix_inverse.hpp>
 
-typedef VertexPNC											Vertex;		// Vertex layout used in this example
+typedef vks::VertexPNC										Vertex;		// Vertex layout used in this example
 
 struct GearInfo {
 	float														innerRadius;

@@ -74,11 +74,7 @@ public:
 		vks::Model													quad;
 	}															models;
 
-	struct {
-		VkPipelineVertexInputStateCreateInfo						inputState;
-		std::vector<VkVertexInputBindingDescription>				bindingDescriptions;
-		std::vector<VkVertexInputAttributeDescription>				attributeDescriptions;
-	}															vertices;
+	vks::VertexInputStateAndDescriptions						vertices;
 
 	struct {
 		glm::mat4													projection;
@@ -431,7 +427,7 @@ public:
 
 	// Create a single quad for fullscreen deferred pass and debug passes (debug pass uses instancing for light visualization) 
 	void														generateQuads							()													{
-		typedef VertexPUCNT												Vertex;		// Vertex layout used in this example
+		typedef vks::VertexPUCNT										Vertex;		// Vertex layout used in this example
 		std::vector<Vertex>												vertexBuffer;
 
 		vertexBuffer.push_back({ { 1.0f, 1.0f, 0.0f },{ 1.0f, 1.0f },{ 1.0f, 1.0f, 1.0f },{ 0.0f, 0.0f, 0.0f } });

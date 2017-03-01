@@ -52,11 +52,7 @@ public:
 		vks::Model													quad;
 	}															models;
 
-	struct {
-		VkPipelineVertexInputStateCreateInfo						inputState							= {};
-		std::vector<VkVertexInputBindingDescription>				bindingDescriptions;
-		std::vector<VkVertexInputAttributeDescription>				attributeDescriptions;
-	}															vertices;
+	vks::VertexInputStateAndDescriptions						vertices;
 
 	struct {
 		vks::Buffer													scene;
@@ -386,7 +382,7 @@ public:
 	void														loadAssets							()											{ models.scene.loadFromFile(getAssetPath() + "models/vulkanscene_shadow.dae", vertexLayout, 4.0f, vulkanDevice, queue); }
 	void														generateQuad						()											{
 		// Setup vertices for a single uv-mapped quad
-		typedef VertexPUCN											Vertex;		// Vertex layout used in this example
+		typedef vks::VertexPUCN											Vertex;		// Vertex layout used in this example
 
 #define QUAD_COLOR_NORMAL { 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f, 1.0f }
 		std::vector<Vertex>												vertexBuffer						=

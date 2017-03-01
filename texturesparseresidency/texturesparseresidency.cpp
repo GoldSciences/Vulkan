@@ -21,7 +21,7 @@
 #define VERTEX_BUFFER_BIND_ID	0
 #define ENABLE_VALIDATION		false
 
-typedef VertexPNU											Vertex;		// Vertex layout used in this example
+typedef vks::VertexPNU										Vertex;		// Vertex layout used in this example
 
 // Virtual texture page as a part of the partially resident texture
 // Contains memory bindings, offsets and status information
@@ -171,11 +171,7 @@ public:
 
 	vks::HeightMap												* heightMap								= nullptr;
 
-	struct {
-		VkPipelineVertexInputStateCreateInfo						inputState;
-		std::vector<VkVertexInputBindingDescription>				bindingDescriptions;
-		std::vector<VkVertexInputAttributeDescription>				attributeDescriptions;
-	}															vertices;
+	vks::VertexInputStateAndDescriptions						vertices;
 
 	uint32_t													indexCount;
 	vks::Buffer													uniformBufferVS;

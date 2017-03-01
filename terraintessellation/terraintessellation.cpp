@@ -39,11 +39,7 @@ public:
 		vks::Model													skysphere;
 	}															models;
 
-	struct {
-		VkPipelineVertexInputStateCreateInfo						inputState;
-		std::vector<VkVertexInputBindingDescription>				bindingDescriptions;
-		std::vector<VkVertexInputAttributeDescription>				attributeDescriptions;
-	}															vertices;
+	vks::VertexInputStateAndDescriptions						vertices;
 
 	struct {
 		vks::Buffer													terrainTessellation;
@@ -327,7 +323,7 @@ public:
 
 	// Generate a terrain quad patch for feeding to the tessellation control shader
 	void														generateTerrain						()													{
-		typedef VertexPNU												Vertex;		// Vertex layout used in this example
+		typedef vks::VertexPNU											Vertex;		// Vertex layout used in this example
 
 		#define PATCH_SIZE	64
 		#define UV_SCALE	1.0f

@@ -23,11 +23,7 @@ public:
 		vks::Texture2D												normalHeightMap;	// Normals and height are combined in one texture (height = alpha channel)
 	}															textures;
 
-	struct {
-		VkPipelineVertexInputStateCreateInfo						inputState;
-		std::vector<VkVertexInputBindingDescription>				bindingDescriptions;
-		std::vector<VkVertexInputAttributeDescription>				attributeDescriptions;
-	}															vertices;
+	vks::VertexInputStateAndDescriptions						vertices;
 
 	// Vertex layout for the models
 	vks::VertexLayout											vertexLayout			= vks::VertexLayout(

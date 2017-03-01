@@ -10,7 +10,7 @@
 #define VERTEX_BUFFER_BIND_ID	0
 #define ENABLE_VALIDATION		false
 
-typedef VertexPU											Vertex;		// Vertex layout used in this example
+typedef vks::VertexPU										Vertex;		// Vertex layout used in this example
 
 class VulkanExample : public VulkanExampleBase
 {
@@ -20,11 +20,7 @@ public:
 	uint32_t													layerCount;
 	vks::Texture												textureArray;
 
-	struct {
-		VkPipelineVertexInputStateCreateInfo						inputState;
-		std::vector<VkVertexInputBindingDescription>				bindingDescriptions;
-		std::vector<VkVertexInputAttributeDescription>				attributeDescriptions;
-	}															vertices;
+	vks::VertexInputStateAndDescriptions						vertices;
 
 	vks::Buffer													vertexBuffer;
 	vks::Buffer													indexBuffer;

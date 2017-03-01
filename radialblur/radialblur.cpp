@@ -34,13 +34,9 @@ public:
 
 	struct {
 		vks::Model													example;
-	}																models;
+	}															models;
 
-	struct {
-		VkPipelineVertexInputStateCreateInfo						inputState;
-		std::vector<VkVertexInputBindingDescription>				bindingDescriptions;
-		std::vector<VkVertexInputAttributeDescription>				attributeDescriptions;
-	}															vertices;
+	vks::VertexInputStateAndDescriptions						vertices;
 
 	struct {
 		vks::Buffer													scene;

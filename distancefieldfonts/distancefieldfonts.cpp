@@ -13,7 +13,7 @@
 #define VERTEX_BUFFER_BIND_ID	0
 #define ENABLE_VALIDATION		false
 
-typedef VertexPU											Vertex;		// Vertex layout used in this example
+typedef vks::VertexPU										Vertex;		// Vertex layout used in this example
 
 // AngelCode .fnt format structs and classes
 struct bmchar {
@@ -49,11 +49,7 @@ public:
 		vks::Texture2D												fontBitmap;
 	}															textures;
 
-	struct {
-		VkPipelineVertexInputStateCreateInfo						inputState;
-		std::vector<VkVertexInputBindingDescription>				bindingDescriptions;
-		std::vector<VkVertexInputAttributeDescription>				attributeDescriptions;
-	}															vertices;
+	vks::VertexInputStateAndDescriptions						vertices;
 
 	vks::Buffer													vertexBuffer;
 	vks::Buffer													indexBuffer;

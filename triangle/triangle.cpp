@@ -17,7 +17,7 @@
 class VulkanExample : public VulkanExampleBase
 {
 public:
-	typedef VertexPC											Vertex;				// Vertex layout used in this example
+	typedef vks::VertexPC										Vertex;				// Vertex layout used in this example
 
 	vks::VertexBuffer											vertices;			// Vertex buffer and attributes
 	vks::IndexBuffer											indices;			// Index buffer

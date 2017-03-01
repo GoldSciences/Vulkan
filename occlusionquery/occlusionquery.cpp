@@ -38,11 +38,7 @@ public:
 		float														visible;
 	}															uboVS;
 
-	struct {
-		VkPipelineVertexInputStateCreateInfo						inputState						= {};
-		std::vector<VkVertexInputBindingDescription>				bindingDescriptions				;
-		std::vector<VkVertexInputAttributeDescription>				attributeDescriptions			;
-	}															vertices;
+	vks::VertexInputStateAndDescriptions						vertices;
 
 	struct {
 		VkPipeline													solid							= VK_NULL_HANDLE;

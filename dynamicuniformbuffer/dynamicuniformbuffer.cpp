@@ -22,7 +22,7 @@
 #define ENABLE_VALIDATION		false
 #define OBJECT_INSTANCES		125
 
-typedef VertexPC											Vertex;		// Vertex layout used in this example
+typedef vks::VertexPC										Vertex;		// Vertex layout used in this example
 
 // Wrapper functions for aligned memory allocation
 // There is currently no standard for this in C++ that works across all platforms and vendors, so we abstract this
@@ -49,11 +49,7 @@ void														alignedFree								(void* data)					{
 class VulkanExample : public VulkanExampleBase
 {
 public:
-	struct {
-		VkPipelineVertexInputStateCreateInfo						inputState								= {};
-		std::vector<VkVertexInputBindingDescription>				bindingDescriptions;
-		std::vector<VkVertexInputAttributeDescription>				attributeDescriptions;
-	}															vertices;
+	vks::VertexInputStateAndDescriptions						vertices;
 
 	vks::Buffer													vertexBuffer;
 	vks::Buffer													indexBuffer;

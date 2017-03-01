@@ -33,7 +33,7 @@
 #define VERTEX_BUFFER_BIND_ID	0
 #define ENABLE_VALIDATION		false
 
-typedef VertexPNUC											Vertex;		// Vertex layout used in this example
+typedef vks::VertexPNUC										Vertex;		// Vertex layout used in this example
 
 // Scene related structs
 
@@ -416,11 +416,7 @@ public:
 	bool														attachLight						= false;
 	Scene														* scene							= nullptr;
 
-	struct {
-		VkPipelineVertexInputStateCreateInfo						inputState;
-		std::vector<VkVertexInputBindingDescription>				bindingDescriptions;
-		std::vector<VkVertexInputAttributeDescription>				attributeDescriptions;
-	}															vertices;
+	vks::VertexInputStateAndDescriptions						vertices;
 
 																~VulkanExample					()													{ delete(scene);						}
 																VulkanExample					()													: VulkanExampleBase(ENABLE_VALIDATION)	{

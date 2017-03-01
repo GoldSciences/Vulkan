@@ -10,7 +10,7 @@
 #define VERTEX_BUFFER_BIND_ID	0
 #define ENABLE_VALIDATION		false
 
-typedef VertexPU											Vertex;		// Vertex layout used in this example
+typedef vks::VertexPU										Vertex;		// Vertex layout used in this example
 
 class VulkanExample : public VulkanExampleBase
 {
@@ -18,11 +18,7 @@ private:
 	vks::Texture2D												textureColorMap;
 	vks::Texture2D												textureComputeTarget;
 public:
-	struct {
-		VkPipelineVertexInputStateCreateInfo						inputState;
-		std::vector<VkVertexInputBindingDescription>				bindingDescriptions;
-		std::vector<VkVertexInputAttributeDescription>				attributeDescriptions;
-	}															vertices;
+	vks::VertexInputStateAndDescriptions						vertices;
 
 	// Resources for the graphics part of the example
 	struct {

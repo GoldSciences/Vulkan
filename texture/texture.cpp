@@ -13,7 +13,7 @@
 #define ENABLE_VALIDATION		false
 
 // Vertex layout for this example
-typedef VertexPUN											Vertex;		// Vertex layout used in this example
+typedef vks::VertexPUN										Vertex;		// Vertex layout used in this example
 
 class VulkanExample : public VulkanExampleBase
 {
@@ -38,11 +38,7 @@ public:
 		}
 	}															texture;
 
-	struct {
-		VkPipelineVertexInputStateCreateInfo						inputState;
-		std::vector<VkVertexInputBindingDescription>				bindingDescriptions;
-		std::vector<VkVertexInputAttributeDescription>				attributeDescriptions;
-	}															vertices;
+	vks::VertexInputStateAndDescriptions						vertices;
 
 	vks::Buffer													vertexBuffer;
 	vks::Buffer													indexBuffer;

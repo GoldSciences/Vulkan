@@ -48,11 +48,7 @@ public:
 		vks::Model													quad;
 	}															models;
 
-	struct {
-		VkPipelineVertexInputStateCreateInfo						inputState;
-		std::vector<VkVertexInputBindingDescription>				bindingDescriptions;
-		std::vector<VkVertexInputAttributeDescription>				attributeDescriptions;
-	}															vertices;
+	vks::VertexInputStateAndDescriptions						vertices;
 
 	struct {
 		glm::mat4													projection;
@@ -487,7 +483,7 @@ public:
 	void														generateQuads							()																					{
 		// Setup vertices for multiple screen aligned quads
 		// Used for displaying final result and debug 
-		typedef	VertexPUCNT												Vertex;		// Vertex layout used 
+		typedef	vks::VertexPUCNT										Vertex;		// Vertex layout used 
 		std::vector<Vertex>												vertexBuffer;
 
 		float															x											= 0.0f;

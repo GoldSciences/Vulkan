@@ -26,11 +26,7 @@ public:
 	float														zNear							= 0.1f;
 	float														zFar							= 1024.0f;
 
-	struct {
-		VkPipelineVertexInputStateCreateInfo						inputState;
-		std::vector<VkVertexInputBindingDescription>				bindingDescriptions;
-		std::vector<VkVertexInputAttributeDescription>				attributeDescriptions;
-	}															vertices;
+	vks::VertexInputStateAndDescriptions						vertices;
 
 	// Vertex layout for the models
 	vks::VertexLayout											vertexLayout					= vks::VertexLayout(
