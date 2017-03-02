@@ -31,35 +31,35 @@
 class TextOverlay
 {
 private:
-	vks::VulkanDevice											* vulkanDevice					= nullptr;
+	vks::VulkanDevice											* vulkanDevice				= nullptr;
 
-	VkQueue														queue							= VK_NULL_HANDLE;
-	VkFormat													colorFormat						= VK_FORMAT_UNDEFINED;
-	VkFormat													depthFormat						= VK_FORMAT_UNDEFINED;
+	VkQueue														queue						= VK_NULL_HANDLE;
+	VkFormat													colorFormat					= VK_FORMAT_UNDEFINED;
+	VkFormat													depthFormat					= VK_FORMAT_UNDEFINED;
 
-	uint32_t													* frameBufferWidth				= nullptr;
-	uint32_t													* frameBufferHeight				= nullptr;
+	uint32_t													* frameBufferWidth			= nullptr;
+	uint32_t													* frameBufferHeight			= nullptr;
 
-	VkSampler													sampler							= VK_NULL_HANDLE;
-	VkImage														image							= VK_NULL_HANDLE;
-	VkImageView													view							= VK_NULL_HANDLE;
-	VkBuffer													buffer							= VK_NULL_HANDLE;
-	VkDeviceMemory												memory							= VK_NULL_HANDLE;
-	VkDeviceMemory												imageMemory						= VK_NULL_HANDLE;
-	VkDescriptorPool											descriptorPool					= VK_NULL_HANDLE;
-	VkDescriptorSetLayout										descriptorSetLayout				= VK_NULL_HANDLE;
-	VkDescriptorSet												descriptorSet					= VK_NULL_HANDLE;
-	VkPipelineLayout											pipelineLayout					= VK_NULL_HANDLE;
-	VkPipelineCache												pipelineCache					= VK_NULL_HANDLE;
-	VkPipeline													pipeline						= VK_NULL_HANDLE;
-	VkRenderPass												renderPass						= VK_NULL_HANDLE;
-	VkCommandPool												commandPool						= VK_NULL_HANDLE;
-	std::vector<VkCommandBuffer>								cmdBuffers						;
-	std::vector<VkFramebuffer*>									frameBuffers					;
-	std::vector<VkPipelineShaderStageCreateInfo>				shaderStages					;
+	VkSampler													sampler						= VK_NULL_HANDLE;
+	VkImage														image						= VK_NULL_HANDLE;
+	VkImageView													view						= VK_NULL_HANDLE;
+	VkBuffer													buffer						= VK_NULL_HANDLE;
+	VkDeviceMemory												memory						= VK_NULL_HANDLE;
+	VkDeviceMemory												imageMemory					= VK_NULL_HANDLE;
+	VkDescriptorPool											descriptorPool				= VK_NULL_HANDLE;
+	VkDescriptorSetLayout										descriptorSetLayout			= VK_NULL_HANDLE;
+	VkDescriptorSet												descriptorSet				= VK_NULL_HANDLE;
+	VkPipelineLayout											pipelineLayout				= VK_NULL_HANDLE;
+	VkPipelineCache												pipelineCache				= VK_NULL_HANDLE;
+	VkPipeline													pipeline					= VK_NULL_HANDLE;
+	VkRenderPass												renderPass					= VK_NULL_HANDLE;
+	VkCommandPool												commandPool					= VK_NULL_HANDLE;
+	std::vector<VkCommandBuffer>								cmdBuffers					;
+	std::vector<VkFramebuffer*>									frameBuffers				;
+	std::vector<VkPipelineShaderStageCreateInfo>				shaderStages				;
 
 	// Pointer to mapped vertex buffer
-	glm::vec4													* mapped						= nullptr;
+	glm::vec4													* mapped					= nullptr;
 
 	stb_fontchar												stbFontData	[STB_NUM_CHARS];	
 	uint32_t													numLetters;
@@ -67,7 +67,7 @@ public:
 
 	enum TextAlign { alignLeft, alignCenter, alignRight };
 
-	bool														visible							= true;
+	bool														visible						= true;
 
 																TextOverlay
 		(	vks::VulkanDevice								* vulkanDevice
@@ -98,7 +98,7 @@ public:
 		preparePipeline		();
 	}
 
-																~TextOverlay					()													{
+																~TextOverlay				()													{
 		// Free up all Vulkan resources requested by the text overlay
 		vkDestroySampler					(vulkanDevice->logicalDevice, sampler				, nullptr);
 		vkDestroyImage						(vulkanDevice->logicalDevice, image					, nullptr);
@@ -117,14 +117,14 @@ public:
 
 	// Prepare all vulkan resources required to render the font
 	// The text overlay uses separate resources for descriptors (pool, sets, layouts), pipelines and command buffers
-	void														prepareResources				()													{
+	void														prepareResources			()													{
 		static unsigned char											font24pixels[STB_FONT_HEIGHT][STB_FONT_WIDTH];
 		STB_FONT_NAME(stbFontData, font24pixels, STB_FONT_HEIGHT);
 
 		// Command buffer
 
 		// Pool
-		VkCommandPoolCreateInfo											cmdPoolInfo						= {};
+		VkCommandPoolCreateInfo											cmdPoolInfo					= {};
 		cmdPoolInfo.sType											= VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
 		cmdPoolInfo.queueFamilyIndex								= vulkanDevice->queueFamilyIndices.graphics;
 		cmdPoolInfo.flags											= VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
@@ -581,7 +581,6 @@ public:
 	struct {
 		vks::Model													cube;
 	}															models;
-
 	vks::VertexInputStateAndDescriptions						vertices;
 
 	vks::Buffer													uniformBuffer;
@@ -592,18 +591,20 @@ public:
 		glm::vec4													lightPos					= glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
 	}															uboVS;
 
+#define PIPELINE_SOLID		0
+#define PIPELINE_BACKGROUND	1
 	struct {
-		VkPipeline													solid						= VK_NULL_HANDLE;
-		VkPipeline													background					= VK_NULL_HANDLE;
+		VkPipeline													solid							= VK_NULL_HANDLE;
+		VkPipeline													background						= VK_NULL_HANDLE;
 	}															pipelines;
-
 	VkPipelineLayout											pipelineLayout					= VK_NULL_HANDLE;
-	VkDescriptorSetLayout										descriptorSetLayout				= VK_NULL_HANDLE;
-
+#define DESCRIPTOR_SET_BACKGROUND	0
+#define DESCRIPTOR_SET_CUBE			1
 	struct {
-		VkDescriptorSet												background					= VK_NULL_HANDLE;
-		VkDescriptorSet												cube						= VK_NULL_HANDLE;
+		VkDescriptorSet												background						= VK_NULL_HANDLE;
+		VkDescriptorSet												cube							= VK_NULL_HANDLE;
 	}															descriptorSets;
+	VkDescriptorSetLayout										descriptorSetLayout				= VK_NULL_HANDLE;
 
 
 																VulkanExample					()								: VulkanExampleBase(ENABLE_VALIDATION)	{
@@ -634,7 +635,7 @@ public:
 		clearValues[0].color										= { { 0.0f, 0.0f, 0.0f, 1.0f } };
 		clearValues[1].depthStencil									= { 1.0f, 0 };
 
-		VkRenderPassBeginInfo											renderPassBeginInfo			= vks::initializers::renderPassBeginInfo();
+		VkRenderPassBeginInfo											renderPassBeginInfo				= vks::initializers::renderPassBeginInfo();
 		renderPassBeginInfo.renderPass								= renderPass;
 		renderPassBeginInfo.renderArea.extent.width					= width;
 		renderPassBeginInfo.renderArea.extent.height				= height;
@@ -700,7 +701,7 @@ public:
 				{
 					std::stringstream												vpos;
 					vpos << std::showpos << x << "/" << y << "/" << z;
-					glm::vec3														projected					= glm::project(glm::vec3((float)x, (float)y, (float)z), uboVS.model, uboVS.projection, glm::vec4(0, 0, (float)width, (float)height));
+					glm::vec3														projected						= glm::project(glm::vec3((float)x, (float)y, (float)z), uboVS.model, uboVS.projection, glm::vec4(0, 0, (float)width, (float)height));
 					textOverlay->addText(vpos.str(), projected.x, projected.y + (y > -1 ? 5.0f : -20.0f), TextOverlay::alignCenter);
 				}
 
@@ -714,7 +715,7 @@ public:
 			textOverlay->addText(ss.str(), (float)width, 25.0f + (float)i * 20.0f, TextOverlay::alignRight);
 		}
 
-		glm::vec3														projected					= glm::project(glm::vec3(0.0f), uboVS.model, uboVS.projection, glm::vec4(0, 0, (float)width, (float)height));
+		glm::vec3														projected						= glm::project(glm::vec3(0.0f), uboVS.model, uboVS.projection, glm::vec4(0, 0, (float)width, (float)height));
 		textOverlay->addText("Uniform cube", projected.x, projected.y, TextOverlay::alignCenter);
 
 #if defined(__ANDROID__)
@@ -751,7 +752,7 @@ public:
 	}
 
 	void														setupDescriptorPool				()								{
-		std::vector<VkDescriptorPoolSize>								poolSizes					=
+		std::vector<VkDescriptorPoolSize>								poolSizes						=
 			{	vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 2)
 			,	vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 2)
 			};
@@ -762,7 +763,7 @@ public:
 	}
 
 	void														setupDescriptorSetLayout		()								{
-		std::vector<VkDescriptorSetLayoutBinding>						setLayoutBindings			=
+		std::vector<VkDescriptorSetLayoutBinding>						setLayoutBindings				=
 			{	vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER			, VK_SHADER_STAGE_VERTEX_BIT	, 0)	// Binding 0 : Vertex shader uniform buffer
 			,	vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER	, VK_SHADER_STAGE_FRAGMENT_BIT	, 1)	// Binding 1 : Fragment shader combined sampler
 			};
@@ -776,11 +777,11 @@ public:
 
 
 	void														setupDescriptorSet				()								{
-		VkDescriptorSetAllocateInfo										allocInfo					= vks::initializers::descriptorSetAllocateInfo(descriptorPool, &descriptorSetLayout, 1);
+		VkDescriptorSetAllocateInfo										allocInfo						= vks::initializers::descriptorSetAllocateInfo(descriptorPool, &descriptorSetLayout, 1);
 
 		// Background
 		VK_CHECK_RESULT(vkAllocateDescriptorSets	(device, &allocInfo, &descriptorSets.background));
-		VkDescriptorImageInfo											texDescriptor				= vks::initializers::descriptorImageInfo(textures.background.sampler, textures.background.view, VK_IMAGE_LAYOUT_GENERAL);
+		VkDescriptorImageInfo											texDescriptor					= vks::initializers::descriptorImageInfo(textures.background.sampler, textures.background.view, VK_IMAGE_LAYOUT_GENERAL);
 
 		std::vector<VkWriteDescriptorSet>								writeDescriptorSets;
 
@@ -798,22 +799,22 @@ public:
 	}
 
 	void														preparePipelines				()								{
-		VkPipelineInputAssemblyStateCreateInfo							inputAssemblyState			= vks::initializers::pipelineInputAssemblyStateCreateInfo(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, 0, VK_FALSE);
-		VkPipelineRasterizationStateCreateInfo							rasterizationState			= vks::initializers::pipelineRasterizationStateCreateInfo(VK_POLYGON_MODE_FILL, VK_CULL_MODE_BACK_BIT, VK_FRONT_FACE_CLOCKWISE, 0);
-		VkPipelineColorBlendAttachmentState								blendAttachmentState		= vks::initializers::pipelineColorBlendAttachmentState(0xf, VK_FALSE);
-		VkPipelineColorBlendStateCreateInfo								colorBlendState				= vks::initializers::pipelineColorBlendStateCreateInfo(1, &blendAttachmentState);
-		VkPipelineDepthStencilStateCreateInfo							depthStencilState			= vks::initializers::pipelineDepthStencilStateCreateInfo(VK_TRUE, VK_TRUE, VK_COMPARE_OP_LESS_OR_EQUAL);
-		VkPipelineViewportStateCreateInfo								viewportState				= vks::initializers::pipelineViewportStateCreateInfo(1, 1, 0);
-		VkPipelineMultisampleStateCreateInfo							multisampleState			= vks::initializers::pipelineMultisampleStateCreateInfo(VK_SAMPLE_COUNT_1_BIT, 0);
-		std::vector<VkDynamicState>										dynamicStateEnables			= {VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR};
-		VkPipelineDynamicStateCreateInfo								dynamicState				= vks::initializers::pipelineDynamicStateCreateInfo(dynamicStateEnables.data(), static_cast<uint32_t>(dynamicStateEnables.size()), 0);
+		VkPipelineInputAssemblyStateCreateInfo							inputAssemblyState				= vks::initializers::pipelineInputAssemblyStateCreateInfo(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, 0, VK_FALSE);
+		VkPipelineRasterizationStateCreateInfo							rasterizationState				= vks::initializers::pipelineRasterizationStateCreateInfo(VK_POLYGON_MODE_FILL, VK_CULL_MODE_BACK_BIT, VK_FRONT_FACE_CLOCKWISE, 0);
+		VkPipelineColorBlendAttachmentState								blendAttachmentState			= vks::initializers::pipelineColorBlendAttachmentState(0xf, VK_FALSE);
+		VkPipelineColorBlendStateCreateInfo								colorBlendState					= vks::initializers::pipelineColorBlendStateCreateInfo(1, &blendAttachmentState);
+		VkPipelineDepthStencilStateCreateInfo							depthStencilState				= vks::initializers::pipelineDepthStencilStateCreateInfo(VK_TRUE, VK_TRUE, VK_COMPARE_OP_LESS_OR_EQUAL);
+		VkPipelineViewportStateCreateInfo								viewportState					= vks::initializers::pipelineViewportStateCreateInfo(1, 1, 0);
+		VkPipelineMultisampleStateCreateInfo							multisampleState				= vks::initializers::pipelineMultisampleStateCreateInfo(VK_SAMPLE_COUNT_1_BIT, 0);
+		std::vector<VkDynamicState>										dynamicStateEnables				= {VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR};
+		VkPipelineDynamicStateCreateInfo								dynamicState					= vks::initializers::pipelineDynamicStateCreateInfo(dynamicStateEnables.data(), static_cast<uint32_t>(dynamicStateEnables.size()), 0);
 
 		// Wire frame rendering pipeline
-		std::array<VkPipelineShaderStageCreateInfo, 2>					shaderStages				= {};
+		std::array<VkPipelineShaderStageCreateInfo, 2>					shaderStages					= {};
 		shaderStages[0]												= loadShader(getAssetPath() + "shaders/textoverlay/mesh.vert.spv", VK_SHADER_STAGE_VERTEX_BIT);
 		shaderStages[1]												= loadShader(getAssetPath() + "shaders/textoverlay/mesh.frag.spv", VK_SHADER_STAGE_FRAGMENT_BIT);
 
-		VkGraphicsPipelineCreateInfo									pipelineCreateInfo			= vks::initializers::pipelineCreateInfo(pipelineLayout, renderPass, 0);
+		VkGraphicsPipelineCreateInfo									pipelineCreateInfo				= vks::initializers::pipelineCreateInfo(pipelineLayout, renderPass, 0);
 
 		pipelineCreateInfo.pVertexInputState						= &vertices.inputState;
 		pipelineCreateInfo.pInputAssemblyState						= &inputAssemblyState;
@@ -853,7 +854,7 @@ public:
 		// Vertex shader
 		uboVS.projection											= glm::perspective(glm::radians(60.0f), (float)width / (float)height, 0.1f, 256.0f);
 
-		glm::mat4														viewMatrix					= glm::translate(glm::mat4(), glm::vec3(0.0f, 0.0f, zoom));
+		glm::mat4														viewMatrix						= glm::translate(glm::mat4(), glm::vec3(0.0f, 0.0f, zoom));
 
 		uboVS.model													= viewMatrix * glm::translate(glm::mat4(), cameraPos);
 		uboVS.model													= glm::rotate(uboVS.model, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));

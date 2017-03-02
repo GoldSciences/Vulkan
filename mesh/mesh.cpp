@@ -40,8 +40,8 @@ public:
 
 		// Destroys all Vulkan resources created for this model
 		void														destroy											(VkDevice device_)					{
-			vertices	.destroy(device_);
-			indices		.destroy(device_);
+			vertices	.Destroy(device_);
+			indices		.Destroy(device_);
 		}
 	}															model;
 
@@ -133,9 +133,9 @@ public:
 
 			VkDeviceSize													offsets[1]										= { 0 };
 			
-			vkCmdBindVertexBuffers	(drawCmdBuffers[i], VERTEX_BUFFER_BIND_ID, 1, &model.vertices.buffer, offsets);	// Bind mesh vertex buffer
-			vkCmdBindIndexBuffer	(drawCmdBuffers[i], model.indices.buffer, 0, VK_INDEX_TYPE_UINT32);				// Bind mesh index buffer
-			vkCmdDrawIndexed		(drawCmdBuffers[i], model.indices.count, 1, 0, 0, 0);							// Render mesh vertex buffer using it's indices
+			vkCmdBindVertexBuffers	(drawCmdBuffers[i], VERTEX_BUFFER_BIND_ID, 1, &model.vertices.Buffer, offsets);	// Bind mesh vertex buffer
+			vkCmdBindIndexBuffer	(drawCmdBuffers[i], model.indices.Buffer, 0, VK_INDEX_TYPE_UINT32);				// Bind mesh index buffer
+			vkCmdDrawIndexed		(drawCmdBuffers[i], model.indices.Count, 1, 0, 0, 0);							// Render mesh vertex buffer using it's indices
 
 			vkCmdEndRenderPass(drawCmdBuffers[i]);
 
@@ -203,7 +203,7 @@ public:
 					indexBuffer.push_back(scene->mMeshes[m]->mFaces[f].mIndices[i] + indexBase);
 		}
 		size_t															indexBufferSize										= indexBuffer.size() * sizeof(uint32_t);
-		model.indices.count											= static_cast<uint32_t>(indexBuffer.size());
+		model.indices.Count											= static_cast<uint32_t>(indexBuffer.size());
 
 		// Static mesh should always be device local
 
@@ -216,19 +216,19 @@ public:
 			}																vertexStaging, indexStaging;
 
 			// Create staging buffers
-			VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, vertexBufferSize, &vertexStaging.buffer, &vertexStaging.memory,vertexBuffer.data()));	// Vertex data
-			VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, indexBufferSize, &indexStaging.buffer, &indexStaging.memory, indexBuffer.data()));		// Index data
+			VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, vertexBufferSize	, &vertexStaging.buffer, &vertexStaging	.memory, vertexBuffer	.data()));	// Vertex data
+			VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, indexBufferSize	, &indexStaging	.buffer, &indexStaging	.memory, indexBuffer	.data()));		// Index data
 
 			// Create device local buffers
-			VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, vertexBufferSize, &model.vertices.buffer, &model.vertices.memory));	// Vertex buffer
-			VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, indexBufferSize, &model.indices.buffer, &model.indices.memory));		// Index buffer
+			VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT	, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, vertexBufferSize	, &model.vertices	.Buffer, &model.vertices.Memory));	// Vertex buffer
+			VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT	, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, indexBufferSize	, &model.indices	.Buffer, &model.indices	.Memory));		// Index buffer
 
 			// Copy from staging buffers
 			VkCommandBuffer													copyCmd											= VulkanExampleBase::createCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY, true);
 
 			VkBufferCopy													copyRegion										= {};
-			copyRegion.size												= vertexBufferSize	; vkCmdCopyBuffer(copyCmd, vertexStaging.buffer	, model.vertices.buffer	, 1, &copyRegion);
-			copyRegion.size												= indexBufferSize	; vkCmdCopyBuffer(copyCmd, indexStaging.buffer	, model.indices.buffer	, 1, &copyRegion);
+			copyRegion.size												= vertexBufferSize	; vkCmdCopyBuffer(copyCmd, vertexStaging.buffer	, model.vertices.Buffer	, 1, &copyRegion);
+			copyRegion.size												= indexBufferSize	; vkCmdCopyBuffer(copyCmd, indexStaging	.buffer	, model.indices	.Buffer	, 1, &copyRegion);
 
 			VulkanExampleBase::flushCommandBuffer(copyCmd, queue, true);
 
@@ -238,8 +238,8 @@ public:
 			vkFreeMemory	(device, indexStaging.memory, nullptr);
 		}
 		else {
-			VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, vertexBufferSize, &model.vertices.buffer, &model.vertices.memory, vertexBuffer.data()));		// Vertex buffer
-			VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, indexBufferSize, &model.indices.buffer, &model.indices.memory, indexBuffer.data()));			// Index buffer
+			VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, vertexBufferSize	, &model.vertices	.Buffer, &model.vertices.Memory, vertexBuffer	.data()));		// Vertex buffer
+			VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_INDEX_BUFFER_BIT	, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, indexBufferSize	, &model.indices	.Buffer, &model.indices	.Memory, indexBuffer	.data()));			// Index buffer
 		}
 	}
 
@@ -255,10 +255,10 @@ public:
 		
 		// Attribute descriptions. Describes memory layout and shader positions
 		vertices.attributeDescriptions.resize(4);
-		vertices.attributeDescriptions[0]							= vks::initializers::vertexInputAttributeDescription(VERTEX_BUFFER_BIND_ID, 0, VK_FORMAT_R32G32B32_SFLOAT	, offsetof(Vertex, position));	// Location 0 : Position
-		vertices.attributeDescriptions[1]							= vks::initializers::vertexInputAttributeDescription(VERTEX_BUFFER_BIND_ID, 1, VK_FORMAT_R32G32B32_SFLOAT	, offsetof(Vertex, normal));	// Location 1 : Normal
-		vertices.attributeDescriptions[2]							= vks::initializers::vertexInputAttributeDescription(VERTEX_BUFFER_BIND_ID, 2, VK_FORMAT_R32G32_SFLOAT		, offsetof(Vertex, uv));		// Location 2 : Texture coordinates
-		vertices.attributeDescriptions[3]							= vks::initializers::vertexInputAttributeDescription(VERTEX_BUFFER_BIND_ID, 3, VK_FORMAT_R32G32B32_SFLOAT	, offsetof(Vertex, color));		// Location 3 : Color
+		vertices.attributeDescriptions[0]							= vks::initializers::vertexInputAttributeDescription(VERTEX_BUFFER_BIND_ID, 0, VK_FORMAT_R32G32B32_SFLOAT	, offsetof(Vertex, position	));	// Location 0 : Position
+		vertices.attributeDescriptions[1]							= vks::initializers::vertexInputAttributeDescription(VERTEX_BUFFER_BIND_ID, 1, VK_FORMAT_R32G32B32_SFLOAT	, offsetof(Vertex, normal	));	// Location 1 : Normal
+		vertices.attributeDescriptions[2]							= vks::initializers::vertexInputAttributeDescription(VERTEX_BUFFER_BIND_ID, 2, VK_FORMAT_R32G32_SFLOAT		, offsetof(Vertex, uv		));	// Location 2 : Texture coordinates
+		vertices.attributeDescriptions[3]							= vks::initializers::vertexInputAttributeDescription(VERTEX_BUFFER_BIND_ID, 3, VK_FORMAT_R32G32B32_SFLOAT	, offsetof(Vertex, color	));	// Location 3 : Color
 
 		vertices.inputState											= vks::initializers::pipelineVertexInputStateCreateInfo();
 		vertices.inputState.vertexBindingDescriptionCount			= static_cast<uint32_t>(vertices.bindingDescriptions.size());

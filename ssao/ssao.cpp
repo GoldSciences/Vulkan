@@ -653,9 +653,9 @@ public:
 
 	void														setupDescriptorPool							()									{
 		std::vector<VkDescriptorPoolSize>								poolSizes									=
-		{	vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 10)
-		,	vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 12)
-		};
+			{	vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 10)
+			,	vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 12)
+			};
 
 		VkDescriptorPoolCreateInfo										descriptorPoolInfo							= vks::initializers::descriptorPoolCreateInfo(static_cast<uint32_t>(poolSizes.size()), poolSizes.data(), descriptorSets.count);
 		VK_CHECK_RESULT(vkCreateDescriptorPool(device, &descriptorPoolInfo, nullptr, &descriptorPool));
@@ -747,11 +747,11 @@ public:
 		descriptorAllocInfo.pSetLayouts								= &descriptorSetLayouts.composition;
 		VK_CHECK_RESULT(vkAllocateDescriptorSets	(device, &descriptorAllocInfo, &descriptorSets.composition));
 		imageDescriptors											= 
-			{	vks::initializers::descriptorImageInfo(colorSampler, frameBuffers.offscreen.position.view, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
-			,	vks::initializers::descriptorImageInfo(colorSampler, frameBuffers.offscreen.normal	.view, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
-			,	vks::initializers::descriptorImageInfo(colorSampler, frameBuffers.offscreen.albedo	.view, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
-			,	vks::initializers::descriptorImageInfo(colorSampler, frameBuffers.ssao		.color	.view, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) 
-			,	vks::initializers::descriptorImageInfo(colorSampler, frameBuffers.ssaoBlur	.color	.view, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
+			{	vks::initializers::descriptorImageInfo(colorSampler, frameBuffers.offscreen	.position	.view, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
+			,	vks::initializers::descriptorImageInfo(colorSampler, frameBuffers.offscreen	.normal		.view, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
+			,	vks::initializers::descriptorImageInfo(colorSampler, frameBuffers.offscreen	.albedo		.view, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
+			,	vks::initializers::descriptorImageInfo(colorSampler, frameBuffers.ssao		.color		.view, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) 
+			,	vks::initializers::descriptorImageInfo(colorSampler, frameBuffers.ssaoBlur	.color		.view, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
 			};
 		writeDescriptorSets											= 
 			{	vks::initializers::writeDescriptorSet(descriptorSets.composition, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER	, 0, &imageDescriptors[0])			// FS Sampler Position+Depth

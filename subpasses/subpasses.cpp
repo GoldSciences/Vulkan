@@ -58,23 +58,6 @@ public:
 		vks::Buffer													lights;
 	}															uniformBuffers;
 
-	struct Pipeline { 
-		VkPipeline													Instance								= VK_NULL_HANDLE; 
-		VkPipelineLayout											Layout									= VK_NULL_HANDLE;
-
-		inline void													Destroy									(VkDevice device) 																	{
-			if(VK_NULL_HANDLE != Instance	) vkDestroyPipeline			(device, Instance	, nullptr); 
-			if(VK_NULL_HANDLE != Layout		) vkDestroyPipelineLayout	(device, Layout		, nullptr); 
-		}
-	};
-
-	struct DescriptorSet { 
-		VkDescriptorSet												Instance								= VK_NULL_HANDLE; 
-		VkDescriptorSetLayout										Layout									= VK_NULL_HANDLE;	
-
-		inline void													Destroy									(VkDevice device) 																	{ if(VK_NULL_HANDLE != Layout) vkDestroyDescriptorSetLayout(device, Layout, nullptr); }
-	};
-
 	Pipeline													PipelineOffscreen							;
 	Pipeline													PipelineScene								;
 	Pipeline													PipelineComposition							;
