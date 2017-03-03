@@ -12,9 +12,7 @@
 
 namespace vks
 {	
-	struct VulkanDevice
-	{
-		
+	struct VulkanDevice {
 		VkPhysicalDevice							physicalDevice			= VK_NULL_HANDLE;	// Physical device representation
 		VkDevice									logicalDevice			= VK_NULL_HANDLE;	// Logical device representation (application's view of the device)
 		VkPhysicalDeviceProperties					properties				= {};				// Properties of the physical device including limits that the application can check against
