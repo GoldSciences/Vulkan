@@ -93,7 +93,7 @@ public:
 			// Set target frame buffer
 			renderPassBeginInfo.framebuffer								= frameBuffers[i];
 
-			VK_CHECK_RESULT(vkBeginCommandBuffer(drawCmdBuffers[i], &cmdBufInfo));
+			VK_EVAL(vkBeginCommandBuffer(drawCmdBuffers[i], &cmdBufInfo));
 			vkCmdBeginRenderPass(drawCmdBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 
 			VkViewport														viewport										= vks::initializers::viewport((float)width, (float)height, 0.0f, 1.0f);
@@ -132,7 +132,7 @@ public:
 
 			vkCmdEndRenderPass		(drawCmdBuffers[i]);
 
-			VK_CHECK_RESULT(vkEndCommandBuffer(drawCmdBuffers[i]));
+			VK_EVAL(vkEndCommandBuffer(drawCmdBuffers[i]));
 		}	// for drawCmdBuffers
 	}
 
@@ -167,7 +167,7 @@ public:
 			};
 
 		VkDescriptorPoolCreateInfo										descriptorPoolInfo								= vks::initializers::descriptorPoolCreateInfo(static_cast<uint32_t>(poolSizes.size()), poolSizes.data(), 2);
-		VK_CHECK_RESULT(vkCreateDescriptorPool(device, &descriptorPoolInfo, nullptr, &descriptorPool));
+		VK_EVAL(vkCreateDescriptorPool(device, &descriptorPoolInfo, nullptr, &descriptorPool));
 	}
 
 	void														setupDescriptorSetLayout						()				{
@@ -176,7 +176,7 @@ public:
 			};
 
 		VkDescriptorSetLayoutCreateInfo									descriptorLayout								= vks::initializers::descriptorSetLayoutCreateInfo(setLayoutBindings.data(), static_cast<uint32_t>(setLayoutBindings.size()));
-		VK_CHECK_RESULT(vkCreateDescriptorSetLayout(device, &descriptorLayout, nullptr, &descriptorSetLayout));
+		VK_EVAL(vkCreateDescriptorSetLayout(device, &descriptorLayout, nullptr, &descriptorSetLayout));
 
 		VkPipelineLayoutCreateInfo										pipelineLayoutCreateInfo						= vks::initializers::pipelineLayoutCreateInfo(&descriptorSetLayout, 1);
 
@@ -193,12 +193,12 @@ public:
 		pipelineLayoutCreateInfo.pushConstantRangeCount				= 1;
 		pipelineLayoutCreateInfo.pPushConstantRanges				= &pushConstantRange;
 
-		VK_CHECK_RESULT(vkCreatePipelineLayout(device, &pipelineLayoutCreateInfo, nullptr, &pipelineLayout));
+		VK_EVAL(vkCreatePipelineLayout(device, &pipelineLayoutCreateInfo, nullptr, &pipelineLayout));
 	}
 
 	void														setupDescriptorSet								()				{
 		VkDescriptorSetAllocateInfo										allocInfo										= vks::initializers::descriptorSetAllocateInfo(descriptorPool, &descriptorSetLayout, 1);
-		VK_CHECK_RESULT(vkAllocateDescriptorSets(device, &allocInfo, &descriptorSet));
+		VK_EVAL(vkAllocateDescriptorSets(device, &allocInfo, &descriptorSet));
 
 		VkWriteDescriptorSet											writeDescriptorSet								= vks::initializers::writeDescriptorSet(descriptorSet, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 0, &uniformBuffer.descriptor);	// Binding 0 : Vertex shader uniform buffer
 		vkUpdateDescriptorSets(device, 1, &writeDescriptorSet, 0, NULL);
@@ -233,13 +233,13 @@ public:
 		pipelineCreateInfo.stageCount								= static_cast<uint32_t>(shaderStages.size());
 		pipelineCreateInfo.pStages									= shaderStages.data();
 
-		VK_CHECK_RESULT(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipelines.solid));
+		VK_EVAL(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipelines.solid));
 	}
 
 	void														prepareUniformBuffers							()				{
 		// Vertex shader uniform buffer block
-		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBuffer, sizeof(uboVS)));
-		VK_CHECK_RESULT(uniformBuffer.map());	// Map persistent
+		VK_EVAL(vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBuffer, sizeof(uboVS)));
+		VK_EVAL(uniformBuffer.map());	// Map persistent
 
 		updateUniformBuffers();
 	}
@@ -265,7 +265,7 @@ public:
 		submitInfo.commandBufferCount								= 1;
 		submitInfo.pCommandBuffers									= &drawCmdBuffers[currentBuffer];
 
-		VK_CHECK_RESULT(vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE));	// Submit to queue
+		VK_EVAL(vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE));	// Submit to queue
 
 		VulkanExampleBase::submitFrame();
 	}

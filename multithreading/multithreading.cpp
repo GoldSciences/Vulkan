@@ -137,11 +137,11 @@ public:
 		// we don't use the per-framebuffer command buffers from the
 		// base class, and create a single primary command buffer instead
 		VkCommandBufferAllocateInfo										cmdBufAllocateInfo								= vks::initializers::commandBufferAllocateInfo(cmdPool, VK_COMMAND_BUFFER_LEVEL_PRIMARY, 1);
-		VK_CHECK_RESULT(vkAllocateCommandBuffers(device, &cmdBufAllocateInfo, &primaryCommandBuffer));
+		VK_EVAL(vkAllocateCommandBuffers(device, &cmdBufAllocateInfo, &primaryCommandBuffer));
 
 		// Create a secondary command buffer for rendering the star sphere
 		cmdBufAllocateInfo.level									= VK_COMMAND_BUFFER_LEVEL_SECONDARY;
-		VK_CHECK_RESULT(vkAllocateCommandBuffers(device, &cmdBufAllocateInfo, &secondaryCommandBuffer));
+		VK_EVAL(vkAllocateCommandBuffers(device, &cmdBufAllocateInfo, &secondaryCommandBuffer));
 		
 		threadData.resize(numThreads);
 
@@ -156,13 +156,13 @@ public:
 			VkCommandPoolCreateInfo											cmdPoolInfo										= vks::initializers::commandPoolCreateInfo();
 			cmdPoolInfo.queueFamilyIndex								= swapChain.queueNodeIndex;
 			cmdPoolInfo.flags											= VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
-			VK_CHECK_RESULT(vkCreateCommandPool(device, &cmdPoolInfo, nullptr, &thread->commandPool));
+			VK_EVAL(vkCreateCommandPool(device, &cmdPoolInfo, nullptr, &thread->commandPool));
 
 			// One secondary command buffer per object that is updated by this thread
 			thread->commandBuffer	.resize(numObjectsPerThread);
 			// Generate secondary command buffers for each thread
 			VkCommandBufferAllocateInfo										secondaryCmdBufAllocateInfo						= vks::initializers::commandBufferAllocateInfo(thread->commandPool, VK_COMMAND_BUFFER_LEVEL_SECONDARY, static_cast<uint32_t>(thread->commandBuffer.size()));
-			VK_CHECK_RESULT(vkAllocateCommandBuffers(device, &secondaryCmdBufAllocateInfo, thread->commandBuffer.data()));
+			VK_EVAL(vkAllocateCommandBuffers(device, &secondaryCmdBufAllocateInfo, thread->commandBuffer.data()));
 
 			thread->pushConstBlock	.resize(numObjectsPerThread);
 			thread->objectData		.resize(numObjectsPerThread);
@@ -200,7 +200,7 @@ public:
 		commandBufferBeginInfo.pInheritanceInfo						= &inheritanceInfo;
 
 		VkCommandBuffer													cmdBuffer										= thread->commandBuffer[cmdBufferIndex];
-		VK_CHECK_RESULT(vkBeginCommandBuffer(cmdBuffer, &commandBufferBeginInfo));
+		VK_EVAL(vkBeginCommandBuffer(cmdBuffer, &commandBufferBeginInfo));
 
 		VkViewport														viewport										= vks::initializers::viewport((float)width, (float)height, 0.0f, 1.0f);
 		vkCmdSetViewport	(cmdBuffer, 0, 1, &viewport);
@@ -237,7 +237,7 @@ public:
 		vkCmdBindIndexBuffer	(cmdBuffer, models.ufo.indices.buffer, 0, VK_INDEX_TYPE_UINT32);
 		vkCmdDrawIndexed		(cmdBuffer, models.ufo.indexCount, 1, 0, 0, 0);
 
-		VK_CHECK_RESULT(vkEndCommandBuffer(cmdBuffer));
+		VK_EVAL(vkEndCommandBuffer(cmdBuffer));
 	}
 
 	void														updateSecondaryCommandBuffer					(VkCommandBufferInheritanceInfo inheritanceInfo)	{
@@ -246,7 +246,7 @@ public:
 		commandBufferBeginInfo.flags								= VK_COMMAND_BUFFER_USAGE_RENDER_PASS_CONTINUE_BIT;
 		commandBufferBeginInfo.pInheritanceInfo						= &inheritanceInfo;
 
-		VK_CHECK_RESULT(vkBeginCommandBuffer(secondaryCommandBuffer, &commandBufferBeginInfo));
+		VK_EVAL(vkBeginCommandBuffer(secondaryCommandBuffer, &commandBufferBeginInfo));
 
 		VkViewport														viewport										= vks::initializers::viewport((float)width, (float)height, 0.0f, 1.0f);
 		vkCmdSetViewport		(secondaryCommandBuffer, 0, 1, &viewport);
@@ -270,7 +270,7 @@ public:
 		vkCmdBindIndexBuffer	(secondaryCommandBuffer, models.skysphere.indices.buffer, 0, VK_INDEX_TYPE_UINT32);
 		vkCmdDrawIndexed		(secondaryCommandBuffer, models.skysphere.indexCount, 1, 0, 0, 0);
 
-		VK_CHECK_RESULT(vkEndCommandBuffer(secondaryCommandBuffer));
+		VK_EVAL(vkEndCommandBuffer(secondaryCommandBuffer));
 	}
 
 	// Updates the secondary command buffers using a thread pool 
@@ -296,7 +296,7 @@ public:
 
 		// Set target frame buffer
 
-		VK_CHECK_RESULT(vkBeginCommandBuffer(primaryCommandBuffer, &cmdBufInfo));
+		VK_EVAL(vkBeginCommandBuffer(primaryCommandBuffer, &cmdBufInfo));
 
 		// The primary command buffer does not contain any rendering commands
 		// These are stored (and retrieved) from the secondary command buffers
@@ -330,7 +330,7 @@ public:
 
 		vkCmdEndRenderPass	(primaryCommandBuffer);
 
-		VK_CHECK_RESULT(vkEndCommandBuffer(primaryCommandBuffer));
+		VK_EVAL(vkEndCommandBuffer(primaryCommandBuffer));
 	}
 
 	void														loadMeshes										()													{
@@ -365,7 +365,7 @@ public:
 		// Push constant ranges are part of the pipeline layout
 		pPipelineLayoutCreateInfo.pushConstantRangeCount			= 1;
 		pPipelineLayoutCreateInfo.pPushConstantRanges				= &pushConstantRange;
-		VK_CHECK_RESULT(vkCreatePipelineLayout(device, &pPipelineLayoutCreateInfo, nullptr, &pipelineLayout));
+		VK_EVAL(vkCreatePipelineLayout(device, &pPipelineLayoutCreateInfo, nullptr, &pipelineLayout));
 	}
 
 	void														preparePipelines								()													{
@@ -398,14 +398,14 @@ public:
 		pipelineCreateInfo.stageCount								= static_cast<uint32_t>(shaderStages.size());
 		pipelineCreateInfo.pStages									= shaderStages.data();
 
-		VK_CHECK_RESULT(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipelines.phong));
+		VK_EVAL(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipelines.phong));
 
 		// Star sphere rendering pipeline
 		rasterizationState.cullMode									= VK_CULL_MODE_FRONT_BIT;
 		depthStencilState.depthWriteEnable							= VK_FALSE;
 		shaderStages[0]												= loadShader(getAssetPath() + "shaders/multithreading/starsphere.vert.spv", VK_SHADER_STAGE_VERTEX_BIT);
 		shaderStages[1]												= loadShader(getAssetPath() + "shaders/multithreading/starsphere.frag.spv", VK_SHADER_STAGE_FRAGMENT_BIT);
-		VK_CHECK_RESULT(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipelines.starsphere));
+		VK_EVAL(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipelines.starsphere));
 	}
 
 	void														updateMatrices									()													{
@@ -426,14 +426,14 @@ public:
 		submitInfo.commandBufferCount								= 1;
 		submitInfo.pCommandBuffers									= &primaryCommandBuffer;
 
-		VK_CHECK_RESULT(vkQueueSubmit(queue, 1, &submitInfo, renderFence));
+		VK_EVAL(vkQueueSubmit(queue, 1, &submitInfo, renderFence));
 
 		// Wait for fence to signal that all command buffers are ready
 		VkResult fenceRes;
 		do {
 			fenceRes													= vkWaitForFences(device, 1, &renderFence, VK_TRUE, 100000000);
 		} while (fenceRes == VK_TIMEOUT);
-		VK_CHECK_RESULT(fenceRes);
+		VK_EVAL(fenceRes);
 		vkResetFences(device, 1, &renderFence);
 
 		VulkanExampleBase::submitFrame();

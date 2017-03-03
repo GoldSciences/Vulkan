@@ -142,12 +142,12 @@ public:
 		VkMemoryAllocateInfo											memAlloc								= vks::initializers::memoryAllocateInfo();
 		VkMemoryRequirements											memReqs;
 
-		VK_CHECK_RESULT(vkCreateImage(device, &image, nullptr, &attachment->image));
+		VK_EVAL(vkCreateImage(device, &image, nullptr, &attachment->image));
 		vkGetImageMemoryRequirements(device, attachment->image, &memReqs);
 		memAlloc.allocationSize										= memReqs.size;
 		memAlloc.memoryTypeIndex									= vulkanDevice->getMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-		VK_CHECK_RESULT(vkAllocateMemory(device, &memAlloc, nullptr, &attachment->memory));
-		VK_CHECK_RESULT(vkBindImageMemory(device, attachment->image, attachment->memory, 0));
+		VK_EVAL(vkAllocateMemory(device, &memAlloc, nullptr, &attachment->memory));
+		VK_EVAL(vkBindImageMemory(device, attachment->image, attachment->memory, 0));
 
 		VkImageViewCreateInfo											imageView								= vks::initializers::imageViewCreateInfo();
 		imageView.viewType											= VK_IMAGE_VIEW_TYPE_2D;
@@ -159,7 +159,7 @@ public:
 		imageView.subresourceRange.baseArrayLayer					= 0;
 		imageView.subresourceRange.layerCount						= 1;
 		imageView.image												= attachment->image;
-		VK_CHECK_RESULT(vkCreateImageView(device, &imageView, nullptr, &attachment->view));
+		VK_EVAL(vkCreateImageView(device, &imageView, nullptr, &attachment->view));
 	}
 
 	// Create color attachments for the G-Buffer components
@@ -191,7 +191,7 @@ public:
 			_attachments[2]												= this->attachments.normal.view;
 			_attachments[3]												= this->attachments.albedo.view;
 			_attachments[4]												= depthStencil.view;
-			VK_CHECK_RESULT(vkCreateFramebuffer(device, &frameBufferCreateInfo, nullptr, &frameBuffers[i]));
+			VK_EVAL(vkCreateFramebuffer(device, &frameBufferCreateInfo, nullptr, &frameBuffers[i]));
 		}
 	}
 
@@ -321,7 +321,7 @@ public:
 		renderPassInfo.dependencyCount								= static_cast<uint32_t>(dependencies.size());
 		renderPassInfo.pDependencies								= dependencies.data();
 
-		VK_CHECK_RESULT(vkCreateRenderPass(device, &renderPassInfo, nullptr, &renderPass));
+		VK_EVAL(vkCreateRenderPass(device, &renderPassInfo, nullptr, &renderPass));
 	}
 
 	void														buildCommandBuffers						()																					{
@@ -346,7 +346,7 @@ public:
 		for (size_t i = 0; i < drawCmdBuffers.size(); ++i) {
 			// Set target frame buffer
 			renderPassBeginInfo.framebuffer								= frameBuffers[i];
-			VK_CHECK_RESULT(vkBeginCommandBuffer(drawCmdBuffers[i], &cmdBufInfo));
+			VK_EVAL(vkBeginCommandBuffer(drawCmdBuffers[i], &cmdBufInfo));
 
 			// First sub pass
 			// Renders the components of the scene to the G-Buffer atttachments
@@ -387,7 +387,7 @@ public:
 			vkCmdDrawIndexed			(drawCmdBuffers[i], models.transparent.indexCount, 1, 0, 0, 0);
 
 			vkCmdEndRenderPass			(drawCmdBuffers[i]);
-			VK_CHECK_RESULT(vkEndCommandBuffer(drawCmdBuffers[i]));
+			VK_EVAL(vkEndCommandBuffer(drawCmdBuffers[i]));
 		}
 	}
 
@@ -426,7 +426,7 @@ public:
 			};
 
 		VkDescriptorPoolCreateInfo										descriptorPoolInfo			= vks::initializers::descriptorPoolCreateInfo(static_cast<uint32_t>(poolSizes.size()), poolSizes.data(), 4);
-		VK_CHECK_RESULT(vkCreateDescriptorPool(device, &descriptorPoolInfo, nullptr, &descriptorPool));
+		VK_EVAL(vkCreateDescriptorPool(device, &descriptorPoolInfo, nullptr, &descriptorPool));
 	}
 
 	void														setupDescriptorSetLayout				()																					{
@@ -437,17 +437,17 @@ public:
 
 		VkDescriptorSetLayoutCreateInfo									descriptorLayout			= vks::initializers::descriptorSetLayoutCreateInfo(setLayoutBindings.data(), static_cast<uint32_t>(setLayoutBindings.size()));
 
-		VK_CHECK_RESULT(vkCreateDescriptorSetLayout(device, &descriptorLayout, nullptr, &DescriptorSetScene.Layout));
+		VK_EVAL(vkCreateDescriptorSetLayout(device, &descriptorLayout, nullptr, &DescriptorSetScene.Layout));
 
 		VkPipelineLayoutCreateInfo										pPipelineLayoutCreateInfo	= vks::initializers::pipelineLayoutCreateInfo(&DescriptorSetScene.Layout, 1);
-		VK_CHECK_RESULT(vkCreatePipelineLayout(device, &pPipelineLayoutCreateInfo, nullptr, &PipelineOffscreen.Layout));	// Offscreen (scene) rendering pipeline layout
+		VK_EVAL(vkCreatePipelineLayout(device, &pPipelineLayoutCreateInfo, nullptr, &PipelineOffscreen.Layout));	// Offscreen (scene) rendering pipeline layout
 	}
 
 	void														setupDescriptorSet						()																					{
 		std::vector<VkWriteDescriptorSet>								writeDescriptorSets;
 		VkDescriptorSetAllocateInfo										allocInfo					= vks::initializers::descriptorSetAllocateInfo(descriptorPool, &DescriptorSetScene.Layout, 1);
 
-		VK_CHECK_RESULT(vkAllocateDescriptorSets(device, &allocInfo, &DescriptorSetScene.Instance));
+		VK_EVAL(vkAllocateDescriptorSets(device, &allocInfo, &DescriptorSetScene.Instance));
 		writeDescriptorSets											= 
 			{	vks::initializers::writeDescriptorSet(DescriptorSetScene.Instance, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 0, &uniformBuffers.GBuffer.descriptor)// Binding 0: Vertex shader uniform buffer
 			};
@@ -495,7 +495,7 @@ public:
 		shaderStages[0]												= loadShader(getAssetPath() + "shaders/subpasses/gbuffer.vert.spv", VK_SHADER_STAGE_VERTEX_BIT);
 		shaderStages[1]												= loadShader(getAssetPath() + "shaders/subpasses/gbuffer.frag.spv", VK_SHADER_STAGE_FRAGMENT_BIT);
 	
-		VK_CHECK_RESULT(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &PipelineOffscreen.Instance));
+		VK_EVAL(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &PipelineOffscreen.Instance));
 	}
 
 	// Create the Vulkan objects used in the composition pass (descriptor sets, pipelines, etc.)
@@ -509,15 +509,15 @@ public:
 			};
 
 		VkDescriptorSetLayoutCreateInfo									descriptorLayout			= vks::initializers::descriptorSetLayoutCreateInfo(setLayoutBindings.data(), static_cast<uint32_t>(setLayoutBindings.size()));
-		VK_CHECK_RESULT(vkCreateDescriptorSetLayout(device, &descriptorLayout, nullptr, &DescriptorSetComposition.Layout));
+		VK_EVAL(vkCreateDescriptorSetLayout(device, &descriptorLayout, nullptr, &DescriptorSetComposition.Layout));
 
 		// Pipeline layout
 		VkPipelineLayoutCreateInfo										pPipelineLayoutCreateInfo	= vks::initializers::pipelineLayoutCreateInfo(&DescriptorSetComposition.Layout, 1);
-		VK_CHECK_RESULT(vkCreatePipelineLayout(device, &pPipelineLayoutCreateInfo, nullptr, &PipelineComposition.Layout));
+		VK_EVAL(vkCreatePipelineLayout(device, &pPipelineLayoutCreateInfo, nullptr, &PipelineComposition.Layout));
 
 		// Descriptor sets
 		VkDescriptorSetAllocateInfo										allocInfo					= vks::initializers::descriptorSetAllocateInfo(descriptorPool, &DescriptorSetComposition.Layout, 1);
-		VK_CHECK_RESULT(vkAllocateDescriptorSets(device, &allocInfo, &DescriptorSetComposition.Instance));
+		VK_EVAL(vkAllocateDescriptorSets(device, &allocInfo, &DescriptorSetComposition.Instance));
 
 		// Image descriptors for the offscreen color attachments
 		VkDescriptorImageInfo											texDescriptorPosition		= vks::initializers::descriptorImageInfo(VK_NULL_HANDLE, attachments.position.view, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
@@ -583,7 +583,7 @@ public:
 
 		depthStencilState.depthWriteEnable							= VK_FALSE;
 
-		VK_CHECK_RESULT(vkCreateGraphicsPipelines	(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &PipelineComposition.Instance));
+		VK_EVAL(vkCreateGraphicsPipelines	(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &PipelineComposition.Instance));
 
 		// Transparent (forward) pipeline
 
@@ -595,15 +595,15 @@ public:
 			};
 
 		descriptorLayout											= vks::initializers::descriptorSetLayoutCreateInfo(setLayoutBindings.data(), static_cast<uint32_t>(setLayoutBindings.size()));
-		VK_CHECK_RESULT(vkCreateDescriptorSetLayout	(device, &descriptorLayout, nullptr, &DescriptorSetTransparent.Layout));
+		VK_EVAL(vkCreateDescriptorSetLayout	(device, &descriptorLayout, nullptr, &DescriptorSetTransparent.Layout));
 
 		// Pipeline layout
 		pPipelineLayoutCreateInfo									= vks::initializers::pipelineLayoutCreateInfo(&DescriptorSetTransparent.Layout, 1);
-		VK_CHECK_RESULT(vkCreatePipelineLayout		(device, &pPipelineLayoutCreateInfo, nullptr, &PipelineTransparent.Layout));
+		VK_EVAL(vkCreatePipelineLayout		(device, &pPipelineLayoutCreateInfo, nullptr, &PipelineTransparent.Layout));
 
 		// Descriptor sets
 		allocInfo													= vks::initializers::descriptorSetAllocateInfo(descriptorPool, &DescriptorSetTransparent.Layout, 1);
-		VK_CHECK_RESULT(vkAllocateDescriptorSets	(device, &allocInfo, &DescriptorSetTransparent.Instance));
+		VK_EVAL(vkAllocateDescriptorSets	(device, &allocInfo, &DescriptorSetTransparent.Instance));
 
 		writeDescriptorSets											= 
 			{	vks::initializers::writeDescriptorSet(DescriptorSetTransparent.Instance, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER			, 0, &uniformBuffers.GBuffer.descriptor	)
@@ -631,7 +631,7 @@ public:
 		shaderStages[0]												= loadShader(getAssetPath() + "shaders/subpasses/transparent.vert.spv", VK_SHADER_STAGE_VERTEX_BIT);
 		shaderStages[1]											= loadShader(getAssetPath() + "shaders/subpasses/transparent.frag.spv", VK_SHADER_STAGE_FRAGMENT_BIT);
 
-		VK_CHECK_RESULT(vkCreateGraphicsPipelines	(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &PipelineTransparent.Instance));
+		VK_EVAL(vkCreateGraphicsPipelines	(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &PipelineTransparent.Instance));
 	}
 
 	// Prepare and initialize uniform buffer containing shader uniforms
@@ -649,7 +649,7 @@ public:
 		uboGBuffer.view												= camera.matrices.view;
 		uboGBuffer.model											= glm::mat4();
 
-		VK_CHECK_RESULT(uniformBuffers.GBuffer.map());
+		VK_EVAL(uniformBuffers.GBuffer.map());
 		memcpy(uniformBuffers.GBuffer.mapped, &uboGBuffer, sizeof(uboGBuffer));
 		uniformBuffers.GBuffer.unmap();
 	}
@@ -679,7 +679,7 @@ public:
 		// Current view position
 		uboLights.viewPos											= glm::vec4(camera.position, 0.0f) * glm::vec4(-1.0f, 1.0f, -1.0f, 1.0f);
 
-		VK_CHECK_RESULT(uniformBuffers.lights.map());
+		VK_EVAL(uniformBuffers.lights.map());
 		memcpy(uniformBuffers.lights.mapped, &uboLights, sizeof(uboLights));
 		uniformBuffers.lights.unmap();
 	}
@@ -692,7 +692,7 @@ public:
 		submitInfo.pCommandBuffers									= &drawCmdBuffers[currentBuffer];
 
 		// Submit to queue
-		VK_CHECK_RESULT(vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE));
+		VK_EVAL(vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE));
 
 		VulkanExampleBase::submitFrame();
 	}

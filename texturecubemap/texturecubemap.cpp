@@ -125,18 +125,18 @@ public:
 		bufferCreateInfo.usage										= VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
 		bufferCreateInfo.sharingMode								= VK_SHARING_MODE_EXCLUSIVE;
 
-		VK_CHECK_RESULT(vkCreateBuffer		(device, &bufferCreateInfo, nullptr, &stagingBuffer));
+		VK_EVAL(vkCreateBuffer		(device, &bufferCreateInfo, nullptr, &stagingBuffer));
 
 		
 		vkGetBufferMemoryRequirements		(device, stagingBuffer, &memReqs);																					// Get memory requirements for the staging buffer (alignment, memory type bits)
 		memAllocInfo.allocationSize									= memReqs.size;
 		memAllocInfo.memoryTypeIndex								= vulkanDevice->getMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);	// Get memory type index for a host visible buffer
-		VK_CHECK_RESULT(vkAllocateMemory	(device, &memAllocInfo, nullptr, &stagingMemory));
-		VK_CHECK_RESULT(vkBindBufferMemory	(device, stagingBuffer, stagingMemory, 0));
+		VK_EVAL(vkAllocateMemory	(device, &memAllocInfo, nullptr, &stagingMemory));
+		VK_EVAL(vkBindBufferMemory	(device, stagingBuffer, stagingMemory, 0));
 
 		// Copy texture data into staging buffer
 		uint8_t *data;
-		VK_CHECK_RESULT(vkMapMemory			(device, stagingMemory, 0, memReqs.size, 0, (void **)&data));
+		VK_EVAL(vkMapMemory			(device, stagingMemory, 0, memReqs.size, 0, (void **)&data));
 		memcpy(data, texCube.data(), texCube.size());
 		vkUnmapMemory						(device, stagingMemory);
 
@@ -155,15 +155,15 @@ public:
 		imageCreateInfo.arrayLayers									= 6;									// Cube faces count as array layers in Vulkan
 		imageCreateInfo.flags										= VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT;	// This flag is required for cube map images
 
-		VK_CHECK_RESULT(vkCreateImage		(device, &imageCreateInfo, nullptr, &cubeMap.image));
+		VK_EVAL(vkCreateImage		(device, &imageCreateInfo, nullptr, &cubeMap.image));
 
 		vkGetImageMemoryRequirements		(device, cubeMap.image, &memReqs);
 
 		memAllocInfo.allocationSize									= memReqs.size;
 		memAllocInfo.memoryTypeIndex								= vulkanDevice->getMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
-		VK_CHECK_RESULT(vkAllocateMemory	(device, &memAllocInfo, nullptr, &cubeMap.deviceMemory));
-		VK_CHECK_RESULT(vkBindImageMemory	(device, cubeMap.image, cubeMap.deviceMemory, 0));
+		VK_EVAL(vkAllocateMemory	(device, &memAllocInfo, nullptr, &cubeMap.deviceMemory));
+		VK_EVAL(vkBindImageMemory	(device, cubeMap.image, cubeMap.deviceMemory, 0));
 
 		VkCommandBuffer													copyCmd									= VulkanExampleBase::createCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY, true);
 
@@ -225,7 +225,7 @@ public:
 			sampler.maxAnisotropy										= vulkanDevice->properties.limits.maxSamplerAnisotropy;
 			sampler.anisotropyEnable									= VK_TRUE;
 		}
-		VK_CHECK_RESULT(vkCreateSampler(device, &sampler, nullptr, &cubeMap.sampler));
+		VK_EVAL(vkCreateSampler(device, &sampler, nullptr, &cubeMap.sampler));
 
 		// Create image view
 		VkImageViewCreateInfo											view									= vks::initializers::imageViewCreateInfo();
@@ -237,7 +237,7 @@ public:
 		view.subresourceRange.layerCount							= 6;					// 6 array layers (faces)
 		view.subresourceRange.levelCount							= cubeMap.mipLevels;	// Set number of mip levels
 		view.image													= cubeMap.image;
-		VK_CHECK_RESULT(vkCreateImageView(device, &view, nullptr, &cubeMap.view));
+		VK_EVAL(vkCreateImageView(device, &view, nullptr, &cubeMap.view));
 
 		// Clean up staging resources
 		vkFreeMemory	(device, stagingMemory, nullptr);
@@ -272,7 +272,7 @@ public:
 			// Set target frame buffer
 			renderPassBeginInfo.framebuffer								= frameBuffers[i];
 
-			VK_CHECK_RESULT(vkBeginCommandBuffer(drawCmdBuffers[i], &cmdBufInfo));
+			VK_EVAL(vkBeginCommandBuffer(drawCmdBuffers[i], &cmdBufInfo));
 
 			vkCmdBeginRenderPass(drawCmdBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 
@@ -302,7 +302,7 @@ public:
 
 			vkCmdEndRenderPass(drawCmdBuffers[i]);
 
-			VK_CHECK_RESULT(vkEndCommandBuffer(drawCmdBuffers[i]));
+			VK_EVAL(vkEndCommandBuffer(drawCmdBuffers[i]));
 		}
 	}
 
@@ -344,7 +344,7 @@ public:
 
 		VkDescriptorPoolCreateInfo										descriptorPoolInfo						= vks::initializers::descriptorPoolCreateInfo(static_cast<uint32_t>(poolSizes.size()), poolSizes.data(), 2);
 
-		VK_CHECK_RESULT(vkCreateDescriptorPool(device, &descriptorPoolInfo, nullptr, &descriptorPool));
+		VK_EVAL(vkCreateDescriptorPool(device, &descriptorPoolInfo, nullptr, &descriptorPool));
 	}
 
 	void														setupDescriptorSetLayout				()																{
@@ -354,10 +354,10 @@ public:
 			};
 
 		VkDescriptorSetLayoutCreateInfo									descriptorLayout						= vks::initializers::descriptorSetLayoutCreateInfo(setLayoutBindings.data(), static_cast<uint32_t>(setLayoutBindings.size())); 
-		VK_CHECK_RESULT(vkCreateDescriptorSetLayout(device, &descriptorLayout, nullptr, &descriptorSetLayout));
+		VK_EVAL(vkCreateDescriptorSetLayout(device, &descriptorLayout, nullptr, &descriptorSetLayout));
 
 		VkPipelineLayoutCreateInfo										pPipelineLayoutCreateInfo				= vks::initializers::pipelineLayoutCreateInfo(&descriptorSetLayout, 1);
-		VK_CHECK_RESULT(vkCreatePipelineLayout(device, &pPipelineLayoutCreateInfo, nullptr, &pipelineLayout));
+		VK_EVAL(vkCreatePipelineLayout(device, &pPipelineLayoutCreateInfo, nullptr, &pipelineLayout));
 	}
 
 	void														setupDescriptorSets						()																{
@@ -366,7 +366,7 @@ public:
 		VkDescriptorSetAllocateInfo										allocInfo								= vks::initializers::descriptorSetAllocateInfo(descriptorPool, &descriptorSetLayout, 1);
 
 		// 3D object descriptor set
-		VK_CHECK_RESULT(vkAllocateDescriptorSets(device, &allocInfo, &descriptorSets.object));
+		VK_EVAL(vkAllocateDescriptorSets(device, &allocInfo, &descriptorSets.object));
 
 		std::vector<VkWriteDescriptorSet>								writeDescriptorSets						=
 			{	vks::initializers::writeDescriptorSet(descriptorSets.object, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER			, 0, &uniformBuffers.object.descriptor)	// Binding 0 : Vertex shader uniform buffer
@@ -375,7 +375,7 @@ public:
 		vkUpdateDescriptorSets(device, static_cast<uint32_t>(writeDescriptorSets.size()), writeDescriptorSets.data(), 0, NULL);
 
 		// Sky box descriptor set
-		VK_CHECK_RESULT(vkAllocateDescriptorSets(device, &allocInfo, &descriptorSets.skybox));
+		VK_EVAL(vkAllocateDescriptorSets(device, &allocInfo, &descriptorSets.skybox));
 
 		writeDescriptorSets											=
 			{	vks::initializers::writeDescriptorSet(descriptorSets.skybox, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER			, 0, &uniformBuffers.skybox.descriptor)	// Binding 0 : Vertex shader uniform buffer
@@ -415,7 +415,7 @@ public:
 		pipelineCreateInfo.stageCount								= static_cast<uint32_t>(shaderStages.size());
 		pipelineCreateInfo.pStages									= shaderStages.data();
 
-		VK_CHECK_RESULT(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipelines.skybox));
+		VK_EVAL(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipelines.skybox));
 
 		// Cube map reflect pipeline
 		shaderStages[0]												= loadShader(getAssetPath() + "shaders/cubemap/reflect.vert.spv", VK_SHADER_STAGE_VERTEX_BIT);
@@ -425,17 +425,17 @@ public:
 		depthStencilState.depthTestEnable							= VK_TRUE;
 	
 		rasterizationState.cullMode									= VK_CULL_MODE_FRONT_BIT;	// Flip cull mode
-		VK_CHECK_RESULT(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipelines.reflect));
+		VK_EVAL(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipelines.reflect));
 	}
 
 	// Prepare and initialize uniform buffer containing shader uniforms
 	void														prepareUniformBuffers					()																{
-		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBuffers.object, sizeof(uboVS)));		// Objact vertex shader uniform buffer
-		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBuffers.skybox, sizeof(uboVS)));		// Skybox vertex shader uniform buffer
+		VK_EVAL(vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBuffers.object, sizeof(uboVS)));		// Objact vertex shader uniform buffer
+		VK_EVAL(vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBuffers.skybox, sizeof(uboVS)));		// Skybox vertex shader uniform buffer
 
 		// Map persistent
-		VK_CHECK_RESULT(uniformBuffers.object.map());
-		VK_CHECK_RESULT(uniformBuffers.skybox.map());
+		VK_EVAL(uniformBuffers.object.map());
+		VK_EVAL(uniformBuffers.skybox.map());
 
 		updateUniformBuffers();
 	}
@@ -472,7 +472,7 @@ public:
 
 		submitInfo.commandBufferCount								= 1;
 		submitInfo.pCommandBuffers									= &drawCmdBuffers[currentBuffer];
-		VK_CHECK_RESULT(vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE));
+		VK_EVAL(vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE));
 
 		VulkanExampleBase::submitFrame();
 	}

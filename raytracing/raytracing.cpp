@@ -133,12 +133,12 @@ public:
 		VkMemoryAllocateInfo											memAllocInfo							= vks::initializers::memoryAllocateInfo();
 		VkMemoryRequirements											memReqs;
 
-		VK_CHECK_RESULT(vkCreateImage		(device, &imageCreateInfo, nullptr, &tex->image));
+		VK_EVAL(vkCreateImage		(device, &imageCreateInfo, nullptr, &tex->image));
 		vkGetImageMemoryRequirements		(device, tex->image, &memReqs);
 		memAllocInfo.allocationSize									= memReqs.size;
 		memAllocInfo.memoryTypeIndex								= vulkanDevice->getMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-		VK_CHECK_RESULT(vkAllocateMemory	(device, &memAllocInfo, nullptr, &tex->deviceMemory));
-		VK_CHECK_RESULT(vkBindImageMemory	(device, tex->image, tex->deviceMemory, 0));
+		VK_EVAL(vkAllocateMemory	(device, &memAllocInfo, nullptr, &tex->deviceMemory));
+		VK_EVAL(vkBindImageMemory	(device, tex->image, tex->deviceMemory, 0));
 
 		VkCommandBuffer													layoutCmd								= VulkanExampleBase::createCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY, true);
 
@@ -161,7 +161,7 @@ public:
 		sampler.minLod												= 0.0f;
 		sampler.maxLod												= 0.0f;
 		sampler.borderColor											= VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
-		VK_CHECK_RESULT(vkCreateSampler(device, &sampler, nullptr, &tex->sampler));
+		VK_EVAL(vkCreateSampler(device, &sampler, nullptr, &tex->sampler));
 
 		// Create image view
 		VkImageViewCreateInfo											view									= vks::initializers::imageViewCreateInfo();
@@ -170,7 +170,7 @@ public:
 		view.components												= { VK_COMPONENT_SWIZZLE_R, VK_COMPONENT_SWIZZLE_G, VK_COMPONENT_SWIZZLE_B, VK_COMPONENT_SWIZZLE_A };
 		view.subresourceRange										= { VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1 };
 		view.image													= tex->image;
-		VK_CHECK_RESULT(vkCreateImageView(device, &view, nullptr, &tex->view));
+		VK_EVAL(vkCreateImageView(device, &view, nullptr, &tex->view));
 
 		// Initialize a descriptor for later use
 		tex->descriptor.imageLayout									= tex->imageLayout;
@@ -206,7 +206,7 @@ public:
 			// Set target frame buffer
 			renderPassBeginInfo.framebuffer								= frameBuffers[i];
 
-			VK_CHECK_RESULT(vkBeginCommandBuffer(drawCmdBuffers[i], &cmdBufInfo));
+			VK_EVAL(vkBeginCommandBuffer(drawCmdBuffers[i], &cmdBufInfo));
 
 			// Image memory barrier to make sure that compute shader writes are finished before sampling from the texture
 			VkImageMemoryBarrier											imageMemoryBarrier						= {};
@@ -235,7 +235,7 @@ public:
 
 			vkCmdEndRenderPass		(drawCmdBuffers[i]);
 
-			VK_CHECK_RESULT(vkEndCommandBuffer(drawCmdBuffers[i]));
+			VK_EVAL(vkEndCommandBuffer(drawCmdBuffers[i]));
 		}
 
 	}
@@ -243,7 +243,7 @@ public:
 	void														buildComputeCommandBuffer				()																		{
 		VkCommandBufferBeginInfo										cmdBufInfo								= vks::initializers::commandBufferBeginInfo();
 
-		VK_CHECK_RESULT(vkBeginCommandBuffer(compute.commandBuffer, &cmdBufInfo));
+		VK_EVAL(vkBeginCommandBuffer(compute.commandBuffer, &cmdBufInfo));
 
 		vkCmdBindPipeline		(compute.commandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, compute.pipeline);
 		vkCmdBindDescriptorSets	(compute.commandBuffer, VK_PIPELINE_BIND_POINT_COMPUTE, compute.pipelineLayout, 0, 1, &compute.descriptorSet, 0, 0);
@@ -333,7 +333,7 @@ public:
 			};
 
 		VkDescriptorPoolCreateInfo										descriptorPoolInfo						= vks::initializers::descriptorPoolCreateInfo(static_cast<uint32_t>(poolSizes.size()), poolSizes.data(), 3);
-		VK_CHECK_RESULT(vkCreateDescriptorPool(device, &descriptorPoolInfo, nullptr, &descriptorPool));
+		VK_EVAL(vkCreateDescriptorPool(device, &descriptorPoolInfo, nullptr, &descriptorPool));
 	}
 
 	void														setupDescriptorSetLayout				()																		{
@@ -342,15 +342,15 @@ public:
 			};
 
 		VkDescriptorSetLayoutCreateInfo									descriptorLayout						= vks::initializers::descriptorSetLayoutCreateInfo(setLayoutBindings.data(), static_cast<uint32_t>(setLayoutBindings.size()));
-		VK_CHECK_RESULT(vkCreateDescriptorSetLayout(device, &descriptorLayout, nullptr, &graphics.descriptorSetLayout));
+		VK_EVAL(vkCreateDescriptorSetLayout(device, &descriptorLayout, nullptr, &graphics.descriptorSetLayout));
 
 		VkPipelineLayoutCreateInfo										pPipelineLayoutCreateInfo				= vks::initializers::pipelineLayoutCreateInfo(&graphics.descriptorSetLayout, 1);
-		VK_CHECK_RESULT(vkCreatePipelineLayout(device, &pPipelineLayoutCreateInfo, nullptr, &graphics.pipelineLayout));
+		VK_EVAL(vkCreatePipelineLayout(device, &pPipelineLayoutCreateInfo, nullptr, &graphics.pipelineLayout));
 	}
 
 	void														setupDescriptorSet						()																		{
 		VkDescriptorSetAllocateInfo										allocInfo								= vks::initializers::descriptorSetAllocateInfo(descriptorPool, &graphics.descriptorSetLayout, 1);
-		VK_CHECK_RESULT(vkAllocateDescriptorSets(device, &allocInfo, &graphics.descriptorSet));
+		VK_EVAL(vkAllocateDescriptorSets(device, &allocInfo, &graphics.descriptorSet));
 
 		std::vector<VkWriteDescriptorSet>								writeDescriptorSets						=
 			{	vks::initializers::writeDescriptorSet(graphics.descriptorSet, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0, &textureComputeTarget.descriptor)	// Binding 0 : Fragment shader texture sampler
@@ -397,7 +397,7 @@ public:
 		pipelineCreateInfo.pStages									= shaderStages.data();
 		pipelineCreateInfo.renderPass								= renderPass;
 
-		VK_CHECK_RESULT(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &graphics.pipeline));
+		VK_EVAL(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &graphics.pipeline));
 	}
 
 	// Prepare the compute pipeline that generates the ray traced image
@@ -421,13 +421,13 @@ public:
 			};
 
 		VkDescriptorSetLayoutCreateInfo									descriptorLayout						= vks::initializers::descriptorSetLayoutCreateInfo(setLayoutBindings.data(), static_cast<uint32_t>(setLayoutBindings.size()));
-		VK_CHECK_RESULT(vkCreateDescriptorSetLayout(device, &descriptorLayout, nullptr,	&compute.descriptorSetLayout));
+		VK_EVAL(vkCreateDescriptorSetLayout(device, &descriptorLayout, nullptr,	&compute.descriptorSetLayout));
 
 		VkPipelineLayoutCreateInfo										pPipelineLayoutCreateInfo				= vks::initializers::pipelineLayoutCreateInfo(&compute.descriptorSetLayout, 1);
-		VK_CHECK_RESULT(vkCreatePipelineLayout(device, &pPipelineLayoutCreateInfo, nullptr, &compute.pipelineLayout));
+		VK_EVAL(vkCreatePipelineLayout(device, &pPipelineLayoutCreateInfo, nullptr, &compute.pipelineLayout));
 
 		VkDescriptorSetAllocateInfo										allocInfo								= vks::initializers::descriptorSetAllocateInfo(descriptorPool, &compute.descriptorSetLayout, 1);
-		VK_CHECK_RESULT(vkAllocateDescriptorSets(device, &allocInfo, &compute.descriptorSet));
+		VK_EVAL(vkAllocateDescriptorSets(device, &allocInfo, &compute.descriptorSet));
 
 		std::vector<VkWriteDescriptorSet>								computeWriteDescriptorSets				=
 			{	vks::initializers::writeDescriptorSet(compute.descriptorSet, VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 0, &textureComputeTarget.descriptor)					// Binding 0: Output storage image
@@ -442,22 +442,22 @@ public:
 		VkComputePipelineCreateInfo										computePipelineCreateInfo				= vks::initializers::computePipelineCreateInfo(compute.pipelineLayout, 0);
 
 		computePipelineCreateInfo.stage								= loadShader(getAssetPath() + "shaders/raytracing/raytracing.comp.spv", VK_SHADER_STAGE_COMPUTE_BIT);
-		VK_CHECK_RESULT(vkCreateComputePipelines(device, pipelineCache, 1, &computePipelineCreateInfo, nullptr, &compute.pipeline));
+		VK_EVAL(vkCreateComputePipelines(device, pipelineCache, 1, &computePipelineCreateInfo, nullptr, &compute.pipeline));
 
 		// Separate command pool as queue family for compute may be different than graphics
 		VkCommandPoolCreateInfo											cmdPoolInfo								= {};
 		cmdPoolInfo.sType											= VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
 		cmdPoolInfo.queueFamilyIndex								= vulkanDevice->queueFamilyIndices.compute;
 		cmdPoolInfo.flags											= VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
-		VK_CHECK_RESULT(vkCreateCommandPool(device, &cmdPoolInfo, nullptr, &compute.commandPool));
+		VK_EVAL(vkCreateCommandPool(device, &cmdPoolInfo, nullptr, &compute.commandPool));
 
 		// Create a command buffer for compute operations
 		VkCommandBufferAllocateInfo										cmdBufAllocateInfo						= vks::initializers::commandBufferAllocateInfo(compute.commandPool, VK_COMMAND_BUFFER_LEVEL_PRIMARY, 1);
-		VK_CHECK_RESULT(vkAllocateCommandBuffers(device, &cmdBufAllocateInfo, &compute.commandBuffer));
+		VK_EVAL(vkAllocateCommandBuffers(device, &cmdBufAllocateInfo, &compute.commandBuffer));
 
 		// Fence for compute CB sync
 		VkFenceCreateInfo												fenceCreateInfo							= vks::initializers::fenceCreateInfo(VK_FENCE_CREATE_SIGNALED_BIT);
-		VK_CHECK_RESULT(vkCreateFence(device, &fenceCreateInfo, nullptr, &compute.fence));
+		VK_EVAL(vkCreateFence(device, &fenceCreateInfo, nullptr, &compute.fence));
 
 		// Build a single command buffer containing the compute dispatch commands
 		buildComputeCommandBuffer();
@@ -476,7 +476,7 @@ public:
 		compute.ubo.lightPos.y										= 0.0f + sin(glm::radians(timer * 360.0f)) * 2.0f;
 		compute.ubo.lightPos.z										= 0.0f + cos(glm::radians(timer * 360.0f)) * 2.0f;
 		compute.ubo.camera.pos										= camera.position * -1.0f;
-		VK_CHECK_RESULT(compute.uniformBuffer.map());
+		VK_EVAL(compute.uniformBuffer.map());
 		memcpy(compute.uniformBuffer.mapped, &compute.ubo, sizeof(compute.ubo));
 		compute.uniformBuffer.unmap();
 	}
@@ -487,7 +487,7 @@ public:
 		// Command buffer to be sumitted to the queue
 		submitInfo.commandBufferCount								= 1;
 		submitInfo.pCommandBuffers									= &drawCmdBuffers[currentBuffer];
-		VK_CHECK_RESULT(vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE));
+		VK_EVAL(vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE));
 
 		VulkanExampleBase::submitFrame();
 
@@ -500,7 +500,7 @@ public:
 		computeSubmitInfo.commandBufferCount						= 1;
 		computeSubmitInfo.pCommandBuffers							= &compute.commandBuffer;
 
-		VK_CHECK_RESULT(vkQueueSubmit(compute.queue, 1, &computeSubmitInfo, compute.fence));
+		VK_EVAL(vkQueueSubmit(compute.queue, 1, &computeSubmitInfo, compute.fence));
 	}
 
 	void														prepare									()																		{

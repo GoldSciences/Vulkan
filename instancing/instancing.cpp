@@ -117,7 +117,7 @@ public:
 		for (size_t i = 0; i < drawCmdBuffers.size(); ++i) {
 			// Set target frame buffer
 			renderPassBeginInfo.framebuffer								= frameBuffers[i];
-			VK_CHECK_RESULT(vkBeginCommandBuffer(drawCmdBuffers[i], &cmdBufInfo));
+			VK_EVAL(vkBeginCommandBuffer(drawCmdBuffers[i], &cmdBufInfo));
 			vkCmdBeginRenderPass	(drawCmdBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 
 			VkViewport														viewport										= vks::initializers::viewport((float)width, (float)height, 0.0f, 1.0f);
@@ -153,7 +153,7 @@ public:
 
 			vkCmdEndRenderPass		(drawCmdBuffers[i]);
 
-			VK_CHECK_RESULT(vkEndCommandBuffer(drawCmdBuffers[i]));
+			VK_EVAL(vkEndCommandBuffer(drawCmdBuffers[i]));
 		}
 	}
 
@@ -172,7 +172,7 @@ public:
 			};
 
 		VkDescriptorPoolCreateInfo										descriptorPoolInfo								= vks::initializers::descriptorPoolCreateInfo(static_cast<uint32_t>(poolSizes.size()), poolSizes.data(), 2);
-		VK_CHECK_RESULT(vkCreateDescriptorPool(device, &descriptorPoolInfo, nullptr, &descriptorPool));
+		VK_EVAL(vkCreateDescriptorPool		(device, &descriptorPoolInfo, nullptr, &descriptorPool));
 	}
 
 	void														setupDescriptorSetLayout						()									{
@@ -182,10 +182,10 @@ public:
 			};
 
 		VkDescriptorSetLayoutCreateInfo									descriptorLayout								= vks::initializers::descriptorSetLayoutCreateInfo(setLayoutBindings.data(), static_cast<uint32_t>(setLayoutBindings.size()));
-		VK_CHECK_RESULT(vkCreateDescriptorSetLayout(device, &descriptorLayout, nullptr, &descriptorSetLayout));
+		VK_EVAL(vkCreateDescriptorSetLayout	(device, &descriptorLayout, nullptr, &descriptorSetLayout));
 
 		VkPipelineLayoutCreateInfo										pPipelineLayoutCreateInfo						= vks::initializers::pipelineLayoutCreateInfo(&descriptorSetLayout, 1);
-		VK_CHECK_RESULT(vkCreatePipelineLayout(device, &pPipelineLayoutCreateInfo, nullptr, &pipelineLayout));
+		VK_EVAL(vkCreatePipelineLayout		(device, &pPipelineLayoutCreateInfo, nullptr, &pipelineLayout));
 	}
 
 	void														setupDescriptorSet								()									{
@@ -195,20 +195,20 @@ public:
 		descripotrSetAllocInfo										= vks::initializers::descriptorSetAllocateInfo(descriptorPool, &descriptorSetLayout, 1);;
 
 		// Instanced rocks
-		VK_CHECK_RESULT(vkAllocateDescriptorSets(device, &descripotrSetAllocInfo, &descriptorSets.instancedRocks));
+		VK_EVAL(vkAllocateDescriptorSets	(device, &descripotrSetAllocInfo, &descriptorSets.instancedRocks));
 		writeDescriptorSets											= 
 			{	vks::initializers::writeDescriptorSet(descriptorSets.instancedRocks, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,	0, &uniformBuffers.scene.descriptor)	// Binding 0 : Vertex shader uniform buffer			
 			,	vks::initializers::writeDescriptorSet(descriptorSets.instancedRocks, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, &textures.rocks.descriptor)	// Binding 1 : Color map 
 			};
-		vkUpdateDescriptorSets(device, static_cast<uint32_t>(writeDescriptorSets.size()), writeDescriptorSets.data(), 0, NULL);
+		vkUpdateDescriptorSets				(device, static_cast<uint32_t>(writeDescriptorSets.size()), writeDescriptorSets.data(), 0, NULL);
 
 		// Planet
-		VK_CHECK_RESULT(vkAllocateDescriptorSets(device, &descripotrSetAllocInfo, &descriptorSets.planet));
+		VK_EVAL(vkAllocateDescriptorSets	(device, &descripotrSetAllocInfo, &descriptorSets.planet));
 		writeDescriptorSets											= 
 			{	vks::initializers::writeDescriptorSet(descriptorSets.planet, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,	0, &uniformBuffers.scene.descriptor)			// Binding 0 : Vertex shader uniform buffer			
 			,	vks::initializers::writeDescriptorSet(descriptorSets.planet, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, &textures.planet.descriptor)			// Binding 1 : Color map 
 			};
-		vkUpdateDescriptorSets(device, static_cast<uint32_t>(writeDescriptorSets.size()), writeDescriptorSets.data(), 0, NULL);
+		vkUpdateDescriptorSets				(device, static_cast<uint32_t>(writeDescriptorSets.size()), writeDescriptorSets.data(), 0, NULL);
 
 	}
 
@@ -278,7 +278,7 @@ public:
 		// Use all input bindings and attribute descriptions
 		inputState.vertexBindingDescriptionCount					= static_cast<uint32_t>(bindingDescriptions.size());
 		inputState.vertexAttributeDescriptionCount					= static_cast<uint32_t>(attributeDescriptions.size());
-		VK_CHECK_RESULT(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipelines.instancedRocks));
+		VK_EVAL(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipelines.instancedRocks));
 
 		// Planet rendering pipeline
 		shaderStages[0]												= loadShader(getAssetPath() + "shaders/instancing/planet.vert.spv", VK_SHADER_STAGE_VERTEX_BIT);
@@ -286,7 +286,7 @@ public:
 		// Only use the non-instanced input bindings and attribute descriptions
 		inputState.vertexBindingDescriptionCount					= 1;
 		inputState.vertexAttributeDescriptionCount					= 4;
-		VK_CHECK_RESULT(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipelines.planet));
+		VK_EVAL(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipelines.planet));
 
 		// Star field pipeline
 		rasterizationState.cullMode									= VK_CULL_MODE_NONE;
@@ -296,7 +296,7 @@ public:
 		// Vertices are generated in the vertex shader
 		inputState.vertexBindingDescriptionCount					= 0;
 		inputState.vertexAttributeDescriptionCount					= 0;
-		VK_CHECK_RESULT(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipelines.starfield));
+		VK_EVAL(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipelines.starfield));
 	}
 
 	float														rnd												(float range)						{ return float(range * (rand() / double(RAND_MAX))); }
@@ -346,8 +346,8 @@ public:
 			VkBuffer														buffer											= VK_NULL_HANDLE;
 		}																stagingBuffer;
 
-		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, instanceBuffer.size, &stagingBuffer.buffer, &stagingBuffer.memory, instanceData.data()));
-		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, instanceBuffer.size, &instanceBuffer.buffer, &instanceBuffer.memory));
+		VK_EVAL(vulkanDevice->createBuffer(VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, instanceBuffer.size, &stagingBuffer.buffer, &stagingBuffer.memory, instanceData.data()));
+		VK_EVAL(vulkanDevice->createBuffer(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, instanceBuffer.size, &instanceBuffer.buffer, &instanceBuffer.memory));
 
 		// Copy to staging buffer
 		VkCommandBuffer													copyCmd											= VulkanExampleBase::createCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY, true);
@@ -367,8 +367,8 @@ public:
 	}
 
 	void														prepareUniformBuffers							()									{
-		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBuffers.scene, sizeof(uboVS)));
-		VK_CHECK_RESULT(uniformBuffers.scene.map());	// Map persistent
+		VK_EVAL(vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBuffers.scene, sizeof(uboVS)));
+		VK_EVAL(uniformBuffers.scene.map());	// Map persistent
 
 		updateUniformBuffer(true);
 	}
@@ -397,7 +397,7 @@ public:
 		submitInfo.commandBufferCount								= 1;
 		submitInfo.pCommandBuffers									= &drawCmdBuffers[currentBuffer];
 
-		VK_CHECK_RESULT(vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE));	// Submit to queue
+		VK_EVAL(vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE));	// Submit to queue
 
 		VulkanExampleBase::submitFrame();
 	}

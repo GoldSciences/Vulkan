@@ -264,11 +264,11 @@ namespace vks
 				// Create staging buffers
 				vks::Buffer							vertexStaging, indexStaging;
 
-				VK_CHECK_RESULT(device_->createBuffer(VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, &vertexStaging	, vBufferSize, vertexBuffer	.data()));				// Vertex buffer
-				VK_CHECK_RESULT(device_->createBuffer(VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, &indexStaging	, iBufferSize, indexBuffer	.data()));				// Index buffer
+				VK_EVAL(device_->createBuffer(VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, &vertexStaging	, vBufferSize, vertexBuffer	.data()));				// Vertex buffer
+				VK_EVAL(device_->createBuffer(VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, &indexStaging	, iBufferSize, indexBuffer	.data()));				// Index buffer
 				// Create device local target buffers
-				VK_CHECK_RESULT(device_->createBuffer(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT	, &vertices	, vBufferSize));	// Vertex buffer
-				VK_CHECK_RESULT(device_->createBuffer(VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT	, &indices	, iBufferSize));		// Index buffer
+				VK_EVAL(device_->createBuffer(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT	, &vertices	, vBufferSize));	// Vertex buffer
+				VK_EVAL(device_->createBuffer(VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT	, &indices	, iBufferSize));		// Index buffer
 
 				// Copy from staging buffers
 				VkCommandBuffer						copyCmd						= device_->createCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY, true);

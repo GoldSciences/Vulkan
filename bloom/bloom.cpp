@@ -186,15 +186,15 @@ public:
 		colorImageView.subresourceRange.baseArrayLayer				= 0;
 		colorImageView.subresourceRange.layerCount					= 1;
 
-		VK_CHECK_RESULT(vkCreateImage		(device, &image, nullptr, &frameBuf->color.image));
+		VK_EVAL(vkCreateImage		(device, &image, nullptr, &frameBuf->color.image));
 		vkGetImageMemoryRequirements		(device, frameBuf->color.image, &memReqs);
 		memAlloc.allocationSize										= memReqs.size;
 		memAlloc.memoryTypeIndex									= vulkanDevice->getMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-		VK_CHECK_RESULT(vkAllocateMemory	(device, &memAlloc, nullptr, &frameBuf->color.memory));
-		VK_CHECK_RESULT(vkBindImageMemory	(device, frameBuf->color.image, frameBuf->color.memory, 0));
+		VK_EVAL(vkAllocateMemory	(device, &memAlloc, nullptr, &frameBuf->color.memory));
+		VK_EVAL(vkBindImageMemory	(device, frameBuf->color.image, frameBuf->color.memory, 0));
 
 		colorImageView.image										= frameBuf->color.image;
-		VK_CHECK_RESULT(vkCreateImageView(device, &colorImageView, nullptr, &frameBuf->color.view));
+		VK_EVAL(vkCreateImageView(device, &colorImageView, nullptr, &frameBuf->color.view));
 
 		// Depth stencil attachment
 		image.format												= depthFormat_;
@@ -211,15 +211,15 @@ public:
 		depthStencilView.subresourceRange.baseArrayLayer			= 0;
 		depthStencilView.subresourceRange.layerCount				= 1;
 
-		VK_CHECK_RESULT(vkCreateImage(device, &image, nullptr, &frameBuf->depth.image));
+		VK_EVAL(vkCreateImage(device, &image, nullptr, &frameBuf->depth.image));
 		vkGetImageMemoryRequirements(device, frameBuf->depth.image, &memReqs);
 		memAlloc.allocationSize										= memReqs.size;
 		memAlloc.memoryTypeIndex									= vulkanDevice->getMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-		VK_CHECK_RESULT(vkAllocateMemory	(device, &memAlloc, nullptr, &frameBuf->depth.memory));
-		VK_CHECK_RESULT(vkBindImageMemory	(device, frameBuf->depth.image, frameBuf->depth.memory, 0));
+		VK_EVAL(vkAllocateMemory	(device, &memAlloc, nullptr, &frameBuf->depth.memory));
+		VK_EVAL(vkBindImageMemory	(device, frameBuf->depth.image, frameBuf->depth.memory, 0));
 
 		depthStencilView.image										= frameBuf->depth.image;
-		VK_CHECK_RESULT(vkCreateImageView	(device, &depthStencilView, nullptr, &frameBuf->depth.view));
+		VK_EVAL(vkCreateImageView	(device, &depthStencilView, nullptr, &frameBuf->depth.view));
 
 		VkImageView														attachments[2];
 		attachments[0]												= frameBuf->color.view;
@@ -233,7 +233,7 @@ public:
 		fbufCreateInfo.height										= FB_DIM;
 		fbufCreateInfo.layers										= 1;
 
-		VK_CHECK_RESULT(vkCreateFramebuffer(device, &fbufCreateInfo, nullptr, &frameBuf->framebuffer));
+		VK_EVAL(vkCreateFramebuffer(device, &fbufCreateInfo, nullptr, &frameBuf->framebuffer));
 
 		// Fill a descriptor for later use in a descriptor set 
 		frameBuf->descriptor.imageLayout							= VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
@@ -311,7 +311,7 @@ public:
 		renderPassInfo.dependencyCount								= static_cast<uint32_t>(dependencies.size());
 		renderPassInfo.pDependencies								= dependencies.data();
 
-		VK_CHECK_RESULT(vkCreateRenderPass(device, &renderPassInfo, nullptr, &offscreenPass.renderPass));
+		VK_EVAL(vkCreateRenderPass(device, &renderPassInfo, nullptr, &offscreenPass.renderPass));
 
 		// Create sampler to sample from the color attachments
 		VkSamplerCreateInfo												sampler									= vks::initializers::samplerCreateInfo();
@@ -326,7 +326,7 @@ public:
 		sampler.minLod												= 0.0f;
 		sampler.maxLod												= 1.0f;
 		sampler.borderColor											= VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
-		VK_CHECK_RESULT(vkCreateSampler(device, &sampler, nullptr, &offscreenPass.sampler));
+		VK_EVAL(vkCreateSampler(device, &sampler, nullptr, &offscreenPass.sampler));
 
 		// Create two frame buffers
 		prepareOffscreenFramebuffer(&offscreenPass.framebuffers[0], FB_COLOR_FORMAT, fbDepthFormat);
@@ -344,7 +344,7 @@ public:
 
 		if (offscreenPass.semaphore == VK_NULL_HANDLE) {
 			VkSemaphoreCreateInfo											semaphoreCreateInfo						= vks::initializers::semaphoreCreateInfo();
-			VK_CHECK_RESULT(vkCreateSemaphore(device, &semaphoreCreateInfo, nullptr, &offscreenPass.semaphore));
+			VK_EVAL(vkCreateSemaphore(device, &semaphoreCreateInfo, nullptr, &offscreenPass.semaphore));
 		}
 
 		VkCommandBufferBeginInfo										cmdBufInfo								= vks::initializers::commandBufferBeginInfo();
@@ -364,7 +364,7 @@ public:
 		renderPassBeginInfo.clearValueCount							= 2;
 		renderPassBeginInfo.pClearValues							= clearValues;
 
-		VK_CHECK_RESULT(vkBeginCommandBuffer(offscreenPass.commandBuffer, &cmdBufInfo));
+		VK_EVAL(vkBeginCommandBuffer(offscreenPass.commandBuffer, &cmdBufInfo));
 
 		VkViewport														viewport								= vks::initializers::viewport((float)offscreenPass.width, (float)offscreenPass.height, 0.0f, 1.0f);
 		vkCmdSetViewport		(offscreenPass.commandBuffer, 0, 1, &viewport);
@@ -398,7 +398,7 @@ public:
 
 		vkCmdEndRenderPass		(offscreenPass.commandBuffer);
 
-		VK_CHECK_RESULT(vkEndCommandBuffer(offscreenPass.commandBuffer));
+		VK_EVAL(vkEndCommandBuffer(offscreenPass.commandBuffer));
 	}
 
 	void														reBuildCommandBuffers					()																				{
@@ -429,7 +429,7 @@ public:
 			// Set target frame buffer
 			renderPassBeginInfo.framebuffer								= frameBuffers[i];
 
-			VK_CHECK_RESULT(vkBeginCommandBuffer(drawCmdBuffers[i], &cmdBufInfo));
+			VK_EVAL(vkBeginCommandBuffer(drawCmdBuffers[i], &cmdBufInfo));
 
 			vkCmdBeginRenderPass	(drawCmdBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 
@@ -468,7 +468,7 @@ public:
 
 			vkCmdEndRenderPass(drawCmdBuffers[i]);
 
-			VK_CHECK_RESULT(vkEndCommandBuffer(drawCmdBuffers[i]));
+			VK_EVAL(vkEndCommandBuffer(drawCmdBuffers[i]));
 		}
 
 		if (bloom) 
@@ -509,7 +509,7 @@ public:
 			};
 
 		VkDescriptorPoolCreateInfo										descriptorPoolInfo						= vks::initializers::descriptorPoolCreateInfo(static_cast<uint32_t>(poolSizes.size()), poolSizes.data(), 5);
-		VK_CHECK_RESULT(vkCreateDescriptorPool(device, &descriptorPoolInfo, nullptr, &descriptorPool));
+		VK_EVAL(vkCreateDescriptorPool(device, &descriptorPoolInfo, nullptr, &descriptorPool));
 	}
 
 	void														setupDescriptorSetLayout				()																				{
@@ -523,9 +523,9 @@ public:
 			,	vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, 1)	// Binding 1: Fragment shader image sampler
 			};
 		descriptorSetLayoutCreateInfo								= vks::initializers::descriptorSetLayoutCreateInfo(setLayoutBindings.data(), static_cast<uint32_t>(setLayoutBindings.size()));
-		VK_CHECK_RESULT(vkCreateDescriptorSetLayout(device, &descriptorSetLayoutCreateInfo, nullptr, &descriptorSetLayouts.blur));
+		VK_EVAL(vkCreateDescriptorSetLayout(device, &descriptorSetLayoutCreateInfo, nullptr, &descriptorSetLayouts.blur));
 		pipelineLayoutCreateInfo									= vks::initializers::pipelineLayoutCreateInfo(&descriptorSetLayouts.blur, 1);
-		VK_CHECK_RESULT(vkCreatePipelineLayout(device, &pipelineLayoutCreateInfo, nullptr, &pipelineLayouts.blur));
+		VK_EVAL(vkCreatePipelineLayout(device, &pipelineLayoutCreateInfo, nullptr, &pipelineLayouts.blur));
 
 		// Scene rendering
 		setLayoutBindings											= 
@@ -535,9 +535,9 @@ public:
 			};
 
 		descriptorSetLayoutCreateInfo								= vks::initializers::descriptorSetLayoutCreateInfo(setLayoutBindings.data(), static_cast<uint32_t>(setLayoutBindings.size()));
-		VK_CHECK_RESULT(vkCreateDescriptorSetLayout(device, &descriptorSetLayoutCreateInfo, nullptr, &descriptorSetLayouts.scene));
+		VK_EVAL(vkCreateDescriptorSetLayout(device, &descriptorSetLayoutCreateInfo, nullptr, &descriptorSetLayouts.scene));
 		pipelineLayoutCreateInfo									= vks::initializers::pipelineLayoutCreateInfo(&descriptorSetLayouts.scene, 1);
-		VK_CHECK_RESULT(vkCreatePipelineLayout(device, &pipelineLayoutCreateInfo, nullptr, &pipelineLayouts.scene));
+		VK_EVAL(vkCreatePipelineLayout(device, &pipelineLayoutCreateInfo, nullptr, &pipelineLayouts.scene));
 	}
 
 	void														setupDescriptorSet						()																				{
@@ -547,7 +547,7 @@ public:
 		// Full screen blur
 		// Vertical
 		descriptorSetAllocInfo										= vks::initializers::descriptorSetAllocateInfo(descriptorPool, &descriptorSetLayouts.blur, 1);
-		VK_CHECK_RESULT(vkAllocateDescriptorSets(device, &descriptorSetAllocInfo, &descriptorSets.blurVert));
+		VK_EVAL(vkAllocateDescriptorSets(device, &descriptorSetAllocInfo, &descriptorSets.blurVert));
 		writeDescriptorSets											= 
 			{	vks::initializers::writeDescriptorSet(descriptorSets.blurVert, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER		, 0, &uniformBuffers.blurParams		.descriptor)	// Binding 0: Fragment shader uniform buffer			
 			,	vks::initializers::writeDescriptorSet(descriptorSets.blurVert, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, &offscreenPass.framebuffers[0]	.descriptor)	// Binding 1: Fragment shader texture sampler
@@ -555,7 +555,7 @@ public:
 		vkUpdateDescriptorSets(device, static_cast<uint32_t>(writeDescriptorSets.size()), writeDescriptorSets.data(), 0, NULL);
 		// Horizontal
 		descriptorSetAllocInfo										= vks::initializers::descriptorSetAllocateInfo(descriptorPool, &descriptorSetLayouts.blur, 1);
-		VK_CHECK_RESULT(vkAllocateDescriptorSets(device, &descriptorSetAllocInfo, &descriptorSets.blurHorz));
+		VK_EVAL(vkAllocateDescriptorSets(device, &descriptorSetAllocInfo, &descriptorSets.blurHorz));
 		writeDescriptorSets											= 
 			{	vks::initializers::writeDescriptorSet(descriptorSets.blurHorz, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER		, 0, &uniformBuffers.blurParams		.descriptor)	// Binding 0: Fragment shader uniform buffer			
 			,	vks::initializers::writeDescriptorSet(descriptorSets.blurHorz, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, &offscreenPass.framebuffers[1]	.descriptor)	// Binding 1: Fragment shader texture sampler
@@ -564,14 +564,14 @@ public:
 
 		// Scene rendering
 		descriptorSetAllocInfo										= vks::initializers::descriptorSetAllocateInfo(descriptorPool, &descriptorSetLayouts.scene, 1);
-		VK_CHECK_RESULT(vkAllocateDescriptorSets(device, &descriptorSetAllocInfo, &descriptorSets.scene));
+		VK_EVAL(vkAllocateDescriptorSets(device, &descriptorSetAllocInfo, &descriptorSets.scene));
 		writeDescriptorSets											= 
 			{	vks::initializers::writeDescriptorSet(descriptorSets.scene, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 0, &uniformBuffers.scene.descriptor)							// Binding 0: Vertex shader uniform buffer
 			};
 		vkUpdateDescriptorSets(device, static_cast<uint32_t>(writeDescriptorSets.size()), writeDescriptorSets.data(), 0, NULL);
 
 		// Skybox
-		VK_CHECK_RESULT(vkAllocateDescriptorSets(device, &descriptorSetAllocInfo, &descriptorSets.skyBox));
+		VK_EVAL(vkAllocateDescriptorSets(device, &descriptorSetAllocInfo, &descriptorSets.skyBox));
 		writeDescriptorSets											= 
 			{	vks::initializers::writeDescriptorSet(descriptorSets.skyBox, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER			, 0, &uniformBuffers.skyBox	.descriptor)			// Binding 0: Vertex shader uniform buffer			
 			,	vks::initializers::writeDescriptorSet(descriptorSets.skyBox, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER	, 1, &textures.cubemap		.descriptor)			// Binding 1: Fragment shader texture sampler
@@ -628,12 +628,12 @@ public:
 		
 		// Vertical blur pipeline
 		pipelineCreateInfo.renderPass								= offscreenPass.renderPass;
-		VK_CHECK_RESULT(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipelines.blurVert));
+		VK_EVAL(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipelines.blurVert));
 
 		// Horizontal blur pipeline
 		blurdirection												= 1;
 		pipelineCreateInfo.renderPass								= renderPass;
-		VK_CHECK_RESULT(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipelines.blurHorz));
+		VK_EVAL(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipelines.blurHorz));
 
 		// Phong pass (3D model)
 		pipelineCreateInfo.layout									= pipelineLayouts.scene;
@@ -644,13 +644,13 @@ public:
 		depthStencilState.depthWriteEnable							= VK_TRUE;
 		rasterizationState.cullMode									= VK_CULL_MODE_BACK_BIT;
 		pipelineCreateInfo.renderPass								= renderPass;
-		VK_CHECK_RESULT(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipelines.phongPass));
+		VK_EVAL(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipelines.phongPass));
 
 		// Color only pass (offscreen blur base)
 		shaderStages[0]												= loadShader(getAssetPath() + "shaders/bloom/colorpass.vert.spv", VK_SHADER_STAGE_VERTEX_BIT);
 		shaderStages[1]												= loadShader(getAssetPath() + "shaders/bloom/colorpass.frag.spv", VK_SHADER_STAGE_FRAGMENT_BIT);
 		pipelineCreateInfo.renderPass								= offscreenPass.renderPass;
-		VK_CHECK_RESULT(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipelines.glowPass));
+		VK_EVAL(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipelines.glowPass));
 
 		// Skybox (cubemap)
 		shaderStages[0]												= loadShader(getAssetPath() + "shaders/bloom/skybox.vert.spv", VK_SHADER_STAGE_VERTEX_BIT);
@@ -658,19 +658,19 @@ public:
 		depthStencilState.depthWriteEnable							= VK_FALSE;
 		rasterizationState.cullMode									= VK_CULL_MODE_FRONT_BIT;
 		pipelineCreateInfo.renderPass								= renderPass;
-		VK_CHECK_RESULT(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipelines.skyBox));
+		VK_EVAL(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipelines.skyBox));
 	}
 
 	// Prepare and initialize uniform buffer containing shader uniforms
 	void														prepareUniformBuffers					()																				{
-		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBuffers.scene		, sizeof(ubos.scene		)));	// Phong and color pass vertex shader uniform buffer
-		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBuffers.blurParams	, sizeof(ubos.blurParams)));	// Blur parameters uniform buffers
-		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBuffers.skyBox		, sizeof(ubos.skyBox	)));	// Skybox
+		VK_EVAL(vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBuffers.scene		, sizeof(ubos.scene		)));	// Phong and color pass vertex shader uniform buffer
+		VK_EVAL(vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBuffers.blurParams	, sizeof(ubos.blurParams)));	// Blur parameters uniform buffers
+		VK_EVAL(vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBuffers.skyBox		, sizeof(ubos.skyBox	)));	// Skybox
 
 		// Map persistent
-		VK_CHECK_RESULT(uniformBuffers.scene		.map());
-		VK_CHECK_RESULT(uniformBuffers.blurParams	.map());
-		VK_CHECK_RESULT(uniformBuffers.skyBox		.map());
+		VK_EVAL(uniformBuffers.scene		.map());
+		VK_EVAL(uniformBuffers.blurParams	.map());
+		VK_EVAL(uniformBuffers.skyBox		.map());
 
 		// Intialize uniform buffers
 		updateUniformBuffersScene();
@@ -715,7 +715,7 @@ public:
 		// Submit work
 		submitInfo.commandBufferCount								= 1;
 		submitInfo.pCommandBuffers									= &offscreenPass.commandBuffer;
-		VK_CHECK_RESULT(vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE));
+		VK_EVAL(vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE));
 
 		// Scene rendering
 		submitInfo.pWaitSemaphores									= &offscreenPass.semaphore;		// Wait for offscreen semaphore
@@ -723,7 +723,7 @@ public:
 
 		// Submit work
 		submitInfo.pCommandBuffers									= &drawCmdBuffers[currentBuffer];
-		VK_CHECK_RESULT(vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE));
+		VK_EVAL(vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE));
 
 		VulkanExampleBase::submitFrame();
 	}

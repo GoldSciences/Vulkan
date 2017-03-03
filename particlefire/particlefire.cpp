@@ -159,7 +159,7 @@ public:
 			// Set target frame buffer
 			renderPassBeginInfo.framebuffer								= frameBuffers[i];
 
-			VK_CHECK_RESULT(vkBeginCommandBuffer(drawCmdBuffers[i], &cmdBufInfo));
+			VK_EVAL(vkBeginCommandBuffer(drawCmdBuffers[i], &cmdBufInfo));
 			vkCmdBeginRenderPass	(drawCmdBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 
 			VkViewport														viewport										= vks::initializers::viewport((float)width, (float)height, 0.0f, 1.0f);
@@ -185,7 +185,7 @@ public:
 
 			vkCmdEndRenderPass		(drawCmdBuffers[i]);
 
-			VK_CHECK_RESULT(vkEndCommandBuffer(drawCmdBuffers[i]));
+			VK_EVAL(vkEndCommandBuffer(drawCmdBuffers[i]));
 		}
 	}
 
@@ -243,10 +243,10 @@ public:
 		}
 
 		particles.size												= particleBuffer.size() * sizeof(Particle);
-		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, particles.size, &particles.buffer, &particles.memory, particleBuffer.data()));
+		VK_EVAL(vulkanDevice->createBuffer(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, particles.size, &particles.buffer, &particles.memory, particleBuffer.data()));
 
 		// Map the memory and store the pointer for reuse
-		VK_CHECK_RESULT(vkMapMemory(device, particles.memory, 0, particles.size, 0, &particles.mappedMemory));
+		VK_EVAL(vkMapMemory(device, particles.memory, 0, particles.size, 0, &particles.mappedMemory));
 	}
 
 	void														updateParticles									()												{
@@ -303,7 +303,7 @@ public:
 		samplerCreateInfo.anisotropyEnable							= VK_TRUE;
 		// Use a different border color (than the normal texture loader) for additive blending
 		samplerCreateInfo.borderColor								= VK_BORDER_COLOR_FLOAT_TRANSPARENT_BLACK;
-		VK_CHECK_RESULT(vkCreateSampler(device, &samplerCreateInfo, nullptr, &textures.particles.sampler));
+		VK_EVAL(vkCreateSampler(device, &samplerCreateInfo, nullptr, &textures.particles.sampler));
 
 		models.environment.loadFromFile(getAssetPath() + "models/fireplace.obj", vertexLayout, 10.0f, vulkanDevice, queue);
 	}
@@ -316,7 +316,7 @@ public:
 			};
 
 		VkDescriptorPoolCreateInfo					descriptorPoolInfo	= vks::initializers::descriptorPoolCreateInfo(static_cast<uint32_t>(poolSizes.size()), poolSizes.data(), 2);
-		VK_CHECK_RESULT(vkCreateDescriptorPool(device, &descriptorPoolInfo, nullptr, &descriptorPool));
+		VK_EVAL(vkCreateDescriptorPool(device, &descriptorPoolInfo, nullptr, &descriptorPool));
 	}
 
 	void														setupDescriptorSetLayout						()												{
@@ -327,16 +327,16 @@ public:
 			};
 
 		VkDescriptorSetLayoutCreateInfo									descriptorLayout								= vks::initializers::descriptorSetLayoutCreateInfo(setLayoutBindings.data(), static_cast<uint32_t>(setLayoutBindings.size()));
-		VK_CHECK_RESULT(vkCreateDescriptorSetLayout(device, &descriptorLayout, nullptr, &descriptorSetLayout));
+		VK_EVAL(vkCreateDescriptorSetLayout(device, &descriptorLayout, nullptr, &descriptorSetLayout));
 
 		VkPipelineLayoutCreateInfo										pPipelineLayoutCreateInfo						= vks::initializers::pipelineLayoutCreateInfo(&descriptorSetLayout, 1);
-		VK_CHECK_RESULT(vkCreatePipelineLayout(device, &pPipelineLayoutCreateInfo, nullptr, &pipelineLayout));
+		VK_EVAL(vkCreatePipelineLayout(device, &pPipelineLayoutCreateInfo, nullptr, &pipelineLayout));
 	}
 
 	void														setupDescriptorSets								()												{
 		std::vector<VkWriteDescriptorSet>								writeDescriptorSets;
 		VkDescriptorSetAllocateInfo										allocInfo										= vks::initializers::descriptorSetAllocateInfo(descriptorPool, &descriptorSetLayout, 1);
-		VK_CHECK_RESULT(vkAllocateDescriptorSets(device, &allocInfo, &descriptorSets.particles));
+		VK_EVAL(vkAllocateDescriptorSets(device, &allocInfo, &descriptorSets.particles));
 
 		// Image descriptor for the color map texture
 		VkDescriptorImageInfo											texDescriptorSmoke								= vks::initializers::descriptorImageInfo(textures.particles.sampler, textures.particles.smoke.view, VK_IMAGE_LAYOUT_GENERAL);
@@ -351,7 +351,7 @@ public:
 		vkUpdateDescriptorSets(device, static_cast<uint32_t>(writeDescriptorSets.size()), writeDescriptorSets.data(), 0, NULL);
 
 		// Environment
-		VK_CHECK_RESULT(vkAllocateDescriptorSets(device, &allocInfo, &descriptorSets.environment));
+		VK_EVAL(vkAllocateDescriptorSets(device, &allocInfo, &descriptorSets.environment));
 
 		writeDescriptorSets											= 
 			{	vks::initializers::writeDescriptorSet(descriptorSets.environment, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER			, 0, &uniformBuffers.environment.descriptor)	// Binding 0: Vertex shader uniform buffer
@@ -425,7 +425,7 @@ public:
 			blendAttachmentState.alphaBlendOp							= VK_BLEND_OP_ADD;
 			blendAttachmentState.colorWriteMask							= VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
 
-			VK_CHECK_RESULT(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipelines.particles));
+			VK_EVAL(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipelines.particles));
 		}
 
 		// Environment rendering pipeline (normal mapped)
@@ -457,18 +457,18 @@ public:
 			depthStencilState.depthWriteEnable							= VK_TRUE;
 			inputAssemblyState.topology									= VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
 
-			VK_CHECK_RESULT(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipelines.environment));
+			VK_EVAL(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipelines.environment));
 		}
 	}
 
 	// Prepare and initialize uniform buffer containing shader uniforms
 	void														prepareUniformBuffers							()												{		
-		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBuffers.fire			, sizeof(uboVS	)));	// Vertex shader uniform buffer block
-		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBuffers.environment	, sizeof(uboEnv	)));	// Vertex shader uniform buffer block
+		VK_EVAL(vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBuffers.fire			, sizeof(uboVS	)));	// Vertex shader uniform buffer block
+		VK_EVAL(vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBuffers.environment	, sizeof(uboEnv	)));	// Vertex shader uniform buffer block
 
 		// Map persistent
-		VK_CHECK_RESULT(uniformBuffers.fire.map());
-		VK_CHECK_RESULT(uniformBuffers.environment.map());
+		VK_EVAL(uniformBuffers.fire.map());
+		VK_EVAL(uniformBuffers.environment.map());
 
 		updateUniformBuffers();
 	}
@@ -512,7 +512,7 @@ public:
 		submitInfo.pCommandBuffers									= &drawCmdBuffers[currentBuffer];
 
 		// Submit to queue
-		VK_CHECK_RESULT(vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE));
+		VK_EVAL(vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE));
 
 		VulkanExampleBase::submitFrame();
 	}

@@ -225,7 +225,7 @@ namespace vks
 			moduleCreateInfo.pCode									= (uint32_t*)shaderCode;
 			moduleCreateInfo.flags									= 0;
 
-			VK_CHECK_RESULT(vkCreateShaderModule(device, &moduleCreateInfo, NULL, &shaderModule));
+			VK_EVAL(vkCreateShaderModule(device, &moduleCreateInfo, NULL, &shaderModule));
 
 			delete[]													shaderCode;
 
@@ -251,7 +251,7 @@ namespace vks
 				moduleCreateInfo.codeSize							= size;
 				moduleCreateInfo.pCode								= (uint32_t*)shaderCode;
 
-				VK_CHECK_RESULT(vkCreateShaderModule(device, &moduleCreateInfo, NULL, &shaderModule));
+				VK_EVAL(vkCreateShaderModule(device, &moduleCreateInfo, NULL, &shaderModule));
 
 				delete[] shaderCode;
 
@@ -284,7 +284,7 @@ namespace vks
 			((uint32_t *)moduleCreateInfo.pCode)[2]					= stage;
 			memcpy(((uint32_t *)moduleCreateInfo.pCode + 3), shaderCode, size + 1);
 
-			VK_CHECK_RESULT(vkCreateShaderModule(device, &moduleCreateInfo, NULL, &shaderModule));
+			VK_EVAL(vkCreateShaderModule(device, &moduleCreateInfo, NULL, &shaderModule));
 
 			return shaderModule;
 		}

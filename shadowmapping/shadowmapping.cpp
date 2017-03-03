@@ -202,7 +202,7 @@ public:
 		renderPassCreateInfo.dependencyCount						= static_cast<uint32_t>(dependencies.size());
 		renderPassCreateInfo.pDependencies							= dependencies.data();
 
-		VK_CHECK_RESULT(vkCreateRenderPass	(device, &renderPassCreateInfo, nullptr, &offscreenPass.renderPass));
+		VK_EVAL(vkCreateRenderPass	(device, &renderPassCreateInfo, nullptr, &offscreenPass.renderPass));
 	}
 
 	// Setup the offscreen framebuffer for rendering the scene from light's point-of-view to
@@ -223,15 +223,15 @@ public:
 		image.tiling												= VK_IMAGE_TILING_OPTIMAL;
 		image.format												= DEPTH_FORMAT;																// Depth stencil attachment
 		image.usage													= VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;		// We will sample directly from the depth attachment for the shadow mapping
-		VK_CHECK_RESULT(vkCreateImage		(device, &image, nullptr, &offscreenPass.depth.image));
+		VK_EVAL(vkCreateImage		(device, &image, nullptr, &offscreenPass.depth.image));
 
 		VkMemoryAllocateInfo												memAlloc							= vks::initializers::memoryAllocateInfo();
 		VkMemoryRequirements												memReqs;
 		vkGetImageMemoryRequirements		(device, offscreenPass.depth.image, &memReqs);
 		memAlloc.allocationSize											= memReqs.size;
 		memAlloc.memoryTypeIndex										= vulkanDevice->getMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-		VK_CHECK_RESULT(vkAllocateMemory	(device, &memAlloc, nullptr, &offscreenPass.depth.memory));
-		VK_CHECK_RESULT(vkBindImageMemory	(device, offscreenPass.depth.image, offscreenPass.depth.memory, 0));
+		VK_EVAL(vkAllocateMemory	(device, &memAlloc, nullptr, &offscreenPass.depth.memory));
+		VK_EVAL(vkBindImageMemory	(device, offscreenPass.depth.image, offscreenPass.depth.memory, 0));
 
 		VkImageViewCreateInfo											depthStencilView					= vks::initializers::imageViewCreateInfo();
 		depthStencilView.viewType									= VK_IMAGE_VIEW_TYPE_2D;
@@ -243,7 +243,7 @@ public:
 		depthStencilView.subresourceRange.baseArrayLayer			= 0;
 		depthStencilView.subresourceRange.layerCount				= 1;
 		depthStencilView.image										= offscreenPass.depth.image;
-		VK_CHECK_RESULT(vkCreateImageView	(device, &depthStencilView, nullptr, &offscreenPass.depth.view));
+		VK_EVAL(vkCreateImageView	(device, &depthStencilView, nullptr, &offscreenPass.depth.view));
 
 		// Create sampler to sample from to depth attachment 
 		// Used to sample in the fragment shader for shadowed rendering
@@ -259,7 +259,7 @@ public:
 		sampler.minLod												= 0.0f;
 		sampler.maxLod												= 1.0f;
 		sampler.borderColor											= VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
-		VK_CHECK_RESULT(vkCreateSampler		(device, &sampler, nullptr, &offscreenPass.depthSampler));
+		VK_EVAL(vkCreateSampler		(device, &sampler, nullptr, &offscreenPass.depthSampler));
 
 		prepareOffscreenRenderpass();
 
@@ -272,7 +272,7 @@ public:
 		fbufCreateInfo.height										= offscreenPass.height;
 		fbufCreateInfo.layers										= 1;
 
-		VK_CHECK_RESULT(vkCreateFramebuffer	(device, &fbufCreateInfo, nullptr, &offscreenPass.frameBuffer));
+		VK_EVAL(vkCreateFramebuffer	(device, &fbufCreateInfo, nullptr, &offscreenPass.frameBuffer));
 	}
 
 	void														buildOffscreenCommandBuffer			()											{
@@ -282,7 +282,7 @@ public:
 		if (offscreenPass.semaphore == VK_NULL_HANDLE) {
 			// Create a semaphore used to synchronize offscreen rendering and usage
 			VkSemaphoreCreateInfo											semaphoreCreateInfo					= vks::initializers::semaphoreCreateInfo();
-			VK_CHECK_RESULT(vkCreateSemaphore	(device, &semaphoreCreateInfo, nullptr, &offscreenPass.semaphore));
+			VK_EVAL(vkCreateSemaphore	(device, &semaphoreCreateInfo, nullptr, &offscreenPass.semaphore));
 		}
 
 		VkCommandBufferBeginInfo										cmdBufInfo							= vks::initializers::commandBufferBeginInfo();
@@ -300,7 +300,7 @@ public:
 		renderPassBeginInfo.clearValueCount							= 2;
 		renderPassBeginInfo.pClearValues							= clearValues;
 
-		VK_CHECK_RESULT(vkBeginCommandBuffer(offscreenPass.commandBuffer, &cmdBufInfo));
+		VK_EVAL(vkBeginCommandBuffer(offscreenPass.commandBuffer, &cmdBufInfo));
 
 		VkViewport														viewport							= vks::initializers::viewport((float)offscreenPass.width, (float)offscreenPass.height, 0.0f, 1.0f);
 		vkCmdSetViewport		(offscreenPass.commandBuffer, 0, 1, &viewport);
@@ -323,7 +323,7 @@ public:
 
 		vkCmdEndRenderPass		(offscreenPass.commandBuffer);
 
-		VK_CHECK_RESULT(vkEndCommandBuffer(offscreenPass.commandBuffer));
+		VK_EVAL(vkEndCommandBuffer(offscreenPass.commandBuffer));
 	}
 
 	void														buildCommandBuffers					()											{
@@ -345,7 +345,7 @@ public:
 		{
 			// Set target frame buffer
 			renderPassBeginInfo.framebuffer								= frameBuffers[i];
-			VK_CHECK_RESULT(vkBeginCommandBuffer(drawCmdBuffers[i], &cmdBufInfo));
+			VK_EVAL(vkBeginCommandBuffer(drawCmdBuffers[i], &cmdBufInfo));
 			vkCmdBeginRenderPass	(drawCmdBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 
 			VkViewport														viewport							= vks::initializers::viewport((float)width, (float)height, 0.0f, 1.0f);
@@ -375,7 +375,7 @@ public:
 
 			vkCmdEndRenderPass		(drawCmdBuffers[i]);
 
-			VK_CHECK_RESULT(vkEndCommandBuffer(drawCmdBuffers[i]));
+			VK_EVAL(vkEndCommandBuffer(drawCmdBuffers[i]));
 		}
 	}
 
@@ -392,12 +392,12 @@ public:
 			,	{ { 1.0f, 0.0f, 0.0f },{ 1.0f, 0.0f }, QUAD_COLOR_NORMAL }
 			};
 #undef QUAD_COLOR_NORMAL
-		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, vertexBuffer.size() * sizeof(Vertex), &models.quad.vertices.buffer, &models.quad.vertices.memory, vertexBuffer.data()));
+		VK_EVAL(vulkanDevice->createBuffer(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, vertexBuffer.size() * sizeof(Vertex), &models.quad.vertices.buffer, &models.quad.vertices.memory, vertexBuffer.data()));
 
 		// Setup indices
 		std::vector<uint32_t>											indexBuffer							= { 0,1,2, 2,3,0 };
 		models.quad.indexCount										= static_cast<uint32_t>(indexBuffer.size());
-		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, indexBuffer.size() * sizeof(uint32_t), &models.quad.indices.buffer, &models.quad.indices.memory, indexBuffer.data()));
+		VK_EVAL(vulkanDevice->createBuffer(VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, indexBuffer.size() * sizeof(uint32_t), &models.quad.indices.buffer, &models.quad.indices.memory, indexBuffer.data()));
 
 		models.quad.device											= device;
 	}
@@ -429,7 +429,7 @@ public:
 			};
 
 		VkDescriptorPoolCreateInfo										descriptorPoolInfo					= vks::initializers::descriptorPoolCreateInfo(static_cast<uint32_t>(poolSizes.size()), poolSizes.data(), 3);
-		VK_CHECK_RESULT(vkCreateDescriptorPool(device, &descriptorPoolInfo, nullptr, &descriptorPool));
+		VK_EVAL(vkCreateDescriptorPool(device, &descriptorPoolInfo, nullptr, &descriptorPool));
 	}
 
 	void														setupDescriptorSetLayout			()											{
@@ -440,11 +440,11 @@ public:
 			};
 
 		VkDescriptorSetLayoutCreateInfo								descriptorLayout					= vks::initializers::descriptorSetLayoutCreateInfo(setLayoutBindings.data(), static_cast<uint32_t>(setLayoutBindings.size()));
-		VK_CHECK_RESULT(vkCreateDescriptorSetLayout(device, &descriptorLayout, nullptr, &descriptorSetLayout));
+		VK_EVAL(vkCreateDescriptorSetLayout(device, &descriptorLayout, nullptr, &descriptorSetLayout));
 
 		VkPipelineLayoutCreateInfo									pPipelineLayoutCreateInfo			= vks::initializers::pipelineLayoutCreateInfo(&descriptorSetLayout, 1);
-		VK_CHECK_RESULT(vkCreatePipelineLayout(device, &pPipelineLayoutCreateInfo, nullptr, &pipelineLayouts.quad));
-		VK_CHECK_RESULT(vkCreatePipelineLayout(device, &pPipelineLayoutCreateInfo, nullptr, &pipelineLayouts.offscreen));	// Offscreen pipeline layout
+		VK_EVAL(vkCreatePipelineLayout(device, &pPipelineLayoutCreateInfo, nullptr, &pipelineLayouts.quad));
+		VK_EVAL(vkCreatePipelineLayout(device, &pPipelineLayoutCreateInfo, nullptr, &pipelineLayouts.offscreen));	// Offscreen pipeline layout
 	}
 
 	void														setupDescriptorSets					()											{
@@ -452,7 +452,7 @@ public:
 
 		// Textured quad descriptor set
 		VkDescriptorSetAllocateInfo										allocInfo							= vks::initializers::descriptorSetAllocateInfo(descriptorPool, &descriptorSetLayout, 1);
-		VK_CHECK_RESULT(vkAllocateDescriptorSets(device, &allocInfo, &descriptorSet));
+		VK_EVAL(vkAllocateDescriptorSets(device, &allocInfo, &descriptorSet));
 
 		// Image descriptor for the shadow map attachment
 		VkDescriptorImageInfo											texDescriptor							= vks::initializers::descriptorImageInfo(offscreenPass.depthSampler, offscreenPass.depth.view, VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL);
@@ -463,14 +463,14 @@ public:
 		vkUpdateDescriptorSets(device, static_cast<uint32_t>(writeDescriptorSets.size()), writeDescriptorSets.data(), 0, NULL);
 
 		// Offscreen
-		VK_CHECK_RESULT(vkAllocateDescriptorSets(device, &allocInfo, &descriptorSets.offscreen));
+		VK_EVAL(vkAllocateDescriptorSets(device, &allocInfo, &descriptorSets.offscreen));
 		writeDescriptorSets											= 
 			{	vks::initializers::writeDescriptorSet(descriptorSets.offscreen, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 0, &uniformBuffers.offscreen.descriptor),	// Binding 0 : Vertex shader uniform buffer
 			};
 		vkUpdateDescriptorSets(device, static_cast<uint32_t>(writeDescriptorSets.size()), writeDescriptorSets.data(), 0, NULL);
 
 		// 3D scene
-		VK_CHECK_RESULT(vkAllocateDescriptorSets(device, &allocInfo, &descriptorSets.scene));
+		VK_EVAL(vkAllocateDescriptorSets(device, &allocInfo, &descriptorSets.scene));
 
 		// Image descriptor for the shadow map attachment
 		texDescriptor.sampler										= offscreenPass.depthSampler;
@@ -512,7 +512,7 @@ public:
 		pipelineCreateInfo.pDynamicState							= &dynamicState;
 		pipelineCreateInfo.stageCount								= static_cast<uint32_t>(shaderStages.size());
 		pipelineCreateInfo.pStages									= shaderStages.data();
-		VK_CHECK_RESULT(vkCreateGraphicsPipelines	(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipelines.quad));
+		VK_EVAL(vkCreateGraphicsPipelines	(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipelines.quad));
 
 		// Scene rendering with shadows applied
 		shaderStages[0]												= loadShader(getAssetPath() + "shaders/shadowmapping/scene.vert.spv", VK_SHADER_STAGE_VERTEX_BIT);
@@ -522,9 +522,9 @@ public:
 		VkSpecializationMapEntry										specializationMapEntry				= vks::initializers::specializationMapEntry(0, 0, sizeof(uint32_t));
 		VkSpecializationInfo											specializationInfo					= vks::initializers::specializationInfo(1, &specializationMapEntry, sizeof(uint32_t), &enablePCF);
 		shaderStages[1].pSpecializationInfo							= &specializationInfo;
-		VK_CHECK_RESULT(vkCreateGraphicsPipelines	(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipelines.sceneShadow));		// No filtering
+		VK_EVAL(vkCreateGraphicsPipelines	(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipelines.sceneShadow));		// No filtering
 		enablePCF													= 1;
-		VK_CHECK_RESULT(vkCreateGraphicsPipelines	(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipelines.sceneShadowPCF));	// PCF filtering
+		VK_EVAL(vkCreateGraphicsPipelines	(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipelines.sceneShadowPCF));	// PCF filtering
 
 		// Offscreen pipeline
 		shaderStages[0]												= loadShader(getAssetPath() + "shaders/shadowmapping/offscreen.vert.spv", VK_SHADER_STAGE_VERTEX_BIT);
@@ -539,19 +539,19 @@ public:
 
 		pipelineCreateInfo.layout									= pipelineLayouts.offscreen;
 		pipelineCreateInfo.renderPass								= offscreenPass.renderPass;
-		VK_CHECK_RESULT(vkCreateGraphicsPipelines	(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipelines.offscreen));
+		VK_EVAL(vkCreateGraphicsPipelines	(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipelines.offscreen));
 	}
 
 	// Prepare and initialize uniform buffer containing shader uniforms
 	void														prepareUniformBuffers				()											{
-		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBuffers.debug		, sizeof(uboVSscene		)));	// Debug quad vertex shader uniform buffer block
-		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBuffers.offscreen	, sizeof(uboOffscreenVS	)));	// Offscreen vertex shader uniform buffer block
-		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBuffers.scene		, sizeof(uboVSscene		)));	// Scene vertex shader uniform buffer block 
+		VK_EVAL(vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBuffers.debug		, sizeof(uboVSscene		)));	// Debug quad vertex shader uniform buffer block
+		VK_EVAL(vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBuffers.offscreen	, sizeof(uboOffscreenVS	)));	// Offscreen vertex shader uniform buffer block
+		VK_EVAL(vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBuffers.scene		, sizeof(uboVSscene		)));	// Scene vertex shader uniform buffer block 
 
 		// Map persistent
-		VK_CHECK_RESULT(uniformBuffers.debug		.map());
-		VK_CHECK_RESULT(uniformBuffers.offscreen	.map());
-		VK_CHECK_RESULT(uniformBuffers.scene		.map());
+		VK_EVAL(uniformBuffers.debug		.map());
+		VK_EVAL(uniformBuffers.offscreen	.map());
+		VK_EVAL(uniformBuffers.scene		.map());
 
 		updateLight();
 		updateUniformBufferOffscreen();
@@ -615,7 +615,7 @@ public:
 		// Submit work
 		submitInfo.commandBufferCount								= 1;
 		submitInfo.pCommandBuffers									= &offscreenPass.commandBuffer;
-		VK_CHECK_RESULT(vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE));
+		VK_EVAL(vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE));
 
 		// Scene rendering
 		submitInfo.pWaitSemaphores									= &offscreenPass.semaphore;;	// Wait for offscreen semaphore
@@ -623,7 +623,7 @@ public:
 
 		// Submit work
 		submitInfo.pCommandBuffers									= &drawCmdBuffers[currentBuffer];
-		VK_CHECK_RESULT(vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE));
+		VK_EVAL(vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE));
 
 		VulkanExampleBase::submitFrame();
 	}

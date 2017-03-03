@@ -82,7 +82,7 @@ public:
 			// Set target frame buffer
 			renderPassBeginInfo.framebuffer								= frameBuffers[i];
 
-			VK_CHECK_RESULT(vkBeginCommandBuffer(drawCmdBuffers[i], &cmdBufInfo));
+			VK_EVAL(vkBeginCommandBuffer(drawCmdBuffers[i], &cmdBufInfo));
 			vkCmdBeginRenderPass	(drawCmdBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 
 			VkViewport														viewport					= vks::initializers::viewport((float)width, (float)height, 0.0f, 1.0f);
@@ -101,7 +101,7 @@ public:
 			vkCmdDrawIndexed		(drawCmdBuffers[i], models.object.indexCount, 1, 0, 0, 0);
 			vkCmdEndRenderPass		(drawCmdBuffers[i]);
 
-			VK_CHECK_RESULT(vkEndCommandBuffer(drawCmdBuffers[i]));
+			VK_EVAL(vkEndCommandBuffer(drawCmdBuffers[i]));
 		}
 	}
 
@@ -112,7 +112,7 @@ public:
 			};
 
 		VkDescriptorPoolCreateInfo										descriptorPoolInfo		= vks::initializers::descriptorPoolCreateInfo(static_cast<uint32_t>(poolSizes.size()), poolSizes.data(), 2);
-		VK_CHECK_RESULT(vkCreateDescriptorPool		(device, &descriptorPoolInfo, nullptr, &descriptorPool));
+		VK_EVAL(vkCreateDescriptorPool		(device, &descriptorPoolInfo, nullptr, &descriptorPool));
 	}
 
 	void														setupDescriptorSetLayout	()									{
@@ -121,15 +121,15 @@ public:
 			};
 
 		VkDescriptorSetLayoutCreateInfo									descriptorLayout			= vks::initializers::descriptorSetLayoutCreateInfo(setLayoutBindings.data(), static_cast<uint32_t>(setLayoutBindings.size()));
-		VK_CHECK_RESULT(vkCreateDescriptorSetLayout	(device, &descriptorLayout, nullptr, &descriptorSetLayout));
+		VK_EVAL(vkCreateDescriptorSetLayout	(device, &descriptorLayout, nullptr, &descriptorSetLayout));
 
 		VkPipelineLayoutCreateInfo										pPipelineLayoutCreateInfo	= vks::initializers::pipelineLayoutCreateInfo(&descriptorSetLayout, 1);
-		VK_CHECK_RESULT(vkCreatePipelineLayout		(device, &pPipelineLayoutCreateInfo, nullptr, &pipelineLayout));
+		VK_EVAL(vkCreatePipelineLayout		(device, &pPipelineLayoutCreateInfo, nullptr, &pipelineLayout));
 	}
 
 	void														setupDescriptorSet			()									{
 		VkDescriptorSetAllocateInfo										allocInfo					= vks::initializers::descriptorSetAllocateInfo(descriptorPool, &descriptorSetLayout, 1);
-		VK_CHECK_RESULT(vkAllocateDescriptorSets	(device, &allocInfo, &descriptorSet));
+		VK_EVAL(vkAllocateDescriptorSets	(device, &allocInfo, &descriptorSet));
 
 		std::vector<VkWriteDescriptorSet>								writeDescriptorSets			= 
 			{	vks::initializers::writeDescriptorSet(descriptorSet, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 0, &uniformBuffer.descriptor)	// Binding 0 : Vertex shader uniform buffer
@@ -186,7 +186,7 @@ public:
 		// Mesh rendering pipeline
 		shaderStages[0]												= loadShader(getAssetPath() + "shaders/screenshot/mesh.vert.spv", VK_SHADER_STAGE_VERTEX_BIT);
 		shaderStages[1]												= loadShader(getAssetPath() + "shaders/screenshot/mesh.frag.spv", VK_SHADER_STAGE_FRAGMENT_BIT);
-		VK_CHECK_RESULT(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipeline));
+		VK_EVAL(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipeline));
 	}
 
 	void														prepareUniformBuffers		()									{
@@ -200,7 +200,7 @@ public:
 		uboVS.view													= camera.matrices.view;
 		uboVS.model													= glm::mat4();
 
-		VK_CHECK_RESULT(uniformBuffer.map());
+		VK_EVAL(uniformBuffer.map());
 		uniformBuffer.copyTo(&uboVS, sizeof(uboVS));
 		uniformBuffer.unmap();
 	}
@@ -248,7 +248,7 @@ public:
 		imgCreateInfo.usage											= VK_IMAGE_USAGE_TRANSFER_DST_BIT;
 		// Create the image
 		VkImage															dstImage;
-		VK_CHECK_RESULT(vkCreateImage(device, &imgCreateInfo, nullptr, &dstImage));
+		VK_EVAL(vkCreateImage(device, &imgCreateInfo, nullptr, &dstImage));
 		// Create memory to back up the image
 		VkMemoryRequirements											memRequirements;
 		VkMemoryAllocateInfo											memAllocInfo				(vks::initializers::memoryAllocateInfo());
@@ -257,8 +257,8 @@ public:
 		memAllocInfo.allocationSize									= memRequirements.size;
 		// Memory must be host visible to copy from
 		memAllocInfo.memoryTypeIndex								= vulkanDevice->getMemoryType(memRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-		VK_CHECK_RESULT(vkAllocateMemory	(device, &memAllocInfo, nullptr, &dstImageMemory));
-		VK_CHECK_RESULT(vkBindImageMemory	(device, dstImage, dstImageMemory, 0));
+		VK_EVAL(vkAllocateMemory	(device, &memAllocInfo, nullptr, &dstImageMemory));
+		VK_EVAL(vkBindImageMemory	(device, dstImage, dstImageMemory, 0));
 
 		// Do the actual blit from the swapchain image to our host visible destination image
 		VkCommandBuffer													copyCmd						= vulkanDevice->createCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY, true);
@@ -407,7 +407,7 @@ public:
 
 		submitInfo.commandBufferCount								= 1;
 		submitInfo.pCommandBuffers									= &drawCmdBuffers[currentBuffer];
-		VK_CHECK_RESULT(vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE));
+		VK_EVAL(vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE));
 
 		VulkanExampleBase::submitFrame();
 	}

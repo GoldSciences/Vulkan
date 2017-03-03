@@ -145,7 +145,7 @@ private:
 
 		VkDescriptorPoolCreateInfo										descriptorPoolInfo				= vks::initializers::descriptorPoolCreateInfo(static_cast<uint32_t>(poolSizes.size()), poolSizes.data(), static_cast<uint32_t>(materials.size()) + 1);
 
-		VK_CHECK_RESULT(vkCreateDescriptorPool		(vulkanDevice->logicalDevice, &descriptorPoolInfo, nullptr, &descriptorPool));
+		VK_EVAL(vkCreateDescriptorPool		(vulkanDevice->logicalDevice, &descriptorPoolInfo, nullptr, &descriptorPool));
 
 		// Descriptor set and pipeline layouts
 		std::vector<VkDescriptorSetLayoutBinding>						setLayoutBindings;
@@ -154,12 +154,12 @@ private:
 		// Set 0: Scene matrices
 		setLayoutBindings.push_back(vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT, 0));
 		descriptorLayout											= vks::initializers::descriptorSetLayoutCreateInfo(setLayoutBindings.data(), static_cast<uint32_t>(setLayoutBindings.size()));
-		VK_CHECK_RESULT(vkCreateDescriptorSetLayout	(vulkanDevice->logicalDevice, &descriptorLayout, nullptr, &descriptorSetLayouts.scene));
+		VK_EVAL(vkCreateDescriptorSetLayout	(vulkanDevice->logicalDevice, &descriptorLayout, nullptr, &descriptorSetLayouts.scene));
 
 		// Set 1: Material data
 		setLayoutBindings.clear();
 		setLayoutBindings.push_back(vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, 0));
-		VK_CHECK_RESULT(vkCreateDescriptorSetLayout	(vulkanDevice->logicalDevice, &descriptorLayout, nullptr, &descriptorSetLayouts.material));
+		VK_EVAL(vkCreateDescriptorSetLayout	(vulkanDevice->logicalDevice, &descriptorLayout, nullptr, &descriptorSetLayouts.material));
 
 		// Setup pipeline layout
 		std::array<VkDescriptorSetLayout, 2>							setLayouts						= { descriptorSetLayouts.scene, descriptorSetLayouts.material };
@@ -170,13 +170,13 @@ private:
 		pipelineLayoutCreateInfo.pushConstantRangeCount				= 1;
 		pipelineLayoutCreateInfo.pPushConstantRanges				= &pushConstantRange;
 
-		VK_CHECK_RESULT(vkCreatePipelineLayout(vulkanDevice->logicalDevice, &pipelineLayoutCreateInfo, nullptr, &pipelineLayout));
+		VK_EVAL(vkCreatePipelineLayout(vulkanDevice->logicalDevice, &pipelineLayoutCreateInfo, nullptr, &pipelineLayout));
 
 		// Material descriptor sets
 		for (size_t i = 0; i < materials.size(); i++) {
 			// Descriptor set
 			VkDescriptorSetAllocateInfo										allocInfo						= vks::initializers::descriptorSetAllocateInfo(descriptorPool, &descriptorSetLayouts.material, 1);
-			VK_CHECK_RESULT(vkAllocateDescriptorSets(vulkanDevice->logicalDevice, &allocInfo, &materials[i].descriptorSet));
+			VK_EVAL(vkAllocateDescriptorSets(vulkanDevice->logicalDevice, &allocInfo, &materials[i].descriptorSet));
 
 			std::vector<VkWriteDescriptorSet>								writeDescriptorSets;
 			// todo : only use image sampler descriptor set and use one scene ubo for matrices
@@ -188,7 +188,7 @@ private:
 
 		// Scene descriptor set
 		VkDescriptorSetAllocateInfo										allocInfo						= vks::initializers::descriptorSetAllocateInfo(descriptorPool, &descriptorSetLayouts.scene, 1);
-		VK_CHECK_RESULT(vkAllocateDescriptorSets(vulkanDevice->logicalDevice, &allocInfo, &descriptorSetScene));
+		VK_EVAL(vkAllocateDescriptorSets(vulkanDevice->logicalDevice, &allocInfo, &descriptorSetScene));
 
 		std::vector<VkWriteDescriptorSet>								writeDescriptorSets;
 		writeDescriptorSets.push_back(vks::initializers::writeDescriptorSet(descriptorSetScene, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 0, &uniformBuffer.descriptor));	// Binding 0 : Vertex shader uniform buffer
@@ -247,28 +247,28 @@ private:
 		vks::Buffer														vertexStaging, indexStaging;
 
 		// Vertex buffer
-		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_TRANSFER_SRC_BIT		, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT	| VK_MEMORY_PROPERTY_HOST_COHERENT_BIT	, &vertexStaging, static_cast<uint32_t>(vertexDataSize), vertices.data()));	// Staging buffer
-		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT	| VK_BUFFER_USAGE_TRANSFER_DST_BIT		, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT	, &vertexBuffer	, static_cast<uint32_t>(vertexDataSize)));					// Target
-		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_TRANSFER_SRC_BIT		, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT	| VK_MEMORY_PROPERTY_HOST_COHERENT_BIT	, &indexStaging	, static_cast<uint32_t>(indexDataSize), indices.data()));	// Index buffer
-		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_INDEX_BUFFER_BIT		| VK_BUFFER_USAGE_TRANSFER_DST_BIT		, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT	, &indexBuffer	, static_cast<uint32_t>(indexDataSize)));					// Target
+		VK_EVAL(vulkanDevice->createBuffer(VK_BUFFER_USAGE_TRANSFER_SRC_BIT		, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT	| VK_MEMORY_PROPERTY_HOST_COHERENT_BIT	, &vertexStaging, static_cast<uint32_t>(vertexDataSize), vertices.data()));	// Staging buffer
+		VK_EVAL(vulkanDevice->createBuffer(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT	| VK_BUFFER_USAGE_TRANSFER_DST_BIT		, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT	, &vertexBuffer	, static_cast<uint32_t>(vertexDataSize)));					// Target
+		VK_EVAL(vulkanDevice->createBuffer(VK_BUFFER_USAGE_TRANSFER_SRC_BIT		, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT	| VK_MEMORY_PROPERTY_HOST_COHERENT_BIT	, &indexStaging	, static_cast<uint32_t>(indexDataSize), indices.data()));	// Index buffer
+		VK_EVAL(vulkanDevice->createBuffer(VK_BUFFER_USAGE_INDEX_BUFFER_BIT		| VK_BUFFER_USAGE_TRANSFER_DST_BIT		, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT	, &indexBuffer	, static_cast<uint32_t>(indexDataSize)));					// Target
 
 		// Copy
 		VkCommandBufferBeginInfo										cmdBufInfo						= vks::initializers::commandBufferBeginInfo();
-		VK_CHECK_RESULT(vkBeginCommandBuffer(copyCmd, &cmdBufInfo));
+		VK_EVAL(vkBeginCommandBuffer(copyCmd, &cmdBufInfo));
 
 		VkBufferCopy													copyRegion						= {};
 		copyRegion.size = vertexDataSize	; vkCmdCopyBuffer(copyCmd, vertexStaging.buffer	, vertexBuffer.buffer	, 1, &copyRegion);
 		copyRegion.size = indexDataSize		; vkCmdCopyBuffer(copyCmd, indexStaging.buffer	, indexBuffer.buffer	, 1, &copyRegion);
 
-		VK_CHECK_RESULT(vkEndCommandBuffer(copyCmd));
+		VK_EVAL(vkEndCommandBuffer(copyCmd));
 
 		VkSubmitInfo													submitInfo						= {};
 		submitInfo.sType											= VK_STRUCTURE_TYPE_SUBMIT_INFO;
 		submitInfo.commandBufferCount								= 1;
 		submitInfo.pCommandBuffers									= &copyCmd;
 
-		VK_CHECK_RESULT(vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE));
-		VK_CHECK_RESULT(vkQueueWaitIdle(queue));
+		VK_EVAL(vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE));
+		VK_EVAL(vkQueueWaitIdle(queue));
 
 		//todo: fence
 		vertexStaging	.destroy();
@@ -316,13 +316,13 @@ public:
 		VkMemoryRequirements											memReqs;
 		VkMemoryAllocateInfo											memAlloc						= vks::initializers::memoryAllocateInfo();
 		VkBufferCreateInfo												bufferCreateInfo				= vks::initializers::bufferCreateInfo(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, sizeof(uniformData));
-		VK_CHECK_RESULT(vkCreateBuffer		(vulkanDevice_->logicalDevice, &bufferCreateInfo, nullptr, &uniformBuffer.buffer));
+		VK_EVAL(vkCreateBuffer		(vulkanDevice_->logicalDevice, &bufferCreateInfo, nullptr, &uniformBuffer.buffer));
 		vkGetBufferMemoryRequirements		(vulkanDevice_->logicalDevice, uniformBuffer.buffer, &memReqs);
 		memAlloc.allocationSize										= memReqs.size;
 		memAlloc.memoryTypeIndex									= vulkanDevice_->getMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-		VK_CHECK_RESULT(vkAllocateMemory	(vulkanDevice_->logicalDevice, &memAlloc, nullptr, &uniformBuffer.memory));
-		VK_CHECK_RESULT(vkBindBufferMemory	(vulkanDevice_->logicalDevice, uniformBuffer.buffer, uniformBuffer.memory, 0));
-		VK_CHECK_RESULT(vkMapMemory			(vulkanDevice_->logicalDevice, uniformBuffer.memory, 0, sizeof(uniformData), 0, (void **)&uniformBuffer.mapped));
+		VK_EVAL(vkAllocateMemory	(vulkanDevice_->logicalDevice, &memAlloc, nullptr, &uniformBuffer.memory));
+		VK_EVAL(vkBindBufferMemory	(vulkanDevice_->logicalDevice, uniformBuffer.buffer, uniformBuffer.memory, 0));
+		VK_EVAL(vkMapMemory			(vulkanDevice_->logicalDevice, uniformBuffer.memory, 0, sizeof(uniformData), 0, (void **)&uniformBuffer.mapped));
 		uniformBuffer.descriptor.offset								= 0;
 		uniformBuffer.descriptor.buffer								= uniformBuffer.buffer;
 		uniformBuffer.descriptor.range								= sizeof(uniformData);
@@ -458,7 +458,7 @@ public:
 
 		for (size_t i = 0; i < drawCmdBuffers.size(); ++i) {
 			renderPassBeginInfo.framebuffer								= frameBuffers[i];
-			VK_CHECK_RESULT(vkBeginCommandBuffer(drawCmdBuffers[i], &cmdBufInfo));
+			VK_EVAL(vkBeginCommandBuffer(drawCmdBuffers[i], &cmdBufInfo));
 			vkCmdBeginRenderPass(drawCmdBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 
 			VkViewport														viewport						= vks::initializers::viewport((float)width, (float)height, 0.0f, 1.0f);
@@ -471,7 +471,7 @@ public:
 
 			vkCmdEndRenderPass	(drawCmdBuffers[i]);
 
-			VK_CHECK_RESULT(vkEndCommandBuffer(drawCmdBuffers[i]));
+			VK_EVAL(vkEndCommandBuffer(drawCmdBuffers[i]));
 		}
 	}
 
@@ -525,7 +525,7 @@ public:
 		pipelineCreateInfo.stageCount								= static_cast<uint32_t>(shaderStages.size());
 		pipelineCreateInfo.pStages									= shaderStages.data();
 
-		VK_CHECK_RESULT(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &scene->pipelines.solid));
+		VK_EVAL(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &scene->pipelines.solid));
 
 		// Alpha blended pipeline
 		rasterizationState.cullMode									= VK_CULL_MODE_NONE;
@@ -534,14 +534,14 @@ public:
 		blendAttachmentState.srcColorBlendFactor					= VK_BLEND_FACTOR_SRC_COLOR;
 		blendAttachmentState.dstColorBlendFactor					= VK_BLEND_FACTOR_ONE_MINUS_SRC_COLOR;
 
-		VK_CHECK_RESULT(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &scene->pipelines.blending));
+		VK_EVAL(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &scene->pipelines.blending));
 
 		// Wire frame rendering pipeline
 		rasterizationState.cullMode									= VK_CULL_MODE_BACK_BIT;
 		blendAttachmentState.blendEnable							= VK_FALSE;
 		rasterizationState.polygonMode								= VK_POLYGON_MODE_LINE;
 		rasterizationState.lineWidth								= 1.0f;
-		VK_CHECK_RESULT(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &scene->pipelines.wireframe));
+		VK_EVAL(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &scene->pipelines.wireframe));
 	}
 
 	void														updateUniformBuffers			()													{
@@ -563,7 +563,7 @@ public:
 		submitInfo.pCommandBuffers									= &drawCmdBuffers[currentBuffer];
 
 		// Submit to queue
-		VK_CHECK_RESULT(vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE));
+		VK_EVAL(vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE));
 
 		VulkanExampleBase::submitFrame();
 	}

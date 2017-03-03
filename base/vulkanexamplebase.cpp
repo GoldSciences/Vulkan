@@ -79,7 +79,7 @@ void										VulkanExampleBase::createCommandBuffers				()																					
 	drawCmdBuffers.resize(swapChain.imageCount);
 
 	VkCommandBufferAllocateInfo									cmdBufAllocateInfo				= vks::initializers::commandBufferAllocateInfo(cmdPool, VK_COMMAND_BUFFER_LEVEL_PRIMARY, static_cast<uint32_t>(drawCmdBuffers.size()));
-	VK_CHECK_RESULT(vkAllocateCommandBuffers(device, &cmdBufAllocateInfo, drawCmdBuffers.data()));
+	VK_EVAL(vkAllocateCommandBuffers(device, &cmdBufAllocateInfo, drawCmdBuffers.data()));
 }
 
 void										VulkanExampleBase::destroyCommandBuffers			()																												{
@@ -89,13 +89,13 @@ void										VulkanExampleBase::destroyCommandBuffers			()																					
 VkCommandBuffer								VulkanExampleBase::createCommandBuffer				(VkCommandBufferLevel level, bool begin)																		{
 	VkCommandBuffer													cmdBuffer;
 	VkCommandBufferAllocateInfo										cmdBufAllocateInfo				= vks::initializers::commandBufferAllocateInfo(cmdPool, level, 1);
-	VK_CHECK_RESULT(vkAllocateCommandBuffers(device, &cmdBufAllocateInfo, &cmdBuffer));
+	VK_EVAL(vkAllocateCommandBuffers(device, &cmdBufAllocateInfo, &cmdBuffer));
 
 	// If requested, also start the new command buffer
 	if (begin)
 	{
 		VkCommandBufferBeginInfo										cmdBufInfo						= vks::initializers::commandBufferBeginInfo();
-		VK_CHECK_RESULT(vkBeginCommandBuffer(cmdBuffer, &cmdBufInfo));
+		VK_EVAL(vkBeginCommandBuffer(cmdBuffer, &cmdBufInfo));
 	}
 
 	return cmdBuffer;
@@ -105,15 +105,15 @@ void										VulkanExampleBase::flushCommandBuffer				(VkCommandBuffer commandB
 	if (commandBuffer == VK_NULL_HANDLE)
 		return;
 	
-	VK_CHECK_RESULT(vkEndCommandBuffer(commandBuffer));
+	VK_EVAL(vkEndCommandBuffer(commandBuffer));
 
 	VkSubmitInfo													_submitInfo						= {};
 	_submitInfo.sType											= VK_STRUCTURE_TYPE_SUBMIT_INFO;
 	_submitInfo.commandBufferCount								= 1;
 	_submitInfo.pCommandBuffers									= &commandBuffer;
 
-	VK_CHECK_RESULT(vkQueueSubmit(queue_, 1, &_submitInfo, VK_NULL_HANDLE));
-	VK_CHECK_RESULT(vkQueueWaitIdle(queue_));
+	VK_EVAL(vkQueueSubmit(queue_, 1, &_submitInfo, VK_NULL_HANDLE));
+	VK_EVAL(vkQueueWaitIdle(queue_));
 
 	if (free)
 		vkFreeCommandBuffers(device, cmdPool, 1, &commandBuffer);
@@ -122,7 +122,7 @@ void										VulkanExampleBase::flushCommandBuffer				(VkCommandBuffer commandB
 void										VulkanExampleBase::createPipelineCache				()																												{
 	VkPipelineCacheCreateInfo										pipelineCacheCreateInfo			= {};
 	pipelineCacheCreateInfo.sType								= VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
-	VK_CHECK_RESULT(vkCreatePipelineCache(device, &pipelineCacheCreateInfo, nullptr, &pipelineCache));
+	VK_EVAL(vkCreatePipelineCache(device, &pipelineCacheCreateInfo, nullptr, &pipelineCache));
 }
 
 void										VulkanExampleBase::prepare							()																												{
@@ -432,7 +432,7 @@ void										VulkanExampleBase::updateTextOverlay				()																								
 
 void										VulkanExampleBase::prepareFrame						()																												{
 	// Acquire the next image from the swap chaing
-	VK_CHECK_RESULT(swapChain.acquireNextImage(semaphores.presentComplete, &currentBuffer));
+	VK_EVAL(swapChain.acquireNextImage(semaphores.presentComplete, &currentBuffer));
 }
 
 void										VulkanExampleBase::submitFrame						()																												{
@@ -454,7 +454,7 @@ void										VulkanExampleBase::submitFrame						()																												
 		// Submit current text overlay command buffer
 		submitInfo.commandBufferCount								= 1;
 		submitInfo.pCommandBuffers									= &textOverlay->cmdBuffers[currentBuffer];
-		VK_CHECK_RESULT(vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE));
+		VK_EVAL(vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE));
 
 		// Reset stage mask
 		submitInfo.pWaitDstStageMask								= &submitPipelineStages;
@@ -467,9 +467,9 @@ void										VulkanExampleBase::submitFrame						()																												
 		submitInfo.pSignalSemaphores								= &semaphores.renderComplete;
 	}
 
-	VK_CHECK_RESULT(swapChain.queuePresent(queue, currentBuffer, submitTextOverlay ? semaphores.textOverlayComplete : semaphores.renderComplete));
+	VK_EVAL(swapChain.queuePresent(queue, currentBuffer, submitTextOverlay ? semaphores.textOverlayComplete : semaphores.renderComplete));
 
-	VK_CHECK_RESULT(vkQueueWaitIdle(queue));
+	VK_EVAL(vkQueueWaitIdle(queue));
 }
 
 											VulkanExampleBase::VulkanExampleBase				(bool enableValidation)																							{
@@ -603,7 +603,7 @@ void										VulkanExampleBase::initVulkan						()																												{
 	// Physical device
 	uint32_t														gpuCount						= 0;
 	// Get number of available physical devices
-	VK_CHECK_RESULT(vkEnumeratePhysicalDevices(instance, &gpuCount, nullptr));
+	VK_EVAL(vkEnumeratePhysicalDevices(instance, &gpuCount, nullptr));
 	assert(gpuCount > 0);
 	// Enumerate devices
 	std::vector<VkPhysicalDevice>									physicalDevices(gpuCount);
@@ -640,14 +640,14 @@ void										VulkanExampleBase::initVulkan						()																												{
 		// List available GPUs
 		if (args[i] == std::string("-listgpus")) {
 			uint32_t													myGpuCount	= 0;
-			VK_CHECK_RESULT(vkEnumeratePhysicalDevices(instance, &myGpuCount, nullptr));
+			VK_EVAL(vkEnumeratePhysicalDevices(instance, &myGpuCount, nullptr));
 			if (myGpuCount == 0) 
 				std::cerr << "No Vulkan devices found!" << std::endl;
 			else {
 				// Enumerate devices
 				std::cout << "Available Vulkan devices" << std::endl;
 				std::vector<VkPhysicalDevice>								devices		(myGpuCount);
-				VK_CHECK_RESULT(vkEnumeratePhysicalDevices(instance, &myGpuCount, devices.data()));
+				VK_EVAL(vkEnumeratePhysicalDevices(instance, &myGpuCount, devices.data()));
 				for (uint32_t igpu = 0; igpu < myGpuCount; igpu++) {
 					VkPhysicalDeviceProperties									_deviceProperties;
 					vkGetPhysicalDeviceProperties(devices[igpu], &_deviceProperties);
@@ -692,10 +692,10 @@ void										VulkanExampleBase::initVulkan						()																												{
 	// Create synchronization objects
 	VkSemaphoreCreateInfo										semaphoreCreateInfo				= vks::initializers::semaphoreCreateInfo();
 	
-	VK_CHECK_RESULT(vkCreateSemaphore(device, &semaphoreCreateInfo, nullptr, &semaphores.presentComplete));		// Create a semaphore used to synchronize image presentation. Ensures that the image is displayed before we start submitting new commands to the queu
-	VK_CHECK_RESULT(vkCreateSemaphore(device, &semaphoreCreateInfo, nullptr, &semaphores.renderComplete));		// Create a semaphore used to synchronize command submission. Ensures that the image is not presented until all commands have been sumbitted and executed
+	VK_EVAL(vkCreateSemaphore(device, &semaphoreCreateInfo, nullptr, &semaphores.presentComplete));		// Create a semaphore used to synchronize image presentation. Ensures that the image is displayed before we start submitting new commands to the queu
+	VK_EVAL(vkCreateSemaphore(device, &semaphoreCreateInfo, nullptr, &semaphores.renderComplete));		// Create a semaphore used to synchronize command submission. Ensures that the image is not presented until all commands have been sumbitted and executed
 	
-	VK_CHECK_RESULT(vkCreateSemaphore(device, &semaphoreCreateInfo, nullptr, &semaphores.textOverlayComplete));	// Create a semaphore used to synchronize command submission. Ensures that the image is not presented until all commands for the text overlay have been sumbitted and executed.
+	VK_EVAL(vkCreateSemaphore(device, &semaphoreCreateInfo, nullptr, &semaphores.textOverlayComplete));	// Create a semaphore used to synchronize command submission. Ensures that the image is not presented until all commands for the text overlay have been sumbitted and executed.
 																												// Will be inserted after the render complete semaphore if the text overlay is enabled
 
 	// Set up submit info structure
@@ -1355,7 +1355,7 @@ void										VulkanExampleBase::createCommandPool				()																								
 	cmdPoolInfo.sType											= VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
 	cmdPoolInfo.queueFamilyIndex								= swapChain.queueNodeIndex;
 	cmdPoolInfo.flags											= VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
-	VK_CHECK_RESULT(vkCreateCommandPool(device, &cmdPoolInfo, nullptr, &cmdPool));
+	VK_EVAL(vkCreateCommandPool(device, &cmdPoolInfo, nullptr, &cmdPool));
 }
 
 void										VulkanExampleBase::setupDepthStencil				()																												{
@@ -1393,15 +1393,15 @@ void										VulkanExampleBase::setupDepthStencil				()																								
 
 	VkMemoryRequirements											memReqs;
 
-	VK_CHECK_RESULT(vkCreateImage		(device, &image, nullptr, &depthStencil.image));
+	VK_EVAL(vkCreateImage		(device, &image, nullptr, &depthStencil.image));
 	vkGetImageMemoryRequirements		(device, depthStencil.image, &memReqs);
 	mem_alloc.allocationSize									= memReqs.size;
 	mem_alloc.memoryTypeIndex									= vulkanDevice->getMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-	VK_CHECK_RESULT(vkAllocateMemory	(device, &mem_alloc, nullptr, &depthStencil.memory));
-	VK_CHECK_RESULT(vkBindImageMemory	(device, depthStencil.image, depthStencil.memory, 0));
+	VK_EVAL(vkAllocateMemory	(device, &mem_alloc, nullptr, &depthStencil.memory));
+	VK_EVAL(vkBindImageMemory	(device, depthStencil.image, depthStencil.memory, 0));
 
 	depthStencilView.image										= depthStencil.image;
-	VK_CHECK_RESULT(vkCreateImageView	(device, &depthStencilView, nullptr, &depthStencil.view));
+	VK_EVAL(vkCreateImageView	(device, &depthStencilView, nullptr, &depthStencil.view));
 }
 
 void										VulkanExampleBase::setupFrameBuffer					()																												{
@@ -1424,7 +1424,7 @@ void										VulkanExampleBase::setupFrameBuffer					()																								
 	frameBuffers.resize(swapChain.imageCount);
 	for (uint32_t i = 0; i < frameBuffers.size(); i++) {
 		attachments[0]												= swapChain.buffers[i].view;
-		VK_CHECK_RESULT(vkCreateFramebuffer	(device, &frameBufferCreateInfo, nullptr, &frameBuffers[i]));
+		VK_EVAL(vkCreateFramebuffer	(device, &frameBufferCreateInfo, nullptr, &frameBuffers[i]));
 	}
 }
 
@@ -1496,7 +1496,7 @@ void										VulkanExampleBase::setupRenderPass					()																									
 	renderPassInfo.dependencyCount								= static_cast<uint32_t>(dependencies.size());
 	renderPassInfo.pDependencies								= dependencies.data();
 
-	VK_CHECK_RESULT(vkCreateRenderPass	(device, &renderPassInfo, nullptr, &renderPass));
+	VK_EVAL(vkCreateRenderPass	(device, &renderPassInfo, nullptr, &renderPass));
 }
 														
 void										VulkanExampleBase::windowResize						()																												{

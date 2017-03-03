@@ -142,11 +142,11 @@ public:
 		cmdPoolInfo.sType								= VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
 		cmdPoolInfo.queueFamilyIndex					= vulkanDevice->queueFamilyIndices.graphics; 
 		cmdPoolInfo.flags								= VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
-		VK_CHECK_RESULT(vkCreateCommandPool(vulkanDevice->logicalDevice, &cmdPoolInfo, nullptr, &commandPool));
+		VK_EVAL(vkCreateCommandPool(vulkanDevice->logicalDevice, &cmdPoolInfo, nullptr, &commandPool));
 
 		VkCommandBufferAllocateInfo							cmdBufAllocateInfo			= vks::initializers::commandBufferAllocateInfo(commandPool, VK_COMMAND_BUFFER_LEVEL_PRIMARY, (uint32_t)cmdBuffers.size());
-		VK_CHECK_RESULT(vkAllocateCommandBuffers(vulkanDevice->logicalDevice, &cmdBufAllocateInfo, cmdBuffers.data()));
-		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &vertexBuffer, MAX_CHAR_COUNT * sizeof(glm::vec4)));	// Vertex buffer
+		VK_EVAL(vkAllocateCommandBuffers(vulkanDevice->logicalDevice, &cmdBufAllocateInfo, cmdBuffers.data()));
+		VK_EVAL(vulkanDevice->createBuffer(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &vertexBuffer, MAX_CHAR_COUNT * sizeof(glm::vec4)));	// Vertex buffer
 
 		// Map persistent
 		vertexBuffer.map();
@@ -165,19 +165,19 @@ public:
 		imageInfo.usage									= VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
 		imageInfo.sharingMode							= VK_SHARING_MODE_EXCLUSIVE;
 		imageInfo.initialLayout							= VK_IMAGE_LAYOUT_PREINITIALIZED;
-		VK_CHECK_RESULT(vkCreateImage(vulkanDevice->logicalDevice, &imageInfo, nullptr, &image));
+		VK_EVAL(vkCreateImage(vulkanDevice->logicalDevice, &imageInfo, nullptr, &image));
 
 		VkMemoryRequirements								memReqs;
 		VkMemoryAllocateInfo								allocInfo					= vks::initializers::memoryAllocateInfo();
 		vkGetImageMemoryRequirements(vulkanDevice->logicalDevice, image, &memReqs);
 		allocInfo.allocationSize						= memReqs.size;
 		allocInfo.memoryTypeIndex						= vulkanDevice->getMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-		VK_CHECK_RESULT(vkAllocateMemory(vulkanDevice->logicalDevice, &allocInfo, nullptr, &imageMemory));
-		VK_CHECK_RESULT(vkBindImageMemory(vulkanDevice->logicalDevice, image, imageMemory, 0));
+		VK_EVAL(vkAllocateMemory(vulkanDevice->logicalDevice, &allocInfo, nullptr, &imageMemory));
+		VK_EVAL(vkBindImageMemory(vulkanDevice->logicalDevice, image, imageMemory, 0));
 
 		// Staging
 		vks::Buffer											stagingBuffer;
-		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &stagingBuffer, allocInfo.allocationSize));
+		VK_EVAL(vulkanDevice->createBuffer(VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &stagingBuffer, allocInfo.allocationSize));
 
 		stagingBuffer.map();
 		memcpy(stagingBuffer.mapped, &font24pixels[0][0], STB_FONT_WIDTH * STB_FONT_HEIGHT);	// Only one channel, so data size = W * H (*R8)
@@ -186,10 +186,10 @@ public:
 		// Copy to image
 		VkCommandBuffer										copyCmd;
 		cmdBufAllocateInfo.commandBufferCount			= 1;
-		VK_CHECK_RESULT(vkAllocateCommandBuffers(vulkanDevice->logicalDevice, &cmdBufAllocateInfo, &copyCmd));
+		VK_EVAL(vkAllocateCommandBuffers(vulkanDevice->logicalDevice, &cmdBufAllocateInfo, &copyCmd));
 
 		VkCommandBufferBeginInfo							cmdBufInfo					= vks::initializers::commandBufferBeginInfo();
-		VK_CHECK_RESULT(vkBeginCommandBuffer(copyCmd, &cmdBufInfo));
+		VK_EVAL(vkBeginCommandBuffer(copyCmd, &cmdBufInfo));
 
 		// Prepare for transfer
 		vks::tools::setImageLayout(copyCmd, image, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_LAYOUT_PREINITIALIZED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
@@ -207,14 +207,14 @@ public:
 		// Prepare for shader read
 		vks::tools::setImageLayout(copyCmd, image, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
-		VK_CHECK_RESULT(vkEndCommandBuffer(copyCmd));
+		VK_EVAL(vkEndCommandBuffer(copyCmd));
 
 		VkSubmitInfo										submitInfo					= vks::initializers::submitInfo();
 		submitInfo.commandBufferCount					= 1;
 		submitInfo.pCommandBuffers						= &copyCmd;
 
-		VK_CHECK_RESULT(vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE));
-		VK_CHECK_RESULT(vkQueueWaitIdle(queue));
+		VK_EVAL(vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE));
+		VK_EVAL(vkQueueWaitIdle(queue));
 
 		stagingBuffer.destroy();
 
@@ -226,7 +226,7 @@ public:
 		imageViewInfo.format							= imageInfo.format;
 		imageViewInfo.components						= { VK_COMPONENT_SWIZZLE_R, VK_COMPONENT_SWIZZLE_G, VK_COMPONENT_SWIZZLE_B,	VK_COMPONENT_SWIZZLE_A };
 		imageViewInfo.subresourceRange					= { VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1 };
-		VK_CHECK_RESULT(vkCreateImageView(vulkanDevice->logicalDevice, &imageViewInfo, nullptr, &view));
+		VK_EVAL(vkCreateImageView(vulkanDevice->logicalDevice, &imageViewInfo, nullptr, &view));
 
 		// Sampler
 		VkSamplerCreateInfo									samplerInfo					= vks::initializers::samplerCreateInfo();
@@ -241,7 +241,7 @@ public:
 		samplerInfo.minLod								= 0.0f;
 		samplerInfo.maxLod								= 1.0f;
 		samplerInfo.borderColor							= VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
-		VK_CHECK_RESULT(vkCreateSampler(vulkanDevice->logicalDevice, &samplerInfo, nullptr, &sampler));
+		VK_EVAL(vkCreateSampler(vulkanDevice->logicalDevice, &samplerInfo, nullptr, &sampler));
 
 		// Descriptor
 		// Font uses a separate descriptor pool
@@ -249,22 +249,22 @@ public:
 		poolSizes[0]									= vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1);
 
 		VkDescriptorPoolCreateInfo							descriptorPoolInfo			= vks::initializers::descriptorPoolCreateInfo(static_cast<uint32_t>(poolSizes.size()), poolSizes.data(), 1);
-		VK_CHECK_RESULT(vkCreateDescriptorPool(vulkanDevice->logicalDevice, &descriptorPoolInfo, nullptr, &descriptorPool));
+		VK_EVAL(vkCreateDescriptorPool(vulkanDevice->logicalDevice, &descriptorPoolInfo, nullptr, &descriptorPool));
 
 		// Descriptor set layout
 		std::array<VkDescriptorSetLayoutBinding, 1>			setLayoutBindings;
 		setLayoutBindings[0]							= vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, 0);
 
 		VkDescriptorSetLayoutCreateInfo						descriptorSetLayoutInfo		= vks::initializers::descriptorSetLayoutCreateInfo(setLayoutBindings.data(), static_cast<uint32_t>(setLayoutBindings.size()));
-		VK_CHECK_RESULT(vkCreateDescriptorSetLayout(vulkanDevice->logicalDevice, &descriptorSetLayoutInfo, nullptr, &descriptorSetLayout));
+		VK_EVAL(vkCreateDescriptorSetLayout(vulkanDevice->logicalDevice, &descriptorSetLayoutInfo, nullptr, &descriptorSetLayout));
 
 		// Pipeline layout
 		VkPipelineLayoutCreateInfo							pipelineLayoutInfo			= vks::initializers::pipelineLayoutCreateInfo(&descriptorSetLayout, 1);
-		VK_CHECK_RESULT(vkCreatePipelineLayout(vulkanDevice->logicalDevice, &pipelineLayoutInfo, nullptr, &pipelineLayout));
+		VK_EVAL(vkCreatePipelineLayout(vulkanDevice->logicalDevice, &pipelineLayoutInfo, nullptr, &pipelineLayout));
 
 		// Descriptor set
 		VkDescriptorSetAllocateInfo							descriptorSetAllocInfo		= vks::initializers::descriptorSetAllocateInfo(descriptorPool, &descriptorSetLayout, 1);
-		VK_CHECK_RESULT(vkAllocateDescriptorSets(vulkanDevice->logicalDevice, &descriptorSetAllocInfo, &descriptorSet));
+		VK_EVAL(vkAllocateDescriptorSets(vulkanDevice->logicalDevice, &descriptorSetAllocInfo, &descriptorSet));
 
 		VkDescriptorImageInfo								texDescriptor				= vks::initializers::descriptorImageInfo(sampler, view, VK_IMAGE_LAYOUT_GENERAL);
 
@@ -275,11 +275,11 @@ public:
 		// Pipeline cache
 		VkPipelineCacheCreateInfo							pipelineCacheCreateInfo		= {};
 		pipelineCacheCreateInfo.sType					= VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
-		VK_CHECK_RESULT(vkCreatePipelineCache(vulkanDevice->logicalDevice, &pipelineCacheCreateInfo, nullptr, &pipelineCache));
+		VK_EVAL(vkCreatePipelineCache(vulkanDevice->logicalDevice, &pipelineCacheCreateInfo, nullptr, &pipelineCache));
 
 		// Command buffer execution fence
 		VkFenceCreateInfo									fenceCreateInfo				= vks::initializers::fenceCreateInfo();
-		VK_CHECK_RESULT(vkCreateFence(vulkanDevice->logicalDevice, &fenceCreateInfo, nullptr, &fence));
+		VK_EVAL(vkCreateFence(vulkanDevice->logicalDevice, &fenceCreateInfo, nullptr, &fence));
 	}
 
 	// Prepare a separate pipeline for the font rendering decoupled from the main application
@@ -333,7 +333,7 @@ public:
 		pipelineCreateInfo.stageCount					= static_cast<uint32_t>(shaderStages.size());
 		pipelineCreateInfo.pStages						= shaderStages.data();
 
-		VK_CHECK_RESULT(vkCreateGraphicsPipelines(vulkanDevice->logicalDevice, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipeline));
+		VK_EVAL(vkCreateGraphicsPipelines(vulkanDevice->logicalDevice, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipeline));
 	}
 
 	// Prepare a separate render pass for rendering the text as an overlay
@@ -412,7 +412,7 @@ public:
 		renderPassInfo.dependencyCount					= 2;
 		renderPassInfo.pDependencies					= subpassDependencies;
 
-		VK_CHECK_RESULT(vkCreateRenderPass(vulkanDevice->logicalDevice, &renderPassInfo, nullptr, &renderPass));
+		VK_EVAL(vkCreateRenderPass(vulkanDevice->logicalDevice, &renderPassInfo, nullptr, &renderPass));
 	}
 
 	/**
@@ -508,7 +508,7 @@ public:
 		for (size_t i = 0; i < cmdBuffers.size(); ++i)
 		{
 			renderPassBeginInfo.framebuffer					= *frameBuffers[i];
-			VK_CHECK_RESULT(vkBeginCommandBuffer(cmdBuffers[i], &cmdBufInfo));
+			VK_EVAL(vkBeginCommandBuffer(cmdBuffers[i], &cmdBufInfo));
 
 			if (vks::debugmarker::active)
 				vks::debugmarker::beginRegion(cmdBuffers[i], "Text overlay", glm::vec4(1.0f, 0.94f, 0.3f, 1.0f));
@@ -535,7 +535,7 @@ public:
 			if (vks::debugmarker::active)
 				vks::debugmarker::endRegion(cmdBuffers[i]);
 
-			VK_CHECK_RESULT(vkEndCommandBuffer(cmdBuffers[i]));
+			VK_EVAL(vkEndCommandBuffer(cmdBuffers[i]));
 		}
 	}
 
@@ -549,10 +549,10 @@ public:
 		submitInfo.pCommandBuffers						= &cmdBuffers[bufferindex];
 		submitInfo.commandBufferCount					= 1;
 
-		VK_CHECK_RESULT(vkQueueSubmit	(queue_, 1, &submitInfo, fence));
+		VK_EVAL(vkQueueSubmit	(queue_, 1, &submitInfo, fence));
 
-		VK_CHECK_RESULT(vkWaitForFences	(vulkanDevice->logicalDevice, 1, &fence, VK_TRUE, UINT64_MAX));
-		VK_CHECK_RESULT(vkResetFences	(vulkanDevice->logicalDevice, 1, &fence));
+		VK_EVAL(vkWaitForFences	(vulkanDevice->logicalDevice, 1, &fence, VK_TRUE, UINT64_MAX));
+		VK_EVAL(vkResetFences	(vulkanDevice->logicalDevice, 1, &fence));
 	}
 
 	/**
@@ -563,7 +563,7 @@ public:
 		vkFreeCommandBuffers(vulkanDevice->logicalDevice, commandPool, static_cast<uint32_t>(cmdBuffers.size()), cmdBuffers.data());
 
 		VkCommandBufferAllocateInfo							cmdBufAllocateInfo			= vks::initializers::commandBufferAllocateInfo(commandPool, VK_COMMAND_BUFFER_LEVEL_PRIMARY, static_cast<uint32_t>(cmdBuffers.size()));
-		VK_CHECK_RESULT(vkAllocateCommandBuffers(vulkanDevice->logicalDevice, &cmdBufAllocateInfo, cmdBuffers.data()));
+		VK_EVAL(vkAllocateCommandBuffers(vulkanDevice->logicalDevice, &cmdBufAllocateInfo, cmdBuffers.data()));
 	}
 
 };

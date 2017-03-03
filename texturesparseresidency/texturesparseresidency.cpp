@@ -49,7 +49,7 @@ struct VirtualTexturePage
 		VkMemoryAllocateInfo											allocInfo							= vks::initializers::memoryAllocateInfo();
 		allocInfo.allocationSize									= size;
 		allocInfo.memoryTypeIndex									= memoryTypeIndex;
-		VK_CHECK_RESULT(vkAllocateMemory(device, &allocInfo, nullptr, &imageMemoryBind.memory));
+		VK_EVAL(vkAllocateMemory(device, &allocInfo, nullptr, &imageMemoryBind.memory));
 
 		VkImageSubresource												subResource{};
 		subResource.aspectMask										= VK_IMAGE_ASPECT_COLOR_BIT;
@@ -288,7 +288,7 @@ public:
 		sparseImageCreateInfo.extent								= { texture.width, texture.height, 1 };
 		sparseImageCreateInfo.usage									= VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
 		sparseImageCreateInfo.flags									= VK_IMAGE_CREATE_SPARSE_BINDING_BIT | VK_IMAGE_CREATE_SPARSE_RESIDENCY_BIT;
-		VK_CHECK_RESULT(vkCreateImage(device, &sparseImageCreateInfo, nullptr, &texture.image));
+		VK_EVAL(vkCreateImage(device, &sparseImageCreateInfo, nullptr, &texture.image));
 
 		// Get memory requirements
 		VkMemoryRequirements											sparseImageMemoryReqs;
@@ -417,7 +417,7 @@ public:
 				allocInfo.memoryTypeIndex									= memoryTypeIndex;
 
 				VkDeviceMemory													deviceMemory;
-				VK_CHECK_RESULT(vkAllocateMemory(device, &allocInfo, nullptr, &deviceMemory));
+				VK_EVAL(vkAllocateMemory(device, &allocInfo, nullptr, &deviceMemory));
 
 				// (Opaque) sparse memory binding
 				VkSparseMemoryBind												sparseMemoryBind{};
@@ -441,7 +441,7 @@ public:
 			allocInfo.memoryTypeIndex									= memoryTypeIndex;
 
 			VkDeviceMemory													deviceMemory;
-			VK_CHECK_RESULT(vkAllocateMemory(device, &allocInfo, nullptr, &deviceMemory));
+			VK_EVAL(vkAllocateMemory(device, &allocInfo, nullptr, &deviceMemory));
 
 			// (Opaque) sparse memory binding
 			VkSparseMemoryBind												sparseMemoryBind{};
@@ -454,7 +454,7 @@ public:
 
 		// Create signal semaphore for sparse binding
 		VkSemaphoreCreateInfo											semaphoreCreateInfo						= vks::initializers::semaphoreCreateInfo();
-		VK_CHECK_RESULT(vkCreateSemaphore(device, &semaphoreCreateInfo, nullptr, &bindSparseSemaphore));
+		VK_EVAL(vkCreateSemaphore(device, &semaphoreCreateInfo, nullptr, &bindSparseSemaphore));
 
 		// Prepare bind sparse info for reuse in queue submission
 		texture.updateSparseBindInfo();
@@ -481,7 +481,7 @@ public:
 		sampler.maxAnisotropy										= vulkanDevice->features.samplerAnisotropy ? vulkanDevice->properties.limits.maxSamplerAnisotropy : 1.0f;
 		sampler.anisotropyEnable									= false;
 		sampler.borderColor											= VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
-		VK_CHECK_RESULT(vkCreateSampler(device, &sampler, nullptr, &texture.sampler));
+		VK_EVAL(vkCreateSampler(device, &sampler, nullptr, &texture.sampler));
 
 		// Create image view
 		VkImageViewCreateInfo											view									= vks::initializers::imageViewCreateInfo();
@@ -495,7 +495,7 @@ public:
 		view.subresourceRange.layerCount							= 1;
 		view.subresourceRange.levelCount							= texture.mipLevels;
 		view.image													= texture.image;
-		VK_CHECK_RESULT(vkCreateImageView(device, &view, nullptr, &texture.view));
+		VK_EVAL(vkCreateImageView(device, &view, nullptr, &texture.view));
 
 		// Fill image descriptor image info that can be used during the descriptor set setup
 		texture.descriptor.imageLayout								= VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
@@ -526,7 +526,7 @@ public:
 			// Set target frame buffer
 			renderPassBeginInfo.framebuffer								= frameBuffers[i];
 
-			VK_CHECK_RESULT(vkBeginCommandBuffer(drawCmdBuffers[i], &cmdBufInfo));
+			VK_EVAL(vkBeginCommandBuffer(drawCmdBuffers[i], &cmdBufInfo));
 
 			vkCmdBeginRenderPass	(drawCmdBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 				
@@ -546,7 +546,7 @@ public:
 
 			vkCmdEndRenderPass(drawCmdBuffers[i]);
 
-			VK_CHECK_RESULT(vkEndCommandBuffer(drawCmdBuffers[i]));
+			VK_EVAL(vkEndCommandBuffer(drawCmdBuffers[i]));
 		}
 	}
 
@@ -563,7 +563,7 @@ public:
 		submitInfo.pCommandBuffers									= &drawCmdBuffers[currentBuffer];
 
 		// Submit to queue
-		VK_CHECK_RESULT(vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE));
+		VK_EVAL(vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE));
 
 		VulkanExampleBase::submitFrame();
 	}
@@ -608,7 +608,7 @@ public:
 
 		VkDescriptorPoolCreateInfo										descriptorPoolInfo						= vks::initializers::descriptorPoolCreateInfo(static_cast<uint32_t>(poolSizes.size()), poolSizes.data(), 2);
 
-		VK_CHECK_RESULT(vkCreateDescriptorPool(device, &descriptorPoolInfo, nullptr, &descriptorPool));
+		VK_EVAL(vkCreateDescriptorPool(device, &descriptorPoolInfo, nullptr, &descriptorPool));
 	}
 
 	void														setupDescriptorSetLayout				()																			{
@@ -618,16 +618,16 @@ public:
 		};
 
 		VkDescriptorSetLayoutCreateInfo									descriptorLayout						= vks::initializers::descriptorSetLayoutCreateInfo(setLayoutBindings.data(), static_cast<uint32_t>(setLayoutBindings.size()));
-		VK_CHECK_RESULT(vkCreateDescriptorSetLayout(device, &descriptorLayout, nullptr, &descriptorSetLayout));
+		VK_EVAL(vkCreateDescriptorSetLayout(device, &descriptorLayout, nullptr, &descriptorSetLayout));
 
 		VkPipelineLayoutCreateInfo										pPipelineLayoutCreateInfo				= vks::initializers::pipelineLayoutCreateInfo(&descriptorSetLayout, 1);
-		VK_CHECK_RESULT(vkCreatePipelineLayout(device, &pPipelineLayoutCreateInfo, nullptr, &pipelineLayout));
+		VK_EVAL(vkCreatePipelineLayout(device, &pPipelineLayoutCreateInfo, nullptr, &pipelineLayout));
 	}
 
 	void														setupDescriptorSet						()																			{
 		VkDescriptorSetAllocateInfo										allocInfo								= vks::initializers::descriptorSetAllocateInfo(descriptorPool, &descriptorSetLayout, 1);
 
-		VK_CHECK_RESULT(vkAllocateDescriptorSets(device, &allocInfo, &descriptorSet));
+		VK_EVAL(vkAllocateDescriptorSets(device, &allocInfo, &descriptorSet));
 
 		std::vector<VkWriteDescriptorSet>								writeDescriptorSets						=
 		{	vks::initializers::writeDescriptorSet(descriptorSet, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 0, &uniformBufferVS.descriptor)	// Binding 0 : Vertex shader uniform buffer
@@ -665,13 +665,13 @@ public:
 		pipelineCreateInfo.stageCount								= static_cast<uint32_t>(shaderStages.size());
 		pipelineCreateInfo.pStages									= shaderStages.data();
 
-		VK_CHECK_RESULT(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipelines.solid));
+		VK_EVAL(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipelines.solid));
 	}
 
 	// Prepare and initialize uniform buffer containing shader uniforms
 	void														prepareUniformBuffers					()																			{
 		// Vertex shader uniform buffer block
-		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBufferVS, sizeof(uboVS), &uboVS));
+		VK_EVAL(vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBufferVS, sizeof(uboVS), &uboVS));
 
 		updateUniformBuffers();
 	}
@@ -692,7 +692,7 @@ public:
 
 		uboVS.viewPos												= glm::vec4(0.0f, 0.0f, -zoom, 0.0f);
 
-		VK_CHECK_RESULT(uniformBufferVS.map());
+		VK_EVAL(uniformBufferVS.map());
 		memcpy(uniformBufferVS.mapped, &uboVS, sizeof(uboVS));
 		uniformBufferVS.unmap();
 	}

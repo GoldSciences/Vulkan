@@ -146,16 +146,16 @@ public:
 		// This buffer is used as a transfer source for the buffer copy
 		bufferCreateInfo.usage										= VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
 		bufferCreateInfo.sharingMode								= VK_SHARING_MODE_EXCLUSIVE;		
-		VK_CHECK_RESULT(vkCreateBuffer(device, &bufferCreateInfo, nullptr, &stagingBuffer));
+		VK_EVAL(vkCreateBuffer(device, &bufferCreateInfo, nullptr, &stagingBuffer));
 		vkGetBufferMemoryRequirements(device, stagingBuffer, &memReqs);
 		memAllocInfo.allocationSize									= memReqs.size;
 		memAllocInfo.memoryTypeIndex								= vulkanDevice->getMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
-		VK_CHECK_RESULT(vkAllocateMemory(device, &memAllocInfo, nullptr, &stagingMemory));
-		VK_CHECK_RESULT(vkBindBufferMemory(device, stagingBuffer, stagingMemory, 0));
+		VK_EVAL(vkAllocateMemory(device, &memAllocInfo, nullptr, &stagingMemory));
+		VK_EVAL(vkBindBufferMemory(device, stagingBuffer, stagingMemory, 0));
 
 		// Copy texture data into staging buffer
 		uint8_t															* data						= nullptr;
-		VK_CHECK_RESULT(vkMapMemory(device, stagingMemory, 0, memReqs.size, 0, (void **)&data));
+		VK_EVAL(vkMapMemory(device, stagingMemory, 0, memReqs.size, 0, (void **)&data));
 		memcpy(data, tex2D.data(), tex2D.size());
 		vkUnmapMemory(device, stagingMemory);
 
@@ -172,12 +172,12 @@ public:
 		imageCreateInfo.initialLayout								= VK_IMAGE_LAYOUT_UNDEFINED;
 		imageCreateInfo.extent										= { texture.width, texture.height, 1 };
 		imageCreateInfo.usage										= VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
-		VK_CHECK_RESULT(vkCreateImage(device, &imageCreateInfo, nullptr, &texture.image));
+		VK_EVAL(vkCreateImage(device, &imageCreateInfo, nullptr, &texture.image));
 		vkGetImageMemoryRequirements(device, texture.image, &memReqs);
 		memAllocInfo.allocationSize									= memReqs.size;
 		memAllocInfo.memoryTypeIndex								= vulkanDevice->getMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-		VK_CHECK_RESULT(vkAllocateMemory(device, &memAllocInfo, nullptr, &texture.deviceMemory));
-		VK_CHECK_RESULT(vkBindImageMemory(device, texture.image, texture.deviceMemory, 0));
+		VK_EVAL(vkAllocateMemory(device, &memAllocInfo, nullptr, &texture.deviceMemory));
+		VK_EVAL(vkBindImageMemory(device, texture.image, texture.deviceMemory, 0));
 
 		VkCommandBuffer													copyCmd						= VulkanExampleBase::createCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY, true);
 		VkImageSubresourceRange											subresourceRange			= {};
@@ -273,18 +273,18 @@ public:
 		sampler.anisotropyEnable									= VK_FALSE;
 
 		// Without mip mapping
-		VK_CHECK_RESULT(vkCreateSampler(device, &sampler, nullptr, &samplers[0]));
+		VK_EVAL(vkCreateSampler(device, &sampler, nullptr, &samplers[0]));
 
 		// With mip mapping
 		sampler.maxLod												= (float)texture.mipLevels;
-		VK_CHECK_RESULT(vkCreateSampler(device, &sampler, nullptr, &samplers[1]));
+		VK_EVAL(vkCreateSampler(device, &sampler, nullptr, &samplers[1]));
 
 		// With mip mapping and anisotropic filtering
 		if (vulkanDevice->features.samplerAnisotropy) {
 			sampler.maxAnisotropy										= vulkanDevice->properties.limits.maxSamplerAnisotropy;
 			sampler.anisotropyEnable									= VK_TRUE;
 		}
-		VK_CHECK_RESULT(vkCreateSampler(device, &sampler, nullptr, &samplers[2]));
+		VK_EVAL(vkCreateSampler(device, &sampler, nullptr, &samplers[2]));
 
 		// Create image view
 		VkImageViewCreateInfo											view						= vks::initializers::imageViewCreateInfo();
@@ -297,7 +297,7 @@ public:
 		view.subresourceRange.baseArrayLayer						= 0;
 		view.subresourceRange.layerCount							= 1;
 		view.subresourceRange.levelCount							= texture.mipLevels;
-		VK_CHECK_RESULT(vkCreateImageView(device, &view, nullptr, &texture.view));
+		VK_EVAL(vkCreateImageView(device, &view, nullptr, &texture.view));
 	}
 
 	void														buildCommandBuffers			()																	{
@@ -319,7 +319,7 @@ public:
 		for (size_t i = 0; i < drawCmdBuffers.size(); ++i) {
 			// Set target frame buffer
 			renderPassBeginInfo.framebuffer								= frameBuffers[i];
-			VK_CHECK_RESULT(vkBeginCommandBuffer(drawCmdBuffers[i], &cmdBufInfo));
+			VK_EVAL(vkBeginCommandBuffer(drawCmdBuffers[i], &cmdBufInfo));
 			vkCmdBeginRenderPass(drawCmdBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 
 			VkViewport														viewport					= vks::initializers::viewport((float)width, (float)height, 0.0f, 1.0f);
@@ -338,7 +338,7 @@ public:
 			vkCmdDrawIndexed		(drawCmdBuffers[i], models.tunnel.indexCount, 1, 0, 0, 0);
 			vkCmdEndRenderPass		(drawCmdBuffers[i]);
 
-			VK_CHECK_RESULT(vkEndCommandBuffer(drawCmdBuffers[i]));
+			VK_EVAL(vkEndCommandBuffer(drawCmdBuffers[i]));
 		}
 	}
 
@@ -350,7 +350,7 @@ public:
 		submitInfo.pCommandBuffers									= &drawCmdBuffers[currentBuffer];
 
 		// Submit to queue
-		VK_CHECK_RESULT(vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE));
+		VK_EVAL(vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE));
 
 		VulkanExampleBase::submitFrame();
 	}
@@ -388,7 +388,7 @@ public:
 			};
 
 		VkDescriptorPoolCreateInfo										descriptorPoolInfo			= vks::initializers::descriptorPoolCreateInfo(static_cast<uint32_t>(poolSizes.size()), poolSizes.data(), 1);
-		VK_CHECK_RESULT(vkCreateDescriptorPool(device, &descriptorPoolInfo, nullptr, &descriptorPool));
+		VK_EVAL(vkCreateDescriptorPool(device, &descriptorPoolInfo, nullptr, &descriptorPool));
 	}
 
 	void														setupDescriptorSetLayout	()																	{
@@ -397,15 +397,15 @@ public:
 		setLayoutBindings.push_back(vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, VK_SHADER_STAGE_FRAGMENT_BIT, 1));	// Binding 1: Sampled image
 		setLayoutBindings.push_back(vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, 2, 3));		// Binding 2: Sampler array (3 descriptors)
 		VkDescriptorSetLayoutCreateInfo									descriptorLayout			= vks::initializers::descriptorSetLayoutCreateInfo(setLayoutBindings.data(), static_cast<uint32_t>(setLayoutBindings.size())); 
-		VK_CHECK_RESULT(vkCreateDescriptorSetLayout(device, &descriptorLayout, nullptr, &descriptorSetLayout));
+		VK_EVAL(vkCreateDescriptorSetLayout(device, &descriptorLayout, nullptr, &descriptorSetLayout));
 
 		VkPipelineLayoutCreateInfo										pPipelineLayoutCreateInfo	= vks::initializers::pipelineLayoutCreateInfo(&descriptorSetLayout, 1);
-		VK_CHECK_RESULT(vkCreatePipelineLayout(device, &pPipelineLayoutCreateInfo, nullptr, &pipelineLayout));
+		VK_EVAL(vkCreatePipelineLayout(device, &pPipelineLayoutCreateInfo, nullptr, &pipelineLayout));
 	}
 
 	void														setupDescriptorSet			()																	{
 		VkDescriptorSetAllocateInfo										allocInfo					= vks::initializers::descriptorSetAllocateInfo(descriptorPool, &descriptorSetLayout, 1);
-		VK_CHECK_RESULT(vkAllocateDescriptorSets(device, &allocInfo, &descriptorSet));
+		VK_EVAL(vkAllocateDescriptorSets(device, &allocInfo, &descriptorSet));
 
 		std::vector<VkWriteDescriptorSet>								writeDescriptorSets;
 
@@ -462,13 +462,13 @@ public:
 		pipelineCreateInfo.stageCount								= static_cast<uint32_t>(shaderStages.size());
 		pipelineCreateInfo.pStages									= shaderStages.data();
 
-		VK_CHECK_RESULT(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipelines.solid));
+		VK_EVAL(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipelines.solid));
 	}
 
 	// Prepare and initialize uniform buffer containing shader uniforms
 	void														prepareUniformBuffers		()																	{
 		// Vertex shader uniform buffer block
-		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBufferVS, sizeof(uboVS), &uboVS));
+		VK_EVAL(vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBufferVS, sizeof(uboVS), &uboVS));
 		updateUniformBuffers();
 	}
 
@@ -477,7 +477,7 @@ public:
 		uboVS.view													= camera.matrices.view;
 		uboVS.model													= glm::rotate(glm::mat4(), glm::radians(timer * 360.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 		uboVS.viewPos												= glm::vec4(camera.position, 0.0f) * glm::vec4(-1.0f);
-		VK_CHECK_RESULT(uniformBufferVS.map());
+		VK_EVAL(uniformBufferVS.map());
 		memcpy(uniformBufferVS.mapped, &uboVS, sizeof(uboVS));
 		uniformBufferVS.unmap();
 	}

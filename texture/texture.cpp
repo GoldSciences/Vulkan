@@ -73,10 +73,10 @@ public:
 		// Note : Inherited destructor cleans up resources stored in base class
 		texture	.destroy(device);
 
-		vkDestroyPipeline			(device, pipelines.solid, nullptr);
+		vkDestroyPipeline				(device, pipelines.solid, nullptr);
 
-		vkDestroyPipelineLayout		(device, pipelineLayout, nullptr);
-		vkDestroyDescriptorSetLayout(device, descriptorSetLayout, nullptr);
+		vkDestroyPipelineLayout			(device, pipelineLayout, nullptr);
+		vkDestroyDescriptorSetLayout	(device, descriptorSetLayout, nullptr);
 
 		vertexBuffer	.destroy();
 		indexBuffer		.destroy();
@@ -171,21 +171,21 @@ public:
 			bufferCreateInfo.usage										= VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
 			bufferCreateInfo.sharingMode								= VK_SHARING_MODE_EXCLUSIVE;
 			
-			VK_CHECK_RESULT(vkCreateBuffer(device, &bufferCreateInfo, nullptr, &stagingBuffer));
+			VK_EVAL(vkCreateBuffer			(device, &bufferCreateInfo, nullptr, &stagingBuffer));
 
 			// Get memory requirements for the staging buffer (alignment, memory type bits)
-			vkGetBufferMemoryRequirements(device, stagingBuffer, &memReqs);
+			vkGetBufferMemoryRequirements	(device, stagingBuffer, &memReqs);
 
 			memAllocInfo.allocationSize									= memReqs.size;
 			// Get memory type index for a host visible buffer
 			memAllocInfo.memoryTypeIndex								= vulkanDevice->getMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
 
-			VK_CHECK_RESULT(vkAllocateMemory(device, &memAllocInfo, nullptr, &stagingMemory));
-			VK_CHECK_RESULT(vkBindBufferMemory(device, stagingBuffer, stagingMemory, 0));
+			VK_EVAL(vkAllocateMemory		(device, &memAllocInfo, nullptr, &stagingMemory));
+			VK_EVAL(vkBindBufferMemory		(device, stagingBuffer, stagingMemory, 0));
 
 			// Copy texture data into staging buffer
 			uint8_t															* data								= nullptr;
-			VK_CHECK_RESULT(vkMapMemory(device, stagingMemory, 0, memReqs.size, 0, (void **)&data));
+			VK_EVAL(vkMapMemory				(device, stagingMemory, 0, memReqs.size, 0, (void **)&data));
 			memcpy(data, tex2D.data(), tex2D.size());
 			vkUnmapMemory(device, stagingMemory);
 
@@ -224,14 +224,14 @@ public:
 			imageCreateInfo.extent										= { texture.width, texture.height, 1 };
 			imageCreateInfo.usage										= VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
 
-			VK_CHECK_RESULT(vkCreateImage	(device, &imageCreateInfo, nullptr, &texture.image));
+			VK_EVAL(vkCreateImage			(device, &imageCreateInfo, nullptr, &texture.image));
 			vkGetImageMemoryRequirements	(device, texture.image, &memReqs);
 
 			memAllocInfo.allocationSize									= memReqs.size;
 			memAllocInfo.memoryTypeIndex								= vulkanDevice->getMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
-			VK_CHECK_RESULT(vkAllocateMemory	(device, &memAllocInfo, nullptr, &texture.deviceMemory));
-			VK_CHECK_RESULT(vkBindImageMemory	(device, texture.image, texture.deviceMemory, 0));
+			VK_EVAL(vkAllocateMemory		(device, &memAllocInfo, nullptr, &texture.deviceMemory));
+			VK_EVAL(vkBindImageMemory		(device, texture.image, texture.deviceMemory, 0));
 
 			VkCommandBuffer													copyCmd								= VulkanExampleBase::createCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY, true);
 
@@ -254,8 +254,8 @@ public:
 			VulkanExampleBase::flushCommandBuffer(copyCmd, queue, true);
 
 			// Clean up staging resources
-			vkFreeMemory	(device, stagingMemory, nullptr);
-			vkDestroyBuffer	(device, stagingBuffer, nullptr);
+			vkFreeMemory					(device, stagingMemory, nullptr);
+			vkDestroyBuffer					(device, stagingBuffer, nullptr);
 		}
 		else {
 			// Prefer using optimal tiling, as linear tiling 
@@ -276,15 +276,15 @@ public:
 			imageCreateInfo.sharingMode									= VK_SHARING_MODE_EXCLUSIVE;
 			imageCreateInfo.initialLayout								= VK_IMAGE_LAYOUT_PREINITIALIZED;
 			imageCreateInfo.extent										= { texture.width, texture.height, 1 };
-			VK_CHECK_RESULT(vkCreateImage(device, &imageCreateInfo, nullptr, &mappableImage));
+			VK_EVAL(vkCreateImage			(device, &imageCreateInfo, nullptr, &mappableImage));
 
-			vkGetImageMemoryRequirements(device, mappableImage, &memReqs);							// Get memory requirements for this image, like size and alignment.
+			vkGetImageMemoryRequirements	(device, mappableImage, &memReqs);							// Get memory requirements for this image, like size and alignment.
 			memAllocInfo.allocationSize									= memReqs.size;																				// Set memory allocation size to required memory size
 			memAllocInfo.memoryTypeIndex								= vulkanDevice->getMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);	// Get memory type that can be mapped to host memory
 
 				
-			VK_CHECK_RESULT(vkAllocateMemory(device, &memAllocInfo, nullptr, &mappableMemory));		// Allocate host memory
-			VK_CHECK_RESULT(vkBindImageMemory(device, mappableImage, mappableMemory, 0));			// Bind allocated image for use
+			VK_EVAL(vkAllocateMemory		(device, &memAllocInfo, nullptr, &mappableMemory));		// Allocate host memory
+			VK_EVAL(vkBindImageMemory		(device, mappableImage, mappableMemory, 0));			// Bind allocated image for use
 
 			// Get sub resource layout
 			// Mip map count, array layer, etc.
@@ -296,11 +296,11 @@ public:
 
 			// Get sub resources layout 
 			// Includes row pitch, size offsets, etc.
-			vkGetImageSubresourceLayout(device, mappableImage, &subRes, &subResLayout);
-			VK_CHECK_RESULT(vkMapMemory(device, mappableMemory, 0, memReqs.size, 0, &data));		// Map image memory
+			vkGetImageSubresourceLayout		(device, mappableImage, &subRes, &subResLayout);
+			VK_EVAL(vkMapMemory				(device, mappableMemory, 0, memReqs.size, 0, &data));		// Map image memory
 			memcpy(data, tex2D[subRes.mipLevel].data(), tex2D[subRes.mipLevel].size());				// Copy image data into memory
 
-			vkUnmapMemory(device, mappableMemory);
+			vkUnmapMemory					(device, mappableMemory);
 
 			// Linear tiled images don't need to be staged
 			// and can be directly used as textures
@@ -354,7 +354,7 @@ public:
 			sampler.anisotropyEnable									= VK_FALSE;
 		}
 		sampler.borderColor											= VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
-		VK_CHECK_RESULT(vkCreateSampler(device, &sampler, nullptr, &texture.sampler));
+		VK_EVAL(vkCreateSampler				(device, &sampler, nullptr, &texture.sampler));
 
 		// Create image view
 		// Textures are not directly accessed by the shaders and
@@ -372,7 +372,7 @@ public:
 		view.subresourceRange.layerCount							= 1;
 		view.subresourceRange.levelCount							= (useStaging) ? texture.mipLevels : 1;	// Linear tiling usually won't support mip maps. Only set mip map count if optimal tiling is used
 		view.image													= texture.image;		// The view will be based on the texture's image
-		VK_CHECK_RESULT(vkCreateImageView(device, &view, nullptr, &texture.view));
+		VK_EVAL(vkCreateImageView			(device, &view, nullptr, &texture.view));
 	}
 
 	void														buildCommandBuffers					()																{
@@ -394,7 +394,7 @@ public:
 		for (size_t i = 0; i < drawCmdBuffers.size(); ++i)	{
 			// Set target frame buffer
 			renderPassBeginInfo.framebuffer								= frameBuffers[i];
-			VK_CHECK_RESULT(vkBeginCommandBuffer(drawCmdBuffers[i], &cmdBufInfo));
+			VK_EVAL(vkBeginCommandBuffer(drawCmdBuffers[i], &cmdBufInfo));
 			vkCmdBeginRenderPass	(drawCmdBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 
 			VkViewport														viewport							= vks::initializers::viewport((float)width, (float)height, 0.0f, 1.0f);
@@ -414,7 +414,7 @@ public:
 
 			vkCmdEndRenderPass		(drawCmdBuffers[i]);
 
-			VK_CHECK_RESULT(vkEndCommandBuffer(drawCmdBuffers[i]));
+			VK_EVAL(vkEndCommandBuffer(drawCmdBuffers[i]));
 		}
 	}
 
@@ -426,7 +426,7 @@ public:
 		submitInfo.pCommandBuffers									= &drawCmdBuffers[currentBuffer];
 
 		// Submit to queue
-		VK_CHECK_RESULT(vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE));
+		VK_EVAL(vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE));
 
 		VulkanExampleBase::submitFrame();
 	}
@@ -446,8 +446,8 @@ public:
 
 		// Create buffers
 		// For the sake of simplicity we won't stage the vertex data to the gpu memory
-		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &vertexBuffer	, _vertices.size() * sizeof(Vertex), _vertices	.data()));	// Vertex buffer
-		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_INDEX_BUFFER_BIT	, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &indexBuffer	, indices.size() * sizeof(uint32_t), indices	.data()));	// Index buffer
+		VK_EVAL(vulkanDevice->createBuffer(VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &vertexBuffer	, _vertices.size() * sizeof(Vertex), _vertices	.data()));	// Vertex buffer
+		VK_EVAL(vulkanDevice->createBuffer(VK_BUFFER_USAGE_INDEX_BUFFER_BIT	, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &indexBuffer	, indices.size() * sizeof(uint32_t), indices	.data()));	// Index buffer
 	}
 
 	void														setupVertexDescriptions				()																{
@@ -477,7 +477,7 @@ public:
 			};
 
 		VkDescriptorPoolCreateInfo										descriptorPoolInfo					= vks::initializers::descriptorPoolCreateInfo(static_cast<uint32_t>(poolSizes.size()), poolSizes.data(), 2);
-		VK_CHECK_RESULT(vkCreateDescriptorPool(device, &descriptorPoolInfo, nullptr, &descriptorPool));
+		VK_EVAL(vkCreateDescriptorPool		(device, &descriptorPoolInfo, nullptr, &descriptorPool));
 	}
 
 	void														setupDescriptorSetLayout			()																{
@@ -487,15 +487,15 @@ public:
 			};
 
 		VkDescriptorSetLayoutCreateInfo									descriptorLayout					= vks::initializers::descriptorSetLayoutCreateInfo(setLayoutBindings.data(), static_cast<uint32_t>(setLayoutBindings.size())); 
-		VK_CHECK_RESULT(vkCreateDescriptorSetLayout(device, &descriptorLayout, nullptr, &descriptorSetLayout));
+		VK_EVAL(vkCreateDescriptorSetLayout	(device, &descriptorLayout, nullptr, &descriptorSetLayout));
 
 		VkPipelineLayoutCreateInfo										pPipelineLayoutCreateInfo			= vks::initializers::pipelineLayoutCreateInfo(&descriptorSetLayout, 1);
-		VK_CHECK_RESULT(vkCreatePipelineLayout(device, &pPipelineLayoutCreateInfo, nullptr, &pipelineLayout));
+		VK_EVAL(vkCreatePipelineLayout		(device, &pPipelineLayoutCreateInfo, nullptr, &pipelineLayout));
 	}
 
 	void														setupDescriptorSet					()																{
 		VkDescriptorSetAllocateInfo										allocInfo							= vks::initializers::descriptorSetAllocateInfo(descriptorPool, &descriptorSetLayout, 1);
-		VK_CHECK_RESULT(vkAllocateDescriptorSets(device, &allocInfo, &descriptorSet));
+		VK_EVAL(vkAllocateDescriptorSets	(device, &allocInfo, &descriptorSet));
 
 		// Setup a descriptor image info for the current texture to be used as a combined image sampler
 		VkDescriptorImageInfo											textureDescriptor;
@@ -546,13 +546,13 @@ public:
 		pipelineCreateInfo.stageCount								= static_cast<uint32_t>(shaderStages.size());
 		pipelineCreateInfo.pStages									= shaderStages.data();
 
-		VK_CHECK_RESULT(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipelines.solid));
+		VK_EVAL(vkCreateGraphicsPipelines	(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipelines.solid));
 	}
 
 	// Prepare and initialize uniform buffer containing shader uniforms
 	void														prepareUniformBuffers				()																{
 		// Vertex shader uniform buffer block
-		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBufferVS, sizeof(uboVS), &uboVS));
+		VK_EVAL(vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBufferVS, sizeof(uboVS), &uboVS));
 		updateUniformBuffers();
 	}
 
@@ -568,7 +568,7 @@ public:
 
 		uboVS.viewPos												= glm::vec4(0.0f, 0.0f, -zoom, 0.0f);
 
-		VK_CHECK_RESULT(uniformBufferVS.map());
+		VK_EVAL(uniformBufferVS.map());
 		memcpy(uniformBufferVS.mapped, &uboVS, sizeof(uboVS));
 		uniformBufferVS.unmap();
 	}
