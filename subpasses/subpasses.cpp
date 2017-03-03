@@ -58,14 +58,14 @@ public:
 		vks::Buffer													lights;
 	}															uniformBuffers;
 
-	Pipeline													PipelineOffscreen							;
-	Pipeline													PipelineScene								;
-	Pipeline													PipelineComposition							;
-	Pipeline													PipelineTransparent							;
+	vks::Pipeline												PipelineOffscreen							;
+	vks::Pipeline												PipelineScene								;
+	vks::Pipeline												PipelineComposition							;
+	vks::Pipeline												PipelineTransparent							;
 
-	DescriptorSet												DescriptorSetScene							;
-	DescriptorSet												DescriptorSetComposition					;
-	DescriptorSet												DescriptorSetTransparent					;
+	vks::DescriptorSet											DescriptorSetScene							;
+	vks::DescriptorSet											DescriptorSetComposition					;
+	vks::DescriptorSet											DescriptorSetTransparent					;
 
 	// G-Buffer framebuffer attachments
 	struct Attachments {
@@ -212,41 +212,19 @@ public:
 
 		// Deferred attachments
 		// Position
+		_attachments[1]												= _attachments[0];
 		_attachments[1].format										= this->attachments.position.format;
-		_attachments[1].samples										= VK_SAMPLE_COUNT_1_BIT;
-		_attachments[1].loadOp										= VK_ATTACHMENT_LOAD_OP_CLEAR;
 		_attachments[1].storeOp										= VK_ATTACHMENT_STORE_OP_DONT_CARE;
-		_attachments[1].stencilLoadOp								= VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-		_attachments[1].stencilStoreOp								= VK_ATTACHMENT_STORE_OP_DONT_CARE;
-		_attachments[1].initialLayout								= VK_IMAGE_LAYOUT_UNDEFINED;
 		_attachments[1].finalLayout									= VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 		// Normals
+		_attachments[2]												= _attachments[1];
 		_attachments[2].format										= this->attachments.normal.format;
-		_attachments[2].samples										= VK_SAMPLE_COUNT_1_BIT;
-		_attachments[2].loadOp										= VK_ATTACHMENT_LOAD_OP_CLEAR;
-		_attachments[2].storeOp										= VK_ATTACHMENT_STORE_OP_DONT_CARE;
-		_attachments[2].stencilLoadOp								= VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-		_attachments[2].stencilStoreOp								= VK_ATTACHMENT_STORE_OP_DONT_CARE;
-		_attachments[2].initialLayout								= VK_IMAGE_LAYOUT_UNDEFINED;
-		_attachments[2].finalLayout									= VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 		// Albedo
+		_attachments[3]												= _attachments[2];
 		_attachments[3].format										= this->attachments.albedo.format;
-		_attachments[3].samples										= VK_SAMPLE_COUNT_1_BIT;
-		_attachments[3].loadOp										= VK_ATTACHMENT_LOAD_OP_CLEAR;
-		_attachments[3].storeOp										= VK_ATTACHMENT_STORE_OP_DONT_CARE;
-		_attachments[3].stencilLoadOp								= VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-		_attachments[3].stencilStoreOp								= VK_ATTACHMENT_STORE_OP_DONT_CARE;
-		_attachments[3].initialLayout								= VK_IMAGE_LAYOUT_UNDEFINED;
-		_attachments[3].finalLayout									= VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 		// Depth attachment
+		_attachments[4]												= _attachments[3];
 		_attachments[4].format										= depthFormat;
-		_attachments[4].samples										= VK_SAMPLE_COUNT_1_BIT;
-		_attachments[4].loadOp										= VK_ATTACHMENT_LOAD_OP_CLEAR;
-		_attachments[4].storeOp										= VK_ATTACHMENT_STORE_OP_DONT_CARE;
-		_attachments[4].stencilLoadOp								= VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-		_attachments[4].stencilStoreOp								= VK_ATTACHMENT_STORE_OP_DONT_CARE;
-		_attachments[4].initialLayout								= VK_IMAGE_LAYOUT_UNDEFINED;
-		_attachments[4].finalLayout									= VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 
 		// Three subpasses
 		std::array<VkSubpassDescription,3>								subpassDescriptions{};
@@ -314,29 +292,25 @@ public:
 		dependencies[0].dependencyFlags								= VK_DEPENDENCY_BY_REGION_BIT;
 
 		// This dependency transitions the input attachment from	 color attachment to shader read
+		dependencies[1]												= dependencies[0];
 		dependencies[1].srcSubpass									= 0;
 		dependencies[1].dstSubpass									= 1;
 		dependencies[1].srcStageMask								= VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
 		dependencies[1].dstStageMask								= VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
 		dependencies[1].srcAccessMask								= VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
 		dependencies[1].dstAccessMask								= VK_ACCESS_SHADER_READ_BIT;
-		dependencies[1].dependencyFlags								= VK_DEPENDENCY_BY_REGION_BIT;
 
+		dependencies[2]												= dependencies[1];
 		dependencies[2].srcSubpass									= 1;
 		dependencies[2].dstSubpass									= 2;
-		dependencies[2].srcStageMask								= VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-		dependencies[2].dstStageMask								= VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
-		dependencies[2].srcAccessMask								= VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-		dependencies[2].dstAccessMask								= VK_ACCESS_SHADER_READ_BIT;
-		dependencies[2].dependencyFlags								= VK_DEPENDENCY_BY_REGION_BIT;
 
+		dependencies[3]												= dependencies[0];
 		dependencies[3].srcSubpass									= 0;
 		dependencies[3].dstSubpass									= VK_SUBPASS_EXTERNAL;
 		dependencies[3].srcStageMask								= VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
 		dependencies[3].dstStageMask								= VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
 		dependencies[3].srcAccessMask								= VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
 		dependencies[3].dstAccessMask								= VK_ACCESS_MEMORY_READ_BIT;
-		dependencies[3].dependencyFlags								= VK_DEPENDENCY_BY_REGION_BIT;
 
 		VkRenderPassCreateInfo											renderPassInfo				= {};
 		renderPassInfo.sType										= VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;

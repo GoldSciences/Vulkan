@@ -37,10 +37,8 @@ public:
 		vks::Buffer													params;
 	}															uniformBuffers;
 
-	struct UBOVS {
-		glm::mat4													projection;
-		glm::mat4													modelview;
-	}															uboVS;
+	typedef vks::Uniform_Proj_ModelView							UBOVS;
+	UBOVS														uboVS;
 
 	struct UBOParams {
 		float														exposure								= 1.0f;
@@ -826,7 +824,7 @@ public:
 
 	void														updateUniformBuffers					()									{
 		uboVS.projection											= camera.matrices.perspective;
-		uboVS.modelview												= camera.matrices.view;
+		uboVS.modelView												= camera.matrices.view;
 		memcpy(uniformBuffers.matrices.mapped, &uboVS, sizeof(uboVS));
 	}
 

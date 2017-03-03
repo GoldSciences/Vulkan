@@ -156,12 +156,9 @@ public:
 
 	vks::Buffer													uniformBuffer;
 
-	struct UBOVS {
-		glm::mat4													projection;
-		glm::mat4													model;
-		glm::vec4													lightPos								= glm::vec4(0.0f, 5.0f, 15.0f, 1.0f);
-	}															uboVS;
-
+	typedef vks::Uniform_Proj_Model_LightPos					UBOVS;
+	UBOVS														uboVS									= {{},{}, glm::vec4(0.0, 5.0, 15.0, 1.0)};;
+	
 	struct {
 		VkPipeline													toonshading								= VK_NULL_HANDLE;
 		VkPipeline													color									= VK_NULL_HANDLE;
@@ -216,8 +213,8 @@ public:
 		uniformBuffer		.destroy();
 
 		// Offscreen
-		offscreenPass.color.	destroy(device);	// Color attachment
-		offscreenPass.depth.	destroy(device);	// Depth attachment
+		offscreenPass.color		.destroy(device);	// Color attachment
+		offscreenPass.depth		.destroy(device);	// Depth attachment
 
 		vkDestroyRenderPass				(device, offscreenPass.renderPass	, nullptr);
 		vkDestroySampler				(device, offscreenPass.sampler		, nullptr);
@@ -677,18 +674,18 @@ public:
 		// Name shader moduels for debugging
 		// Shader module count starts at 2 when text overlay in base class is enabled
 		uint32_t														moduleIndex								= enableTextOverlay ? 2 : 0;
-		DebugMarker::setObjectName(device, (uint64_t)shaderModules[moduleIndex + 0], VK_DEBUG_REPORT_OBJECT_TYPE_SHADER_MODULE_EXT, "Toon shading vertex shader");
-		DebugMarker::setObjectName(device, (uint64_t)shaderModules[moduleIndex + 1], VK_DEBUG_REPORT_OBJECT_TYPE_SHADER_MODULE_EXT, "Toon shading fragment shader");
-		DebugMarker::setObjectName(device, (uint64_t)shaderModules[moduleIndex + 2], VK_DEBUG_REPORT_OBJECT_TYPE_SHADER_MODULE_EXT, "Color-only vertex shader");
-		DebugMarker::setObjectName(device, (uint64_t)shaderModules[moduleIndex + 3], VK_DEBUG_REPORT_OBJECT_TYPE_SHADER_MODULE_EXT, "Color-only fragment shader");
-		DebugMarker::setObjectName(device, (uint64_t)shaderModules[moduleIndex + 4], VK_DEBUG_REPORT_OBJECT_TYPE_SHADER_MODULE_EXT, "Postprocess vertex shader");
-		DebugMarker::setObjectName(device, (uint64_t)shaderModules[moduleIndex + 5], VK_DEBUG_REPORT_OBJECT_TYPE_SHADER_MODULE_EXT, "Postprocess fragment shader");
-
-		// Name pipelines for debugging
-		DebugMarker::setObjectName(device, (uint64_t)pipelines.toonshading, VK_DEBUG_REPORT_OBJECT_TYPE_PIPELINE_EXT, "Toon shading pipeline");
-		DebugMarker::setObjectName(device, (uint64_t)pipelines.color, VK_DEBUG_REPORT_OBJECT_TYPE_PIPELINE_EXT, "Color only pipeline");
-		DebugMarker::setObjectName(device, (uint64_t)pipelines.wireframe, VK_DEBUG_REPORT_OBJECT_TYPE_PIPELINE_EXT, "Wireframe rendering pipeline");
-		DebugMarker::setObjectName(device, (uint64_t)pipelines.postprocess, VK_DEBUG_REPORT_OBJECT_TYPE_PIPELINE_EXT, "Post processing pipeline");
+		DebugMarker::setObjectName(device, (uint64_t)shaderModules[moduleIndex + 0]	, VK_DEBUG_REPORT_OBJECT_TYPE_SHADER_MODULE_EXT	, "Toon shading vertex shader"		);
+		DebugMarker::setObjectName(device, (uint64_t)shaderModules[moduleIndex + 1]	, VK_DEBUG_REPORT_OBJECT_TYPE_SHADER_MODULE_EXT	, "Toon shading fragment shader"	);
+		DebugMarker::setObjectName(device, (uint64_t)shaderModules[moduleIndex + 2]	, VK_DEBUG_REPORT_OBJECT_TYPE_SHADER_MODULE_EXT	, "Color-only vertex shader"		);
+		DebugMarker::setObjectName(device, (uint64_t)shaderModules[moduleIndex + 3]	, VK_DEBUG_REPORT_OBJECT_TYPE_SHADER_MODULE_EXT	, "Color-only fragment shader"		);
+		DebugMarker::setObjectName(device, (uint64_t)shaderModules[moduleIndex + 4]	, VK_DEBUG_REPORT_OBJECT_TYPE_SHADER_MODULE_EXT	, "Postprocess vertex shader"		);
+		DebugMarker::setObjectName(device, (uint64_t)shaderModules[moduleIndex + 5]	, VK_DEBUG_REPORT_OBJECT_TYPE_SHADER_MODULE_EXT	, "Postprocess fragment shader"		);
+																																										
+		// Name pipelines for debugging																																	
+		DebugMarker::setObjectName(device, (uint64_t)pipelines.toonshading			, VK_DEBUG_REPORT_OBJECT_TYPE_PIPELINE_EXT		, "Toon shading pipeline"			);
+		DebugMarker::setObjectName(device, (uint64_t)pipelines.color				, VK_DEBUG_REPORT_OBJECT_TYPE_PIPELINE_EXT		, "Color only pipeline"				);
+		DebugMarker::setObjectName(device, (uint64_t)pipelines.wireframe			, VK_DEBUG_REPORT_OBJECT_TYPE_PIPELINE_EXT		, "Wireframe rendering pipeline"	);
+		DebugMarker::setObjectName(device, (uint64_t)pipelines.postprocess			, VK_DEBUG_REPORT_OBJECT_TYPE_PIPELINE_EXT		, "Post processing pipeline"		);
 	}
 
 	// Prepare and initialize uniform buffer containing shader uniforms
@@ -755,8 +752,8 @@ public:
 		prepared													= true;
 	}
 
-	virtual void												render									()									{ if (prepared) draw(); }
-	virtual void												viewChanged								()									{ updateUniformBuffers(); }
+	virtual void												render									()									{ if (prepared) draw();		}
+	virtual void												viewChanged								()									{ updateUniformBuffers();	}
 	virtual void												keyPressed								(uint32_t keyCode)					{
 		switch (keyCode) {
 		case 0x57				:
@@ -768,9 +765,9 @@ public:
 
 	virtual void												getOverlayText							(VulkanTextOverlay *textOverlay_)	{
 		if (DebugMarker::active)
-			textOverlay_->addText("VK_EXT_debug_marker active", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
+			textOverlay_->addText("VK_EXT_debug_marker active"		, 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
 		else
-			textOverlay_->addText("VK_EXT_debug_marker not present", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
+			textOverlay_->addText("VK_EXT_debug_marker not present"	, 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
 	}
 };
 

@@ -29,11 +29,8 @@ public:
 	vks::Buffer													uniformBuffer;
 
 	// Same uniform buffer layout as shader
-	struct UBOVS {
-		glm::mat4												projection;
-		glm::mat4												modelView;
-		glm::vec4												lightPos											= glm::vec4(0.0f, 2.0f, 1.0f, 0.0f);
-	}															uboVS;
+	typedef vks::Uniform_Proj_ModelView_LightPos				UBOVS;
+	UBOVS														uboVS											= {{}, {}, glm::vec4(0.0f, 2.0f, 1.0f, 0.0f)};
 
 	VkPipelineLayout											pipelineLayout									= VK_NULL_HANDLE;
 	VkDescriptorSet												descriptorSet									= VK_NULL_HANDLE;

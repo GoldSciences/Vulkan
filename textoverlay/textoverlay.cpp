@@ -585,11 +585,8 @@ public:
 
 	vks::Buffer													uniformBuffer;
 
-	struct UBOVS {
-		glm::mat4													projection;
-		glm::mat4													model;
-		glm::vec4													lightPos					= glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
-	}															uboVS;
+	typedef vks::Uniform_Proj_Model_LightPos					UBOVS;
+	UBOVS 														uboVS							= {{},{}, glm::vec4(0.0, 0.0, 0.0, 1.0)};
 
 #define PIPELINE_SOLID		0
 #define PIPELINE_BACKGROUND	1

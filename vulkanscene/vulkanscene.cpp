@@ -43,13 +43,8 @@ public:
 		vks::Buffer													meshVS;
 	}															uniformData;
 
-	struct {
-		glm::mat4													projection;
-		glm::mat4													model;
-		glm::mat4													normal;
-		glm::mat4													view;
-		glm::vec4													lightPos;
-	}															uboVS;
+	typedef vks::Uniform_Proj_Model_Normal_View_LightPos		UBOVS;
+	UBOVS														uboVS;
 
 	struct {
 		vks::TextureCubeMap											skybox;

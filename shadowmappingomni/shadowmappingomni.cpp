@@ -134,6 +134,7 @@ public:
 	}
 
 	void														prepareCubeMap					()									{
+		shadowCubeMap.device										= vulkanDevice;
 		shadowCubeMap.width											= TEX_DIM;
 		shadowCubeMap.height										= TEX_DIM;
 		
@@ -169,7 +170,7 @@ public:
 		VK_CHECK_RESULT(vkBindImageMemory	(device, shadowCubeMap.image, shadowCubeMap.deviceMemory, 0));
 
 		// Image barrier for optimal image (target)
-		VkImageSubresourceRange											subresourceRange					= {};
+		VkImageSubresourceRange											subresourceRange				= {};
 		subresourceRange.aspectMask									= VK_IMAGE_ASPECT_COLOR_BIT;
 		subresourceRange.baseMipLevel								= 0;
 		subresourceRange.levelCount									= 1;
@@ -179,7 +180,7 @@ public:
 		VulkanExampleBase::flushCommandBuffer(layoutCmd, queue, true);
 
 		// Create sampler
-		VkSamplerCreateInfo												sampler								= vks::initializers::samplerCreateInfo();
+		VkSamplerCreateInfo												sampler							= vks::initializers::samplerCreateInfo();
 		sampler.magFilter											= TEX_FILTER;
 		sampler.minFilter											= TEX_FILTER;
 		sampler.mipmapMode											= VK_SAMPLER_MIPMAP_MODE_LINEAR;
@@ -195,7 +196,7 @@ public:
 		VK_CHECK_RESULT(vkCreateSampler		(device, &sampler, nullptr, &shadowCubeMap.sampler));
 
 		// Create image view
-		VkImageViewCreateInfo											view								= vks::initializers::imageViewCreateInfo();
+		VkImageViewCreateInfo											view							= vks::initializers::imageViewCreateInfo();
 		view.image													= VK_NULL_HANDLE;
 		view.viewType												= VK_IMAGE_VIEW_TYPE_CUBE;
 		view.format													= format;
@@ -213,10 +214,10 @@ public:
 		offscreenPass.width											= FB_DIM;
 		offscreenPass.height										= FB_DIM;
 
-		VkFormat														fbColorFormat						= FB_COLOR_FORMAT;
+		VkFormat														fbColorFormat					= FB_COLOR_FORMAT;
 
 		// Color attachment
-		VkImageCreateInfo												imageCreateInfo						= vks::initializers::imageCreateInfo();
+		VkImageCreateInfo												imageCreateInfo					= vks::initializers::imageCreateInfo();
 		imageCreateInfo.imageType									= VK_IMAGE_TYPE_2D;
 		imageCreateInfo.format										= fbColorFormat;
 		imageCreateInfo.extent.width								= offscreenPass.width;
@@ -231,8 +232,8 @@ public:
 		imageCreateInfo.usage										= VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
 		imageCreateInfo.sharingMode									= VK_SHARING_MODE_EXCLUSIVE;
 
-		VkMemoryAllocateInfo											memAlloc							= vks::initializers::memoryAllocateInfo();
-		VkImageViewCreateInfo											colorImageView						= vks::initializers::imageViewCreateInfo();
+		VkMemoryAllocateInfo											memAlloc						= vks::initializers::memoryAllocateInfo();
+		VkImageViewCreateInfo											colorImageView					= vks::initializers::imageViewCreateInfo();
 		colorImageView.viewType										= VK_IMAGE_VIEW_TYPE_2D;
 		colorImageView.format										= fbColorFormat;
 		colorImageView.flags										= 0;
@@ -252,7 +253,7 @@ public:
 		VK_CHECK_RESULT(vkAllocateMemory	(device, &memAlloc, nullptr, &offscreenPass.color.memory));
 		VK_CHECK_RESULT(vkBindImageMemory	(device, offscreenPass.color.image, offscreenPass.color.memory, 0));
 
-		VkCommandBuffer													layoutCmd							= VulkanExampleBase::createCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY, true);
+		VkCommandBuffer													layoutCmd						= VulkanExampleBase::createCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY, true);
 
 		vks::tools::setImageLayout(layoutCmd, offscreenPass.color.image, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
 
@@ -263,7 +264,7 @@ public:
 		imageCreateInfo.format										= fbDepthFormat;
 		imageCreateInfo.usage										= VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
 
-		VkImageViewCreateInfo											depthStencilView					= vks::initializers::imageViewCreateInfo();
+		VkImageViewCreateInfo											depthStencilView				= vks::initializers::imageViewCreateInfo();
 		depthStencilView.viewType									= VK_IMAGE_VIEW_TYPE_2D;
 		depthStencilView.format										= fbDepthFormat;
 		depthStencilView.flags										= 0;
@@ -292,7 +293,7 @@ public:
 		attachments[0]												= offscreenPass.color.view;
 		attachments[1]												= offscreenPass.depth.view;
 
-		VkFramebufferCreateInfo											fbufCreateInfo						= vks::initializers::framebufferCreateInfo();
+		VkFramebufferCreateInfo											fbufCreateInfo					= vks::initializers::framebufferCreateInfo();
 		fbufCreateInfo.renderPass									= offscreenPass.renderPass;
 		fbufCreateInfo.attachmentCount								= 2;
 		fbufCreateInfo.pAttachments									= attachments;

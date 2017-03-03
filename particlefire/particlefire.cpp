@@ -83,13 +83,8 @@ public:
 		float														pointSize										= PARTICLE_SIZE;
 	}															uboVS;
 
-	struct UBOEnv {
-		glm::mat4													projection;
-		glm::mat4													model;
-		glm::mat4													normal;
-		glm::vec4													lightPos										= glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
-		glm::vec4													cameraPos;
-	}															uboEnv;
+	typedef vks::Uniform_Proj_Model_Normal_LightPos_CamPos		UBOEnv;
+	UBOEnv														uboEnv											= {{}, {}, {}, glm::vec4(0.0f, 0.0f, 0.0f, 0.0f)};
 
 	struct {
 		VkPipeline													particles										= VK_NULL_HANDLE;

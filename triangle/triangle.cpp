@@ -34,11 +34,8 @@ public:
 	//
 	// This way we can just memcopy the ubo data to the ubo
 	// Note: You should use data types that align with the GPU in order to avoid manual padding (vec4, mat4)
-	struct {
-		glm::mat4													projectionMatrix;
-		glm::mat4													modelMatrix;
-		glm::mat4													viewMatrix;
-	}															uboVS;
+	typedef vks::Uniform_Proj_Model_View						UBOVS;
+	UBOVS														uboVS;
 
 	vks::Pipelines												Pipelines;
 	vks::DescriptorSets											DescriptorSets;
@@ -904,14 +901,14 @@ public:
 
 	void														updateUniformBuffers					()																{
 		// Update matrices
-		uboVS.projectionMatrix										= glm::perspective(glm::radians(60.0f), (float)width / (float)height, 0.1f, 256.0f);
+		uboVS.projection											= glm::perspective(glm::radians(60.0f), (float)width / (float)height, 0.1f, 256.0f);
 
-		uboVS.viewMatrix											= glm::translate(glm::mat4(), glm::vec3(0.0f, 0.0f, zoom));
+		uboVS.view													= glm::translate(glm::mat4(), glm::vec3(0.0f, 0.0f, zoom));
 
-		uboVS.modelMatrix											= glm::mat4();
-		uboVS.modelMatrix											= glm::rotate(uboVS.modelMatrix, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
-		uboVS.modelMatrix											= glm::rotate(uboVS.modelMatrix, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
-		uboVS.modelMatrix											= glm::rotate(uboVS.modelMatrix, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+		uboVS.model													= glm::mat4();
+		uboVS.model													= glm::rotate(uboVS.model, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+		uboVS.model													= glm::rotate(uboVS.model, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+		uboVS.model													= glm::rotate(uboVS.model, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
 
 		// Map uniform buffer and update it
 		uint8_t															* pData									= nullptr;

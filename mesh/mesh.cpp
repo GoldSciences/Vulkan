@@ -49,11 +49,8 @@ public:
 		vks::Buffer													scene;
 	}															uniformBuffers;
 
-	struct {
-		glm::mat4													projection;
-		glm::mat4													model;
-		glm::vec4													lightPos										= glm::vec4(25.0f, 5.0f, 5.0f, 1.0f);
-	}															uboVS;
+	typedef vks::Uniform_Proj_Model_LightPos					UBOVS;
+	UBOVS														uboVS											= {{}, {}, glm::vec4(25.0f, 5.0f, 5.0f, 1.0f)};
 
 	struct {
 		VkPipeline													solid											= VK_NULL_HANDLE;

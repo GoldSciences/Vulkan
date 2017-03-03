@@ -60,10 +60,8 @@ public:
 		vks::Buffer													dynamic;
 	}															uniformBuffers;
 
-	struct {
-		glm::mat4													projection;
-		glm::mat4													view;
-	}															uboVS;
+	typedef vks::Uniform_Proj_View								UBOVS;
+	UBOVS 														uboVS;
 
 	// Store random per-object rotations
 	glm::vec3													rotations		[OBJECT_INSTANCES];

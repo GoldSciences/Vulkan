@@ -10,15 +10,26 @@ namespace vks
 {
 	// Vertex layout used in the examples
 	// These must fit input locations of the vertex shader used to render the model
-	struct VertexPC		{	glm::vec3 position;	glm::vec3 color		;																												};
-	struct VertexPU		{	glm::vec3 position;	glm::vec2 uv		;																												};
-	struct VertexPNC	{	glm::vec3 position;	glm::vec3 normal	;	glm::vec3 color		;																						};
-	struct VertexPUN	{	glm::vec3 position;	glm::vec2 uv		;	glm::vec3 normal	; 																						};
-	struct VertexPNU	{	glm::vec3 position;	glm::vec3 normal	;	glm::vec2 uv		;																						};
-	struct VertexPNUC	{	glm::vec3 position;	glm::vec3 normal	;	glm::vec2 uv		;	glm::vec3 color		;																};
-	struct VertexPUCN	{	glm::vec3 position;	glm::vec2 uv		;	glm::vec3 color		;	glm::vec3 normal	; 																};
-	struct VertexPUCNT	{	glm::vec3 position;	glm::vec2 uv		;	glm::vec3 color		;	glm::vec3 normal	;	glm::vec3	tangent			; 								};
-	struct VertexPNUCWI	{	glm::vec3 position;	glm::vec3 normal	;	glm::vec2 uv		;	glm::vec3 color		;	float		boneWeights	[4]	;	uint32_t boneIDs	[4]	;	};
+	struct VertexPC				{	glm::vec3 position		;	glm::vec3 color		;																													};
+	struct VertexPU				{	glm::vec3 position		;	glm::vec2 uv		;																													};
+	struct VertexPNC			{	glm::vec3 position		;	glm::vec3 normal	;	glm::vec3 color			;																						};
+	struct VertexPUN			{	glm::vec3 position		;	glm::vec2 uv		;	glm::vec3 normal		; 																						};
+	struct VertexPNU			{	glm::vec3 position		;	glm::vec3 normal	;	glm::vec2 uv			;																						};
+	struct VertexPNUC			{	glm::vec3 position		;	glm::vec3 normal	;	glm::vec2 uv			;	glm::vec3 color		;																};
+	struct VertexPUCN			{	glm::vec3 position		;	glm::vec2 uv		;	glm::vec3 color			;	glm::vec3 normal	; 																};
+	struct VertexPUCNT			{	glm::vec3 position		;	glm::vec2 uv		;	glm::vec3 color			;	glm::vec3 normal	;	glm::vec3	tangent			; 								};
+	struct VertexPNUCWI			{	glm::vec3 position		;	glm::vec3 normal	;	glm::vec2 uv			;	glm::vec3 color		;	float		boneWeights	[4]	;	uint32_t boneIDs	[4]	;	};
+	
+	struct Uniform_Proj_Model								{	glm::mat4 projection	;	glm::mat4 model			;																					};
+	struct Uniform_Proj_View								{	glm::mat4 projection	;	glm::mat4 view			;																					};
+	struct Uniform_Proj_ModelView							{	glm::mat4 projection	;	glm::mat4 modelView		;																					};
+	struct Uniform_Proj_ModelView_LightPos					{	glm::mat4 projection	;	glm::mat4 modelView		;	glm::vec3 lightPos	;															};
+	struct Uniform_Proj_Model_View							{	glm::mat4 projection	;	glm::mat4 model			;	glm::mat4 view		;															};
+	struct Uniform_Proj_View_Model							{	glm::mat4 projection	;	glm::mat4 view			;	glm::mat4 model		;															};
+	struct Uniform_Proj_Model_LightPos						{	glm::mat4 projection	;	glm::mat4 model			;	glm::vec3 lightPos	;															};
+	struct Uniform_Proj_Model_View_CamPos					{	glm::mat4 projection	;	glm::mat4 model			;	glm::mat4 view		;	glm::vec3 camPos	;									};
+	struct Uniform_Proj_Model_Normal_View_LightPos			{	glm::mat4 projection	;	glm::mat4 model			;	glm::mat4 normal	;	glm::mat4 view		;	glm::vec3 lightPos	;			};
+	struct Uniform_Proj_Model_Normal_LightPos_CamPos		{	glm::mat4 projection	;	glm::mat4 model			;	glm::mat4 normal	;	glm::vec3 lightPos	;	glm::vec3 cameraPos	;			};
 
 	struct VertexInputStateAndDescriptions	{
 		VkPipelineVertexInputStateCreateInfo						inputState								= {};

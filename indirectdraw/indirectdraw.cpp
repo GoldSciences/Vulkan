@@ -71,10 +71,8 @@ public:
 	vks::Buffer													indirectCommandsBuffer;		// Contains the indirect drawing commands
 	uint32_t													indirectDrawCount						= 0;
 
-	struct {
-		glm::mat4													projection;
-		glm::mat4													view;
-	}															uboVS;
+	typedef vks::Uniform_Proj_View								UBOVS;
+	UBOVS 														uboVS;
 
 	struct {
 		vks::Buffer													scene;

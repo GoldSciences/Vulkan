@@ -60,10 +60,8 @@ public:
 		vks::Buffer													fs;
 	}															uniformBuffers;
 
-	struct UBOVS {
-		glm::mat4													projection;
-		glm::mat4													model;
-	}															uboVS;
+	typedef vks::Uniform_Proj_Model								UBOVS;
+	UBOVS 														uboVS;
 
 	struct UBOFS {
 		glm::vec4													outlineColor							= glm::vec4(1.0f, 0.0f, 0.0f, 0.0f);

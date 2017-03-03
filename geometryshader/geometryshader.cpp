@@ -27,10 +27,8 @@ public:
 		vks::Model													object;
 	}															models;
 
-	struct {
-		glm::mat4													projection;
-		glm::mat4													model;
-	}															uboVS;
+	typedef vks::Uniform_Proj_Model								UBOVS;
+	UBOVS														uboVS;
 
 	struct {
 		glm::mat4													projection;
