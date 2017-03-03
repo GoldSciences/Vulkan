@@ -161,6 +161,7 @@ public:
 	}
 
 	void														prepareCubeMap					()									{
+		shadowCubeMap.device										= vulkanDevice;
 		shadowCubeMap.width											= TEX_DIM;
 		shadowCubeMap.height										= TEX_DIM;
 		
