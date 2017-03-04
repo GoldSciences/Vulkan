@@ -52,16 +52,14 @@ namespace vks
 			if (extCount > 0) {
 				std::vector<VkExtensionProperties>				extensions			(extCount);
 				if (vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &extCount, &extensions.front()) == VK_SUCCESS)
-				{
-					for (auto ext : extensions)
+					for (const VkExtensionProperties& ext : extensions)
 						supportedExtensions.push_back(ext.extensionName);
-				}
 			}
 		}
 
 													~VulkanDevice			()																							{
-			if (commandPool		) vkDestroyCommandPool(logicalDevice, commandPool, nullptr);
-			if (logicalDevice	) vkDestroyDevice(logicalDevice, nullptr);
+			if (commandPool		) vkDestroyCommandPool	(logicalDevice, commandPool, nullptr);
+			if (logicalDevice	) vkDestroyDevice		(logicalDevice, nullptr);
 		}
 
 		// Get the index of a memory type that has all the requested property bits set.
@@ -144,8 +142,7 @@ namespace vks
 			const float										defaultQueuePriority(0.0f);
 
 			// Graphics queue
-			if (requestedQueueTypes & VK_QUEUE_GRAPHICS_BIT)
-			{
+			if (requestedQueueTypes & VK_QUEUE_GRAPHICS_BIT) {
 				queueFamilyIndices.graphics					= getQueueFamilyIndex(VK_QUEUE_GRAPHICS_BIT);
 				VkDeviceQueueCreateInfo							queueInfo{};
 				queueInfo.sType								= VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
@@ -154,16 +151,13 @@ namespace vks
 				queueInfo.pQueuePriorities					= &defaultQueuePriority;
 				queueCreateInfos.push_back(queueInfo);
 			}
-			else {
+			else
 				queueFamilyIndices.graphics					= VK_NULL_HANDLE;
-			}
 
 			// Dedicated compute queue
-			if (requestedQueueTypes & VK_QUEUE_COMPUTE_BIT)
-			{
+			if (requestedQueueTypes & VK_QUEUE_COMPUTE_BIT) {
 				queueFamilyIndices.compute					= getQueueFamilyIndex(VK_QUEUE_COMPUTE_BIT);
-				if (queueFamilyIndices.compute != queueFamilyIndices.graphics)
-				{
+				if (queueFamilyIndices.compute != queueFamilyIndices.graphics) {
 					// If compute family index differs, we need an additional queue create info for the compute queue
 					VkDeviceQueueCreateInfo							queueInfo{};
 					queueInfo.sType								= VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
@@ -173,16 +167,13 @@ namespace vks
 					queueCreateInfos.push_back(queueInfo);
 				}
 			}
-			else { // Else we use the same queue
+			else // Else we use the same queue
 				queueFamilyIndices.compute					= queueFamilyIndices.graphics;
-			}
 
 			// Dedicated transfer queue
-			if (requestedQueueTypes & VK_QUEUE_TRANSFER_BIT)
-			{
+			if (requestedQueueTypes & VK_QUEUE_TRANSFER_BIT) {
 				queueFamilyIndices.transfer					= getQueueFamilyIndex(VK_QUEUE_TRANSFER_BIT);
-				if ((queueFamilyIndices.transfer != queueFamilyIndices.graphics) && (queueFamilyIndices.transfer != queueFamilyIndices.compute))
-				{
+				if ((queueFamilyIndices.transfer != queueFamilyIndices.graphics) && (queueFamilyIndices.transfer != queueFamilyIndices.compute)) {
 					// If compute family index differs, we need an additional queue create info for the compute queue
 					VkDeviceQueueCreateInfo							queueInfo{};
 					queueInfo.sType								= VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
@@ -192,15 +183,13 @@ namespace vks
 					queueCreateInfos.push_back(queueInfo);
 				}
 			}
-			else { // Else we use the same queue
+			else // Else we use the same queue
 				queueFamilyIndices.transfer					= queueFamilyIndices.graphics;	
-			}
 
 			// Create the logical device representation
 			std::vector<const char*>						deviceExtensions		(enabledExtensions);
-			if (useSwapChain)	{	// If the device will be used for presenting to a display via a swapchain we need to request the swapchain extension
+			if (useSwapChain)		// If the device will be used for presenting to a display via a swapchain we need to request the swapchain extension
 				deviceExtensions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
-			}
 
 			VkDeviceCreateInfo								deviceCreateInfo		= {};
 			deviceCreateInfo.sType						= VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
@@ -240,28 +229,27 @@ namespace vks
 			// Create the buffer handle
 			VkBufferCreateInfo								bufferCreateInfo		= vks::initializers::bufferCreateInfo(usageFlags, size);
 			bufferCreateInfo.sharingMode				= VK_SHARING_MODE_EXCLUSIVE;
-			VK_EVAL(vkCreateBuffer		(logicalDevice, &bufferCreateInfo, nullptr, buffer));
+			VK_EVAL(vkCreateBuffer			(logicalDevice, &bufferCreateInfo, nullptr, buffer));
 
 			// Create the memory backing up the buffer handle
 			VkMemoryRequirements							memReqs;
 			VkMemoryAllocateInfo							memAlloc				= vks::initializers::memoryAllocateInfo();
-			vkGetBufferMemoryRequirements		(logicalDevice, *buffer, &memReqs);
+			vkGetBufferMemoryRequirements	(logicalDevice, *buffer, &memReqs);
 			memAlloc.allocationSize						= memReqs.size;
 			// Find a memory type index that fits the properties of the buffer
 			memAlloc.memoryTypeIndex					= getMemoryType(memReqs.memoryTypeBits, memoryPropertyFlags);
-			VK_EVAL(vkAllocateMemory	(logicalDevice, &memAlloc, nullptr, memory));
+			VK_EVAL(vkAllocateMemory		(logicalDevice, &memAlloc, nullptr, memory));
 			
 			// If a pointer to the buffer data has been passed, map the buffer and copy over the data
-			if (data != nullptr)
-			{
+			if (data != nullptr) {
 				void											* mapped				= nullptr;
-				VK_EVAL(vkMapMemory			(logicalDevice, *memory, 0, size, 0, &mapped));
+				VK_EVAL(vkMapMemory				(logicalDevice, *memory, 0, size, 0, &mapped));
 				memcpy(mapped, data, (size_t)size);
-				vkUnmapMemory(logicalDevice, *memory);
+				vkUnmapMemory					(logicalDevice, *memory);
 			}
 
 			// Attach the memory to the buffer object
-			VK_EVAL(vkBindBufferMemory	(logicalDevice, *buffer, *memory, 0));
+			VK_EVAL(vkBindBufferMemory		(logicalDevice, *buffer, *memory, 0));
 
 			return VK_SUCCESS;
 		}
@@ -278,7 +266,7 @@ namespace vks
 
 			// Create the buffer handle
 			VkBufferCreateInfo								bufferCreateInfo		= vks::initializers::bufferCreateInfo(usageFlags, size);
-			VK_EVAL(vkCreateBuffer	(logicalDevice, &bufferCreateInfo, nullptr, &buffer->buffer));
+			VK_EVAL(vkCreateBuffer			(logicalDevice, &bufferCreateInfo, nullptr, &buffer->buffer));
 
 			// Create the memory backing up the buffer handle
 			VkMemoryRequirements							memReqs;
@@ -287,7 +275,7 @@ namespace vks
 			memAlloc.allocationSize						= memReqs.size;
 			
 			memAlloc.memoryTypeIndex					= getMemoryType(memReqs.memoryTypeBits, memoryPropertyFlags);				// Find a memory type index that fits the properties of the buffer
-			VK_EVAL(vkAllocateMemory(logicalDevice, &memAlloc, nullptr, &buffer->memory));
+			VK_EVAL(vkAllocateMemory		(logicalDevice, &memAlloc, nullptr, &buffer->memory));
 
 			buffer->alignment							= memReqs.alignment;
 			buffer->size								= memAlloc.allocationSize;
@@ -336,7 +324,7 @@ namespace vks
 			cmdPoolInfo.queueFamilyIndex				= queueFamilyIndex;
 			cmdPoolInfo.flags							= createFlags;
 			VkCommandPool									cmdPool;
-			VK_EVAL(vkCreateCommandPool(logicalDevice, &cmdPoolInfo, nullptr, &cmdPool));
+			VK_EVAL(vkCreateCommandPool		(logicalDevice, &cmdPoolInfo, nullptr, &cmdPool));
 			return cmdPool;
 		}
 
@@ -380,9 +368,9 @@ namespace vks
 			VkFenceCreateInfo								fenceInfo				= vks::initializers::fenceCreateInfo(VK_FLAGS_NONE);
 			VkFence											fence;
 
-			VK_EVAL(vkCreateFence	(logicalDevice, &fenceInfo, nullptr, &fence));
+			VK_EVAL(vkCreateFence			(logicalDevice, &fenceInfo, nullptr, &fence));
 			VK_EVAL(vkQueueSubmit	(queue, 1, &submitInfo, fence));									// Submit to the queue
-			VK_EVAL(vkWaitForFences	(logicalDevice, 1, &fence, VK_TRUE, DEFAULT_FENCE_TIMEOUT));		// Wait for the fence to signal that command buffer has finished executing
+			VK_EVAL(vkWaitForFences			(logicalDevice, 1, &fence, VK_TRUE, DEFAULT_FENCE_TIMEOUT));		// Wait for the fence to signal that command buffer has finished executing
 
 			vkDestroyFence					(logicalDevice, fence, nullptr);
 

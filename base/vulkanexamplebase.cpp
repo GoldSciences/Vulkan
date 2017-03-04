@@ -237,8 +237,7 @@ void										VulkanExampleBase::renderLoop						()																												{
 			break;
 
 		// Render frame
-		if (prepared)
-		{
+		if (prepared) {
 			auto															tStart							= std::chrono::high_resolution_clock::now();
 			render();
 			frameCounter++;
@@ -253,8 +252,7 @@ void										VulkanExampleBase::renderLoop						()																												{
 					timer -= 1.0f;
 			}
 			fpsTimer													+= (float)tDiff;
-			if (fpsTimer > 1000.0f)
-			{
+			if (fpsTimer > 1000.0f) {
 				lastFPS														= frameCounter;
 				updateTextOverlay();
 				fpsTimer													= 0.0f;
@@ -265,8 +263,7 @@ void										VulkanExampleBase::renderLoop						()																												{
 			// todo : check if gamepad is present
 			// todo : time based and relative axis positions
 			bool															updateView						= false;
-			if (camera.type != Camera::CameraType::firstperson)
-			{
+			if (camera.type != Camera::CameraType::firstperson)	{
 				// Rotate
 				if (std::abs(gamePadState.axisLeft.x) > deadZone)	{
 					rotation.y													+= gamePadState.axisLeft.x * 0.5f * rotationSpeed;
@@ -286,8 +283,7 @@ void										VulkanExampleBase::renderLoop						()																												{
 				if (updateView)
 					viewChanged();
 			}
-			else
-			{
+			else {
 				updateView														= camera.updatePad(gamePadState.axisLeft, gamePadState.axisRight, frameTimer);
 				if (updateView)
 					viewChanged();
@@ -619,11 +615,9 @@ void										VulkanExampleBase::initVulkan						()																												{
 
 #if !defined(__ANDROID__)	
 	// GPU selection via command line argument
-	for (size_t i = 0; i < args.size(); i++)
-	{
+	for (size_t i = 0; i < args.size(); i++) {
 		// Select GPU
-		if ((args[i] == std::string("-g")) || (args[i] == std::string("-gpu")))
-		{
+		if ((args[i] == std::string("-g")) || (args[i] == std::string("-gpu"))) {
 			char															* endptr						= nullptr;
 			uint32_t														index							= strtol(args[i + 1], &endptr, 10);
 			if (endptr != args[i + 1])  { 
@@ -675,10 +669,9 @@ void										VulkanExampleBase::initVulkan						()																												{
 	// todo: remove
 	// Store properties (including limits) and features of the phyiscal device
 	// So examples can check against them and see if a feature is actually supported
-	vkGetPhysicalDeviceProperties(physicalDevice, &deviceProperties);
-	vkGetPhysicalDeviceFeatures(physicalDevice, &deviceFeatures);
-	// Gather physical device memory properties
-	vkGetPhysicalDeviceMemoryProperties(physicalDevice, &deviceMemoryProperties);
+	vkGetPhysicalDeviceProperties		(physicalDevice, &deviceProperties);
+	vkGetPhysicalDeviceFeatures			(physicalDevice, &deviceFeatures);
+	vkGetPhysicalDeviceMemoryProperties	(physicalDevice, &deviceMemoryProperties);	// Gather physical device memory properties
 
 	// Get a graphics queue from the device
 	vkGetDeviceQueue(device, vulkanDevice->queueFamilyIndices.graphics, 0, &queue);
@@ -761,7 +754,7 @@ HWND										VulkanExampleBase::setupWindow						(HINSTANCE hinstance, WNDPROC 
 				if (MessageBox(NULL, "Fullscreen Mode not supported!\n Switch to window mode?", "Error", MB_YESNO | MB_ICONEXCLAMATION) == IDYES)
 					settings.fullscreen											= false;
 				else
-					return false;
+					return NULL;
 			}
 	}
 
