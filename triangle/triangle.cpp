@@ -67,7 +67,7 @@ public:
 		vkDestroySemaphore			(device, renderCompleteSemaphore	, nullptr);
 
 		for (VkFence& fence : waitFences)
-			vkDestroyFence					(device, fence						, nullptr);
+			vkDestroyFence				(device, fence						, nullptr);
 	}
 
 	// This function is used to request a device memory type that supports all the property flags we request (e.g. device local, host visibile)
@@ -147,7 +147,7 @@ public:
 		fenceCreateInfo.sType										= VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
 		fenceCreateInfo.flags										= 0;
 		VkFence															fence;
-		VK_EVAL(vkCreateFence	(device, &fenceCreateInfo, nullptr, &fence));
+		VK_EVAL(vkCre ateFence	(device, &fenceCreateInfo, nullptr, &fence));
 
 		VK_EVAL(vkQueueSubmit	(queue, 1, &_submitInfo, fence));						// Submit to the queue
 		VK_EVAL(vkWaitForFences	(device, 1, &fence, VK_TRUE, DEFAULT_FENCE_TIMEOUT));	// Wait for the fence to signal that command buffer has finished executing
@@ -274,8 +274,7 @@ public:
 
 		void															* data									= nullptr;
 
-		if (useStagingBuffers)
-		{
+		if (useStagingBuffers) {
 			// Static data like vertex and index buffer should be stored on the device memory 
 			// for optimal (and fastest) access by the GPU
 			//
@@ -372,10 +371,8 @@ public:
 			vkDestroyBuffer	(device, stagingBuffers.indices.buffer	, nullptr);
 			vkFreeMemory	(device, stagingBuffers.indices.memory	, nullptr);
 		}
-		else
-		{
-			// Don't use staging
-			// Create host-visible buffers only and use these for rendering. This is not advised and will usually result in lower rendering performance
+		else {	// Don't use staging
+				// Create host-visible buffers only and use these for rendering. This is not advised and will usually result in lower rendering performance
 
 			// Vertex buffer
 			VkBufferCreateInfo												vertexBufferInfo						= {};
