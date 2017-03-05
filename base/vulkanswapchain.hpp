@@ -30,6 +30,15 @@ struct SwapChainBuffer {
 	VkImageView											view										= VK_NULL_HANDLE;
 };
 
+
+struct ScreenSize {
+	uint32_t							Width	;
+	uint32_t							Height	;
+
+	inline constexpr bool				operator==					(const ScreenSize& other)								const	{ return Width == other.Width && Height == other.Height;	}
+	inline constexpr bool				operator!=					(const ScreenSize& other)								const	{ return Width != other.Width || Height != other.Height;	}
+};
+
 class VulkanSwapChain
 {
 private: 
@@ -246,7 +255,7 @@ public:
 	// width	: Pointer to the width of the swapchain (may be adjusted to fit the requirements of the swapchain)
 	// height	: Pointer to the height of the swapchain (may be adjusted to fit the requirements of the swapchain)
 	// vsync	: (Optional) Can be used to force vsync'd rendering (by using VK_PRESENT_MODE_FIFO_KHR as presentation mode)
-	void												create										(uint32_t *width_, uint32_t *height_, bool vsync = false)								{
+	void												create										(ScreenSize* screenSize, bool vsync = false)								{
 		VkResult												err;
 		VkSwapchainKHR											oldSwapchain								= swapChain;
 
@@ -269,13 +278,13 @@ public:
 		// If width (and height) equals the special value 0xFFFFFFFF, the size of the surface will be set by the swapchain
 		if (surfCaps.currentExtent.width == (uint32_t)-1) {
 			// If the surface size is undefined, the size is set to the size of the images requested.
-			swapchainExtent.width								= *width_;
-			swapchainExtent.height								= *height_;
+			swapchainExtent.width								= (*screenSize).Width	;
+			swapchainExtent.height								= (*screenSize).Height	;
 		}
 		else { // If the surface size is defined, the swap chain size must match
 			swapchainExtent										= surfCaps.currentExtent;
-			*width_												= surfCaps.currentExtent.width;
-			*height_											= surfCaps.currentExtent.height;
+			(*screenSize).Width									= surfCaps.currentExtent.width;
+			(*screenSize).Height								= surfCaps.currentExtent.height;
 		}
 
 

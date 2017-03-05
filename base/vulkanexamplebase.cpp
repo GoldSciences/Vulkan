@@ -120,7 +120,7 @@ void										VulkanExampleBase::flushCommandBuffer				(VkCommandBuffer commandB
 }
 
 void										VulkanExampleBase::createPipelineCache				()																												{
-	VkPipelineCacheCreateInfo										pipelineCacheCreateInfo			= {};
+	VkPipelineCacheCreateInfo										pipelineCacheCreateInfo				= {};
 	pipelineCacheCreateInfo.sType								= VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
 	VK_EVAL(vkCreatePipelineCache(device, &pipelineCacheCreateInfo, nullptr, &pipelineCache));
 }
@@ -147,8 +147,8 @@ void										VulkanExampleBase::prepare							()																												{
 	}
 }
 
-VkPipelineShaderStageCreateInfo				VulkanExampleBase::loadShader						(std::string fileName, VkShaderStageFlagBits stage)																{
-	VkPipelineShaderStageCreateInfo									shaderStage						= {};
+VkPipelineShaderStageCreateInfo				VulkanExampleBase::loadShader						(const std::string& fileName, VkShaderStageFlagBits stage)																{
+	VkPipelineShaderStageCreateInfo									shaderStage							= {};
 	shaderStage.sType											= VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 	shaderStage.stage											= stage;
 #if defined(__ANDROID__)
@@ -167,9 +167,8 @@ void										VulkanExampleBase::renderLoop						()																												{
 	destHeight													= screenSize.Height	;
 #if defined(_WIN32)
 	MSG																msg;
-	while (TRUE)
-	{
-		auto															tStart						= std::chrono::high_resolution_clock::now();
+	while (TRUE) {
+		auto															tStart								= std::chrono::high_resolution_clock::now();
 		if (viewUpdated)	{
 			viewUpdated													= false;
 			viewChanged();
@@ -185,8 +184,8 @@ void										VulkanExampleBase::renderLoop						()																												{
 
 		render();
 		frameCounter++;
-		auto															tEnd						= std::chrono::high_resolution_clock::now();
-		auto															tDiff						= std::chrono::duration<double, std::milli>(tEnd - tStart).count();
+		auto															tEnd								= std::chrono::high_resolution_clock::now();
+		auto															tDiff								= std::chrono::duration<double, std::milli>(tEnd - tStart).count();
 		frameTimer													= (float)tDiff / 1000.0f;
 		camera.update(frameTimer);
 		if (camera.moving())
@@ -200,7 +199,7 @@ void										VulkanExampleBase::renderLoop						()																												{
 		fpsTimer += (float)tDiff;
 		if (fpsTimer > 1000.0f) {
 			if (!enableTextOverlay) {
-				std::string														windowTitle					= getWindowTitle();
+				std::string														windowTitle							= getWindowTitle();
 				SetWindowText(window, windowTitle.c_str());
 			}
 			lastFPS														= static_cast<uint32_t>(1.0f / frameTimer);
@@ -214,8 +213,8 @@ void										VulkanExampleBase::renderLoop						()																												{
 	{
 		int																ident;
 		int																events;
-		struct															android_poll_source	* source	= nullptr;
-		bool															destroy							= false;
+		struct															android_poll_source	* source		= nullptr;
+		bool															destroy								= false;
 
 		focused														= true;
 

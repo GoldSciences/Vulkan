@@ -35,14 +35,6 @@
 
 #include <array>
 
-struct ScreenSize {
-	uint32_t							Width	;
-	uint32_t							Height	;
-
-	inline constexpr bool				operator==					(const ScreenSize& other)								const	{ return Width == other.Width && Height == other.Height;	}
-	inline constexpr bool				operator!=					(const ScreenSize& other)								const	{ return Width != other.Width || Height != other.Height;	}
-};
-
 class VulkanExampleBase
 {
 private:	
@@ -227,7 +219,7 @@ public:
 	virtual void						setupFrameBuffer			();																	// Create framebuffers for all requested swap chain images. Can be overriden in derived class to setup a custom framebuffer (e.g. for MSAA)
 	virtual void						setupRenderPass				();																	// Setup a default render pass. Can be overriden in derived class to setup a custom render pass (e.g. for MSAA)
 	void								initSwapchain				();																	// Connect and prepare the swap chain
-	inline void							setupSwapChain				()															{ swapChain.create(&screenSize.Width, &screenSize.Height, settings.vsync); }	// Create swap chain images
+	inline void							setupSwapChain				()															{ swapChain.create(&screenSize, settings.vsync); }	// Create swap chain images
 	bool								checkCommandBuffers			();																	// Check if command buffers are valid (!= VK_NULL_HANDLE)
 	void								createCommandBuffers		();																	// Create command buffers for drawing commands
 	void								destroyCommandBuffers		();																	// Destroy all command buffers and set their handles to VK_NULL_HANDLE. May be necessary during runtime if options are toggled 
@@ -237,7 +229,7 @@ public:
 	virtual void						prepare						();																	// Prepare commonly used Vulkan functions
 
 	
-	VkPipelineShaderStageCreateInfo		loadShader					(std::string fileName, VkShaderStageFlagBits stage);				// Load a SPIR-V shader
+	VkPipelineShaderStageCreateInfo		loadShader					(const std::string& fileName, VkShaderStageFlagBits stage);			// Load a SPIR-V shader
 	void								renderLoop					();																	// Start the main render loop
 	void								updateTextOverlay			();
 	virtual void						getOverlayText				(VulkanTextOverlay *)										{}		// Called when the text overlay is updating. Can be overriden in derived class to add custom text to the overlay
