@@ -134,16 +134,15 @@ public:
 		bufferCreateInfo.sharingMode								= VK_SHARING_MODE_EXCLUSIVE;
 
 		VK_CHECK_RESULT(vkCreateBuffer		(device, &bufferCreateInfo, nullptr, &stagingBuffer));
-
 		
-		vkGetBufferMemoryRequirements		(device, stagingBuffer, &memReqs);																					// Get memory requirements for the staging buffer (alignment, memory type bits)
+		vkGetBufferMemoryRequirements		(device, stagingBuffer, &memReqs);	// Get memory requirements for the staging buffer (alignment, memory type bits)
 		memAllocInfo.allocationSize									= memReqs.size;
-		memAllocInfo.memoryTypeIndex								= vulkanDevice->getMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);	// Get memory type index for a host visible buffer
+		memAllocInfo.memoryTypeIndex								= vulkanDevice->getMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);	// Get memory type index for a host visible buffer
 		VK_CHECK_RESULT(vkAllocateMemory	(device, &memAllocInfo, nullptr, &stagingMemory));
 		VK_CHECK_RESULT(vkBindBufferMemory	(device, stagingBuffer, stagingMemory, 0));
 
 		// Copy texture data into staging buffer
-		uint8_t *data;
+		uint8_t															* data									= nullptr;
 		VK_CHECK_RESULT(vkMapMemory			(device, stagingMemory, 0, memReqs.size, 0, (void **)&data));
 		memcpy(data, texCube.data(), texCube.size());
 		vkUnmapMemory						(device, stagingMemory);

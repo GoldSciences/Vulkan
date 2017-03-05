@@ -12,9 +12,7 @@
 
 namespace vks
 {	
-	struct VulkanDevice
-	{
-		
+	struct VulkanDevice {
 		VkPhysicalDevice							physicalDevice			= VK_NULL_HANDLE;	// Physical device representation
 		VkDevice									logicalDevice			= VK_NULL_HANDLE;	// Logical device representation (application's view of the device)
 		VkPhysicalDeviceProperties					properties				= {};				// Properties of the physical device including limits that the application can check against
@@ -50,14 +48,12 @@ namespace vks
 			vkGetPhysicalDeviceQueueFamilyProperties	(physicalDevice, &queueFamilyCount, queueFamilyProperties.data());
 
 			uint32_t										extCount			= 0;
-			vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &extCount, nullptr);			// Get list of supported extensions
+			vkEnumerateDeviceExtensionProperties		(physicalDevice, nullptr, &extCount, nullptr);			// Get list of supported extensions
 			if (extCount > 0) {
 				std::vector<VkExtensionProperties>				extensions			(extCount);
-				if (vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &extCount, &extensions.front()) == VK_SUCCESS)
-				{
-					for (auto ext : extensions)
+				if (vkEnumerateDeviceExtensionProperties	(physicalDevice, nullptr, &extCount, &extensions.front()) == VK_SUCCESS)
+					for (VkExtensionProperties& ext : extensions)
 						supportedExtensions.push_back(ext.extensionName);
-				}
 			}
 		}
 
@@ -146,8 +142,7 @@ namespace vks
 			const float										defaultQueuePriority(0.0f);
 
 			// Graphics queue
-			if (requestedQueueTypes & VK_QUEUE_GRAPHICS_BIT)
-			{
+			if (requestedQueueTypes & VK_QUEUE_GRAPHICS_BIT) {
 				queueFamilyIndices.graphics					= getQueueFamilyIndex(VK_QUEUE_GRAPHICS_BIT);
 				VkDeviceQueueCreateInfo							queueInfo{};
 				queueInfo.sType								= VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
@@ -156,16 +151,13 @@ namespace vks
 				queueInfo.pQueuePriorities					= &defaultQueuePriority;
 				queueCreateInfos.push_back(queueInfo);
 			}
-			else {
+			else 
 				queueFamilyIndices.graphics					= VK_NULL_HANDLE;
-			}
 
 			// Dedicated compute queue
-			if (requestedQueueTypes & VK_QUEUE_COMPUTE_BIT)
-			{
+			if (requestedQueueTypes & VK_QUEUE_COMPUTE_BIT) {
 				queueFamilyIndices.compute					= getQueueFamilyIndex(VK_QUEUE_COMPUTE_BIT);
-				if (queueFamilyIndices.compute != queueFamilyIndices.graphics)
-				{
+				if (queueFamilyIndices.compute != queueFamilyIndices.graphics) {
 					// If compute family index differs, we need an additional queue create info for the compute queue
 					VkDeviceQueueCreateInfo							queueInfo{};
 					queueInfo.sType								= VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
@@ -175,16 +167,13 @@ namespace vks
 					queueCreateInfos.push_back(queueInfo);
 				}
 			}
-			else { // Else we use the same queue
+			else  // Else we use the same queue
 				queueFamilyIndices.compute					= queueFamilyIndices.graphics;
-			}
 
 			// Dedicated transfer queue
-			if (requestedQueueTypes & VK_QUEUE_TRANSFER_BIT)
-			{
+			if (requestedQueueTypes & VK_QUEUE_TRANSFER_BIT) {
 				queueFamilyIndices.transfer					= getQueueFamilyIndex(VK_QUEUE_TRANSFER_BIT);
-				if ((queueFamilyIndices.transfer != queueFamilyIndices.graphics) && (queueFamilyIndices.transfer != queueFamilyIndices.compute))
-				{
+				if ((queueFamilyIndices.transfer != queueFamilyIndices.graphics) && (queueFamilyIndices.transfer != queueFamilyIndices.compute)) {
 					// If compute family index differs, we need an additional queue create info for the compute queue
 					VkDeviceQueueCreateInfo							queueInfo{};
 					queueInfo.sType								= VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
@@ -194,15 +183,13 @@ namespace vks
 					queueCreateInfos.push_back(queueInfo);
 				}
 			}
-			else { // Else we use the same queue
+			else // Else we use the same queue
 				queueFamilyIndices.transfer					= queueFamilyIndices.graphics;	
-			}
 
 			// Create the logical device representation
 			std::vector<const char*>						deviceExtensions		(enabledExtensions);
-			if (useSwapChain)	{	// If the device will be used for presenting to a display via a swapchain we need to request the swapchain extension
+			if (useSwapChain)		// If the device will be used for presenting to a display via a swapchain we need to request the swapchain extension
 				deviceExtensions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
-			}
 
 			VkDeviceCreateInfo								deviceCreateInfo		= {};
 			deviceCreateInfo.sType						= VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
@@ -224,7 +211,7 @@ namespace vks
 			VkResult										result					= vkCreateDevice(physicalDevice, &deviceCreateInfo, nullptr, &logicalDevice);
 
 			if (result == VK_SUCCESS)
-				commandPool								= createCommandPool(queueFamilyIndices.graphics);	// Create a default command pool for graphics command buffers
+				commandPool									= createCommandPool(queueFamilyIndices.graphics);	// Create a default command pool for graphics command buffers
 
 			return result;
 		}
@@ -254,12 +241,19 @@ namespace vks
 			VK_CHECK_RESULT(vkAllocateMemory	(logicalDevice, &memAlloc, nullptr, memory));
 			
 			// If a pointer to the buffer data has been passed, map the buffer and copy over the data
-			if (data != nullptr)
-			{
-				void											* mapped				= nullptr;
+			if (data != nullptr) {
+				void											*mapped					= nullptr;
 				VK_CHECK_RESULT(vkMapMemory			(logicalDevice, *memory, 0, size, 0, &mapped));
 				memcpy(mapped, data, (size_t)size);
-				vkUnmapMemory(logicalDevice, *memory);
+				// If host coherency hasn't been requested, do a manual flush to make writes visible
+				if ((memoryPropertyFlags & VK_MEMORY_PROPERTY_HOST_COHERENT_BIT) == 0) {
+					VkMappedMemoryRange								mappedRange				= vks::initializers::mappedMemoryRange();
+					mappedRange.memory							= *memory;
+					mappedRange.offset							= 0;
+					mappedRange.size							= size;
+					vkFlushMappedMemoryRanges			(logicalDevice, 1, &mappedRange);
+				}
+				vkUnmapMemory						(logicalDevice, *memory);
 			}
 
 			// Attach the memory to the buffer object

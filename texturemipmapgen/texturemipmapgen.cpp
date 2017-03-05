@@ -142,16 +142,16 @@ public:
 		// This buffer is used as a transfer source for the buffer copy
 		bufferCreateInfo.usage										= VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
 		bufferCreateInfo.sharingMode								= VK_SHARING_MODE_EXCLUSIVE;		
-		VK_CHECK_RESULT(vkCreateBuffer(device, &bufferCreateInfo, nullptr, &stagingBuffer));
-		vkGetBufferMemoryRequirements(device, stagingBuffer, &memReqs);
+		VK_CHECK_RESULT(vkCreateBuffer		(device, &bufferCreateInfo, nullptr, &stagingBuffer));
+		vkGetBufferMemoryRequirements		(device, stagingBuffer, &memReqs);
 		memAllocInfo.allocationSize									= memReqs.size;
-		memAllocInfo.memoryTypeIndex								= vulkanDevice->getMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
-		VK_CHECK_RESULT(vkAllocateMemory(device, &memAllocInfo, nullptr, &stagingMemory));
-		VK_CHECK_RESULT(vkBindBufferMemory(device, stagingBuffer, stagingMemory, 0));
+		memAllocInfo.memoryTypeIndex								= vulkanDevice->getMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+		VK_CHECK_RESULT(vkAllocateMemory	(device, &memAllocInfo, nullptr, &stagingMemory));
+		VK_CHECK_RESULT(vkBindBufferMemory	(device, stagingBuffer, stagingMemory, 0));
 
 		// Copy texture data into staging buffer
 		uint8_t															* data						= nullptr;
-		VK_CHECK_RESULT(vkMapMemory(device, stagingMemory, 0, memReqs.size, 0, (void **)&data));
+		VK_CHECK_RESULT(vkMapMemory			(device, stagingMemory, 0, memReqs.size, 0, (void **)&data));
 		memcpy(data, tex2D.data(), tex2D.size());
 		vkUnmapMemory(device, stagingMemory);
 
@@ -168,12 +168,12 @@ public:
 		imageCreateInfo.initialLayout								= VK_IMAGE_LAYOUT_UNDEFINED;
 		imageCreateInfo.extent										= { texture.width, texture.height, 1 };
 		imageCreateInfo.usage										= VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
-		VK_CHECK_RESULT(vkCreateImage(device, &imageCreateInfo, nullptr, &texture.image));
-		vkGetImageMemoryRequirements(device, texture.image, &memReqs);
+		VK_CHECK_RESULT(vkCreateImage		(device, &imageCreateInfo, nullptr, &texture.image));
+		vkGetImageMemoryRequirements		(device, texture.image, &memReqs);
 		memAllocInfo.allocationSize									= memReqs.size;
 		memAllocInfo.memoryTypeIndex								= vulkanDevice->getMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-		VK_CHECK_RESULT(vkAllocateMemory(device, &memAllocInfo, nullptr, &texture.deviceMemory));
-		VK_CHECK_RESULT(vkBindImageMemory(device, texture.image, texture.deviceMemory, 0));
+		VK_CHECK_RESULT(vkAllocateMemory	(device, &memAllocInfo, nullptr, &texture.deviceMemory));
+		VK_CHECK_RESULT(vkBindImageMemory	(device, texture.image, texture.deviceMemory, 0));
 
 		VkCommandBuffer													copyCmd						= VulkanExampleBase::createCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY, true);
 		VkImageSubresourceRange											subresourceRange			= {};
@@ -351,9 +351,7 @@ public:
 		// Command buffer to be sumitted to the queue
 		submitInfo.commandBufferCount								= 1;
 		submitInfo.pCommandBuffers									= &drawCmdBuffers[currentBuffer];
-
-		// Submit to queue
-		VK_CHECK_RESULT(vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE));
+		VK_CHECK_RESULT(vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE));	// Submit to queue
 
 		VulkanExampleBase::submitFrame();
 	}
@@ -535,7 +533,7 @@ public:
 	}
 
 	virtual void												getOverlayText				(VulkanTextOverlay *textOverlay_)									{
-		std::stringstream											ss;
+		std::stringstream												ss;
 		ss << std::setprecision(2) << std::fixed << uboVS.lodBias;
 #if defined(__ANDROID__)
 		textOverla_->addText("LOD bias: " + ss.str() + " (Buttons L1/R1 to change)", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);

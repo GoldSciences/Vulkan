@@ -171,23 +171,21 @@ public:
 			bufferCreateInfo.usage										= VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
 			bufferCreateInfo.sharingMode								= VK_SHARING_MODE_EXCLUSIVE;
 			
-			VK_CHECK_RESULT(vkCreateBuffer(device, &bufferCreateInfo, nullptr, &stagingBuffer));
+			VK_CHECK_RESULT(vkCreateBuffer		(device, &bufferCreateInfo, nullptr, &stagingBuffer));
 
-			// Get memory requirements for the staging buffer (alignment, memory type bits)
-			vkGetBufferMemoryRequirements(device, stagingBuffer, &memReqs);
+			vkGetBufferMemoryRequirements		(device, stagingBuffer, &memReqs);	// Get memory requirements for the staging buffer (alignment, memory type bits)
 
 			memAllocInfo.allocationSize									= memReqs.size;
-			// Get memory type index for a host visible buffer
-			memAllocInfo.memoryTypeIndex								= vulkanDevice->getMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+			memAllocInfo.memoryTypeIndex								= vulkanDevice->getMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);	// Get memory type index for a host visible buffer
 
-			VK_CHECK_RESULT(vkAllocateMemory(device, &memAllocInfo, nullptr, &stagingMemory));
-			VK_CHECK_RESULT(vkBindBufferMemory(device, stagingBuffer, stagingMemory, 0));
+			VK_CHECK_RESULT(vkAllocateMemory	(device, &memAllocInfo, nullptr, &stagingMemory));
+			VK_CHECK_RESULT(vkBindBufferMemory	(device, stagingBuffer, stagingMemory, 0));
 
 			// Copy texture data into staging buffer
 			uint8_t															* data								= nullptr;
-			VK_CHECK_RESULT(vkMapMemory(device, stagingMemory, 0, memReqs.size, 0, (void **)&data));
+			VK_CHECK_RESULT(vkMapMemory			(device, stagingMemory, 0, memReqs.size, 0, (void **)&data));
 			memcpy(data, tex2D.data(), tex2D.size());
-			vkUnmapMemory(device, stagingMemory);
+			vkUnmapMemory						(device, stagingMemory);
 
 			// Setup buffer copy regions for each mip level
 			std::vector<VkBufferImageCopy>									bufferCopyRegions;
@@ -217,15 +215,13 @@ public:
 			imageCreateInfo.arrayLayers									= 1;
 			imageCreateInfo.samples										= VK_SAMPLE_COUNT_1_BIT;
 			imageCreateInfo.tiling										= VK_IMAGE_TILING_OPTIMAL;
-			imageCreateInfo.usage										= VK_IMAGE_USAGE_SAMPLED_BIT;
 			imageCreateInfo.sharingMode									= VK_SHARING_MODE_EXCLUSIVE;
-			// Set initial layout of the image to undefined
-			imageCreateInfo.initialLayout								= VK_IMAGE_LAYOUT_UNDEFINED;
+			imageCreateInfo.initialLayout								= VK_IMAGE_LAYOUT_UNDEFINED;	// Set initial layout of the image to undefined
 			imageCreateInfo.extent										= { texture.width, texture.height, 1 };
 			imageCreateInfo.usage										= VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
 
-			VK_CHECK_RESULT(vkCreateImage	(device, &imageCreateInfo, nullptr, &texture.image));
-			vkGetImageMemoryRequirements	(device, texture.image, &memReqs);
+			VK_CHECK_RESULT(vkCreateImage		(device, &imageCreateInfo, nullptr, &texture.image));
+			vkGetImageMemoryRequirements		(device, texture.image, &memReqs);
 
 			memAllocInfo.allocationSize									= memReqs.size;
 			memAllocInfo.memoryTypeIndex								= vulkanDevice->getMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
@@ -254,15 +250,15 @@ public:
 			VulkanExampleBase::flushCommandBuffer(copyCmd, queue, true);
 
 			// Clean up staging resources
-			vkFreeMemory	(device, stagingMemory, nullptr);
-			vkDestroyBuffer	(device, stagingBuffer, nullptr);
+			vkFreeMemory						(device, stagingMemory, nullptr);
+			vkDestroyBuffer						(device, stagingBuffer, nullptr);
 		}
 		else {
 			// Prefer using optimal tiling, as linear tiling 
 			// may support only a small set of features 
 			// depending on implementation (e.g. no mip maps, only one layer, etc.)
-			VkImage															mappableImage;
-			VkDeviceMemory													mappableMemory;
+			VkImage															mappableImage						= VK_NULL_HANDLE;
+			VkDeviceMemory													mappableMemory						= VK_NULL_HANDLE;
 
 			// Load mip map level 0 to linear tiling image
 			VkImageCreateInfo												imageCreateInfo						= vks::initializers::imageCreateInfo();
@@ -276,15 +272,15 @@ public:
 			imageCreateInfo.sharingMode									= VK_SHARING_MODE_EXCLUSIVE;
 			imageCreateInfo.initialLayout								= VK_IMAGE_LAYOUT_PREINITIALIZED;
 			imageCreateInfo.extent										= { texture.width, texture.height, 1 };
-			VK_CHECK_RESULT(vkCreateImage(device, &imageCreateInfo, nullptr, &mappableImage));
+			VK_CHECK_RESULT(vkCreateImage		(device, &imageCreateInfo, nullptr, &mappableImage));
 
-			vkGetImageMemoryRequirements(device, mappableImage, &memReqs);							// Get memory requirements for this image, like size and alignment.
-			memAllocInfo.allocationSize									= memReqs.size;																				// Set memory allocation size to required memory size
-			memAllocInfo.memoryTypeIndex								= vulkanDevice->getMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);	// Get memory type that can be mapped to host memory
-
-				
-			VK_CHECK_RESULT(vkAllocateMemory(device, &memAllocInfo, nullptr, &mappableMemory));		// Allocate host memory
-			VK_CHECK_RESULT(vkBindImageMemory(device, mappableImage, mappableMemory, 0));			// Bind allocated image for use
+			// Get memory requirements for this image , like size and alignment
+			vkGetImageMemoryRequirements		(device, mappableImage, &memReqs);
+			
+			memAllocInfo.allocationSize									= memReqs.size;	// Set memory allocation size to required memory size
+			memAllocInfo.memoryTypeIndex								= vulkanDevice->getMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);	// Get memory type that can be mapped to host memory
+			VK_CHECK_RESULT(vkAllocateMemory	(device, &memAllocInfo, nullptr, &mappableMemory));		// Allocate host memory
+			VK_CHECK_RESULT(vkBindImageMemory	(device, mappableImage, mappableMemory, 0));			// Bind allocated image for use
 
 			// Get sub resource layout
 			// Mip map count, array layer, etc.
@@ -294,16 +290,14 @@ public:
 			VkSubresourceLayout												subResLayout						= {};
 			void															* data								= nullptr;
 
-			// Get sub resources layout 
-			// Includes row pitch, size offsets, etc.
-			vkGetImageSubresourceLayout(device, mappableImage, &subRes, &subResLayout);
-			VK_CHECK_RESULT(vkMapMemory(device, mappableMemory, 0, memReqs.size, 0, &data));		// Map image memory
-			memcpy(data, tex2D[subRes.mipLevel].data(), tex2D[subRes.mipLevel].size());				// Copy image data into memory
+			// Get sub resources layout. Includes row pitch, size offsets, etc.
+			vkGetImageSubresourceLayout			(device, mappableImage, &subRes, &subResLayout);
+			VK_CHECK_RESULT(vkMapMemory			(device, mappableMemory, 0, memReqs.size, 0, &data));		// Map image memory
+			memcpy(data, tex2D[subRes.mipLevel].data(), tex2D[subRes.mipLevel].size());						// Copy image data into memory
 
 			vkUnmapMemory(device, mappableMemory);
 
-			// Linear tiled images don't need to be staged
-			// and can be directly used as textures
+			// Linear tiled images don't need to be staged and can be directly used as textures
 			texture.image												= mappableImage;
 			texture.deviceMemory										= mappableMemory;
 			texture.imageLayout											= VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;

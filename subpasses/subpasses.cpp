@@ -104,9 +104,9 @@ public:
 		camera.movementSpeed										= 5.0f;
 #ifndef __ANDROID__
 		camera.rotationSpeed										= 0.25f;
-#endif
-		camera.position												= { 9.5f, 4.5f, -5.8f };
-		camera.setRotation(glm::vec3(-9.5f, 53.25f, 0.0f));
+#endif  
+		camera.setPosition(glm::vec3(-3.2f, 1.0f, 5.9f));
+		camera.setRotation(glm::vec3(0.5f, 210.05f, 0.0f));
 		camera.setPerspective(60.0f, (float)width / (float)height, 0.1f, 256.0f);
 	}
 
@@ -584,14 +584,14 @@ public:
 		VK_CHECK_RESULT(vkAllocateDescriptorSets(device, &allocInfo, &descriptorSets.composition));
 
 		// Image descriptors for the offscreen color attachments
-		VkDescriptorImageInfo											texDescriptorPosition		= vks::initializers::descriptorImageInfo(VK_NULL_HANDLE, attachments.position.view, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
-		VkDescriptorImageInfo											texDescriptorNormal			= vks::initializers::descriptorImageInfo(VK_NULL_HANDLE, attachments.normal.view, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
-		VkDescriptorImageInfo											texDescriptorAlbedo			= vks::initializers::descriptorImageInfo(VK_NULL_HANDLE, attachments.albedo.view, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
-		std::vector<VkWriteDescriptorSet>								writeDescriptorSets			=
-			{	vks::initializers::writeDescriptorSet(descriptorSets.composition, VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT, 0, &texDescriptorPosition)				// Binding 0: Position texture target
-			,	vks::initializers::writeDescriptorSet(descriptorSets.composition, VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT, 1, &texDescriptorNormal)					// Binding 1: Normals texture target
-			,	vks::initializers::writeDescriptorSet(descriptorSets.composition, VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT, 2, &texDescriptorAlbedo)					// Binding 2: Albedo texture target
-			,	vks::initializers::writeDescriptorSet(descriptorSets.composition, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 3, &uniformBuffers.lights.descriptor)		// Binding 4: Fragment shader lights
+		VkDescriptorImageInfo											texDescriptorPosition		= vks::initializers::descriptorImageInfo(VK_NULL_HANDLE, attachments.position.view, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+		VkDescriptorImageInfo											texDescriptorNormal			= vks::initializers::descriptorImageInfo(VK_NULL_HANDLE, attachments.normal.view, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+		VkDescriptorImageInfo											texDescriptorAlbedo			= vks::initializers::descriptorImageInfo(VK_NULL_HANDLE, attachments.albedo.view, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+		std::vector<VkWriteDescriptorSet>								writeDescriptorSets			= 
+			{	vks::initializers::writeDescriptorSet(descriptorSets.composition, VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT, 0, &texDescriptorPosition)			// Binding 0: Position texture target
+			,	vks::initializers::writeDescriptorSet(descriptorSets.composition, VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT, 1, &texDescriptorNormal)				// Binding 1: Normals texture target
+			,	vks::initializers::writeDescriptorSet(descriptorSets.composition, VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT, 2, &texDescriptorAlbedo)				// Binding 2: Albedo texture target
+			,	vks::initializers::writeDescriptorSet(descriptorSets.composition, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 3, &uniformBuffers.lights.descriptor)	// Binding 4: Fragment shader lights
 			};
 
 		vkUpdateDescriptorSets(device, static_cast<uint32_t>(writeDescriptorSets.size()), writeDescriptorSets.data(), 0, NULL);

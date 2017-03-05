@@ -153,8 +153,8 @@ public:
 		// Results are saved in a host visible buffer for easy access by the application
 		VK_CHECK_RESULT(vkCreateBuffer		(device, &bufferCreateInfo, nullptr, &queryResult.buffer));
 		vkGetBufferMemoryRequirements		(device, queryResult.buffer, &memReqs);
-		memAlloc.allocationSize																				= memReqs.size;
-		memAlloc.memoryTypeIndex																			= vulkanDevice->getMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+		memAlloc.allocationSize										= memReqs.size;
+		memAlloc.memoryTypeIndex									= vulkanDevice->getMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 		VK_CHECK_RESULT(vkAllocateMemory	(device, &memAlloc, nullptr, &queryResult.memory));
 		VK_CHECK_RESULT(vkBindBufferMemory	(device, queryResult.buffer, queryResult.memory, 0));
 
@@ -172,8 +172,7 @@ public:
 
 	// Retrieves the results of the pipeline statistics query submitted to the command buffer
 	void														getQueryResults						()													{
-		// We use vkGetQueryResults to copy the results into a host visible buffer
-		vkGetQueryPoolResults(device, queryPool, 0, 1, sizeof(pipelineStats), pipelineStats, sizeof(uint64_t), VK_QUERY_RESULT_64_BIT);
+		vkGetQueryPoolResults(device, queryPool, 0, 1, sizeof(pipelineStats), pipelineStats, sizeof(uint64_t), VK_QUERY_RESULT_64_BIT);	// We use vkGetQueryResults to copy the results into a host visible buffer
 	}
 
 	void														loadAssets							()													{
