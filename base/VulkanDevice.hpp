@@ -48,10 +48,10 @@ namespace vks
 			vkGetPhysicalDeviceQueueFamilyProperties	(physicalDevice, &queueFamilyCount, queueFamilyProperties.data());
 
 			uint32_t										extCount			= 0;
-			vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &extCount, nullptr);			// Get list of supported extensions
+			vkEnumerateDeviceExtensionProperties		(physicalDevice, nullptr, &extCount, nullptr);			// Get list of supported extensions
 			if (extCount > 0) {
 				std::vector<VkExtensionProperties>				extensions			(extCount);
-				if (vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &extCount, &extensions.front()) == VK_SUCCESS)
+				if (vkEnumerateDeviceExtensionProperties	(physicalDevice, nullptr, &extCount, &extensions.front()) == VK_SUCCESS)
 					for (const VkExtensionProperties& ext : extensions)
 						supportedExtensions.push_back(ext.extensionName);
 			}
@@ -211,7 +211,7 @@ namespace vks
 			VkResult										result					= vkCreateDevice(physicalDevice, &deviceCreateInfo, nullptr, &logicalDevice);
 
 			if (result == VK_SUCCESS)
-				commandPool								= createCommandPool(queueFamilyIndices.graphics);	// Create a default command pool for graphics command buffers
+				commandPool									= createCommandPool(queueFamilyIndices.graphics);	// Create a default command pool for graphics command buffers
 
 			return result;
 		}
@@ -242,9 +242,17 @@ namespace vks
 			
 			// If a pointer to the buffer data has been passed, map the buffer and copy over the data
 			if (data != nullptr) {
-				void											* mapped				= nullptr;
+				void											*mapped					= nullptr;
 				VK_EVAL(vkMapMemory				(logicalDevice, *memory, 0, size, 0, &mapped));
 				memcpy(mapped, data, (size_t)size);
+				// If host coherency hasn't been requested, do a manual flush to make writes visible
+				if ((memoryPropertyFlags & VK_MEMORY_PROPERTY_HOST_COHERENT_BIT) == 0) {
+					VkMappedMemoryRange								mappedRange				= vks::initializers::mappedMemoryRange();
+					mappedRange.memory							= *memory;
+					mappedRange.offset							= 0;
+					mappedRange.size							= size;
+					vkFlushMappedMemoryRanges		(logicalDevice, 1, &mappedRange);
+				}
 				vkUnmapMemory					(logicalDevice, *memory);
 			}
 
@@ -289,7 +297,6 @@ namespace vks
 				buffer->unmap();
 			}
 
-			
 			buffer->setupDescriptor();		// Initialize a default descriptor that covers the whole buffer size
 			return buffer->bind();			// Attach the memory to the buffer object
 		}
@@ -345,7 +352,6 @@ namespace vks
 
 			return cmdBuffer;
 		}
-
 		// Finish command buffer recording and submit it to a queue
 		// 
 		// commandBuffer	: Command buffer to flush
@@ -377,7 +383,6 @@ namespace vks
 			if (free)
 				vkFreeCommandBuffers			(logicalDevice, commandPool, 1, &commandBuffer);
 		}
-
 		// Check if an extension is supported by the (physical device). Returns true if the extension is supported (present in the list read at device creation time)
 		bool										extensionSupported		(std::string extension)																		{
 			return (std::find(supportedExtensions.begin(), supportedExtensions.end(), extension) != supportedExtensions.end());

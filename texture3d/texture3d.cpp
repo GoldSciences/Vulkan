@@ -332,22 +332,22 @@ public:
 		bufferCreateInfo.size										= texMemSize;
 		bufferCreateInfo.usage										= VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
 		bufferCreateInfo.sharingMode								= VK_SHARING_MODE_EXCLUSIVE;			
-		VK_EVAL(vkCreateBuffer(device, &bufferCreateInfo, nullptr, &stagingBuffer));
+		VK_EVAL(vkCreateBuffer			(device, &bufferCreateInfo, nullptr, &stagingBuffer));
 
 		// Allocate host visible memory for data upload
 		VkMemoryAllocateInfo											memAllocInfo							= vks::initializers::memoryAllocateInfo();
 		VkMemoryRequirements											memReqs									= {};
-		vkGetBufferMemoryRequirements(device, stagingBuffer, &memReqs);
+		vkGetBufferMemoryRequirements	(device, stagingBuffer, &memReqs);
 		memAllocInfo.allocationSize									= memReqs.size;
-		memAllocInfo.memoryTypeIndex								= vulkanDevice->getMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
-		VK_EVAL(vkAllocateMemory(device, &memAllocInfo, nullptr, &stagingMemory));
-		VK_EVAL(vkBindBufferMemory(device, stagingBuffer, stagingMemory, 0));
+		memAllocInfo.memoryTypeIndex								= vulkanDevice->getMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+		VK_EVAL(vkAllocateMemory		(device, &memAllocInfo, nullptr, &stagingMemory));
+		VK_EVAL(vkBindBufferMemory		(device, stagingBuffer, stagingMemory, 0));
 
 		// Copy texture data into staging buffer
 		uint8_t															* mapped								= nullptr;
-		VK_EVAL(vkMapMemory(device, stagingMemory, 0, memReqs.size, 0, (void **)&mapped));
+		VK_EVAL(vkMapMemory				(device, stagingMemory, 0, memReqs.size, 0, (void **)&mapped));
 		memcpy(mapped, data, texMemSize);
-		vkUnmapMemory(device, stagingMemory);
+		vkUnmapMemory					(device, stagingMemory);
 
 		VkCommandBuffer													copyCmd									= VulkanExampleBase::createCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY, true);
 
@@ -386,8 +386,8 @@ public:
 
 		// Clean up staging resources
 		delete[]														data;
-		vkFreeMemory	(device, stagingMemory, nullptr);
-		vkDestroyBuffer	(device, stagingBuffer, nullptr);
+		vkFreeMemory					(device, stagingMemory, nullptr);
+		vkDestroyBuffer					(device, stagingBuffer, nullptr);
 		regenerateNoise												= false;
 	}
 

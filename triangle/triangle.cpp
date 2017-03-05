@@ -105,7 +105,7 @@ public:
 		fenceCreateInfo.flags										= VK_FENCE_CREATE_SIGNALED_BIT;
 		waitFences.resize(drawCmdBuffers.size());
 		for (VkFence& fence : waitFences)
-			VK_EVAL(vkCreateFence	(device, &fenceCreateInfo		, nullptr, &fence));
+			VK_EVAL(vkCreateFence		(device, &fenceCreateInfo		, nullptr, &fence));
 	}
 
 	// Get a new command buffer from the command pool
@@ -147,13 +147,13 @@ public:
 		fenceCreateInfo.sType										= VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
 		fenceCreateInfo.flags										= 0;
 		VkFence															fence;
-		VK_EVAL(vkCre ateFence	(device, &fenceCreateInfo, nullptr, &fence));
+		VK_EVAL(vkCreateFence		(device, &fenceCreateInfo, nullptr, &fence));
 
 		VK_EVAL(vkQueueSubmit	(queue, 1, &_submitInfo, fence));						// Submit to the queue
-		VK_EVAL(vkWaitForFences	(device, 1, &fence, VK_TRUE, DEFAULT_FENCE_TIMEOUT));	// Wait for the fence to signal that command buffer has finished executing
+		VK_EVAL(vkWaitForFences		(device, 1, &fence, VK_TRUE, DEFAULT_FENCE_TIMEOUT));	// Wait for the fence to signal that command buffer has finished executing
 
-		vkDestroyFence					(device, fence, nullptr);
-		vkFreeCommandBuffers			(device, cmdPool, 1, &commandBuffer);
+		vkDestroyFence				(device, fence, nullptr);
+		vkFreeCommandBuffers		(device, cmdPool, 1, &commandBuffer);
 	}
 
 	// Build separate command buffers for every framebuffer image
@@ -189,7 +189,7 @@ public:
 
 			// Start the first sub pass specified in our default render pass setup by the base class
 			// This will clear the color and depth attachment
-			vkCmdBeginRenderPass(drawCmdBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
+			vkCmdBeginRenderPass	(drawCmdBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 
 			
 			VkViewport														viewport								= {};
@@ -197,14 +197,14 @@ public:
 			viewport.width												= (float) width;
 			viewport.minDepth											= (float)  0.0f;
 			viewport.maxDepth											= (float)  1.0f;
-			vkCmdSetViewport(drawCmdBuffers[i], 0, 1, &viewport);								// Update dynamic viewport state
+			vkCmdSetViewport		(drawCmdBuffers[i], 0, 1, &viewport);								// Update dynamic viewport state
 
 			VkRect2D														scissor									= {};	
 			scissor.extent.width										= width;
 			scissor.extent.height										= height;
 			scissor.offset.x											= 0;
 			scissor.offset.y											= 0;
-			vkCmdSetScissor(drawCmdBuffers[i], 0, 1, &scissor);									// Update dynamic scissor state
+			vkCmdSetScissor			(drawCmdBuffers[i], 0, 1, &scissor);									// Update dynamic scissor state
 
 			
 			vkCmdBindDescriptorSets	(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, Pipelines.Layout, 0, 1, &DescriptorSets.Instances[0], 0, nullptr);	// Bind descriptor sets describing shader binding points
@@ -225,8 +225,8 @@ public:
 		VK_EVAL(swapChain.acquireNextImage(presentCompleteSemaphore, &currentBuffer));		// Get next image in the swap chain (back/front buffer)
 
 		// Use a fence to wait until the command buffer has finished execution before using it again
-		VK_EVAL(vkWaitForFences(device, 1, &waitFences[currentBuffer], VK_TRUE, UINT64_MAX));
-		VK_EVAL(vkResetFences(device, 1, &waitFences[currentBuffer]));
+		VK_EVAL(vkWaitForFences		(device, 1, &waitFences[currentBuffer], VK_TRUE, UINT64_MAX));
+		VK_EVAL(vkResetFences		(device, 1, &waitFences[currentBuffer]));
 
 		
 		VkPipelineStageFlags											waitStageMask							= VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;	// Pipeline stage at which the queue submission will wait (via pWaitSemaphores)
@@ -300,28 +300,28 @@ public:
 			vertexBufferInfo.sType										= VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
 			vertexBufferInfo.size										= vertexBufferSize;
 			vertexBufferInfo.usage										= VK_BUFFER_USAGE_TRANSFER_SRC_BIT;						// Buffer is used as the copy source
-			VK_EVAL(vkCreateBuffer		(device, &vertexBufferInfo, nullptr, &stagingBuffers.vertices.buffer));	// Create a host-visible buffer to copy the vertex data to (staging buffer)
+			VK_EVAL(vkCreateBuffer				(device, &vertexBufferInfo, nullptr, &stagingBuffers.vertices.buffer));	// Create a host-visible buffer to copy the vertex data to (staging buffer)
 			vkGetBufferMemoryRequirements		(device, stagingBuffers.vertices.buffer, &memReqs);
 			memAlloc.allocationSize										= memReqs.size;
 
 			// Request a host visible memory type that can be used to copy our data do. Also request it to be coherent, so that writes are visible to the GPU right after unmapping the buffer
 			memAlloc.memoryTypeIndex									= getMemoryTypeIndex(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-			VK_EVAL(vkAllocateMemory	(device, &memAlloc, nullptr, &stagingBuffers.vertices.memory));
+			VK_EVAL(vkAllocateMemory			(device, &memAlloc, nullptr, &stagingBuffers.vertices.memory));
 			
 			// Map and copy
-			VK_EVAL(vkMapMemory			(device, stagingBuffers.vertices.memory, 0, memAlloc.allocationSize, 0, &data));
+			VK_EVAL(vkMapMemory					(device, stagingBuffers.vertices.memory, 0, memAlloc.allocationSize, 0, &data));
 			memcpy(data, vertexBuffer.data(), vertexBufferSize);
 			vkUnmapMemory						(device, stagingBuffers.vertices.memory);
-			VK_EVAL(vkBindBufferMemory	(device, stagingBuffers.vertices.buffer, stagingBuffers.vertices.memory, 0));
+			VK_EVAL(vkBindBufferMemory			(device, stagingBuffers.vertices.buffer, stagingBuffers.vertices.memory, 0));
 
 			// Create a device local buffer to which the (host local) vertex data will be copied and which will be used for rendering
 			vertexBufferInfo.usage										= VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
-			VK_EVAL(vkCreateBuffer		(device, &vertexBufferInfo, nullptr, &vertices.Buffer));
+			VK_EVAL(vkCreateBuffer				(device, &vertexBufferInfo, nullptr, &vertices.Buffer));
 			vkGetBufferMemoryRequirements		(device, vertices.Buffer, &memReqs);
 			memAlloc.allocationSize										= memReqs.size;
 			memAlloc.memoryTypeIndex									= getMemoryTypeIndex(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-			VK_EVAL(vkAllocateMemory	(device, &memAlloc, nullptr, &vertices.Memory));
-			VK_EVAL(vkBindBufferMemory	(device, vertices.Buffer, vertices.Memory, 0));
+			VK_EVAL(vkAllocateMemory			(device, &memAlloc, nullptr, &vertices.Memory));
+			VK_EVAL(vkBindBufferMemory			(device, vertices.Buffer, vertices.Memory, 0));
 
 			// Index buffer
 			VkBufferCreateInfo												indexbufferInfo							= {};
@@ -329,24 +329,24 @@ public:
 			indexbufferInfo.size										= indexBufferSize;
 			indexbufferInfo.usage										= VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
 			// Copy index data to a buffer visible to the host (staging buffer)
-			VK_EVAL(vkCreateBuffer		(device, &indexbufferInfo, nullptr, &stagingBuffers.indices.buffer));
+			VK_EVAL(vkCreateBuffer				(device, &indexbufferInfo, nullptr, &stagingBuffers.indices.buffer));
 			vkGetBufferMemoryRequirements		(device, stagingBuffers.indices.buffer, &memReqs);
 			memAlloc.allocationSize										= memReqs.size;
 			memAlloc.memoryTypeIndex									= getMemoryTypeIndex(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-			VK_EVAL(vkAllocateMemory	(device, &memAlloc, nullptr, &stagingBuffers.indices.memory));
-			VK_EVAL(vkMapMemory			(device, stagingBuffers.indices.memory, 0, indexBufferSize, 0, &data));
+			VK_EVAL(vkAllocateMemory			(device, &memAlloc, nullptr, &stagingBuffers.indices.memory));
+			VK_EVAL(vkMapMemory					(device, stagingBuffers.indices.memory, 0, indexBufferSize, 0, &data));
 			memcpy(data, indexBuffer.data(), indexBufferSize);
 			vkUnmapMemory						(device, stagingBuffers.indices.memory);
-			VK_EVAL(vkBindBufferMemory	(device, stagingBuffers.indices.buffer, stagingBuffers.indices.memory, 0));
+			VK_EVAL(vkBindBufferMemory			(device, stagingBuffers.indices.buffer, stagingBuffers.indices.memory, 0));
 
 			// Create destination buffer with device only visibility
 			indexbufferInfo.usage										= VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
-			VK_EVAL(vkCreateBuffer		(device, &indexbufferInfo, nullptr, &indices.Buffer));
+			VK_EVAL(vkCreateBuffer				(device, &indexbufferInfo, nullptr, &indices.Buffer));
 			vkGetBufferMemoryRequirements		(device, indices.Buffer, &memReqs);
 			memAlloc.allocationSize										= memReqs.size;
 			memAlloc.memoryTypeIndex									= getMemoryTypeIndex(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-			VK_EVAL(vkAllocateMemory	(device, &memAlloc, nullptr, &indices.Memory));
-			VK_EVAL(vkBindBufferMemory	(device, indices.Buffer, indices.Memory, 0));
+			VK_EVAL(vkAllocateMemory			(device, &memAlloc, nullptr, &indices.Memory));
+			VK_EVAL(vkBindBufferMemory			(device, indices.Buffer, indices.Memory, 0));
 
 			VkCommandBufferBeginInfo										cmdBufferBeginInfo						= {};
 			cmdBufferBeginInfo.sType									= VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -366,10 +366,10 @@ public:
 
 			// Destroy staging buffers
 			// Note: Staging buffer must not be deleted before the copies have been submitted and executed
-			vkDestroyBuffer	(device, stagingBuffers.vertices.buffer	, nullptr);
-			vkFreeMemory	(device, stagingBuffers.vertices.memory	, nullptr);
-			vkDestroyBuffer	(device, stagingBuffers.indices.buffer	, nullptr);
-			vkFreeMemory	(device, stagingBuffers.indices.memory	, nullptr);
+			vkDestroyBuffer						(device, stagingBuffers.vertices.buffer	, nullptr);
+			vkFreeMemory						(device, stagingBuffers.vertices.memory	, nullptr);
+			vkDestroyBuffer						(device, stagingBuffers.indices.buffer	, nullptr);
+			vkFreeMemory						(device, stagingBuffers.indices.memory	, nullptr);
 		}
 		else {	// Don't use staging
 				// Create host-visible buffers only and use these for rendering. This is not advised and will usually result in lower rendering performance
@@ -381,15 +381,17 @@ public:
 			vertexBufferInfo.usage										= VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
 
 			// Copy vertex data to a buffer visible to the host
-			VK_EVAL(vkCreateBuffer			(device, &vertexBufferInfo, nullptr, &vertices.Buffer));
-			vkGetBufferMemoryRequirements			(device, vertices.Buffer, &memReqs);
+			VK_EVAL(vkCreateBuffer				(device, &vertexBufferInfo, nullptr, &vertices.Buffer));
+			vkGetBufferMemoryRequirements		(device, vertices.Buffer, &memReqs);
 			memAlloc.allocationSize										= memReqs.size;
-			memAlloc.memoryTypeIndex									= getMemoryTypeIndex(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
-			VK_EVAL(vkAllocateMemory		(device, &memAlloc, nullptr, &vertices.Memory));
-			VK_EVAL(vkMapMemory				(device, vertices.Memory, 0, memAlloc.allocationSize, 0, &data));
+
+			// VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT is host visible memory, and VK_MEMORY_PROPERTY_HOST_COHERENT_BIT makes sure writes are directly visible
+			memAlloc.memoryTypeIndex									= getMemoryTypeIndex(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+			VK_EVAL(vkAllocateMemory			(device, &memAlloc, nullptr, &vertices.Memory));
+			VK_EVAL(vkMapMemory					(device, vertices.Memory, 0, memAlloc.allocationSize, 0, &data));
 			memcpy(data, vertexBuffer.data(), vertexBufferSize);
-			vkUnmapMemory							(device, vertices.Memory);
-			VK_EVAL(vkBindBufferMemory		(device, vertices.Buffer, vertices.Memory, 0));
+			vkUnmapMemory						(device, vertices.Memory);
+			VK_EVAL(vkBindBufferMemory			(device, vertices.Buffer, vertices.Memory, 0));
 
 			// Index buffer
 			VkBufferCreateInfo												indexbufferInfo							= {};
@@ -398,15 +400,17 @@ public:
 			indexbufferInfo.usage										= VK_BUFFER_USAGE_INDEX_BUFFER_BIT;
 
 			// Copy index data to a buffer visible to the host
-			VK_EVAL(vkCreateBuffer			(device, &indexbufferInfo, nullptr, &indices.Buffer));
-			vkGetBufferMemoryRequirements			(device, indices.Buffer, &memReqs);
-			memAlloc.allocationSize										= memReqs.size;
-			memAlloc.memoryTypeIndex									= getMemoryTypeIndex(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
-			VK_EVAL(vkAllocateMemory		(device, &memAlloc, nullptr, &indices.Memory));
-			VK_EVAL(vkMapMemory				(device, indices.Memory, 0, indexBufferSize, 0, &data));
+			VK_EVAL(vkCreateBuffer				(device, &indexbufferInfo, nullptr, &indices.Buffer));
+			vkGetBufferMemoryRequirements		(device, indices.Buffer, &memReqs);
+			memAlloc.allocationSize											= memReqs.size;
+
+			memAlloc.memoryTypeIndex										= getMemoryTypeIndex(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+			VK_EVAL(vkAllocateMemory			(device, &memAlloc, nullptr, &indices.Memory));
+			VK_EVAL(vkMapMemory					(device, indices.Memory, 0, indexBufferSize, 0, &data));
+
 			memcpy(data, indexBuffer.data(), indexBufferSize);
-			vkUnmapMemory							(device, indices.Memory);
-			VK_EVAL(vkBindBufferMemory		(device, indices.Buffer, indices.Memory, 0));
+			vkUnmapMemory						(device, indices.Memory);
+			VK_EVAL(vkBindBufferMemory			(device, indices.Buffer, indices.Memory, 0));
 		}
 	}
 
@@ -493,7 +497,7 @@ public:
 		// Binds this uniform buffer to binding point 0
 		writeDescriptorSet.dstBinding								= 0;
 
-		vkUpdateDescriptorSets						(device, 1, &writeDescriptorSet, 0, nullptr);
+		vkUpdateDescriptorSets				(device, 1, &writeDescriptorSet, 0, nullptr);
 	}
 
 	// Create the depth (and stencil) buffer attachments used by our framebuffers
@@ -517,7 +521,7 @@ public:
 		VkMemoryAllocateInfo											memAlloc								= {};
 		memAlloc.sType												= VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 		VkMemoryRequirements											 memReqs;
-		vkGetImageMemoryRequirements				(device, depthStencil.image, &memReqs);
+		vkGetImageMemoryRequirements		(device, depthStencil.image, &memReqs);
 		memAlloc.allocationSize										= memReqs.size;
 		memAlloc.memoryTypeIndex									= getMemoryTypeIndex(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 		VK_EVAL(vkAllocateMemory			(device, &memAlloc, nullptr, &depthStencil.memory));
@@ -559,7 +563,7 @@ public:
 			frameBufferCreateInfo.height								= height;
 			frameBufferCreateInfo.layers								= 1;
 			// Create the framebuffer
-			VK_EVAL(vkCreateFramebuffer		(device, &frameBufferCreateInfo, nullptr, &frameBuffers[i]));
+			VK_EVAL(vkCreateFramebuffer			(device, &frameBufferCreateInfo, nullptr, &frameBuffers[i]));
 		}
 	}
 
@@ -854,8 +858,8 @@ public:
 		
 
 		// Shader modules are no longer needed once the graphics pipeline has been created
-		vkDestroyShaderModule(device, shaderStages[0].module, nullptr);
-		vkDestroyShaderModule(device, shaderStages[1].module, nullptr);
+		vkDestroyShaderModule				(device, shaderStages[0].module, nullptr);
+		vkDestroyShaderModule				(device, shaderStages[1].module, nullptr);
 	}
 
 	void														prepareUniformBuffers					()																{

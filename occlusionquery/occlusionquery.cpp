@@ -107,21 +107,20 @@ public:
 		VkBufferCreateInfo												bufferCreateInfo				= vks::initializers::bufferCreateInfo(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, bufSize);
 
 		// Results are saved in a host visible buffer for easy access by the application
-		VK_EVAL(vkCreateBuffer		(device, &bufferCreateInfo, nullptr, &queryResult.buffer));
-		vkGetBufferMemoryRequirements		(device, queryResult.buffer, &memReqs);
+		VK_EVAL(vkCreateBuffer			(device, &bufferCreateInfo, nullptr, &queryResult.buffer));
+		vkGetBufferMemoryRequirements	(device, queryResult.buffer, &memReqs);
 		memAlloc.allocationSize										= memReqs.size;
-		memAlloc.memoryTypeIndex									= vulkanDevice->getMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
-		VK_EVAL(vkAllocateMemory	(device, &memAlloc, nullptr, &queryResult.memory));
-		VK_EVAL(vkBindBufferMemory	(device, queryResult.buffer, queryResult.memory, 0));
+		memAlloc.memoryTypeIndex									= vulkanDevice->getMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+		VK_EVAL(vkAllocateMemory		(device, &memAlloc, nullptr, &queryResult.memory));
+		VK_EVAL(vkBindBufferMemory		(device, queryResult.buffer, queryResult.memory, 0));
 
 		// Create query pool
 		VkQueryPoolCreateInfo											queryPoolInfo					= {};
 		queryPoolInfo.sType											= VK_STRUCTURE_TYPE_QUERY_POOL_CREATE_INFO;
-		// Query pool will be created for occlusion queries
-		queryPoolInfo.queryType										= VK_QUERY_TYPE_OCCLUSION;
+		queryPoolInfo.queryType										= VK_QUERY_TYPE_OCCLUSION;		// Query pool will be created for occlusion queries
 		queryPoolInfo.queryCount									= 2;
 
-		VK_EVAL(vkCreateQueryPool(device, &queryPoolInfo, NULL, &queryPool));
+		VK_EVAL(vkCreateQueryPool		(device, &queryPoolInfo, nullptr, &queryPool));
 	}
 
 	// Retrieves the results of the occlusion queries submitted to the command buffer

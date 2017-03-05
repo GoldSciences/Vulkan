@@ -125,20 +125,20 @@ public:
 		bufferCreateInfo.usage										= VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
 		bufferCreateInfo.sharingMode								= VK_SHARING_MODE_EXCLUSIVE;
 
-		VK_EVAL(vkCreateBuffer		(device, &bufferCreateInfo, nullptr, &stagingBuffer));
-
+		VK_EVAL(vkCreateBuffer			(device, &bufferCreateInfo, nullptr, &stagingBuffer));
 		
-		vkGetBufferMemoryRequirements		(device, stagingBuffer, &memReqs);																					// Get memory requirements for the staging buffer (alignment, memory type bits)
+		vkGetBufferMemoryRequirements	(device, stagingBuffer, &memReqs);	// Get memory requirements for the staging buffer (alignment, memory type bits)
 		memAllocInfo.allocationSize									= memReqs.size;
-		memAllocInfo.memoryTypeIndex								= vulkanDevice->getMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);	// Get memory type index for a host visible buffer
-		VK_EVAL(vkAllocateMemory	(device, &memAllocInfo, nullptr, &stagingMemory));
-		VK_EVAL(vkBindBufferMemory	(device, stagingBuffer, stagingMemory, 0));
+
+		memAllocInfo.memoryTypeIndex								= vulkanDevice->getMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);	// Get memory type index for a host visible buffer
+		VK_EVAL(vkAllocateMemory		(device, &memAllocInfo, nullptr, &stagingMemory));
+		VK_EVAL(vkBindBufferMemory		(device, stagingBuffer, stagingMemory, 0));
 
 		// Copy texture data into staging buffer
-		uint8_t *data;
-		VK_EVAL(vkMapMemory			(device, stagingMemory, 0, memReqs.size, 0, (void **)&data));
+		uint8_t															* data									= nullptr;
+		VK_EVAL(vkMapMemory				(device, stagingMemory, 0, memReqs.size, 0, (void **)&data));
 		memcpy(data, texCube.data(), texCube.size());
-		vkUnmapMemory						(device, stagingMemory);
+		vkUnmapMemory					(device, stagingMemory);
 
 		// Create optimal tiled target image
 		VkImageCreateInfo												imageCreateInfo							= vks::initializers::imageCreateInfo();
@@ -155,15 +155,15 @@ public:
 		imageCreateInfo.arrayLayers									= 6;									// Cube faces count as array layers in Vulkan
 		imageCreateInfo.flags										= VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT;	// This flag is required for cube map images
 
-		VK_EVAL(vkCreateImage		(device, &imageCreateInfo, nullptr, &cubeMap.image));
+		VK_EVAL(vkCreateImage			(device, &imageCreateInfo, nullptr, &cubeMap.image));
 
-		vkGetImageMemoryRequirements		(device, cubeMap.image, &memReqs);
+		vkGetImageMemoryRequirements	(device, cubeMap.image, &memReqs);
 
 		memAllocInfo.allocationSize									= memReqs.size;
 		memAllocInfo.memoryTypeIndex								= vulkanDevice->getMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
-		VK_EVAL(vkAllocateMemory	(device, &memAllocInfo, nullptr, &cubeMap.deviceMemory));
-		VK_EVAL(vkBindImageMemory	(device, cubeMap.image, cubeMap.deviceMemory, 0));
+		VK_EVAL(vkAllocateMemory		(device, &memAllocInfo, nullptr, &cubeMap.deviceMemory));
+		VK_EVAL(vkBindImageMemory		(device, cubeMap.image, cubeMap.deviceMemory, 0));
 
 		VkCommandBuffer													copyCmd									= VulkanExampleBase::createCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY, true);
 
@@ -225,7 +225,7 @@ public:
 			sampler.maxAnisotropy										= vulkanDevice->properties.limits.maxSamplerAnisotropy;
 			sampler.anisotropyEnable									= VK_TRUE;
 		}
-		VK_EVAL(vkCreateSampler(device, &sampler, nullptr, &cubeMap.sampler));
+		VK_EVAL(vkCreateSampler			(device, &sampler, nullptr, &cubeMap.sampler));
 
 		// Create image view
 		VkImageViewCreateInfo											view									= vks::initializers::imageViewCreateInfo();
@@ -237,11 +237,11 @@ public:
 		view.subresourceRange.layerCount							= 6;					// 6 array layers (faces)
 		view.subresourceRange.levelCount							= cubeMap.mipLevels;	// Set number of mip levels
 		view.image													= cubeMap.image;
-		VK_EVAL(vkCreateImageView(device, &view, nullptr, &cubeMap.view));
+		VK_EVAL(vkCreateImageView		(device, &view, nullptr, &cubeMap.view));
 
 		// Clean up staging resources
-		vkFreeMemory	(device, stagingMemory, nullptr);
-		vkDestroyBuffer	(device, stagingBuffer, nullptr);
+		vkFreeMemory					(device, stagingMemory, nullptr);
+		vkDestroyBuffer					(device, stagingBuffer, nullptr);
 	}
 
 	void														reBuildCommandBuffers					()																{
@@ -274,13 +274,13 @@ public:
 
 			VK_EVAL(vkBeginCommandBuffer(drawCmdBuffers[i], &cmdBufInfo));
 
-			vkCmdBeginRenderPass(drawCmdBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
+			vkCmdBeginRenderPass	(drawCmdBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 
 			VkViewport														viewport								= vks::initializers::viewport((float)width,	(float)height, 0.0f, 1.0f);
-			vkCmdSetViewport(drawCmdBuffers[i], 0, 1, &viewport);
+			vkCmdSetViewport		(drawCmdBuffers[i], 0, 1, &viewport);
 
 			VkRect2D														scissor									= vks::initializers::rect2D(width,	height,	0, 0);
-			vkCmdSetScissor(drawCmdBuffers[i], 0, 1, &scissor);
+			vkCmdSetScissor			(drawCmdBuffers[i], 0, 1, &scissor);
 
 			VkDeviceSize													offsets[1]								= { 0 };
 
@@ -300,7 +300,7 @@ public:
 			vkCmdBindPipeline		(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines.reflect);
 			vkCmdDrawIndexed		(drawCmdBuffers[i], models.objects[models.objectIndex].indexCount, 1, 0, 0, 0);
 
-			vkCmdEndRenderPass(drawCmdBuffers[i]);
+			vkCmdEndRenderPass		(drawCmdBuffers[i]);
 
 			VK_EVAL(vkEndCommandBuffer(drawCmdBuffers[i]));
 		}
@@ -504,11 +504,9 @@ public:
 
 	void														changeLodBias							(float delta)													{
 		uboVS.lodBias												+= delta;
-		if (uboVS.lodBias < 0.0f)
-			uboVS.lodBias												= 0.0f;
 
-		if (uboVS.lodBias > cubeMap.mipLevels)
-			uboVS.lodBias												= (float)cubeMap.mipLevels;
+		if (uboVS.lodBias < 0.0f)				uboVS.lodBias			= 0.0f;
+		if (uboVS.lodBias > cubeMap.mipLevels)	uboVS.lodBias			= (float)cubeMap.mipLevels;
 
 		updateUniformBuffers();
 		updateTextOverlay();
