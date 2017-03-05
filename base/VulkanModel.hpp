@@ -7,8 +7,6 @@
 
 #include "VulkanDevice.hpp"
 
-#include "vulkan/vulkan.h"
-
 #include <map>
 
 #include <assimp/Importer.hpp> 
