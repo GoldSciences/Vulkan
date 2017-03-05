@@ -176,8 +176,8 @@ public:
 		renderPassBeginInfo.renderPass								= renderPass;
 		renderPassBeginInfo.renderArea.offset.x						= 0;
 		renderPassBeginInfo.renderArea.offset.y						= 0;
-		renderPassBeginInfo.renderArea.extent.width					= width;
-		renderPassBeginInfo.renderArea.extent.height				= height;
+		renderPassBeginInfo.renderArea.extent.width					= screenSize.Width;
+		renderPassBeginInfo.renderArea.extent.height				= screenSize.Height;
 		renderPassBeginInfo.clearValueCount							= 2;
 		renderPassBeginInfo.pClearValues							= clearValues;
 	
@@ -193,15 +193,15 @@ public:
 
 			
 			VkViewport														viewport								= {};
-			viewport.height												= (float)height;
-			viewport.width												= (float) width;
+			viewport.height												= (float)screenSize.Height	;
+			viewport.width												= (float)screenSize.Width	;
 			viewport.minDepth											= (float)  0.0f;
 			viewport.maxDepth											= (float)  1.0f;
 			vkCmdSetViewport		(drawCmdBuffers[i], 0, 1, &viewport);								// Update dynamic viewport state
 
 			VkRect2D														scissor									= {};	
-			scissor.extent.width										= width;
-			scissor.extent.height										= height;
+			scissor.extent.width										= screenSize.Width;
+			scissor.extent.height										= screenSize.Height;
 			scissor.offset.x											= 0;
 			scissor.offset.y											= 0;
 			vkCmdSetScissor			(drawCmdBuffers[i], 0, 1, &scissor);									// Update dynamic scissor state
@@ -508,7 +508,7 @@ public:
 		image.sType													= VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
 		image.imageType												= VK_IMAGE_TYPE_2D;
 		image.format												= depthFormat;
-		image.extent												= { width, height, 1 };					// Use example's height and width
+		image.extent												= { screenSize.Width, screenSize.Height, 1 };					// Use example's height and width
 		image.mipLevels												= 1;
 		image.arrayLayers											= 1;
 		image.samples												= VK_SAMPLE_COUNT_1_BIT;
@@ -559,8 +559,8 @@ public:
 			frameBufferCreateInfo.renderPass							= renderPass;	// All frame buffers use the same renderpass setup
 			frameBufferCreateInfo.attachmentCount						= static_cast<uint32_t>(attachments.size());
 			frameBufferCreateInfo.pAttachments							= attachments.data();
-			frameBufferCreateInfo.width									= width;
-			frameBufferCreateInfo.height								= height;
+			frameBufferCreateInfo.width									= screenSize.Width;
+			frameBufferCreateInfo.height								= screenSize.Height;
 			frameBufferCreateInfo.layers								= 1;
 			// Create the framebuffer
 			VK_EVAL(vkCreateFramebuffer			(device, &frameBufferCreateInfo, nullptr, &frameBuffers[i]));
@@ -902,7 +902,7 @@ public:
 
 	void														updateUniformBuffers					()																{
 		// Update matrices
-		uboVS.projection											= glm::perspective(glm::radians(60.0f), (float)width / (float)height, 0.1f, 256.0f);
+		uboVS.projection											= glm::perspective(glm::radians(60.0f), (float)screenSize.Width / (float)screenSize.Height, 0.1f, 256.0f);
 
 		uboVS.view													= glm::translate(glm::mat4(), glm::vec3(0.0f, 0.0f, zoom));
 

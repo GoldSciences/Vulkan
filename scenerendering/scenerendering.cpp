@@ -426,7 +426,7 @@ public:
 		camera.movementSpeed										= 7.5f;
 		camera.position												= { 15.0f, -13.5f, 0.0f };
 		camera.setRotation		(glm::vec3(5.0f, 90.0f, 0.0f));
-		camera.setPerspective	(60.0f, (float)width / (float)height, 0.1f, 256.0f);
+		camera.setPerspective	(60.0f, (float)screenSize.Width / (float)screenSize.Height, 0.1f, 256.0f);
 		title														= "Vulkan Example - Scene rendering";
 		enabledFeatures.fillModeNonSolid							= VK_TRUE;
 	}
@@ -451,8 +451,8 @@ public:
 		renderPassBeginInfo.renderPass								= renderPass;
 		renderPassBeginInfo.renderArea.offset.x						= 0;
 		renderPassBeginInfo.renderArea.offset.y						= 0;
-		renderPassBeginInfo.renderArea.extent.width					= width;
-		renderPassBeginInfo.renderArea.extent.height				= height;
+		renderPassBeginInfo.renderArea.extent.width					= screenSize.Width;
+		renderPassBeginInfo.renderArea.extent.height				= screenSize.Height;
 		renderPassBeginInfo.clearValueCount							= 2;
 		renderPassBeginInfo.pClearValues							= clearValues;
 
@@ -461,10 +461,10 @@ public:
 			VK_EVAL(vkBeginCommandBuffer(drawCmdBuffers[i], &cmdBufInfo));
 			vkCmdBeginRenderPass(drawCmdBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 
-			VkViewport														viewport						= vks::initializers::viewport((float)width, (float)height, 0.0f, 1.0f);
+			VkViewport														viewport						= vks::initializers::viewport((float)screenSize.Width, (float)screenSize.Height, 0.0f, 1.0f);
 			vkCmdSetViewport	(drawCmdBuffers[i], 0, 1, &viewport);
 
-			VkRect2D														scissor							= vks::initializers::rect2D(width, height, 0, 0);
+			VkRect2D														scissor							= vks::initializers::rect2D(screenSize.Width, screenSize.Height, 0, 0);
 			vkCmdSetScissor		(drawCmdBuffers[i], 0, 1, &scissor);
 
 			scene->render		(drawCmdBuffers[i], wireframe);

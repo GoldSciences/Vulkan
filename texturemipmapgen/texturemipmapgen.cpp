@@ -74,7 +74,7 @@ public:
 		title														= "Vulkan Example - Runtime mip map generation";
 		enableTextOverlay											= true;
 		camera.type													= Camera::CameraType::firstperson;
-		camera.setPerspective	(60.0f, (float)width / (float)height, 0.1f, 1024.0f);
+		camera.setPerspective	(60.0f, (float)screenSize.Width / (float)screenSize.Height, 0.1f, 1024.0f);
 		camera.setRotation		(glm::vec3(0.0f, 90.0f, 0.0f));
 		camera.setTranslation	(glm::vec3(40.75f, 0.0f, 0.0f));
 		camera.movementSpeed										= 2.5f;
@@ -313,8 +313,8 @@ public:
 		renderPassBeginInfo.renderPass								= renderPass;
 		renderPassBeginInfo.renderArea.offset.x						= 0;
 		renderPassBeginInfo.renderArea.offset.y						= 0;
-		renderPassBeginInfo.renderArea.extent.width					= width;
-		renderPassBeginInfo.renderArea.extent.height				= height;
+		renderPassBeginInfo.renderArea.extent.width					= screenSize.Width;
+		renderPassBeginInfo.renderArea.extent.height				= screenSize.Height;
 		renderPassBeginInfo.clearValueCount							= 2;
 		renderPassBeginInfo.pClearValues							= clearValues;
 
@@ -324,10 +324,10 @@ public:
 			VK_EVAL(vkBeginCommandBuffer(drawCmdBuffers[i], &cmdBufInfo));
 			vkCmdBeginRenderPass(drawCmdBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 
-			VkViewport														viewport					= vks::initializers::viewport((float)width, (float)height, 0.0f, 1.0f);
+			VkViewport														viewport					= vks::initializers::viewport((float)screenSize.Width, (float)screenSize.Height, 0.0f, 1.0f);
 			vkCmdSetViewport(drawCmdBuffers[i], 0, 1, &viewport);
 
-			VkRect2D														scissor						= vks::initializers::rect2D(width, height, 0, 0);
+			VkRect2D														scissor						= vks::initializers::rect2D(screenSize.Width, screenSize.Height, 0, 0);
 			vkCmdSetScissor(drawCmdBuffers[i], 0, 1, &scissor);
 
 			vkCmdBindDescriptorSets(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSet, 0, NULL);

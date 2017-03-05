@@ -202,10 +202,10 @@ public:
 		VkCommandBuffer													cmdBuffer										= thread->commandBuffer[cmdBufferIndex];
 		VK_EVAL(vkBeginCommandBuffer(cmdBuffer, &commandBufferBeginInfo));
 
-		VkViewport														viewport										= vks::initializers::viewport((float)width, (float)height, 0.0f, 1.0f);
+		VkViewport														viewport										= vks::initializers::viewport((float)screenSize.Width, (float)screenSize.Height, 0.0f, 1.0f);
 		vkCmdSetViewport	(cmdBuffer, 0, 1, &viewport);
 
-		VkRect2D														scissor											= vks::initializers::rect2D(width, height, 0, 0);
+		VkRect2D														scissor											= vks::initializers::rect2D(screenSize.Width, screenSize.Height, 0, 0);
 		vkCmdSetScissor		(cmdBuffer, 0, 1, &scissor);
 
 		vkCmdBindPipeline	(cmdBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines.phong);
@@ -248,10 +248,10 @@ public:
 
 		VK_EVAL(vkBeginCommandBuffer(secondaryCommandBuffer, &commandBufferBeginInfo));
 
-		VkViewport														viewport										= vks::initializers::viewport((float)width, (float)height, 0.0f, 1.0f);
+		VkViewport														viewport										= vks::initializers::viewport((float)screenSize.Width, (float)screenSize.Height, 0.0f, 1.0f);
 		vkCmdSetViewport		(secondaryCommandBuffer, 0, 1, &viewport);
 
-		VkRect2D														scissor											= vks::initializers::rect2D(width, height, 0, 0);
+		VkRect2D														scissor											= vks::initializers::rect2D(screenSize.Width, screenSize.Height, 0, 0);
 		vkCmdSetScissor			(secondaryCommandBuffer, 0, 1, &scissor);
 
 		vkCmdBindPipeline		(secondaryCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines.starsphere);
@@ -288,8 +288,8 @@ public:
 		renderPassBeginInfo.renderPass								= renderPass;
 		renderPassBeginInfo.renderArea.offset.x						= 0;
 		renderPassBeginInfo.renderArea.offset.y						= 0;
-		renderPassBeginInfo.renderArea.extent.width					= width;
-		renderPassBeginInfo.renderArea.extent.height				= height;
+		renderPassBeginInfo.renderArea.extent.width					= screenSize.Width;
+		renderPassBeginInfo.renderArea.extent.height				= screenSize.Height;
 		renderPassBeginInfo.clearValueCount							= 2;
 		renderPassBeginInfo.pClearValues							= clearValues;
 		renderPassBeginInfo.framebuffer								= frameBuffer;
@@ -409,7 +409,7 @@ public:
 	}
 
 	void														updateMatrices									()													{
-		matrices.projection											= glm::perspective(glm::radians(60.0f), (float)width / (float)height, 0.1f, 256.0f);
+		matrices.projection											= glm::perspective(glm::radians(60.0f), (float)screenSize.Width / (float)screenSize.Height, 0.1f, 256.0f);
 		matrices.view												= glm::translate(glm::mat4(), glm::vec3(0.0f, 0.0f, zoom));
 		matrices.view												= glm::rotate(matrices.view, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
 		matrices.view												= glm::rotate(matrices.view, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));

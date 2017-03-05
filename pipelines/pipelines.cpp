@@ -79,8 +79,8 @@ public:
 		renderPassBeginInfo.renderPass								= renderPass;
 		renderPassBeginInfo.renderArea.offset.x						= 0;
 		renderPassBeginInfo.renderArea.offset.y						= 0;
-		renderPassBeginInfo.renderArea.extent.width					= width;
-		renderPassBeginInfo.renderArea.extent.height				= height;
+		renderPassBeginInfo.renderArea.extent.width					= screenSize.Width;
+		renderPassBeginInfo.renderArea.extent.height				= screenSize.Height;
 		renderPassBeginInfo.clearValueCount							= 2;
 		renderPassBeginInfo.pClearValues							= clearValues;
 
@@ -90,10 +90,10 @@ public:
 			VK_EVAL(vkBeginCommandBuffer(drawCmdBuffers[i], &cmdBufInfo));
 			vkCmdBeginRenderPass	(drawCmdBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 
-			VkViewport														viewport											= vks::initializers::viewport((float)width, (float)height, 0.0f, 1.0f);
+			VkViewport														viewport											= vks::initializers::viewport((float)screenSize.Width, (float)screenSize.Height, 0.0f, 1.0f);
 			vkCmdSetViewport		(drawCmdBuffers[i], 0, 1, &viewport);
 
-			VkRect2D														scissor												= vks::initializers::rect2D(width, height,	0, 0);
+			VkRect2D														scissor												= vks::initializers::rect2D(screenSize.Width, screenSize.Height,	0, 0);
 			vkCmdSetScissor			(drawCmdBuffers[i], 0, 1, &scissor);
 
 			vkCmdBindDescriptorSets	(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSet, 0, NULL);
@@ -103,14 +103,14 @@ public:
 			vkCmdBindIndexBuffer	(drawCmdBuffers[i], models.cube.indices.buffer, 0, VK_INDEX_TYPE_UINT32);
 
 			// Left : Solid colored 
-			viewport.width												= (float)(width / 3.0);
+			viewport.width												= (float)(screenSize.Width / 3.0);
 			vkCmdSetViewport		(drawCmdBuffers[i], 0, 1, &viewport);
 			vkCmdBindPipeline		(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines.phong);
 			
 			vkCmdDrawIndexed		(drawCmdBuffers[i], models.cube.indexCount, 1, 0, 0, 0);
 
 			// Center : Toon
-			viewport.x													= (float)(width / 3.0);
+			viewport.x													= (float)(screenSize.Width / 3.0);
 			vkCmdSetViewport		(drawCmdBuffers[i], 0, 1, &viewport);
 			vkCmdBindPipeline		(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines.toon);
 			vkCmdSetLineWidth		(drawCmdBuffers[i], 2.0f);
@@ -118,7 +118,7 @@ public:
 
 			if (deviceFeatures.fillModeNonSolid) {
 				// Right : Wireframe 
-				viewport.x														= (float)(width / 3.0 + width / 3.0);
+				viewport.x														= (float)(screenSize.Width / 3.0 + screenSize.Width / 3.0);
 				vkCmdSetViewport		(drawCmdBuffers[i], 0, 1, &viewport);
 				vkCmdBindPipeline		(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines.wireframe);
 				vkCmdDrawIndexed		(drawCmdBuffers[i], models.cube.indexCount, 1, 0, 0, 0);
@@ -257,7 +257,7 @@ public:
 	}
 
 	void														updateUniformBuffers							()									{
-		uboVS.projection											= glm::perspective(glm::radians(60.0f), (float)(width / 3.0f) / (float)height, 0.1f, 256.0f);
+		uboVS.projection											= glm::perspective(glm::radians(60.0f), (float)(screenSize.Width / 3.0f) / (float)screenSize.Height, 0.1f, 256.0f);
 
 		glm::mat4														viewMatrix										= glm::translate(glm::mat4(), glm::vec3(0.0f, 0.0f, zoom));
 
@@ -295,9 +295,9 @@ public:
 	virtual void												render											()									{ if (prepared) draw();		}
 	virtual void												viewChanged										()									{ updateUniformBuffers();	}
 	virtual void												getOverlayText									(VulkanTextOverlay *textOverlay_)	{
-		textOverlay_->addText("Phong shading pipeline"	, (float)width / 6.0f			, height - 35.0f, VulkanTextOverlay::alignCenter);
-		textOverlay_->addText("Toon shading pipeline"	, (float)width / 2.0f			, height - 35.0f, VulkanTextOverlay::alignCenter);
-		textOverlay_->addText("Wireframe pipeline"		, width - (float)width / 6.5f	, height - 35.0f, VulkanTextOverlay::alignCenter);
+		textOverlay_->addText("Phong shading pipeline"	, (float)screenSize.Width / 6.0f			, screenSize.Height - 35.0f, VulkanTextOverlay::alignCenter);
+		textOverlay_->addText("Toon shading pipeline"	, (float)screenSize.Width / 2.0f			, screenSize.Height - 35.0f, VulkanTextOverlay::alignCenter);
+		textOverlay_->addText("Wireframe pipeline"		, screenSize.Width - (float)screenSize.Width / 6.5f	, screenSize.Height - 35.0f, VulkanTextOverlay::alignCenter);
 	}
 };
 

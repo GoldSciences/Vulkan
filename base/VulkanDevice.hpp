@@ -32,10 +32,15 @@ namespace vks
 
 		operator									VkDevice				()																							{ return logicalDevice; }
 
+													~VulkanDevice			()																							{
+			if (commandPool		) vkDestroyCommandPool	(logicalDevice, commandPool, nullptr);
+			if (logicalDevice	) vkDestroyDevice		(logicalDevice, nullptr);
+		}
+
 		// The default constructor takes a physical device that is to be used
-													VulkanDevice			(VkPhysicalDevice physicalDevice)															{
-			assert(physicalDevice);
-			this->physicalDevice						= physicalDevice;
+													VulkanDevice			(VkPhysicalDevice physicalDevice_)															{
+			assert(physicalDevice_);
+			this->physicalDevice						= physicalDevice_;
 
 			vkGetPhysicalDeviceProperties				(physicalDevice, &properties);					// Store Properties features, limits and properties of the physical device for later use. Device properties also contain limits and sparse properties
 			vkGetPhysicalDeviceFeatures					(physicalDevice, &features);					// Features should be checked by the examples before using them
@@ -55,11 +60,6 @@ namespace vks
 					for (const VkExtensionProperties& ext : extensions)
 						supportedExtensions.push_back(ext.extensionName);
 			}
-		}
-
-													~VulkanDevice			()																							{
-			if (commandPool		) vkDestroyCommandPool	(logicalDevice, commandPool, nullptr);
-			if (logicalDevice	) vkDestroyDevice		(logicalDevice, nullptr);
 		}
 
 		// Get the index of a memory type that has all the requested property bits set.

@@ -180,8 +180,8 @@ public:
 		renderPassBeginInfo.renderPass								= renderPass;
 		renderPassBeginInfo.renderArea.offset.x						= 0;
 		renderPassBeginInfo.renderArea.offset.y						= 0;
-		renderPassBeginInfo.renderArea.extent.width					= width;
-		renderPassBeginInfo.renderArea.extent.height				= height;
+		renderPassBeginInfo.renderArea.extent.width					= screenSize.Width;
+		renderPassBeginInfo.renderArea.extent.height				= screenSize.Height;
 		renderPassBeginInfo.clearValueCount							= 2;
 		renderPassBeginInfo.pClearValues							= clearValues;
 
@@ -204,10 +204,10 @@ public:
 			vkCmdPipelineBarrier(drawCmdBuffers[i], VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, VK_FLAGS_NONE, 0, nullptr, 0, nullptr, 1, &imageMemoryBarrier);
 			vkCmdBeginRenderPass(drawCmdBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 
-			VkViewport														viewport								= vks::initializers::viewport((float)width * 0.5f, (float)height, 0.0f, 1.0f);
+			VkViewport														viewport								= vks::initializers::viewport((float)screenSize.Width * 0.5f, (float)screenSize.Height, 0.0f, 1.0f);
 			vkCmdSetViewport(drawCmdBuffers[i], 0, 1, &viewport);
 
-			VkRect2D														scissor									= vks::initializers::rect2D(width, height, 0, 0);
+			VkRect2D														scissor									= vks::initializers::rect2D(screenSize.Width, screenSize.Height, 0, 0);
 			vkCmdSetScissor(drawCmdBuffers[i], 0, 1, &scissor);
 
 			VkDeviceSize													offsets[1]								= { 0 };
@@ -224,7 +224,7 @@ public:
 			vkCmdBindDescriptorSets	(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, graphics.pipelineLayout, 0, 1, &graphics.descriptorSetPostCompute, 0, NULL);
 			vkCmdBindPipeline		(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, graphics.pipeline);
 
-			viewport.x													= (float)width / 2.0f;
+			viewport.x													= (float)screenSize.Width / 2.0f;
 			vkCmdSetViewport		(drawCmdBuffers[i], 0, 1, &viewport);
 			vkCmdDrawIndexed		(drawCmdBuffers[i], indexCount, 1, 0, 0, 0);
 
@@ -481,7 +481,7 @@ public:
 
 	void														updateUniformBuffers					()																			{
 		// Vertex shader uniform buffer block
-		uboVS.projection											= glm::perspective(glm::radians(60.0f), (float)width*0.5f / (float)height, 0.1f, 256.0f);
+		uboVS.projection											= glm::perspective(glm::radians(60.0f), (float)screenSize.Width*0.5f / (float)screenSize.Height, 0.1f, 256.0f);
 		glm::mat4														viewMatrix								= glm::translate(glm::mat4(), glm::vec3(0.0f, 0.0f, zoom));
 
 		uboVS.model													= viewMatrix * glm::translate(glm::mat4(), cameraPos);

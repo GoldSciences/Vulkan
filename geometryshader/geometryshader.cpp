@@ -92,8 +92,8 @@ public:
 		renderPassBeginInfo.renderPass								= renderPass;
 		renderPassBeginInfo.renderArea.offset.x						= 0;
 		renderPassBeginInfo.renderArea.offset.y						= 0;
-		renderPassBeginInfo.renderArea.extent.width					= width;
-		renderPassBeginInfo.renderArea.extent.height				= height;
+		renderPassBeginInfo.renderArea.extent.width					= screenSize.Width;
+		renderPassBeginInfo.renderArea.extent.height				= screenSize.Height;
 		renderPassBeginInfo.clearValueCount							= 2;
 		renderPassBeginInfo.pClearValues							= clearValues;
 
@@ -105,10 +105,10 @@ public:
 
 			vkCmdBeginRenderPass	(drawCmdBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 
-			VkViewport														viewport								= vks::initializers::viewport((float)width, (float)height, 0.0f, 1.0f);
+			VkViewport														viewport								= vks::initializers::viewport((float)screenSize.Width, (float)screenSize.Height, 0.0f, 1.0f);
 			vkCmdSetViewport		(drawCmdBuffers[i], 0, 1, &viewport);
 
-			VkRect2D														scissor									= vks::initializers::rect2D(width, height, 0, 0);
+			VkRect2D														scissor									= vks::initializers::rect2D(screenSize.Width, screenSize.Height, 0, 0);
 			vkCmdSetScissor			(drawCmdBuffers[i], 0, 1, &scissor);
 
 			vkCmdSetLineWidth		(drawCmdBuffers[i], 1.0f);
@@ -253,7 +253,7 @@ public:
 
 	void														updateUniformBuffers					()									{
 		// Vertex shader
-		uboVS.projection											= glm::perspective(glm::radians(60.0f), (float)width / (float)height, 0.001f, 256.0f);
+		uboVS.projection											= glm::perspective(glm::radians(60.0f), (float)screenSize.Width / (float)screenSize.Height, 0.001f, 256.0f);
 		glm::mat4														viewMatrix								= glm::translate(glm::mat4(), glm::vec3(0.0f, 0.0f, zoom));
 		uboVS.model													= viewMatrix * glm::translate(glm::mat4(), cameraPos);
 		uboVS.model													= glm::rotate(uboVS.model, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));

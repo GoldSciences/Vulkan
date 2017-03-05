@@ -96,7 +96,7 @@ public:
 		camera.type													= Camera::CameraType::lookat;
 		camera.setPosition		(glm::vec3(0.0f, 0.0f, -4.0f));
 		camera.setRotation		(glm::vec3(0.0f, 180.0f, 0.0f));
-		camera.setPerspective	(60.0f, (float)width / (float)height, 0.1f, 256.0f);
+		camera.setPerspective	(60.0f, (float)screenSize.Width / (float)screenSize.Height, 0.1f, 256.0f);
 	}
 
 																~VulkanExample							()									{
@@ -192,15 +192,15 @@ public:
 
 			vkCmdEndRenderPass		(drawCmdBuffers[i]);
 
-			viewport													= vks::initializers::viewport((float)width, (float)height, 0.0f, 1.0f);
-			scissor														= vks::initializers::rect2D(width, height, 0, 0);
+			viewport													= vks::initializers::viewport((float)screenSize.Width, (float)screenSize.Height, 0.0f, 1.0f);
+			scissor														= vks::initializers::rect2D(screenSize.Width, screenSize.Height, 0, 0);
 
 			// Final composition
 			renderPassBeginInfo.framebuffer								= frameBuffers[i];
 			renderPassBeginInfo.renderPass								= renderPass;
 			renderPassBeginInfo.clearValueCount							= 2;
-			renderPassBeginInfo.renderArea.extent.width					= width;
-			renderPassBeginInfo.renderArea.extent.height				= height;
+			renderPassBeginInfo.renderArea.extent.width					= screenSize.Width;
+			renderPassBeginInfo.renderArea.extent.height				= screenSize.Height;
 
 			vkCmdBeginRenderPass	(drawCmdBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 
@@ -280,8 +280,8 @@ public:
 	// Prepare a new framebuffer and attachments for offscreen rendering (G-Buffer)
 	void														prepareoffscreenfer						()									{
 	{
-		offscreen.width												= width;
-		offscreen.height											= height;
+		offscreen.width												= screenSize.Width;
+		offscreen.height											= screenSize.Height;
 
 		// Color attachments
 
@@ -394,8 +394,8 @@ public:
 
 	// Bloom separable filter pass
 	{
-		filterPass.width											= width;
-		filterPass.height											= height;
+		filterPass.width											= screenSize.Width;
+		filterPass.height											= screenSize.Height;
 
 		// Color attachments
 

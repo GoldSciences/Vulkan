@@ -631,8 +631,8 @@ public:
 
 		VkRenderPassBeginInfo											renderPassBeginInfo				= vks::initializers::renderPassBeginInfo();
 		renderPassBeginInfo.renderPass								= renderPass;
-		renderPassBeginInfo.renderArea.extent.width					= width;
-		renderPassBeginInfo.renderArea.extent.height				= height;
+		renderPassBeginInfo.renderArea.extent.width					= screenSize.Width;
+		renderPassBeginInfo.renderArea.extent.height				= screenSize.Height;
 		renderPassBeginInfo.clearValueCount							= 2;
 		renderPassBeginInfo.pClearValues							= clearValues;
 
@@ -645,10 +645,10 @@ public:
 
 			vkCmdBeginRenderPass	(drawCmdBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 
-			VkViewport														viewport					= vks::initializers::viewport((float)width, (float)height, 0.0f, 1.0f);
+			VkViewport														viewport					= vks::initializers::viewport((float)screenSize.Width, (float)screenSize.Height, 0.0f, 1.0f);
 			vkCmdSetViewport		(drawCmdBuffers[i], 0, 1, &viewport);
 
-			VkRect2D														scissor						= vks::initializers::rect2D(width, height, 0, 0);
+			VkRect2D														scissor						= vks::initializers::rect2D(screenSize.Width, screenSize.Height, 0, 0);
 			vkCmdSetScissor			(drawCmdBuffers[i], 0, 1, &scissor);
 
 			vkCmdBindDescriptorSets	(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSets.background, 0, NULL);
@@ -695,21 +695,21 @@ public:
 				{
 					std::stringstream												vpos;
 					vpos << std::showpos << x << "/" << y << "/" << z;
-					glm::vec3														projected						= glm::project(glm::vec3((float)x, (float)y, (float)z), uboVS.model, uboVS.projection, glm::vec4(0, 0, (float)width, (float)height));
+					glm::vec3														projected						= glm::project(glm::vec3((float)x, (float)y, (float)z), uboVS.model, uboVS.projection, glm::vec4(0, 0, (float)screenSize.Width, (float)screenSize.Height));
 					textOverlay->addText(vpos.str(), projected.x, projected.y + (y > -1 ? 5.0f : -20.0f), TextOverlay::alignCenter);
 				}
 
 		// Display current model view matrix
-		textOverlay->addText("model view matrix", (float)width, 5.0f, TextOverlay::alignRight);
+		textOverlay->addText("model view matrix", (float)screenSize.Width, 5.0f, TextOverlay::alignRight);
 
 		for (uint32_t i = 0; i < 4; i++) {
 			ss.str("");
 			ss << std::fixed << std::setprecision(2) << std::showpos;
 			ss << uboVS.model[0][i] << " " << uboVS.model[1][i] << " " << uboVS.model[2][i] << " " << uboVS.model[3][i];
-			textOverlay->addText(ss.str(), (float)width, 25.0f + (float)i * 20.0f, TextOverlay::alignRight);
+			textOverlay->addText(ss.str(), (float)screenSize.Width, 25.0f + (float)i * 20.0f, TextOverlay::alignRight);
 		}
 
-		glm::vec3														projected						= glm::project(glm::vec3(0.0f), uboVS.model, uboVS.projection, glm::vec4(0, 0, (float)width, (float)height));
+		glm::vec3														projected						= glm::project(glm::vec3(0.0f), uboVS.model, uboVS.projection, glm::vec4(0, 0, (float)screenSize.Width, (float)screenSize.Height));
 		textOverlay->addText("Uniform cube", projected.x, projected.y, TextOverlay::alignCenter);
 
 #if defined(__ANDROID__)
@@ -846,7 +846,7 @@ public:
 
 	void														updateUniformBuffers			()								{
 		// Vertex shader
-		uboVS.projection											= glm::perspective(glm::radians(60.0f), (float)width / (float)height, 0.1f, 256.0f);
+		uboVS.projection											= glm::perspective(glm::radians(60.0f), (float)screenSize.Width / (float)screenSize.Height, 0.1f, 256.0f);
 
 		glm::mat4														viewMatrix						= glm::translate(glm::mat4(), glm::vec3(0.0f, 0.0f, zoom));
 
@@ -864,7 +864,7 @@ public:
 		shaderStages.push_back(loadShader(getAssetPath() + "shaders/textoverlay/text.vert.spv", VK_SHADER_STAGE_VERTEX_BIT	));
 		shaderStages.push_back(loadShader(getAssetPath() + "shaders/textoverlay/text.frag.spv", VK_SHADER_STAGE_FRAGMENT_BIT));
 
-		textOverlay													= new TextOverlay(vulkanDevice, queue, frameBuffers, swapChain.colorFormat, depthFormat, &width, &height, shaderStages);
+		textOverlay													= new TextOverlay(vulkanDevice, queue, frameBuffers, swapChain.colorFormat, depthFormat, &screenSize.Width, &screenSize.Height, shaderStages);
 		updateTextOverlay();
 	}
 

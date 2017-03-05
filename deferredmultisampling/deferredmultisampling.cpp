@@ -118,7 +118,7 @@ public:
 #endif
 		camera.position												= { 2.15f, 0.3f, -8.75f };
 		camera.setRotation		(glm::vec3(-0.75f, 12.5f, 0.0f));
-		camera.setPerspective	(60.0f, (float)width / (float)height, 0.1f, 256.0f);
+		camera.setPerspective	(60.0f, (float)screenSize.Width / (float)screenSize.Height, 0.1f, 256.0f);
 		paused														= true;
 	}
 
@@ -231,8 +231,8 @@ public:
 	void														prepareOffscreenFramebuffer				()									{
 		VkCommandBuffer													layoutCmd								= VulkanExampleBase::createCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY, true);
 
-		offScreenFrameBuf.width										= this->width;
-		offScreenFrameBuf.height									= this->height;
+		offScreenFrameBuf.width										= screenSize.Width;
+		offScreenFrameBuf.height									= screenSize.Height;
 
 		//offScreenFrameBuf.width = FB_DIM;
 		//offScreenFrameBuf.height = FB_DIM;
@@ -434,8 +434,8 @@ public:
 		renderPassBeginInfo.renderPass								= renderPass;
 		renderPassBeginInfo.renderArea.offset.x						= 0;
 		renderPassBeginInfo.renderArea.offset.y						= 0;
-		renderPassBeginInfo.renderArea.extent.width					= width;
-		renderPassBeginInfo.renderArea.extent.height				= height;
+		renderPassBeginInfo.renderArea.extent.width					= screenSize.Width;
+		renderPassBeginInfo.renderArea.extent.height				= screenSize.Height;
 		renderPassBeginInfo.clearValueCount							= 2;
 		renderPassBeginInfo.pClearValues							= clearValues;
 
@@ -445,10 +445,10 @@ public:
 			VK_EVAL(vkBeginCommandBuffer(drawCmdBuffers[i], &cmdBufInfo));
 			vkCmdBeginRenderPass	(drawCmdBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 
-			VkViewport														viewport								= vks::initializers::viewport((float)width, (float)height, 0.0f, 1.0f);
+			VkViewport														viewport								= vks::initializers::viewport((float)screenSize.Width, (float)screenSize.Height, 0.0f, 1.0f);
 			vkCmdSetViewport		(drawCmdBuffers[i], 0, 1, &viewport);
 
-			VkRect2D														scissor									= vks::initializers::rect2D(width, height, 0, 0);
+			VkRect2D														scissor									= vks::initializers::rect2D(screenSize.Width, screenSize.Height, 0, 0);
 			vkCmdSetScissor			(drawCmdBuffers[i], 0, 1, &scissor);
 
 			vkCmdBindDescriptorSets	(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayouts.deferred, 0, 1, &descriptorSet, 0, NULL);
@@ -459,8 +459,8 @@ public:
 				// Move viewport to display final composition in lower right corner
 				viewport.x													= viewport.width * 0.5f;
 				viewport.y													= viewport.height * 0.5f;
-				viewport.width												= (float)width * 0.5f;
-				viewport.height												= (float)height * 0.5f;
+				viewport.width												= (float)screenSize.Width * 0.5f;
+				viewport.height												= (float)screenSize.Height * 0.5f;
 				vkCmdSetViewport		(drawCmdBuffers[i], 0, 1, &viewport);
 			}
 
@@ -710,7 +710,7 @@ public:
 	}
 
 	void														updateUniformBufferDeferredMatrices		()									{
-		uboOffscreenVS.projection									= glm::perspective(glm::radians(45.0f), (float)width / (float)height, 0.1f, 256.0f);
+		uboOffscreenVS.projection									= glm::perspective(glm::radians(45.0f), (float)screenSize.Width / (float)screenSize.Height, 0.1f, 256.0f);
 		uboOffscreenVS.view											= glm::translate(glm::mat4(), glm::vec3(0.0f, 0.0f, zoom));
 
 		uboOffscreenVS.model										= glm::mat4();
@@ -793,7 +793,7 @@ public:
 		updateUniformBufferDeferredLights();
 	}
 
-	virtual void												viewChanged								()									{ updateUniformBufferDeferredMatrices(); uboFragmentLights.windowSize = glm::ivec2(width, height);	}
+	virtual void												viewChanged								()									{ updateUniformBufferDeferredMatrices(); uboFragmentLights.windowSize = glm::ivec2(screenSize.Width, screenSize.Height);	}
 	void														toggleDebugDisplay						()									{ debugDisplay = !debugDisplay;	reBuildCommandBuffers(); updateUniformBuffersScreen();				}
 	virtual void												keyPressed								(uint32_t keyCode)					{
 		switch (keyCode) {
@@ -814,10 +814,10 @@ public:
 #endif
 		// Render targets
 		if (debugDisplay) {
-			textOverlay_->addText("World space position", (float)width * 0.25f, (float)height * 0.5f - 25.0f	, VulkanTextOverlay::alignCenter);
-			textOverlay_->addText("World space normals"	, (float)width * 0.75f, (float)height * 0.5f - 25.0f	, VulkanTextOverlay::alignCenter);
-			textOverlay_->addText("Albedo"				, (float)width * 0.25f, (float)height - 25.0f			, VulkanTextOverlay::alignCenter);
-			textOverlay_->addText("Final image"			, (float)width * 0.75f, (float)height - 25.0f			, VulkanTextOverlay::alignCenter);
+			textOverlay_->addText("World space position", (float)screenSize.Width * 0.25f, (float)screenSize.Height * 0.5f - 25.0f	, VulkanTextOverlay::alignCenter);
+			textOverlay_->addText("World space normals"	, (float)screenSize.Width * 0.75f, (float)screenSize.Height * 0.5f - 25.0f	, VulkanTextOverlay::alignCenter);
+			textOverlay_->addText("Albedo"				, (float)screenSize.Width * 0.25f, (float)screenSize.Height - 25.0f			, VulkanTextOverlay::alignCenter);
+			textOverlay_->addText("Final image"			, (float)screenSize.Width * 0.75f, (float)screenSize.Height - 25.0f			, VulkanTextOverlay::alignCenter);
 		}
 	}
 };

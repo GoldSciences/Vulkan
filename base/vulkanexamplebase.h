@@ -35,7 +35,13 @@
 
 #include <array>
 
+struct ScreenSize {
+	uint32_t							Width	;
+	uint32_t							Height	;
 
+	inline constexpr bool				operator==					(const ScreenSize& other)								const	{ return Width == other.Width && Height == other.Height;	}
+	inline constexpr bool				operator!=					(const ScreenSize& other)								const	{ return Width != other.Width || Height != other.Height;	}
+};
 
 class VulkanExampleBase
 {
@@ -91,8 +97,7 @@ protected:
 	const std::string					getAssetPath				();
 public: 
 	bool								prepared					= false;
-	uint32_t							width						= 1280;
-	uint32_t							height						= 720;
+	ScreenSize							screenSize					= {1280, 720};
 
 	// Example settings that can be changed e.g. by command line arguments
 	struct Settings {
@@ -126,8 +131,7 @@ public:
 	vks::FrameBufferAttachmentSmall		depthStencil;
 
 	// Gamepad state (only one pad supported)
-	struct
-	{
+	struct {
 		glm::vec2							axisLeft					= glm::vec2(0.0f);
 		glm::vec2							axisRight					= glm::vec2(0.0f);
 	}									gamePadState;
@@ -173,7 +177,7 @@ public:
 										VulkanExampleBase			(bool enableValidation);
 
 	// Setup the vulkan instance, enable required extensions and connect to the physical device (GPU)
-	void								initVulkan();
+	void								initVulkan					(const Settings& settings);
 
 #if defined(_WIN32)
 	void								setupConsole				(std::string title);
@@ -211,7 +215,7 @@ public:
 	void								handleEvent					(const xcb_generic_event_t *event);
 #endif
 	
-	virtual VkResult					createInstance				(bool enableValidation);											// Create the application wide Vulkan instance: note: Virtual, can be overriden by derived example class for custom instance creation
+	virtual VkResult					createInstance				(bool enableValidation, const std::string& appName, const std::string& engineName);	// Create the application wide Vulkan instance: note: Virtual, can be overriden by derived example class for custom instance creation
 	virtual void						render						()															= 0;	// Pure virtual render function (override in derived class)
 	virtual void						viewChanged					()															{}		// Called when view change occurs. Can be overriden in derived class to e.g. update uniform buffers. Containing view dependant matrices
 	virtual void						keyPressed					(uint32_t)													{}		// Called if a key is pressed. Can be overriden in derived class to do custom key handling
@@ -223,7 +227,7 @@ public:
 	virtual void						setupFrameBuffer			();																	// Create framebuffers for all requested swap chain images. Can be overriden in derived class to setup a custom framebuffer (e.g. for MSAA)
 	virtual void						setupRenderPass				();																	// Setup a default render pass. Can be overriden in derived class to setup a custom render pass (e.g. for MSAA)
 	void								initSwapchain				();																	// Connect and prepare the swap chain
-	inline void							setupSwapChain				()															{ swapChain.create(&width, &height, settings.vsync); }	// Create swap chain images
+	inline void							setupSwapChain				()															{ swapChain.create(&screenSize.Width, &screenSize.Height, settings.vsync); }	// Create swap chain images
 	bool								checkCommandBuffers			();																	// Check if command buffers are valid (!= VK_NULL_HANDLE)
 	void								createCommandBuffers		();																	// Create command buffers for drawing commands
 	void								destroyCommandBuffers		();																	// Destroy all command buffers and set their handles to VK_NULL_HANDLE. May be necessary during runtime if options are toggled 

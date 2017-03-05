@@ -99,7 +99,7 @@ public:
 		enableTextOverlay											= true;
 		title														= "Vulkan Example - Dynamic terrain tessellation";
 		camera.type													= Camera::CameraType::firstperson;
-		camera.setPerspective	(60.0f, (float)width / (float)height, 0.1f, 512.0f);
+		camera.setPerspective	(60.0f, (float)screenSize.Width / (float)screenSize.Height, 0.1f, 512.0f);
 		camera.setRotation		(glm::vec3(-12.0f, 159.0f, 0.0f));
 		camera.setTranslation	(glm::vec3(18.0f, 22.5f, 57.5f));
 		camera.movementSpeed										= 7.5f;
@@ -235,8 +235,8 @@ public:
 		renderPassBeginInfo.renderPass								= renderPass;
 		renderPassBeginInfo.renderArea.offset.x						= 0;
 		renderPassBeginInfo.renderArea.offset.y						= 0;
-		renderPassBeginInfo.renderArea.extent.width					= width;
-		renderPassBeginInfo.renderArea.extent.height				= height;
+		renderPassBeginInfo.renderArea.extent.width					= screenSize.Width;
+		renderPassBeginInfo.renderArea.extent.height				= screenSize.Height;
 		renderPassBeginInfo.clearValueCount							= 2;
 		renderPassBeginInfo.pClearValues							= clearValues;
 
@@ -246,10 +246,10 @@ public:
 			vkCmdResetQueryPool		(drawCmdBuffers[i], queryPool, 0, 2);
 			vkCmdBeginRenderPass	(drawCmdBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 
-			VkViewport														viewport							= vks::initializers::viewport((float)width, (float)height, 0.0f, 1.0f);
+			VkViewport														viewport							= vks::initializers::viewport((float)screenSize.Width, (float)screenSize.Height, 0.0f, 1.0f);
 			vkCmdSetViewport		(drawCmdBuffers[i], 0, 1, &viewport);
 
-			VkRect2D														scissor								= vks::initializers::rect2D(width, height, 0, 0);
+			VkRect2D														scissor								= vks::initializers::rect2D(screenSize.Width, screenSize.Height, 0, 0);
 			vkCmdSetScissor			(drawCmdBuffers[i], 0, 1, &scissor);
 			vkCmdSetLineWidth		(drawCmdBuffers[i], 1.0f);
 
@@ -569,7 +569,7 @@ public:
 		uboTess.projection											= camera.matrices.perspective;
 		uboTess.modelview											= camera.matrices.view * glm::mat4();
 		uboTess.lightPos.y											= -0.5f - uboTess.displacementFactor; // todo: Not uesed yet
-		uboTess.viewportDim											= glm::vec2((float)width, (float)height);
+		uboTess.viewportDim											= glm::vec2((float)screenSize.Width, (float)screenSize.Height);
 
 		frustum.update(uboTess.projection * uboTess.modelview);
 		memcpy(uboTess.frustumPlanes, frustum.planes.data(), sizeof(glm::vec4) * 6);
@@ -659,9 +659,9 @@ public:
 		textOverlay_->addText("Press \"t\" to toggle tessellation", 5.0f, 115.0f, VulkanTextOverlay::alignLeft);
 #endif
 
-		textOverlay_->addText("pipeline stats:", width - 5.0f, 5.0f, VulkanTextOverlay::alignRight);
-		textOverlay_->addText("VS:" + std::to_string(pipelineStats[0]), width - 5.0f, 20.0f, VulkanTextOverlay::alignRight);
-		textOverlay_->addText("TE:" + std::to_string(pipelineStats[1]), width - 5.0f, 35.0f, VulkanTextOverlay::alignRight);
+		textOverlay_->addText("pipeline stats:", screenSize.Width - 5.0f, 5.0f, VulkanTextOverlay::alignRight);
+		textOverlay_->addText("VS:" + std::to_string(pipelineStats[0]), screenSize.Width - 5.0f, 20.0f, VulkanTextOverlay::alignRight);
+		textOverlay_->addText("TE:" + std::to_string(pipelineStats[1]), screenSize.Width - 5.0f, 35.0f, VulkanTextOverlay::alignRight);
 	}
 };
 

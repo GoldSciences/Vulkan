@@ -42,7 +42,7 @@ public:
 		enableTextOverlay											= true;
 
 		camera.type													= Camera::CameraType::lookat;
-		camera.setPerspective	(60.0f, (float)width / (float)height, 0.1f, 512.0f);
+		camera.setPerspective	(60.0f, (float)screenSize.Width / (float)screenSize.Height, 0.1f, 512.0f);
 		camera.setRotation		(glm::vec3(-25.0f, 23.75f, 0.0f));
 		camera.setTranslation	(glm::vec3(0.0f, 0.0f, -2.0f));
 	}
@@ -73,8 +73,8 @@ public:
 		renderPassBeginInfo.renderPass								= renderPass;
 		renderPassBeginInfo.renderArea.offset.x						= 0;
 		renderPassBeginInfo.renderArea.offset.y						= 0;
-		renderPassBeginInfo.renderArea.extent.width					= width;
-		renderPassBeginInfo.renderArea.extent.height				= height;
+		renderPassBeginInfo.renderArea.extent.width					= screenSize.Width;
+		renderPassBeginInfo.renderArea.extent.height				= screenSize.Height;
 		renderPassBeginInfo.clearValueCount							= 2;
 		renderPassBeginInfo.pClearValues							= clearValues;
 
@@ -85,10 +85,10 @@ public:
 			VK_EVAL(vkBeginCommandBuffer(drawCmdBuffers[i], &cmdBufInfo));
 			vkCmdBeginRenderPass	(drawCmdBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 
-			VkViewport														viewport					= vks::initializers::viewport((float)width, (float)height, 0.0f, 1.0f);
+			VkViewport														viewport					= vks::initializers::viewport((float)screenSize.Width, (float)screenSize.Height, 0.0f, 1.0f);
 			vkCmdSetViewport		(drawCmdBuffers[i], 0, 1, &viewport);
 
-			VkRect2D														scissor						= vks::initializers::rect2D(width, height,	0, 0);
+			VkRect2D														scissor						= vks::initializers::rect2D(screenSize.Width, screenSize.Height, 0, 0);
 			vkCmdSetScissor			(drawCmdBuffers[i], 0, 1, &scissor);
 
 			vkCmdBindDescriptorSets	(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSet, 0, NULL);
@@ -237,8 +237,8 @@ public:
 		VkImageCreateInfo												imgCreateInfo				(vks::initializers::imageCreateInfo());
 		imgCreateInfo.imageType										= VK_IMAGE_TYPE_2D;
 		imgCreateInfo.format										= VK_FORMAT_R8G8B8A8_UNORM;	// Note that vkCmdBlitImage (if supported) will also do format conversions if the swapchain color format would differ
-		imgCreateInfo.extent.width									= width;
-		imgCreateInfo.extent.height									= height;
+		imgCreateInfo.extent.width									= screenSize.Width;
+		imgCreateInfo.extent.height									= screenSize.Height;
 		imgCreateInfo.extent.depth									= 1;
 		imgCreateInfo.arrayLayers									= 1;
 		imgCreateInfo.mipLevels										= 1;
@@ -294,8 +294,8 @@ public:
 		if (supportsBlit) {
 			// Define the region to blit (we will blit the whole swapchain image)
 			VkOffset3D														blitSize;
-			blitSize.x													= width;
-			blitSize.y													= height;
+			blitSize.x													= screenSize.Width;
+			blitSize.y													= screenSize.Height;
 			blitSize.z													= 1;
 			VkImageBlit														imageBlitRegion{};
 			imageBlitRegion.srcSubresource.aspectMask					= VK_IMAGE_ASPECT_COLOR_BIT;
@@ -314,8 +314,8 @@ public:
 			imageCopyRegion.srcSubresource.layerCount					= 1;
 			imageCopyRegion.dstSubresource.aspectMask					= VK_IMAGE_ASPECT_COLOR_BIT;
 			imageCopyRegion.dstSubresource.layerCount					= 1;
-			imageCopyRegion.extent.width								= width;
-			imageCopyRegion.extent.height								= height;
+			imageCopyRegion.extent.width								= screenSize.Width;
+			imageCopyRegion.extent.height								= screenSize.Height;
 			imageCopyRegion.extent.depth								= 1;
 
 			// Issue the copy command
@@ -365,7 +365,7 @@ public:
 		std::ofstream													file						(filename, std::ios::out | std::ios::binary);
 
 		// ppm header
-		file << "P6\n" << width << "\n" << height << "\n" << 255 << "\n";
+		file << "P6\n" << screenSize.Width << "\n" << screenSize.Height << "\n" << 255 << "\n";
 
 		// If source is BGR (destination is always RGB) and we can't use blit (which does automatic conversion), we'll have to manually swizzle color components
 		bool															colorSwizzle				= false;
@@ -377,9 +377,9 @@ public:
 		}
 
 		// ppm binary pixel data
-		for (uint32_t y = 0; y < height; y++) {
+		for (uint32_t y = 0; y < screenSize.Height; y++) {
 			unsigned int														* row					= (unsigned int*)data;
-			for (uint32_t x = 0; x < width; x++)  {
+			for (uint32_t x = 0; x < screenSize.Width; x++)  {
 				if (colorSwizzle) { 
 					file.write((char*)row+2, 1);
 					file.write((char*)row+1, 1);

@@ -6,13 +6,13 @@
 #include "vulkanexamplebase.h"
 
 std::vector<const char*>					VulkanExampleBase::args;
-VkResult									VulkanExampleBase::createInstance					(bool enableValidation)																							{
+VkResult									VulkanExampleBase::createInstance					(bool enableValidation, const std::string& appName, const std::string& engineName)								{
 	this->settings.validation									= enableValidation;
 
 	VkApplicationInfo												appInfo								= {};
 	appInfo.sType												= VK_STRUCTURE_TYPE_APPLICATION_INFO;
-	appInfo.pApplicationName									= name.c_str();
-	appInfo.pEngineName											= name.c_str();
+	appInfo.pApplicationName									= appName	.c_str();
+	appInfo.pEngineName											= engineName.c_str();
 	appInfo.apiVersion											= VK_API_VERSION_1_0;
 
 	std::vector<const char*>										instanceExtensions					= { VK_KHR_SURFACE_EXTENSION_NAME };
@@ -142,7 +142,7 @@ void										VulkanExampleBase::prepare							()																												{
 		std::vector<VkPipelineShaderStageCreateInfo>					shaderStages;
 		shaderStages.push_back(loadShader(getAssetPath() + "shaders/base/textoverlay.vert.spv", VK_SHADER_STAGE_VERTEX_BIT));
 		shaderStages.push_back(loadShader(getAssetPath() + "shaders/base/textoverlay.frag.spv", VK_SHADER_STAGE_FRAGMENT_BIT));
-		textOverlay													= new VulkanTextOverlay(vulkanDevice, queue, frameBuffers, swapChain.colorFormat, depthFormat, &width, &height, shaderStages );
+		textOverlay													= new VulkanTextOverlay(vulkanDevice, queue, frameBuffers, swapChain.colorFormat, depthFormat, &screenSize.Width, &screenSize.Height, shaderStages );
 		updateTextOverlay();
 	}
 }
@@ -163,8 +163,8 @@ VkPipelineShaderStageCreateInfo				VulkanExampleBase::loadShader						(std::stri
 }
 
 void										VulkanExampleBase::renderLoop						()																												{
-	destWidth													= width;
-	destHeight													= height;
+	destWidth													= screenSize.Width	;
+	destHeight													= screenSize.Height	;
 #if defined(_WIN32)
 	MSG																msg;
 	while (TRUE)
@@ -493,12 +493,12 @@ void										VulkanExampleBase::submitFrame						()																												
 		if ((args[i] == std::string("-w")) || (args[i] == std::string("-width"))) {
 			char															* endptr								= nullptr;
 			uint32_t														w										= strtol(args[i + 1], &endptr, 10);
-			if (endptr != args[i + 1]) { width = w; }
+			if (endptr != args[i + 1]) { screenSize.Width = w; }
 		}
 		if ((args[i] == std::string("-h")) || (args[i] == std::string("-height"))) {
 			char															* endptr								= nullptr;
 			uint32_t														h										= strtol(args[i + 1], &endptr, 10);
-			if (endptr != args[i + 1]) { height = h; }
+			if (endptr != args[i + 1]) { screenSize.Height = h; }
 		}
 	}
 	
@@ -578,10 +578,10 @@ void										VulkanExampleBase::submitFrame						()																												
 #endif
 }
 
-void										VulkanExampleBase::initVulkan						()																												{
+void										VulkanExampleBase::initVulkan						(const Settings& settings)																						{
 	VkResult														err;
 	// Vulkan instance
-	err															= createInstance(settings.validation);
+	err															= createInstance(settings.validation, name, name);
 	if (err)
 		vks::tools::exitFatal("Could not create Vulkan instance : \n" + vks::tools::errorString(err), "Fatal error");
 
@@ -602,7 +602,7 @@ void										VulkanExampleBase::initVulkan						()																												{
 	VK_EVAL(vkEnumeratePhysicalDevices(instance, &gpuCount, nullptr));
 	assert(gpuCount > 0);
 	// Enumerate devices
-	std::vector<VkPhysicalDevice>									physicalDevices(gpuCount);
+	std::vector<VkPhysicalDevice>									physicalDevices					(gpuCount);
 	err															= vkEnumeratePhysicalDevices(instance, &gpuCount, physicalDevices.data());
 	if (err) 
 		vks::tools::exitFatal("Could not enumerate physical devices : \n" + vks::tools::errorString(err), "Fatal error");
@@ -749,9 +749,9 @@ HWND										VulkanExampleBase::setupWindow						(HINSTANCE hinstance, WNDPROC 
 		dmScreenSettings.dmBitsPerPel								= 32;
 		dmScreenSettings.dmFields									= DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
 
-		if ((width != (uint32_t)screenWidth) && (height != (uint32_t)screenHeight))
-			if (ChangeDisplaySettings(&dmScreenSettings, CDS_FULLSCREEN) != DISP_CHANGE_SUCCESSFUL) {
-				if (MessageBox(NULL, "Fullscreen Mode not supported!\n Switch to window mode?", "Error", MB_YESNO | MB_ICONEXCLAMATION) == IDYES)
+		if(screenSize != ScreenSize{(uint32_t)screenWidth, (uint32_t)screenHeight})		// ((screenSize.Width != (uint32_t)screenWidth) && (screenSize.Height != (uint32_t)screenHeight))	this seems to be a bug 
+			if(ChangeDisplaySettings(&dmScreenSettings, CDS_FULLSCREEN) != DISP_CHANGE_SUCCESSFUL) {
+				if(MessageBox(NULL, "Fullscreen Mode not supported!\n Switch to window mode?", "Error", MB_YESNO | MB_ICONEXCLAMATION) == IDYES)
 					settings.fullscreen											= false;
 				else
 					return NULL;
@@ -773,8 +773,8 @@ HWND										VulkanExampleBase::setupWindow						(HINSTANCE hinstance, WNDPROC 
 	RECT															windowRect;
 	windowRect.left												= 0L;
 	windowRect.top												= 0L;
-	windowRect.right											= settings.fullscreen ? (long)screenWidth : (long)width;
-	windowRect.bottom											= settings.fullscreen ? (long)screenHeight : (long)height;
+	windowRect.right											= settings.fullscreen ? (long)screenWidth	: (long)screenSize.Width	;
+	windowRect.bottom											= settings.fullscreen ? (long)screenHeight	: (long)screenSize.Height	;
 
 	AdjustWindowRectEx(&windowRect, dwStyle, FALSE, dwExStyle);
 
@@ -1117,7 +1117,7 @@ void										VulkanExampleBase::registryGlobal					(wl_registry *registry, uint
 		 if (strcmp(interface, "wl_compositor"	) == 0)	{ compositor	= (wl_compositor *)		wl_registry_bind(registry, name, &wl_compositor_interface, 3);	}
 	else if (strcmp(interface, "wl_shell"		) == 0)	{ shell			= (wl_shell *)			wl_registry_bind(registry, name, &wl_shell_interface, 1);		}
 	else if (strcmp(interface, "wl_seat"		) == 0)	{ seat			= (wl_seat *)			wl_registry_bind(registry, name, &wl_seat_interface, 1);
-		static const struct wl_seat_listener							seat_listener						= { seatCapabilitiesCb, };
+		static const struct wl_seat_listener								seat_listener					= { seatCapabilitiesCb, };
 		wl_seat_add_listener(seat, &seat_listener, this);
 	}
 }
@@ -1357,7 +1357,7 @@ void										VulkanExampleBase::setupDepthStencil				()																								
 	image.pNext													= NULL;
 	image.imageType												= VK_IMAGE_TYPE_2D;
 	image.format												= depthFormat;
-	image.extent												= { width, height, 1 };
+	image.extent												= { screenSize.Width, screenSize.Height, 1 };
 	image.mipLevels												= 1;
 	image.arrayLayers											= 1;
 	image.samples												= VK_SAMPLE_COUNT_1_BIT;
@@ -1409,8 +1409,8 @@ void										VulkanExampleBase::setupFrameBuffer					()																								
 	frameBufferCreateInfo.renderPass							= renderPass;
 	frameBufferCreateInfo.attachmentCount						= 2;
 	frameBufferCreateInfo.pAttachments							= attachments;
-	frameBufferCreateInfo.width									= width;
-	frameBufferCreateInfo.height								= height;
+	frameBufferCreateInfo.width									= screenSize.Width;
+	frameBufferCreateInfo.height								= screenSize.Height;
 	frameBufferCreateInfo.layers								= 1;
 
 	// Create frame buffers for every swap chain image
@@ -1502,8 +1502,8 @@ void										VulkanExampleBase::windowResize						()																											
 	vkDeviceWaitIdle(device);
 
 	// Recreate swap chain
-	width														= destWidth;
-	height														= destHeight;
+	screenSize.Width														= destWidth;
+	screenSize.Height														= destHeight;
 	setupSwapChain();
 
 	// Recreate the frame buffers
@@ -1528,7 +1528,7 @@ void										VulkanExampleBase::windowResize						()																											
 		updateTextOverlay();
 	}
 
-	camera.updateAspectRatio((float)width / (float)height);
+	camera.updateAspectRatio((float)screenSize.Width / (float)screenSize.Height);
 
 	// Notify derived class
 	windowResized			();
@@ -1575,7 +1575,7 @@ int WINAPI									WinMain
 #endif
 	for (size_t i = 0; i < (size_t)__argc; i++) { VulkanExampleBase::args.push_back(__argv[i]); }
 	createVulkanExample(&vulkanExample);			
-	vulkanExample->initVulkan	();					
+	vulkanExample->initVulkan	(vulkanExample->settings);	
 	vulkanExample->setupWindow	(hInstance, WndProc);	
 	vulkanExample->initSwapchain();					
 	vulkanExample->prepare		();						
