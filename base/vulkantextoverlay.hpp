@@ -5,6 +5,9 @@
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 #pragma once
 
+#include "VulkanDebug.h"
+#include "VulkanDevice.hpp"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -12,12 +15,7 @@
 #include <vector>
 #include <sstream>
 #include <iomanip>
-
-#include <vulkan/vulkan.h>
-#include "VulkanTools.h"
-#include "VulkanDebug.h"
-#include "VulkanBuffer.hpp"
-#include "VulkanDevice.hpp"
+#include <array>
 
 #include "../external/stb/stb_font_consolas_24_latin1.inl"
 

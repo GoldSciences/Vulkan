@@ -7,9 +7,6 @@
 
 #ifdef _WIN32
 #pragma comment(linker, "/subsystem:windows")
-#include <windows.h>
-#include <fcntl.h>
-#include <io.h>
 #elif defined(__ANDROID__)
 #include <android/native_activity.h>
 #include <android/asset_manager.h>
@@ -20,17 +17,7 @@
 #elif defined(__linux__)
 #include <xcb/xcb.h>
 #endif
-
-#include <iostream>
-#include <chrono>
-#include <sys/stat.h>
-
-
-#include <string>
-#include <array>
-
 #include "keycodes.hpp"
-#include "VulkanDebug.h"
 
 #include "VulkanDevice.hpp"
 #include "vulkanswapchain.hpp"
@@ -39,6 +26,14 @@
 
 #include "vertex.h"
 #include "VulkanFrameBufferAttachment.h"
+
+
+#include <chrono>
+#include <sys/stat.h>
+
+#include <array>
+
+
 
 class VulkanExampleBase
 {

@@ -5,7 +5,6 @@
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 #pragma once
 
-#include "vulkan/vulkan.h"
 #include "VulkanInitializers.hpp"
 
 #include <math.h>
@@ -15,7 +14,6 @@
 #include <fstream>
 #include <assert.h>
 #include <stdio.h>
-#include <vector>
 #include <iostream>
 #include <stdexcept>
 #if defined(_WIN32)
@@ -59,7 +57,6 @@ namespace vks
 {
 	namespace tools
 	{
-		
 		void							exitFatal					(std::string message, std::string caption);	// Display error message and exit on fatal error
 		std::string						errorString					(VkResult errorCode);						//	Returns an error code as a string 
 		std::string						physicalDeviceTypeString	(VkPhysicalDeviceType type);				//	Returns the device type as a string
@@ -113,6 +110,6 @@ namespace vks
 			);
 
 
-		VkShaderModule	loadShaderGLSL				(const char *fileName, VkDevice device, VkShaderStageFlagBits stage);									// Load a GLSL shader (text). GLSL support requires vendor-specific extensions to be enabled and is not a core-feature of Vulkan.
+		VkShaderModule					loadShaderGLSL				(const char *fileName, VkDevice device, VkShaderStageFlagBits stage);	// Load a GLSL shader (text). GLSL support requires vendor-specific extensions to be enabled and is not a core-feature of Vulkan.
 	}
 }
