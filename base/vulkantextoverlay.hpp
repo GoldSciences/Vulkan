@@ -8,11 +8,6 @@
 #include "VulkanDebug.h"
 #include "VulkanDevice.hpp"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <assert.h>
-#include <vector>
 #include <sstream>
 #include <iomanip>
 #include <array>

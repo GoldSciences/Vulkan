@@ -15,8 +15,7 @@ private:
 	float														fov;
 	float														znear, zfar;
 
-	void														updateViewMatrix				()
-	{
+	void														updateViewMatrix				()														{
 		glm::mat4														rotM							= glm::mat4();
 		glm::mat4														transM;
 
@@ -66,10 +65,9 @@ public:
 		matrices.perspective										= glm::perspective(glm::radians(fov_), aspect_, znear_, zfar_);
 	}
 
-	void															updateAspectRatio			(float aspect)												{ matrices.perspective	= glm::perspective(glm::radians(fov), aspect, znear, zfar); }
-	void															update						(float deltaTime)											{
-		if (type == CameraType::firstperson)
-		{
+	void															updateAspectRatio			(float aspect)											{ matrices.perspective	= glm::perspective(glm::radians(fov), aspect, znear, zfar); }
+	void															update						(float deltaTime)										{
+		if (type == CameraType::firstperson) {
 			if (moving()) {
 				glm::vec3															camFront;
 				camFront.x														= -cos(glm::radians(rotation.x)) * sin(glm::radians(rotation.y));

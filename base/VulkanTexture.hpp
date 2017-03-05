@@ -5,18 +5,9 @@
 // This code is licensed under the MIT license(MIT) (http://opensource.org/licenses/MIT)
 #pragma once
 
-#include <stdlib.h>
-#include <string>
-#include <fstream>
-#include <vector>
-
-#include "vulkan/vulkan.h"
+#include "VulkanDevice.hpp"
 
 #include <gli/gli.hpp>
-
-#include "VulkanTools.h"
-#include "VulkanDevice.hpp"
-#include "VulkanBuffer.hpp"
 
 #if defined(__ANDROID__)
 #include <android/asset_manager.h>

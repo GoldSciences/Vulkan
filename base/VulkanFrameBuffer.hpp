@@ -5,13 +5,12 @@
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 #pragma once
 
-#include <algorithm>
-#include <iterator>
-#include <vector>
 #include "vulkan/vulkan.h"
 #include "VulkanDevice.hpp"
 #include "VulkanTools.h"
 #include "VulkanFrameBufferAttachment.h"
+
+#include <iterator>
 
 namespace vks
 {

@@ -5,9 +5,10 @@
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 #pragma once
 
+#include "VulkanBuffer.hpp"
+
 #include <exception>
 #include <algorithm>
-#include "VulkanBuffer.hpp"
 
 namespace vks
 {	

@@ -3,12 +3,11 @@
 // Copyright (C) 2016 by Sascha Willems - www.saschawillems.de
 // 
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
-#include <glm/glm.hpp>
-#include <glm/glm.hpp>
-#include <gli/gli.hpp>
-
 #include "vulkan/vulkan.h"
 #include "VulkanDevice.hpp"
+
+#include <glm/glm.hpp>
+#include <gli/gli.hpp>
 
 namespace vks 
 {
@@ -91,21 +90,16 @@ namespace vks
 			const float									wy				= 2.0f;
 
 			for (uint32_t x = 0; x < patchsize; x++)
-			{
-				for (uint32_t y = 0; y < patchsize; y++)
-				{
+				for (uint32_t y = 0; y < patchsize; y++) {
 					uint32_t									index		= (x + y * patchsize);
 					vertices[index].position[0]				= (x * wx + wx / 2.0f - (float)patchsize * wx / 2.0f) * scale_.x;
 					vertices[index].position[1]				= -getHeight(x, y);
 					vertices[index].position[2]				= (y * wy + wy / 2.0f - (float)patchsize * wy / 2.0f) * scale_.z;
 					vertices[index].uv						= glm::vec2((float)x / patchsize, (float)y / patchsize) * uvScale;
 				}
-			}
 
-			for (uint32_t y = 0; y < patchsize; y++)
-			{
-				for (uint32_t x = 0; x < patchsize; x++)
-				{
+			for (uint32_t y = 0; y < patchsize; y++) 
+				for (uint32_t x = 0; x < patchsize; x++) {
 					float										dx						= getHeight(x < patchsize - 1 ? x + 1 : x, y) - getHeight(x > 0 ? x - 1 : x, y);
 					if (x == 0 || x == patchsize - 1)
 						dx *= 2.0f;
@@ -120,21 +114,17 @@ namespace vks
 
 					vertices[x + y * patchsize].normal		= glm::vec3(normal.x, normal.z, normal.y);
 				}
-			}
 
 			// Generate indices
-
 			const uint32_t								w							= (patchsize - 1);
 			uint32_t									* indices					= nullptr;
 
-			switch (topology)
-			{
+			switch (topology) {
 			case topologyTriangles	:	// Indices for triangles
 			{
 				indices									= new uint32_t[w * w * 6];
 				for (uint32_t x = 0; x < w; x++)
-					for (uint32_t y = 0; y < w; y++)
-					{
+					for (uint32_t y = 0; y < w; y++) {
 						uint32_t									index					= (x + y * w) * 6;
 						indices[index]							= (x + y * patchsize);
 						indices[index + 1]						= indices[index] + patchsize;
@@ -154,8 +144,7 @@ namespace vks
 			{
 				indices									= new uint32_t[w * w * 4];
 				for (uint32_t x = 0; x < w; x++)
-					for (uint32_t y = 0; y < w; y++)
-					{
+					for (uint32_t y = 0; y < w; y++) {
 						uint32_t									index					= (x + y * w) * 4;
 						indices[index]							= (x + y * patchsize);
 						indices[index + 1]						= indices[index] + patchsize;

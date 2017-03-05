@@ -5,13 +5,11 @@
 // This code is licensed under the MIT license(MIT) (http://opensource.org/licenses/MIT)
 #pragma once
 
-#include <stdlib.h>
-#include <string>
-#include <fstream>
-#include <vector>
-#include <map>
+#include "VulkanDevice.hpp"
 
 #include "vulkan/vulkan.h"
+
+#include <map>
 
 #include <assimp/Importer.hpp> 
 #include <assimp/scene.h>     
@@ -22,7 +20,6 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "VulkanDevice.hpp"
 
 #if defined(__ANDROID__)
 #include <android/asset_manager.h>

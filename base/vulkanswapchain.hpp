@@ -7,25 +7,7 @@
 // This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 #pragma once
 
-#include <stdlib.h>
-#include <string>
-#include <fstream>
-#include <assert.h>
-#include <stdio.h>
-#include <vector>
-#ifdef _WIN32
-#include <windows.h>
-#include <fcntl.h>
-#include <io.h>
-#else
-#endif
-
-#include <vulkan/vulkan.h>
 #include "VulkanTools.h"
-
-#ifdef __ANDROID__
-#include "vulkanandroid.h"
-#endif
 
 // Macro to get a procedure address based on a vulkan instance
 #define GET_INSTANCE_PROC_ADDR(inst, entrypoint)                        \
@@ -46,7 +28,7 @@
 typedef struct _SwapChainBuffers {
 	VkImage image;
 	VkImageView view;
-} SwapChainBuffer;
+}														SwapChainBuffer;
 
 class VulkanSwapChain
 {
@@ -175,9 +157,7 @@ public:
 		uint32_t												graphicsQueueNodeIndex						= UINT32_MAX;
 		uint32_t												presentQueueNodeIndex						= UINT32_MAX;
 		for (uint32_t i = 0; i < queueCount; i++) 
-		{
-			if ((queueProps[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) != 0) 
-			{
+			if ((queueProps[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) != 0) {
 				if (graphicsQueueNodeIndex == UINT32_MAX) 
 					graphicsQueueNodeIndex								= i;
 
@@ -187,19 +167,12 @@ public:
 					break;
 				}
 			}
-		}
-		if (presentQueueNodeIndex == UINT32_MAX) {	
-			// If there's no queue that supports both present and graphics
-			// try to find a separate present queue
-			for (uint32_t i = 0; i < queueCount; ++i) 
-			{
+		if (presentQueueNodeIndex == UINT32_MAX) 									// If there's no queue that supports both present and graphics, try to find a separate present queue
+			for (uint32_t i = 0; i < queueCount; ++i)								
 				if (supportsPresent[i] == VK_TRUE) {
 					presentQueueNodeIndex								= i;
 					break;
 				}
-			}
-		}
-
 		// Exit if either a graphics or a presenting queue hasn't been found
 		if (graphicsQueueNodeIndex == UINT32_MAX || presentQueueNodeIndex == UINT32_MAX) 
 			vks::tools::exitFatal("Could not find a graphics and/or presenting queue!", "Fatal error");
@@ -222,18 +195,15 @@ public:
 
 		// If the surface format list only includes one entry with VK_FORMAT_UNDEFINED,
 		// there is no preferered format, so we assume VK_FORMAT_B8G8R8A8_UNORM
-		if ((formatCount == 1) && (surfaceFormats[0].format == VK_FORMAT_UNDEFINED))
-		{
+		if ((formatCount == 1) && (surfaceFormats[0].format == VK_FORMAT_UNDEFINED)) {
 			colorFormat											= VK_FORMAT_B8G8R8A8_UNORM;
 			colorSpace											= surfaceFormats[0].colorSpace;
 		}
-		else
-		{
+		else {
 			// iterate over the list of available surface format and
 			// check for the presence of VK_FORMAT_B8G8R8A8_UNORM
 			bool													found_B8G8R8A8_UNORM						= false;
 			for (auto&& surfaceFormat : surfaceFormats)
-			{
 				if (surfaceFormat.format == VK_FORMAT_B8G8R8A8_UNORM)
 				{
 					colorFormat																							= surfaceFormat.format;
@@ -241,12 +211,10 @@ public:
 					found_B8G8R8A8_UNORM																				= true;
 					break;
 				}
-			}
 
 			// in case VK_FORMAT_B8G8R8A8_UNORM is not available
 			// select the first available color format
-			if (!found_B8G8R8A8_UNORM)
-			{
+			if (!found_B8G8R8A8_UNORM) {
 				colorFormat																							= surfaceFormats[0].format;
 				colorSpace																							= surfaceFormats[0].colorSpace;
 			}
@@ -254,14 +222,11 @@ public:
 
 	}
 
-	/**
-	* Set instance, physical and logical device to use for the swapchain and get all required function pointers
-	* 
-	* @param instance Vulkan instance to use
-	* @param physicalDevice Physical device used to query properties and formats relevant to the swapchain
-	* @param device Logical representation of the device to create the swapchain for
-	*
-	*/
+	// Set instance, physical and logical device to use for the swapchain and get all required function pointers
+	// 
+	// instance			: Vulkan instance to use
+	// physicalDevice	: Physical device used to query properties and formats relevant to the swapchain
+	// device Logical	: representation of the device to create the swapchain for
 	void												connect										(VkInstance instance_, VkPhysicalDevice physicalDevice_, VkDevice device_)				{
 		this->instance										= instance_;
 		this->physicalDevice								= physicalDevice_;
@@ -323,8 +288,7 @@ public:
 
 		// If v-sync is not requested, try to find a mailbox mode
 		// It's the lowest latency non-tearing present mode available
-		if (!vsync)
-		{
+		if (!vsync) 
 			for (size_t i = 0; i < presentModeCount; i++) {
 				if (presentModes[i] == VK_PRESENT_MODE_MAILBOX_KHR) {
 					swapchainPresentMode								= VK_PRESENT_MODE_MAILBOX_KHR;
@@ -333,7 +297,6 @@ public:
 				if ((swapchainPresentMode != VK_PRESENT_MODE_MAILBOX_KHR) && (presentModes[i] == VK_PRESENT_MODE_IMMEDIATE_KHR))
 					swapchainPresentMode								= VK_PRESENT_MODE_IMMEDIATE_KHR;
 			}
-		}
 
 		// Determine the number of images
 		uint32_t												desiredNumberOfSwapchainImages				= surfCaps.minImageCount + 1;
@@ -390,8 +353,7 @@ public:
 
 		// Get the swap chain buffers containing the image and imageview
 		buffers.resize(imageCount);
-		for (uint32_t i = 0; i < imageCount; i++)
-		{
+		for (uint32_t i = 0; i < imageCount; i++) {
 			VkImageViewCreateInfo									colorAttachmentView							= {};
 			colorAttachmentView.sType							= VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
 			colorAttachmentView.pNext							= NULL;
@@ -487,8 +449,7 @@ public:
 		VkDisplayModePropertiesKHR								* pModeProperties							= nullptr;
 		bool													foundMode									= false;
 
-	   	for(uint32_t i = 0; i < displayPropertyCount;++i)
-	   	{
+		for(uint32_t i = 0; i < displayPropertyCount;++i) {
 			display												= pDisplayProperties[i].display;
 			uint32_t												modeCount;
 			vkGetDisplayModePropertiesKHR(physicalDevice, display, &modeCount, NULL);

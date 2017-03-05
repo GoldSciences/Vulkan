@@ -7,16 +7,8 @@
 
 #ifdef _WIN32
 #pragma comment(linker, "/subsystem:windows")
-#elif defined(__ANDROID__)
-#include <android/native_activity.h>
-#include <android/asset_manager.h>
-#include <android_native_app_glue.h>
-#include "vulkanandroid.h"
-#elif defined(VK_USE_PLATFORM_WAYLAND_KHR)
-#include <wayland-client.h>
-#elif defined(__linux__)
-#include <xcb/xcb.h>
 #endif
+
 #include "keycodes.hpp"
 
 #include "VulkanDevice.hpp"
@@ -27,6 +19,16 @@
 #include "vertex.h"
 #include "VulkanFrameBufferAttachment.h"
 
+#if defined(__ANDROID__)
+#include <android/native_activity.h>
+#include <android/asset_manager.h>
+#include <android_native_app_glue.h>
+#include "vulkanandroid.h"
+#elif defined(VK_USE_PLATFORM_WAYLAND_KHR)
+#include <wayland-client.h>
+#elif defined(__linux__)
+#include <xcb/xcb.h>
+#endif
 
 #include <chrono>
 #include <sys/stat.h>
