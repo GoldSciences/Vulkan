@@ -1588,7 +1588,7 @@ int WINAPI									WinMain
 void										android_main										(android_app* state)																							{
 	app_dummy();	
 	createVulkanExample(&vulkanExample);					
-	state->userData								= VulkanExampleBase;					
+	state->userData								= vulkanExample;					
 	state->onAppCmd								= VulkanExampleBase::handleAppCommand;	
 	state->onInputEvent							= VulkanExampleBase::handleAppInput;
 	androidApp									= state;
@@ -1597,7 +1597,6 @@ void										android_main										(android_app* state)																							{
 }
 #elif defined(_DIRECT2DISPLAY)
 // Linux entry point with direct to display wsi
-static void									handleEvent											()																												{}					
 int											main												(const int argc, const char *argv[])																			{					
 	for (size_t i = 0; i < argc; i++) { VulkanExample::args.push_back(argv[i]); }
 	createVulkanExample(&vulkanExample);					
@@ -1621,12 +1620,6 @@ int											main												(const int argc, const char *argv[])														
 	return 0;		
 }
 #elif defined(__linux__)
-// Linux entry point
-static void									handleEvent											(const xcb_generic_event_t *event)																				{
-	if (vulkanExample != NULL)				
-		vulkanExample->handleEvent(event);	
-}					
-
 int											main												(const int argc, const char *argv[])																			{
 	for (size_t i = 0; i < argc; i++) { VulkanExample::args.push_back(argv[i]); }
 	createVulkanExample(&vulkanExample);	
