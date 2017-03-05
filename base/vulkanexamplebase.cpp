@@ -1598,7 +1598,7 @@ int WINAPI									WinMain
 void										android_main										(android_app* state)																							{
 	app_dummy();	
 	createVulkanExample(&vulkanExample);					
-	state->userData								= VulkanExampleBase;					
+	state->userData								= vulkanExample;					
 	state->onAppCmd								= VulkanExampleBase::handleAppCommand;	
 	state->onInputEvent							= VulkanExampleBase::handleAppInput;
 	androidApp									= state;
