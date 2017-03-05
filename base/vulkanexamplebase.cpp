@@ -1190,14 +1190,14 @@ xcb_window_t								VulkanExampleBase::setupWindow						()																						
 		XCB_EVENT_MASK_BUTTON_RELEASE;
 
 	if (settings.fullscreen) {
-		width	= destWidth		= screen->width_in_pixels;
-		height	= destHeight	= screen->height_in_pixels;
+		screenSize.Width	= destWidth		= screen->width_in_pixels;
+		screenSize.Height	= destHeight	= screen->height_in_pixels;
 	}
 
 	xcb_create_window(connection,
 		XCB_COPY_FROM_PARENT,
 		window, screen->root,
-		0, 0, width, height, 0,
+		0, 0, screenSize.Width, screenSize.Height, 0,
 		XCB_WINDOW_CLASS_INPUT_OUTPUT,
 		screen->root_visual,
 		value_mask, value_list);
@@ -1329,7 +1329,7 @@ void										VulkanExampleBase::handleEvent						(const xcb_generic_event_t *ev
 	case XCB_CONFIGURE_NOTIFY	:
 	{
 		const xcb_configure_notify_event_t							* cfgEvent								= (const xcb_configure_notify_event_t *)event;
-		if ((prepared) && ((cfgEvent->width != width) || (cfgEvent->height != height))) {
+		if ((prepared) && ((cfgEvent->width != screenSize.Width) || (cfgEvent->height != screenSize.Height))) {
 				destWidth											= cfgEvent->width;
 				destHeight											= cfgEvent->height;
 				if ((destWidth > 0) && (destHeight > 0))
@@ -1543,7 +1543,7 @@ void										VulkanExampleBase::initSwapchain					()																											
 #elif defined(__ANDROID__)	
 	swapChain.initSurface(androidApp->window);
 #elif defined(_DIRECT2DISPLAY)
-	swapChain.initSurface(width, height);
+	swapChain.initSurface(screenSize.Width, screenSize.Height);
 #elif defined(VK_USE_PLATFORM_WAYLAND_KHR)
 	swapChain.initSurface(display, surface);
 #elif defined(__linux__)

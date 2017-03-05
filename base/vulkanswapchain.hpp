@@ -251,12 +251,12 @@ public:
 		VkSwapchainKHR											oldSwapchain								= swapChain;
 
 		// Get physical device surface properties and formats
-		VkSurfaceCapabilitiesKHR								surfCaps;
+		VkSurfaceCapabilitiesKHR								surfCaps									= {};
 		err													= fpGetPhysicalDeviceSurfaceCapabilitiesKHR(physicalDevice, surface, &surfCaps);
 		assert(!err);
 
 		// Get available present modes
-		uint32_t												presentModeCount;
+		uint32_t												presentModeCount							= 0;
 		err													= fpGetPhysicalDeviceSurfacePresentModesKHR(physicalDevice, surface, &presentModeCount, NULL);
 		assert(!err);
 		assert(presentModeCount > 0);
