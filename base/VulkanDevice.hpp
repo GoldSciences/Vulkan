@@ -157,8 +157,7 @@ namespace vks
 			// Dedicated compute queue
 			if (requestedQueueTypes & VK_QUEUE_COMPUTE_BIT) {
 				queueFamilyIndices.compute					= getQueueFamilyIndex(VK_QUEUE_COMPUTE_BIT);
-				if (queueFamilyIndices.compute != queueFamilyIndices.graphics) {
-					// If compute family index differs, we need an additional queue create info for the compute queue
+				if (queueFamilyIndices.compute != queueFamilyIndices.graphics) {	// If compute family index differs, we need an additional queue create info for the compute queue
 					VkDeviceQueueCreateInfo							queueInfo{};
 					queueInfo.sType								= VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
 					queueInfo.queueFamilyIndex					= queueFamilyIndices.compute;
@@ -174,8 +173,7 @@ namespace vks
 			if (requestedQueueTypes & VK_QUEUE_TRANSFER_BIT) {
 				queueFamilyIndices.transfer					= getQueueFamilyIndex(VK_QUEUE_TRANSFER_BIT);
 				if ((queueFamilyIndices.transfer != queueFamilyIndices.graphics) && (queueFamilyIndices.transfer != queueFamilyIndices.compute)) {
-					// If compute family index differs, we need an additional queue create info for the compute queue
-					VkDeviceQueueCreateInfo							queueInfo{};
+					VkDeviceQueueCreateInfo							queueInfo{};	// If compute family index differs, we need an additional queue create info for the compute queue
 					queueInfo.sType								= VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
 					queueInfo.queueFamilyIndex					= queueFamilyIndices.transfer;
 					queueInfo.queueCount						= 1;
@@ -197,8 +195,7 @@ namespace vks
 			deviceCreateInfo.pQueueCreateInfos			= queueCreateInfos.data();
 			deviceCreateInfo.pEnabledFeatures			= &enabledFeatures;
 
-			// Enable the debug marker extension if it is present (likely meaning a debugging tool is present)
-			if (extensionSupported(VK_EXT_DEBUG_MARKER_EXTENSION_NAME)) {
+			if (extensionSupported(VK_EXT_DEBUG_MARKER_EXTENSION_NAME)) {	// Enable the debug marker extension if it is present (likely meaning a debugging tool is present)
 				deviceExtensions.push_back(VK_EXT_DEBUG_MARKER_EXTENSION_NAME);
 				enableDebugMarkers							= true;
 			}

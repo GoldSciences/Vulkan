@@ -32,11 +32,11 @@ struct SwapChainBuffer {
 
 
 struct ScreenSize {
-	uint32_t							Width	;
-	uint32_t							Height	;
+	uint32_t											Width										;
+	uint32_t											Height										;
 
-	inline constexpr bool				operator==					(const ScreenSize& other)								const	{ return Width == other.Width && Height == other.Height;	}
-	inline constexpr bool				operator!=					(const ScreenSize& other)								const	{ return Width != other.Width || Height != other.Height;	}
+	inline constexpr bool								operator==									(const ScreenSize& other)								const	{ return Width == other.Width && Height == other.Height;	}
+	inline constexpr bool								operator!=									(const ScreenSize& other)								const	{ return Width != other.Width || Height != other.Height;	}
 };
 
 class VulkanSwapChain
@@ -68,21 +68,21 @@ public:
 	uint32_t											queueNodeIndex								= UINT32_MAX;
 
 	// Creates an os specific surface
-	/**
-	* Create the surface object, an abstraction for the native platform window
-	*
-	* @pre Windows
-	* @param platformHandle HINSTANCE of the window to create the surface for
-	* @param platformWindow HWND of the window to create the surface for
-	*
-	* @pre Android 
-	* @param window A native platform window
-	*
-	* @pre Linux (XCB)
-	* @param connection xcb connection to the X Server
-	* @param window The xcb window to create the surface for
-	* @note Targets other than XCB ar not yet supported
-	*/
+	// 
+	// Create the surface object, an abstraction for the native platform window
+	// 
+	// --- Windows
+	// platformHandle	: HINSTANCE of the window to create the surface for
+	// platformWindow	: HWND of the window to create the surface for
+	// 
+	// --- Android 
+	// window			: A native platform window
+	// 
+	// --- Linux (XCB)
+	// connection		: xcb connection to the X Server
+	// window			: The xcb window to create the surface for
+	// @note Targets other than XCB ar not yet supported
+	// 
 	void												initSurface									
 #ifdef _WIN32
 		( void				* platformHandle
