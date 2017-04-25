@@ -1,302 +1,214 @@
-/*
-* Vulkan Example - Using different pipelines in one single renderpass
-*
-* Copyright (C) 2016 by Sascha Willems - www.saschawillems.de
-*
-* This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
-*/
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <assert.h>
-#include <vector>
-
-#define GLM_FORCE_RADIANS
-#define GLM_FORCE_DEPTH_ZERO_TO_ONE
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-
-#include <vulkan/vulkan.h>
+// Vulkan Example - Using different pipelines in one single renderpass
+// 
+// Copyright (C) 2016 by Sascha Willems - www.saschawillems.de
+// 
+// This code is licensed under the MIT license (MIT) (http://opensource.org/licenses/MIT)
 #include "vulkanexamplebase.h"
 #include "VulkanModel.hpp"
-#include "VulkanBuffer.hpp"
 
-#define VERTEX_BUFFER_BIND_ID 0
-#define ENABLE_VALIDATION false
+#define VERTEX_BUFFER_BIND_ID	0
+#define ENABLE_VALIDATION		false
 
-class VulkanExample: public VulkanExampleBase 
+class VulkanExample : public VulkanExampleBase 
 {
 public:
+
 	// Vertex layout for the models
-	vks::VertexLayout vertexLayout = vks::VertexLayout({
-		vks::VERTEX_COMPONENT_POSITION,
-		vks::VERTEX_COMPONENT_NORMAL,
-		vks::VERTEX_COMPONENT_UV,
-		vks::VERTEX_COMPONENT_COLOR,
-	});
+	vks::VertexLayout											vertexLayout									= vks::VertexLayout(
+		{	vks::VERTEX_COMPONENT_POSITION
+		,	vks::VERTEX_COMPONENT_NORMAL
+		,	vks::VERTEX_COMPONENT_UV
+		,	vks::VERTEX_COMPONENT_COLOR
+		});
 
 	struct {
-		vks::Model cube;
-	} models;
+		vks::Model													cube;
+	}															models;
 
-	vks::Buffer uniformBuffer;
+	vks::Buffer													uniformBuffer;
 
 	// Same uniform buffer layout as shader
 	struct UBOVS {
-		glm::mat4 projection;
-		glm::mat4 modelView;
-		glm::vec4 lightPos = glm::vec4(0.0f, 2.0f, 1.0f, 0.0f);
-	} uboVS;
+		glm::mat4												projection;
+		glm::mat4												modelView;
+		glm::vec4												lightPos											= glm::vec4(0.0f, 2.0f, 1.0f, 0.0f);
+	}															uboVS;
 
-	VkPipelineLayout pipelineLayout;
-	VkDescriptorSet descriptorSet;
-	VkDescriptorSetLayout descriptorSetLayout;
+	VkPipelineLayout											pipelineLayout									= VK_NULL_HANDLE;
+	VkDescriptorSet												descriptorSet									= VK_NULL_HANDLE;
+	VkDescriptorSetLayout										descriptorSetLayout								= VK_NULL_HANDLE;
 
 	struct {
-		VkPipeline phong;
-		VkPipeline wireframe;
-		VkPipeline toon;
-	} pipelines;
+		VkPipeline													phong											= VK_NULL_HANDLE;
+		VkPipeline													wireframe										= VK_NULL_HANDLE;
+		VkPipeline													toon											= VK_NULL_HANDLE;
+	}															pipelines;
 
-	VulkanExample() : VulkanExampleBase(ENABLE_VALIDATION)
-	{
-		zoom = -10.5f;
-		rotation = glm::vec3(-25.0f, 15.0f, 0.0f);
-		enableTextOverlay = true;
-		title = "Vulkan Example - Pipeline state objects";
+																VulkanExample									()							: VulkanExampleBase(ENABLE_VALIDATION)	{
+		zoom														= -10.5f;
+		rotation													= glm::vec3(-25.0f, 15.0f, 0.0f);
+		enableTextOverlay											= true;
+		title														= "Vulkan Example - Pipeline state objects";
 	}
 
-	~VulkanExample()
-	{
-		// Clean up used Vulkan resources 
-		// Note : Inherited destructor cleans up resources stored in base class
-		vkDestroyPipeline(device, pipelines.phong, nullptr);
+	// Clean up used Vulkan resources 
+	// Note : Inherited destructor cleans up resources stored in base class
+																~VulkanExample									()							{
+		vkDestroyPipeline				(device, pipelines.phong		, nullptr);
 		if (deviceFeatures.fillModeNonSolid)
-		{
-			vkDestroyPipeline(device, pipelines.wireframe, nullptr);
-		}
-		vkDestroyPipeline(device, pipelines.toon, nullptr);
-		
-		vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
-		vkDestroyDescriptorSetLayout(device, descriptorSetLayout, nullptr);
+			vkDestroyPipeline				(device, pipelines.wireframe	, nullptr);
 
-		models.cube.destroy();
-		uniformBuffer.destroy();
+		vkDestroyPipeline				(device, pipelines.toon			, nullptr);
+		
+		vkDestroyPipelineLayout			(device, pipelineLayout			, nullptr);
+		vkDestroyDescriptorSetLayout	(device, descriptorSetLayout	, nullptr);
+
+		models.cube		.destroy();
+		uniformBuffer	.destroy();
 	}
+
 
 	// Enable physical device features required for this example				
-	virtual void getEnabledFeatures()
-	{
+	virtual void												getEnabledFeatures								()							{
 		// Fill mode non solid is required for wireframe display
 		if (deviceFeatures.fillModeNonSolid) {
-			enabledFeatures.fillModeNonSolid = VK_TRUE;
+			enabledFeatures.fillModeNonSolid							= VK_TRUE;
 			// Wide lines must be present for line width > 1.0f
-			if (deviceFeatures.wideLines) {
-				enabledFeatures.wideLines = VK_TRUE;
-			}
-		};
+			if (deviceFeatures.wideLines) 
+				enabledFeatures.wideLines									= VK_TRUE;
+		}
 	}
 
-	void buildCommandBuffers()
-	{		 
-		VkCommandBufferBeginInfo cmdBufInfo = vks::initializers::commandBufferBeginInfo();
+	void														buildCommandBuffers								()							{		 
+		VkCommandBufferBeginInfo										cmdBufInfo										= vks::initializers::commandBufferBeginInfo();
 
-		VkClearValue clearValues[2];
-		clearValues[0].color = defaultClearColor;
-		clearValues[1].depthStencil = { 1.0f, 0 };
+		VkClearValue													clearValues[2];
+		clearValues[0].color										= defaultClearColor;
+		clearValues[1].depthStencil									= { 1.0f, 0 };
 
-		VkRenderPassBeginInfo renderPassBeginInfo = vks::initializers::renderPassBeginInfo();
-		renderPassBeginInfo.renderPass = renderPass;
-		renderPassBeginInfo.renderArea.offset.x = 0;
-		renderPassBeginInfo.renderArea.offset.y = 0;
-		renderPassBeginInfo.renderArea.extent.width = width;
-		renderPassBeginInfo.renderArea.extent.height = height;
-		renderPassBeginInfo.clearValueCount = 2;
-		renderPassBeginInfo.pClearValues = clearValues;
+		VkRenderPassBeginInfo											renderPassBeginInfo								= vks::initializers::renderPassBeginInfo();
+		renderPassBeginInfo.renderPass								= renderPass;
+		renderPassBeginInfo.renderArea.offset.x						= 0;
+		renderPassBeginInfo.renderArea.offset.y						= 0;
+		renderPassBeginInfo.renderArea.extent.width					= width;
+		renderPassBeginInfo.renderArea.extent.height				= height;
+		renderPassBeginInfo.clearValueCount							= 2;
+		renderPassBeginInfo.pClearValues							= clearValues;
 
-		for (int32_t i = 0; i < drawCmdBuffers.size(); ++i)
-		{
+		for (size_t i = 0; i < drawCmdBuffers.size(); ++i) {
 			// Set target frame buffer
-			renderPassBeginInfo.framebuffer = frameBuffers[i];
-
+			renderPassBeginInfo.framebuffer								= frameBuffers[i];
 			VK_CHECK_RESULT(vkBeginCommandBuffer(drawCmdBuffers[i], &cmdBufInfo));
+			vkCmdBeginRenderPass	(drawCmdBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 
-			vkCmdBeginRenderPass(drawCmdBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
+			VkViewport														viewport											= vks::initializers::viewport((float)width, (float)height, 0.0f, 1.0f);
+			vkCmdSetViewport		(drawCmdBuffers[i], 0, 1, &viewport);
 
-			VkViewport viewport = vks::initializers::viewport((float)width, (float)height, 0.0f, 1.0f);
-			vkCmdSetViewport(drawCmdBuffers[i], 0, 1, &viewport);
+			VkRect2D														scissor												= vks::initializers::rect2D(width, height,	0, 0);
+			vkCmdSetScissor			(drawCmdBuffers[i], 0, 1, &scissor);
 
-			VkRect2D scissor = vks::initializers::rect2D(width, height,	0, 0);
-			vkCmdSetScissor(drawCmdBuffers[i], 0, 1, &scissor);
+			vkCmdBindDescriptorSets	(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSet, 0, NULL);
 
-			vkCmdBindDescriptorSets(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSet, 0, NULL);
-
-			VkDeviceSize offsets[1] = { 0 };
-			vkCmdBindVertexBuffers(drawCmdBuffers[i], VERTEX_BUFFER_BIND_ID, 1, &models.cube.vertices.buffer, offsets);
-			vkCmdBindIndexBuffer(drawCmdBuffers[i], models.cube.indices.buffer, 0, VK_INDEX_TYPE_UINT32);
+			VkDeviceSize													offsets[1]											= { 0 };
+			vkCmdBindVertexBuffers	(drawCmdBuffers[i], VERTEX_BUFFER_BIND_ID, 1, &models.cube.vertices.buffer, offsets);
+			vkCmdBindIndexBuffer	(drawCmdBuffers[i], models.cube.indices.buffer, 0, VK_INDEX_TYPE_UINT32);
 
 			// Left : Solid colored 
-			viewport.width = (float)(width / 3.0);
-			vkCmdSetViewport(drawCmdBuffers[i], 0, 1, &viewport);
-			vkCmdBindPipeline(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines.phong);
+			viewport.width												= (float)(width / 3.0);
+			vkCmdSetViewport		(drawCmdBuffers[i], 0, 1, &viewport);
+			vkCmdBindPipeline		(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines.phong);
 			
-			vkCmdDrawIndexed(drawCmdBuffers[i], models.cube.indexCount, 1, 0, 0, 0);
+			vkCmdDrawIndexed		(drawCmdBuffers[i], models.cube.indexCount, 1, 0, 0, 0);
 
 			// Center : Toon
-			viewport.x = (float)(width / 3.0);
-			vkCmdSetViewport(drawCmdBuffers[i], 0, 1, &viewport);
-			vkCmdBindPipeline(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines.toon);
+			viewport.x													= (float)(width / 3.0);
+			vkCmdSetViewport			(drawCmdBuffers[i], 0, 1, &viewport);
+			vkCmdBindPipeline			(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines.toon);
 			// Line width > 1.0f only if wide lines feature is supported
 			if (deviceFeatures.wideLines) {
-				vkCmdSetLineWidth(drawCmdBuffers[i], 2.0f);
+				vkCmdSetLineWidth			(drawCmdBuffers[i], 2.0f);
 			}
-			vkCmdDrawIndexed(drawCmdBuffers[i], models.cube.indexCount, 1, 0, 0, 0);
+			vkCmdDrawIndexed			(drawCmdBuffers[i], models.cube.indexCount, 1, 0, 0, 0);
 
-			if (deviceFeatures.fillModeNonSolid)
-			{
+			if (deviceFeatures.fillModeNonSolid) {
 				// Right : Wireframe 
-				viewport.x = (float)(width / 3.0 + width / 3.0);
-				vkCmdSetViewport(drawCmdBuffers[i], 0, 1, &viewport);
-				vkCmdBindPipeline(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines.wireframe);
-				vkCmdDrawIndexed(drawCmdBuffers[i], models.cube.indexCount, 1, 0, 0, 0);
+				viewport.x													= (float)(width / 3.0 + width / 3.0);
+				vkCmdSetViewport		(drawCmdBuffers[i], 0, 1, &viewport);
+				vkCmdBindPipeline		(drawCmdBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelines.wireframe);
+				vkCmdDrawIndexed		(drawCmdBuffers[i], models.cube.indexCount, 1, 0, 0, 0);
 			}
 
-			vkCmdEndRenderPass(drawCmdBuffers[i]);
+			vkCmdEndRenderPass		(drawCmdBuffers[i]);
 
 			VK_CHECK_RESULT(vkEndCommandBuffer(drawCmdBuffers[i]));
 		}
 	}
 
-	void loadAssets()
-	{
+	void														loadAssets										()									{
 		models.cube.loadFromFile(getAssetPath() + "models/treasure_smooth.dae", vertexLayout, 1.0f, vulkanDevice, queue);
 	}
 
-	void setupDescriptorPool()
-	{
-		std::vector<VkDescriptorPoolSize> poolSizes =
-		{
-			vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1)
-		};
+	void														setupDescriptorPool								()									{
+		std::vector<VkDescriptorPoolSize>								poolSizes										=
+			{	vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1),
+			};
 
-		VkDescriptorPoolCreateInfo descriptorPoolInfo =
-			vks::initializers::descriptorPoolCreateInfo(
-				static_cast<uint32_t>(poolSizes.size()),
-				poolSizes.data(),
-				2);
-
+		VkDescriptorPoolCreateInfo										descriptorPoolInfo			= vks::initializers::descriptorPoolCreateInfo(static_cast<uint32_t>(poolSizes.size()), poolSizes.data(), 2);
 		VK_CHECK_RESULT(vkCreateDescriptorPool(device, &descriptorPoolInfo, nullptr, &descriptorPool));
 	}
 
-	void setupDescriptorSetLayout()
-	{
-		std::vector<VkDescriptorSetLayoutBinding> setLayoutBindings =
-		{
-			// Binding 0 : Vertex shader uniform buffer
-			vks::initializers::descriptorSetLayoutBinding(
-				VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-				VK_SHADER_STAGE_VERTEX_BIT,
-				0)
-		};
+	void														setupDescriptorSetLayout						()									{
+		std::vector<VkDescriptorSetLayoutBinding>						setLayoutBindings								=
+			{	vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT, 0)			// Binding 0 : Vertex shader uniform buffer
+			};
 
-		VkDescriptorSetLayoutCreateInfo descriptorLayout =
-			vks::initializers::descriptorSetLayoutCreateInfo(
-				setLayoutBindings.data(),
-				static_cast<uint32_t>(setLayoutBindings.size()));
-
+		VkDescriptorSetLayoutCreateInfo									descriptorLayout								= vks::initializers::descriptorSetLayoutCreateInfo(setLayoutBindings.data(), static_cast<uint32_t>(setLayoutBindings.size()));
 		VK_CHECK_RESULT(vkCreateDescriptorSetLayout(device, &descriptorLayout, nullptr, &descriptorSetLayout));
 
-		VkPipelineLayoutCreateInfo pPipelineLayoutCreateInfo =
-			vks::initializers::pipelineLayoutCreateInfo(
-				&descriptorSetLayout,
-				1);
-
+		VkPipelineLayoutCreateInfo										pPipelineLayoutCreateInfo						= vks::initializers::pipelineLayoutCreateInfo(&descriptorSetLayout, 1);
 		VK_CHECK_RESULT(vkCreatePipelineLayout(device, &pPipelineLayoutCreateInfo, nullptr, &pipelineLayout));
 	}
 
-	void setupDescriptorSet()
-	{
-		VkDescriptorSetAllocateInfo allocInfo =
-			vks::initializers::descriptorSetAllocateInfo(
-				descriptorPool,
-				&descriptorSetLayout,
-				1);
-
+	void														setupDescriptorSet								()									{
+		VkDescriptorSetAllocateInfo										allocInfo										= vks::initializers::descriptorSetAllocateInfo(descriptorPool, &descriptorSetLayout, 1);
 		VK_CHECK_RESULT(vkAllocateDescriptorSets(device, &allocInfo, &descriptorSet));
-
-		std::vector<VkWriteDescriptorSet> writeDescriptorSets =
-		{
-			// Binding 0 : Vertex shader uniform buffer
-			vks::initializers::writeDescriptorSet(
-				descriptorSet,
-				VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-				0,
-				&uniformBuffer.descriptor)
-		};
+		std::vector<VkWriteDescriptorSet>								writeDescriptorSets								=
+			{	vks::initializers::writeDescriptorSet(descriptorSet, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 0, &uniformBuffer.descriptor)	// Binding 0 : Vertex shader uniform buffer
+			};
 
 		vkUpdateDescriptorSets(device, static_cast<uint32_t>(writeDescriptorSets.size()), writeDescriptorSets.data(), 0, NULL);
 	}
 
-	void preparePipelines()
-	{
-		VkPipelineInputAssemblyStateCreateInfo inputAssemblyState =
-			vks::initializers::pipelineInputAssemblyStateCreateInfo(
-				VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST,
-				0,
-				VK_FALSE);
+	void															preparePipelines							()									{
+		VkPipelineInputAssemblyStateCreateInfo							inputAssemblyState								= vks::initializers::pipelineInputAssemblyStateCreateInfo(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST, 0, VK_FALSE);
+		VkPipelineRasterizationStateCreateInfo							rasterizationState								= vks::initializers::pipelineRasterizationStateCreateInfo(VK_POLYGON_MODE_FILL, VK_CULL_MODE_BACK_BIT, VK_FRONT_FACE_CLOCKWISE, 0);
+		VkPipelineColorBlendAttachmentState								blendAttachmentState							= vks::initializers::pipelineColorBlendAttachmentState(0xf, VK_FALSE);
+		VkPipelineColorBlendStateCreateInfo								colorBlendState									= vks::initializers::pipelineColorBlendStateCreateInfo(1, &blendAttachmentState);
+		VkPipelineDepthStencilStateCreateInfo							depthStencilState								= vks::initializers::pipelineDepthStencilStateCreateInfo(VK_TRUE, VK_TRUE, VK_COMPARE_OP_LESS_OR_EQUAL);
+		VkPipelineViewportStateCreateInfo								viewportState									= vks::initializers::pipelineViewportStateCreateInfo(1, 1, 0);
+		VkPipelineMultisampleStateCreateInfo							multisampleState								= vks::initializers::pipelineMultisampleStateCreateInfo(VK_SAMPLE_COUNT_1_BIT);
+		std::vector<VkDynamicState>										dynamicStateEnables								= 
+			{	VK_DYNAMIC_STATE_VIEWPORT
+			,	VK_DYNAMIC_STATE_SCISSOR
+			,	VK_DYNAMIC_STATE_LINE_WIDTH
+			};
+		VkPipelineDynamicStateCreateInfo								dynamicState									= vks::initializers::pipelineDynamicStateCreateInfo(dynamicStateEnables);
+		std::array<VkPipelineShaderStageCreateInfo, 2>					shaderStages;
 
-		VkPipelineRasterizationStateCreateInfo rasterizationState =
-			vks::initializers::pipelineRasterizationStateCreateInfo(
-				VK_POLYGON_MODE_FILL,
-				VK_CULL_MODE_BACK_BIT,
-				VK_FRONT_FACE_CLOCKWISE,
-				0);
+		VkGraphicsPipelineCreateInfo									pipelineCreateInfo								= vks::initializers::pipelineCreateInfo(pipelineLayout, renderPass);
+		pipelineCreateInfo.pInputAssemblyState						= &inputAssemblyState;
+		pipelineCreateInfo.pRasterizationState						= &rasterizationState;
+		pipelineCreateInfo.pColorBlendState							= &colorBlendState;
+		pipelineCreateInfo.pMultisampleState						= &multisampleState;
+		pipelineCreateInfo.pViewportState							= &viewportState;
+		pipelineCreateInfo.pDepthStencilState						= &depthStencilState;
+		pipelineCreateInfo.pDynamicState							= &dynamicState;
+		pipelineCreateInfo.stageCount								= static_cast<uint32_t>(shaderStages.size());
+		pipelineCreateInfo.pStages									= shaderStages.data();
 
-		VkPipelineColorBlendAttachmentState blendAttachmentState =
-			vks::initializers::pipelineColorBlendAttachmentState(
-				0xf,
-				VK_FALSE);
-
-		VkPipelineColorBlendStateCreateInfo colorBlendState =
-			vks::initializers::pipelineColorBlendStateCreateInfo(
-				1,
-				&blendAttachmentState);
-
-		VkPipelineDepthStencilStateCreateInfo depthStencilState =
-			vks::initializers::pipelineDepthStencilStateCreateInfo(
-				VK_TRUE,
-				VK_TRUE,
-				VK_COMPARE_OP_LESS_OR_EQUAL);
-
-		VkPipelineViewportStateCreateInfo viewportState =
-			vks::initializers::pipelineViewportStateCreateInfo(1, 1, 0);
-
-		VkPipelineMultisampleStateCreateInfo multisampleState =
-			vks::initializers::pipelineMultisampleStateCreateInfo(VK_SAMPLE_COUNT_1_BIT);
-
-		std::vector<VkDynamicState> dynamicStateEnables = {
-			VK_DYNAMIC_STATE_VIEWPORT,
-			VK_DYNAMIC_STATE_SCISSOR,
-			VK_DYNAMIC_STATE_LINE_WIDTH,
-		};
-		VkPipelineDynamicStateCreateInfo dynamicState =
-			vks::initializers::pipelineDynamicStateCreateInfo(dynamicStateEnables);
-
-		VkGraphicsPipelineCreateInfo pipelineCreateInfo =
-			vks::initializers::pipelineCreateInfo(pipelineLayout, renderPass);
-
-		std::array<VkPipelineShaderStageCreateInfo, 2> shaderStages;
-
-		pipelineCreateInfo.pInputAssemblyState = &inputAssemblyState;
-		pipelineCreateInfo.pRasterizationState = &rasterizationState;
-		pipelineCreateInfo.pColorBlendState = &colorBlendState;
-		pipelineCreateInfo.pMultisampleState = &multisampleState;
-		pipelineCreateInfo.pViewportState = &viewportState;
-		pipelineCreateInfo.pDepthStencilState = &depthStencilState;
-		pipelineCreateInfo.pDynamicState = &dynamicState;
-		pipelineCreateInfo.stageCount = static_cast<uint32_t>(shaderStages.size());
-		pipelineCreateInfo.pStages = shaderStages.data();
+		// Phong shading pipeline
+		shaderStages[0]												= loadShader(getAssetPath() + "shaders/pipelines/phong.vert.spv", VK_SHADER_STAGE_VERTEX_BIT);
+		shaderStages[1]												= loadShader(getAssetPath() + "shaders/pipelines/phong.frag.spv", VK_SHADER_STAGE_FRAGMENT_BIT);
 
 		// Shared vertex bindings and attributes used by all pipelines
 
@@ -327,81 +239,68 @@ public:
 		// Pipeline derivatives can be used for pipelines that share most of their state
 		// Depending on the implementation this may result in better performance for pipeline 
 		// switchting and faster creation time
-		pipelineCreateInfo.flags = VK_PIPELINE_CREATE_ALLOW_DERIVATIVES_BIT;
+		pipelineCreateInfo.flags									= VK_PIPELINE_CREATE_ALLOW_DERIVATIVES_BIT;
 
 		// Textured pipeline
 		// Phong shading pipeline
 		shaderStages[0] = loadShader(getAssetPath() + "shaders/pipelines/phong.vert.spv", VK_SHADER_STAGE_VERTEX_BIT);
 		shaderStages[1] = loadShader(getAssetPath() + "shaders/pipelines/phong.frag.spv", VK_SHADER_STAGE_FRAGMENT_BIT);
 		VK_CHECK_RESULT(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipelines.phong));
-
-		// All pipelines created after the base pipeline will be derivatives
-		pipelineCreateInfo.flags = VK_PIPELINE_CREATE_DERIVATIVE_BIT;
-		// Base pipeline will be our first created pipeline
-		pipelineCreateInfo.basePipelineHandle = pipelines.phong;
+		pipelineCreateInfo.flags									= VK_PIPELINE_CREATE_DERIVATIVE_BIT;		// All pipelines created after the base pipeline will be derivatives
+		pipelineCreateInfo.basePipelineHandle						= pipelines.phong;							// Base pipeline will be our first created pipeline
 		// It's only allowed to either use a handle or index for the base pipeline
 		// As we use the handle, we must set the index to -1 (see section 9.5 of the specification)
-		pipelineCreateInfo.basePipelineIndex = -1;
+		pipelineCreateInfo.basePipelineIndex						= -1;
 
 		// Toon shading pipeline
-		shaderStages[0] = loadShader(getAssetPath() + "shaders/pipelines/toon.vert.spv", VK_SHADER_STAGE_VERTEX_BIT);
-		shaderStages[1] = loadShader(getAssetPath() + "shaders/pipelines/toon.frag.spv", VK_SHADER_STAGE_FRAGMENT_BIT);
+		shaderStages[0]												= loadShader(getAssetPath() + "shaders/pipelines/toon.vert.spv", VK_SHADER_STAGE_VERTEX_BIT);
+		shaderStages[1]												= loadShader(getAssetPath() + "shaders/pipelines/toon.frag.spv", VK_SHADER_STAGE_FRAGMENT_BIT);
 		VK_CHECK_RESULT(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipelines.toon));
 
 		// Pipeline for wire frame rendering
 		// Non solid rendering is not a mandatory Vulkan feature
-		if (deviceFeatures.fillModeNonSolid)
-		{
-			rasterizationState.polygonMode = VK_POLYGON_MODE_LINE;
-			shaderStages[0] = loadShader(getAssetPath() + "shaders/pipelines/wireframe.vert.spv", VK_SHADER_STAGE_VERTEX_BIT);
-			shaderStages[1] = loadShader(getAssetPath() + "shaders/pipelines/wireframe.frag.spv", VK_SHADER_STAGE_FRAGMENT_BIT);
+		if (deviceFeatures.fillModeNonSolid) {
+			// Pipeline for wire frame rendering
+			rasterizationState.polygonMode								= VK_POLYGON_MODE_LINE;
+			shaderStages[0]												= loadShader(getAssetPath() + "shaders/pipelines/wireframe.vert.spv", VK_SHADER_STAGE_VERTEX_BIT);
+			shaderStages[1]												= loadShader(getAssetPath() + "shaders/pipelines/wireframe.frag.spv", VK_SHADER_STAGE_FRAGMENT_BIT);
 			VK_CHECK_RESULT(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipelines.wireframe));
 		}
 	}
 
 	// Prepare and initialize uniform buffer containing shader uniforms
-	void prepareUniformBuffers()
-	{
+	void														prepareUniformBuffers							()									{
 		// Create the vertex shader uniform buffer block
-		VK_CHECK_RESULT(vulkanDevice->createBuffer(
-			VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-			&uniformBuffer,
-			sizeof(uboVS)));
-
-		// Map persistent
-		VK_CHECK_RESULT(uniformBuffer.map());
+		VK_CHECK_RESULT(vulkanDevice->createBuffer(VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &uniformBuffer, sizeof(uboVS)));
+		VK_CHECK_RESULT(uniformBuffer.map());		// Map persistent
 
 		updateUniformBuffers();
 	}
 
-	void updateUniformBuffers()
-	{
-		uboVS.projection = glm::perspective(glm::radians(60.0f), (float)(width / 3.0f) / (float)height, 0.1f, 256.0f);
+	void														updateUniformBuffers							()									{
+		uboVS.projection											= glm::perspective(glm::radians(60.0f), (float)(width / 3.0f) / (float)height, 0.1f, 256.0f);
 
-		glm::mat4 viewMatrix = glm::translate(glm::mat4(), glm::vec3(0.0f, 0.0f, zoom));
+		glm::mat4														viewMatrix										= glm::translate(glm::mat4(), glm::vec3(0.0f, 0.0f, zoom));
 
-		uboVS.modelView = viewMatrix * glm::translate(glm::mat4(), cameraPos);
-		uboVS.modelView = glm::rotate(uboVS.modelView, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
-		uboVS.modelView = glm::rotate(uboVS.modelView, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
-		uboVS.modelView = glm::rotate(uboVS.modelView, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+		uboVS.modelView												= viewMatrix * glm::translate(glm::mat4(), cameraPos);
+		uboVS.modelView												= glm::rotate(uboVS.modelView, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+		uboVS.modelView												= glm::rotate(uboVS.modelView, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+		uboVS.modelView												= glm::rotate(uboVS.modelView, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
 
 		memcpy(uniformBuffer.mapped, &uboVS, sizeof(uboVS));
 	}
 
-	void draw()
-	{
+	void														draw											()									{
 		VulkanExampleBase::prepareFrame();
 
-		submitInfo.commandBufferCount = 1;
-		submitInfo.pCommandBuffers = &drawCmdBuffers[currentBuffer];
+		submitInfo.commandBufferCount								= 1;
+		submitInfo.pCommandBuffers									= &drawCmdBuffers[currentBuffer];
 		VK_CHECK_RESULT(vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE));
 
 		VulkanExampleBase::submitFrame();
 	}
 
-	void prepare()
-	{
+	void														prepare											()									{
 		VulkanExampleBase::prepare();
 		loadAssets();
 		prepareUniformBuffers();
@@ -410,30 +309,18 @@ public:
 		setupDescriptorPool();
 		setupDescriptorSet();
 		buildCommandBuffers();
-		prepared = true;
+		prepared													= true;
 	}
 
-	virtual void render()
-	{
-		if (!prepared)
-			return;
-		draw();
-	}
-
-	virtual void viewChanged()
-	{
-		updateUniformBuffers();
-	}
-
-	virtual void getOverlayText(VulkanTextOverlay *textOverlay)
-	{
-		textOverlay->addText("Phong shading pipeline",(float)width / 6.0f, height - 35.0f, VulkanTextOverlay::alignCenter);
-		textOverlay->addText("Toon shading pipeline", (float)width / 2.0f, height - 35.0f, VulkanTextOverlay::alignCenter);
-		textOverlay->addText("Wireframe pipeline", width - (float)width / 6.5f, height - 35.0f, VulkanTextOverlay::alignCenter);
-		if (!deviceFeatures.fillModeNonSolid) {
+	virtual void												render											()									{ if (prepared) draw();		}
+	virtual void												viewChanged										()									{ updateUniformBuffers();	}
+	virtual void												getOverlayText									(VulkanTextOverlay *textOverlay_)	{
+		textOverlay_->addText("Phong shading pipeline"	, (float)width / 6.0f			, height - 35.0f, VulkanTextOverlay::alignCenter);
+		textOverlay_->addText("Toon shading pipeline"	, (float)width / 2.0f			, height - 35.0f, VulkanTextOverlay::alignCenter);
+		textOverlay_->addText("Wireframe pipeline"		, width - (float)width / 6.5f	, height - 35.0f, VulkanTextOverlay::alignCenter);
+		if (!deviceFeatures.fillModeNonSolid)
 			textOverlay->addText("Non solid fill modes not supported!", width - (float)width / 6.5f, (float)height / 2.0f - 7.5f, VulkanTextOverlay::alignCenter);
-		}
 	}
 };
 
-VULKAN_EXAMPLE_MAIN()
+VULKAN_EXAMPLE_EXPORT_FUNCTIONS()
