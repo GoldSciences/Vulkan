@@ -251,6 +251,31 @@ public:
 		vkDestroyBuffer	(device, stagingBuffer, nullptr);
 	}
 
+
+	void														loadTextures							()																{
+		// Vulkan core supports three different compressed texture formats
+		// As the support differs between implemementations we need to check device features and select a proper format and file
+		std::string													filename;
+		VkFormat													format;
+		if (deviceFeatures.textureCompressionBC) {
+			filename												= "cubemap_yokohama_bc3_unorm.ktx";
+			format													= VK_FORMAT_BC2_UNORM_BLOCK;
+		}
+		else if (deviceFeatures.textureCompressionASTC_LDR) {
+			filename												= "cubemap_yokohama_astc_8x8_unorm.ktx";
+			format													= VK_FORMAT_ASTC_8x8_UNORM_BLOCK;
+		}
+		else if (deviceFeatures.textureCompressionETC2) {
+			filename												= "cubemap_yokohama_etc2_unorm.ktx";
+			format													= VK_FORMAT_ETC2_R8G8B8_UNORM_BLOCK;
+		}
+		else {
+			vks::tools::exitFatal("Device does not support any compressed texture format!", "Error");
+		}
+
+		loadCubemap(getAssetPath() + "textures/" + filename, format, false);
+	}
+
 	void														reBuildCommandBuffers					()																{
 		if (!checkCommandBuffers()) {
 			destroyCommandBuffers();
@@ -483,13 +508,12 @@ public:
 
 		VulkanExampleBase::submitFrame();
 	}
-
 	void														prepare									()																{
 		VulkanExampleBase::prepare	();
+		loadTextures				();
 		loadMeshes					();
 		setupVertexDescriptions		();
 		prepareUniformBuffers		();
-		loadCubemap(getAssetPath() + "textures/cubemap_yokohama.ktx", VK_FORMAT_BC3_UNORM_BLOCK, false);
 		setupDescriptorSetLayout	();
 		preparePipelines			();
 		setupDescriptorPool			();
@@ -497,7 +521,6 @@ public:
 		buildCommandBuffers			();
 		prepared													= true;
 	}
-
 	virtual void												render									()																{ if (prepared) draw();										}
 	virtual void												viewChanged								()																{ updateUniformBuffers();									}
 	void														toggleSkyBox							()																{ displaySkybox = !displaySkybox; reBuildCommandBuffers();	}

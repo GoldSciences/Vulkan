@@ -237,8 +237,7 @@ void										VulkanExampleBase::renderLoop						()																												{
 			break;
 
 		// Render frame
-		if (prepared)
-		{
+		if (prepared) {
 			auto															tStart							= std::chrono::high_resolution_clock::now();
 			render();
 			frameCounter++;
@@ -248,7 +247,7 @@ void										VulkanExampleBase::renderLoop						()																												{
 			camera.update(frameTimer);
 			// Convert to clamped timer value
 			if (!paused) {
-				timer	+= timerSpeed * frameTimer;
+				timer														+= timerSpeed * frameTimer;
 				if (timer > 1.0)
 					timer -= 1.0f;
 			}
@@ -260,35 +259,45 @@ void										VulkanExampleBase::renderLoop						()																												{
 				fpsTimer													= 0.0f;
 				frameCounter												= 0;
 			}
+
+			bool															updateView						= false;
+
+			// Check touch state (for movement)
+			if (touchDown)
+				touchTimer													+= frameTimer;
+
+			if (touchTimer >= 1.0) {
+				camera.keys.up												= true;
+				viewChanged();
+			}
+
 			// Check gamepad state
 			const float														deadZone						= 0.0015f;
 			// todo : check if gamepad is present
 			// todo : time based and relative axis positions
-			bool															updateView						= false;
-			if (camera.type != Camera::CameraType::firstperson)
-			{
+			if (camera.type != Camera::CameraType::firstperson) {
 				// Rotate
 				if (std::abs(gamePadState.axisLeft.x) > deadZone)	{
 					rotation.y													+= gamePadState.axisLeft.x * 0.5f * rotationSpeed;
 					camera.rotate(glm::vec3(0.0f, gamePadState.axisLeft.x * 0.5f, 0.0f));
-					updateView														= true;
+					updateView													= true;
 				}
 				if (std::abs(gamePadState.axisLeft.y) > deadZone)	{
-					rotation.x														-= gamePadState.axisLeft.y * 0.5f * rotationSpeed;
+					rotation.x													-= gamePadState.axisLeft.y * 0.5f * rotationSpeed;
 					camera.rotate(glm::vec3(gamePadState.axisLeft.y * 0.5f, 0.0f, 0.0f));
-					updateView														= true;
+					updateView													= true;
 				}
 				// Zoom
 				if (std::abs(gamePadState.axisRight.y) > deadZone)	{
-					zoom															-= gamePadState.axisRight.y * 0.01f * zoomSpeed;
-					updateView														= true;
+					zoom														-= gamePadState.axisRight.y * 0.01f * zoomSpeed;
+					updateView													= true;
 				}
 				if (updateView)
 					viewChanged();
 			}
 			else
 			{
-				updateView														= camera.updatePad(gamePadState.axisLeft, gamePadState.axisRight, frameTimer);
+				updateView													= camera.updatePad(gamePadState.axisLeft, gamePadState.axisRight, frameTimer);
 				if (updateView)
 					viewChanged();
 			}
@@ -423,7 +432,11 @@ void										VulkanExampleBase::updateTextOverlay				()																								
 	ss << std::fixed << std::setprecision(3) << (frameTimer * 1000.0f) << "ms (" << lastFPS << " fps)";
 	textOverlay->addText(ss.str(), 5.0f, 25.0f, VulkanTextOverlay::alignLeft);
 
-	textOverlay->addText(deviceProperties.deviceName, 5.0f, 45.0f, VulkanTextOverlay::alignLeft);
+	std::string deviceName(deviceProperties.deviceName);
+#if defined(__ANDROID__)	
+	deviceName += " (" + androidProduct + ")";
+#endif
+	textOverlay->addText(deviceName, 5.0f, 45.0f, VulkanTextOverlay::alignLeft);
 
 	getOverlayText(textOverlay);
 
@@ -508,7 +521,7 @@ void										VulkanExampleBase::submitFrame						()																												
 	
 #if defined(__ANDROID__)
 	// Vulkan library is loaded dynamically on Android
-	bool													libLoaded							= loadVulkanLibrary();
+	bool													libLoaded							= vks::android::loadVulkanLibrary();
 	assert(libLoaded);
 #elif defined(_DIRECT2DISPLAY)
 
@@ -592,20 +605,18 @@ void										VulkanExampleBase::initVulkan						()																												{
 		vks::tools::exitFatal("Could not create Vulkan instance : \n" + vks::tools::errorString(err), "Fatal error");
 
 #if defined(__ANDROID__)
-	loadVulkanFunctions(instance);
+	vks::android::loadVulkanFunctions(instance);
 #endif
 
 	// If requested, we enable the default validation layers for debugging
 	if (settings.validation) {
-		// The report flags determine what type of messages for the layers will be displayed. For validating (debugging) an appplication the error and warning bits should suffice.
-		VkDebugReportFlagsEXT											debugReportFlags				= VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT | VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT;
+		// The report flags determine what type of messages for the layers will be displayed. For validating (debugging) an appplication the error and warning bits should suffice
+		VkDebugReportFlagsEXT											debugReportFlags			= VK_DEBUG_REPORT_ERROR_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT;
 		vks::debug::setupDebugging(instance, debugReportFlags, VK_NULL_HANDLE);	// Additional flags include performance info, loader and layer debug messages, etc.
 	}
-
-	// Physical device
-	uint32_t														gpuCount						= 0;
-	// Get number of available physical devices
-	VK_CHECK_RESULT(vkEnumeratePhysicalDevices(instance, &gpuCount, nullptr));
+	
+	uint32_t														gpuCount						= 0;	// Physical device
+	VK_CHECK_RESULT(vkEnumeratePhysicalDevices(instance, &gpuCount, nullptr));								// Get number of available physical devices
 	assert(gpuCount > 0);
 	// Enumerate devices
 	std::vector<VkPhysicalDevice>									physicalDevices(gpuCount);
@@ -614,9 +625,7 @@ void										VulkanExampleBase::initVulkan						()																												{
 		vks::tools::exitFatal("Could not enumerate physical devices : \n" + vks::tools::errorString(err), "Fatal error");
 
 	// GPU selection
-
-	// Select physical device to be used for the Vulkan example
-	// Defaults to the first device unless specified by command line
+	// Select physical device to be used for the Vulkan example. Defaults to the first device unless specified by command line.
 	uint32_t														selectedDevice					= 0;
 
 #if !defined(__ANDROID__)	
@@ -624,15 +633,13 @@ void										VulkanExampleBase::initVulkan						()																												{
 	for (size_t i = 0; i < args.size(); i++)
 	{
 		// Select GPU
-		if ((args[i] == std::string("-g")) || (args[i] == std::string("-gpu")))
-		{
+		if ((args[i] == std::string("-g")) || (args[i] == std::string("-gpu"))) {
 			char															* endptr						= nullptr;
 			uint32_t														index							= strtol(args[i + 1], &endptr, 10);
 			if (endptr != args[i + 1])  { 
 				if (index > gpuCount - 1)
 					std::cerr << "Selected device index " << index << " is out of range, reverting to device 0 (use -listgpus to show available Vulkan devices)" << std::endl;
-				else
-				{
+				else {
 					std::cout << "Selected Vulkan device " << index << std::endl;
 					selectedDevice												= index;
 				}
@@ -664,6 +671,14 @@ void										VulkanExampleBase::initVulkan						()																												{
 
 	physicalDevice											= physicalDevices[selectedDevice];
 
+	// Store properties (including limits), features and memory properties of the phyiscal device (so that examples can check against them)
+	vkGetPhysicalDeviceProperties(physicalDevice, &deviceProperties);
+	vkGetPhysicalDeviceFeatures(physicalDevice, &deviceFeatures);
+	vkGetPhysicalDeviceMemoryProperties(physicalDevice, &deviceMemoryProperties);
+
+	// Derived examples can override this to set actual features (based on above readings) to enable for logical device creation
+	getEnabledFeatures();
+
 	// Vulkan device creation
 	// This is handled by a separate class that gets a logical device representation
 	// and encapsulates functions related to a device
@@ -673,14 +688,6 @@ void										VulkanExampleBase::initVulkan						()																												{
 		vks::tools::exitFatal("Could not create Vulkan device: \n" + vks::tools::errorString(res), "Fatal error");
 	}
 	device													= vulkanDevice->logicalDevice;
-
-	// todo: remove
-	// Store properties (including limits) and features of the phyiscal device
-	// So examples can check against them and see if a feature is actually supported
-	vkGetPhysicalDeviceProperties(physicalDevice, &deviceProperties);
-	vkGetPhysicalDeviceFeatures(physicalDevice, &deviceFeatures);
-	// Gather physical device memory properties
-	vkGetPhysicalDeviceMemoryProperties(physicalDevice, &deviceMemoryProperties);
 
 	// Get a graphics queue from the device
 	vkGetDeviceQueue(device, vulkanDevice->queueFamilyIndices.graphics, 0, &queue);
@@ -696,19 +703,32 @@ void										VulkanExampleBase::initVulkan						()																												{
 	
 	VK_CHECK_RESULT(vkCreateSemaphore(device, &semaphoreCreateInfo, nullptr, &semaphores.presentComplete));		// Create a semaphore used to synchronize image presentation. Ensures that the image is displayed before we start submitting new commands to the queu
 	VK_CHECK_RESULT(vkCreateSemaphore(device, &semaphoreCreateInfo, nullptr, &semaphores.renderComplete));		// Create a semaphore used to synchronize command submission. Ensures that the image is not presented until all commands have been sumbitted and executed
-	
 	VK_CHECK_RESULT(vkCreateSemaphore(device, &semaphoreCreateInfo, nullptr, &semaphores.textOverlayComplete));	// Create a semaphore used to synchronize command submission. Ensures that the image is not presented until all commands for the text overlay have been sumbitted and executed.
 																												// Will be inserted after the render complete semaphore if the text overlay is enabled
 
 	// Set up submit info structure
 	// Semaphores will stay the same during application lifetime
 	// Command buffer submission info is set by each example
-	submitInfo													= vks::initializers::submitInfo();
-	submitInfo.pWaitDstStageMask								= &submitPipelineStages;
-	submitInfo.waitSemaphoreCount								= 1;
-	submitInfo.pWaitSemaphores									= &semaphores.presentComplete;
-	submitInfo.signalSemaphoreCount								= 1;
-	submitInfo.pSignalSemaphores								= &semaphores.renderComplete;
+	submitInfo												= vks::initializers::submitInfo();
+	submitInfo.pWaitDstStageMask							= &submitPipelineStages;
+	submitInfo.waitSemaphoreCount							= 1;
+	submitInfo.pWaitSemaphores								= &semaphores.presentComplete;
+	submitInfo.signalSemaphoreCount							= 1;
+	submitInfo.pSignalSemaphores							= &semaphores.renderComplete;
+
+#if defined(__ANDROID__)
+	// Get Android device name and manufacturer (to display along GPU name)
+	androidProduct											= "";
+	char														prop[PROP_VALUE_MAX+1];
+	int															len								= __system_property_get("ro.product.manufacturer", prop);
+	if (len > 0)
+		androidProduct											+= std::string(prop) + " ";
+	len														= __system_property_get("ro.product.model", prop);
+	if (len > 0)
+		androidProduct											+= std::string(prop);
+
+	LOGD("androidProduct = %s", androidProduct.c_str());
+#endif	
 }
 
 #if defined(_WIN32)
@@ -905,21 +925,68 @@ void										VulkanExampleBase::handleMessages					(HWND hWnd, UINT uMsg, WPARA
 	}
 }
 #elif defined(__ANDROID__)
-int32_t										VulkanExampleBase::handleAppInput					(struct android_app* app, AInputEvent* event)																	{
-	VulkanExampleBase												* vulkanExample						= reinterpret_cast<VulkanExampleBase*>(app->userData);
-	if (AInputEvent_getType(event) == AINPUT_EVENT_TYPE_MOTION) {
-		if (AInputEvent_getSource(event) == AINPUT_SOURCE_JOYSTICK) {
-			// Left thumbstick
-			vulkanExample->gamePadState.axisLeft.x						= AMotionEvent_getAxisValue(event, AMOTION_EVENT_AXIS_X, 0);
-			vulkanExample->gamePadState.axisLeft.y						= AMotionEvent_getAxisValue(event, AMOTION_EVENT_AXIS_Y, 0);
-			// Right thumbstick
-			vulkanExample->gamePadState.axisRight.x						= AMotionEvent_getAxisValue(event, AMOTION_EVENT_AXIS_Z, 0);
-			vulkanExample->gamePadState.axisRight.y						= AMotionEvent_getAxisValue(event, AMOTION_EVENT_AXIS_RZ, 0);
+int32_t VulkanExampleBase::handleAppInput(struct android_app* app, AInputEvent* event)
+{
+	VulkanExampleBase* vulkanExample = reinterpret_cast<VulkanExampleBase*>(app->userData);
+	if (AInputEvent_getType(event) == AINPUT_EVENT_TYPE_MOTION)
+	{
+		int32_t eventSource = AInputEvent_getSource(event);
+		switch (eventSource) {
+			case AINPUT_SOURCE_JOYSTICK: {
+				// Left thumbstick
+				vulkanExample->gamePadState.axisLeft.x = AMotionEvent_getAxisValue(event, AMOTION_EVENT_AXIS_X, 0);
+				vulkanExample->gamePadState.axisLeft.y = AMotionEvent_getAxisValue(event, AMOTION_EVENT_AXIS_Y, 0);
+				// Right thumbstick
+				vulkanExample->gamePadState.axisRight.x = AMotionEvent_getAxisValue(event, AMOTION_EVENT_AXIS_Z, 0);
+				vulkanExample->gamePadState.axisRight.y = AMotionEvent_getAxisValue(event, AMOTION_EVENT_AXIS_RZ, 0);
+				break;
+			}
+
+			case AINPUT_SOURCE_TOUCHSCREEN: {
+				int32_t action = AMotionEvent_getAction(event);
+
+				switch (action) {
+					case AMOTION_EVENT_ACTION_UP: {
+						vulkanExample->touchTimer = 0.0;
+						vulkanExample->touchDown = false;
+						vulkanExample->camera.keys.up = false;
+						return 1;
+						break;
+					}
+					case AMOTION_EVENT_ACTION_DOWN: {
+						vulkanExample->touchPos.x = AMotionEvent_getX(event, 0);
+						vulkanExample->touchPos.y = AMotionEvent_getY(event, 0);
+						vulkanExample->touchDown = true;
+						break;
+					}
+					case AMOTION_EVENT_ACTION_MOVE: {
+						int32_t eventX = AMotionEvent_getX(event, 0);
+						int32_t eventY = AMotionEvent_getY(event, 0);
+
+						float deltaX = (float)(vulkanExample->touchPos.y - eventY) * vulkanExample->rotationSpeed * 0.5f;
+						float deltaY = (float)(vulkanExample->touchPos.x - eventX) * vulkanExample->rotationSpeed * 0.5f;
+
+						vulkanExample->camera.rotate(glm::vec3(deltaX, 0.0f, 0.0f));
+						vulkanExample->camera.rotate(glm::vec3(0.0f, -deltaY, 0.0f));
+
+						vulkanExample->rotation.x += deltaX;				
+						vulkanExample->rotation.y -= deltaY;				
+
+						vulkanExample->viewChanged();	
+
+						vulkanExample->touchPos.x = eventX;
+						vulkanExample->touchPos.y = eventY;
+
+						break;
+					}
+					default:
+						return 1;
+						break;
+				}
+			}
+
+			return 1;
 		}
-		else {
-			// todo : touch input
-		}
-		return 1;
 	}
 
 	if (AInputEvent_getType(event) == AINPUT_EVENT_TYPE_KEY) {
@@ -1500,8 +1567,9 @@ void										VulkanExampleBase::setupRenderPass					()																									
 
 	VK_CHECK_RESULT(vkCreateRenderPass(device, &renderPassInfo, nullptr, &renderPass));
 }
-														
-void										VulkanExampleBase::windowResize						()																												{
+
+void VulkanExampleBase::windowResize()
+{
 	if (!prepared)
 		return;
 

@@ -51,32 +51,43 @@ public:
 		VkPipeline													normals									= VK_NULL_HANDLE;
 	}															pipelines;
 
-	VkPipelineLayout											pipelineLayout							= VK_NULL_HANDLE;
-	VkDescriptorSet												descriptorSet							= VK_NULL_HANDLE;
-	VkDescriptorSetLayout										descriptorSetLayout						= VK_NULL_HANDLE;
+	VkPipelineLayout											pipelineLayout;
+	VkDescriptorSet												descriptorSet;
+	VkDescriptorSetLayout										descriptorSetLayout;
 
-																VulkanExample							()									: VulkanExampleBase(ENABLE_VALIDATION)	{
+																VulkanExample							()									: VulkanExampleBase(ENABLE_VALIDATION)
+	{
 		zoom														= -8.0f;
 		rotation													= glm::vec3(0.0f, -25.0f, 0.0f);
 		enableTextOverlay											= true;
 		title														= "Vulkan Example - Geometry shader";
-		// Enable physical device features required for this example		
-		enabledFeatures.geometryShader								= VK_TRUE;		// Tell the driver that we are going to use geometry shaders
 	}
 
 																~VulkanExample							()									{
 		// Clean up used Vulkan resources 
 		// Note : Inherited destructor cleans up resources stored in base class
-		vkDestroyPipeline				(device, pipelines.solid, nullptr);
-		vkDestroyPipeline				(device, pipelines.normals, nullptr);
+		vkDestroyPipeline				(device, pipelines.solid	, nullptr);
+		vkDestroyPipeline				(device, pipelines.normals	, nullptr);
 
-		vkDestroyPipelineLayout			(device, pipelineLayout, nullptr);
+		vkDestroyPipelineLayout			(device, pipelineLayout		, nullptr);
 		vkDestroyDescriptorSetLayout	(device, descriptorSetLayout, nullptr);
 
 		models.object		.destroy();
 
 		uniformBuffers.GS	.destroy();
 		uniformBuffers.VS	.destroy();
+	}
+
+
+	// Enable physical device features required for this example				
+	virtual void												getEnabledFeatures						()									{
+		// Geometry shader support is required for this example
+		if (deviceFeatures.fillModeNonSolid) {
+			enabledFeatures.geometryShader								= VK_TRUE;
+		}
+		else {
+			vks::tools::exitFatal("Selected GPU does not support geometry shaders!", "Feature not supported");
+		}
 	}
 
 	void														reBuildCommandBuffers					()									{
@@ -135,7 +146,6 @@ public:
 			}
 
 			vkCmdEndRenderPass		(drawCmdBuffers[i]);
-
 			VK_CHECK_RESULT(vkEndCommandBuffer(drawCmdBuffers[i]));
 		}
 	}

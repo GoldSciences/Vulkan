@@ -267,8 +267,28 @@ public:
 		vkDestroyBuffer	(device, stagingBuffer, nullptr);
 	}
 
+
 	void														loadTextures							()										{
-		loadTextureArray(getAssetPath() + "textures/texturearray_bc3.ktx", VK_FORMAT_BC3_UNORM_BLOCK);
+		// Vulkan core supports three different compressed texture formats
+		// As the support differs between implemementations we need to check device features and select a proper format and file
+		std::string														filename;
+		VkFormat														format;
+		if (deviceFeatures.textureCompressionBC) {
+			filename												= "texturearray_bc3_unorm.ktx";
+			format													= VK_FORMAT_BC3_UNORM_BLOCK;
+		}
+		else if (deviceFeatures.textureCompressionASTC_LDR) {
+			filename												= "texturearray_astc_8x8_unorm.ktx";
+			format													= VK_FORMAT_ASTC_8x8_UNORM_BLOCK;
+		}
+		else if (deviceFeatures.textureCompressionETC2) {
+			filename												= "texturearray_etc2_unorm.ktx";
+			format													= VK_FORMAT_ETC2_R8G8B8_UNORM_BLOCK;
+		}
+		else {
+			vks::tools::exitFatal("Device does not support any compressed texture format!", "Error");
+		}
+		loadTextureArray(getAssetPath() + "textures/" + filename, format);
 	}
 
 	void														buildCommandBuffers						()										{
@@ -484,10 +504,11 @@ public:
 		VulkanExampleBase::submitFrame();
 	}
 
+
 	void														prepare									()										{
 		VulkanExampleBase::prepare	();
-		setupVertexDescriptions		();
 		loadTextures				();
+		setupVertexDescriptions		();
 		generateQuad				();
 		prepareUniformBuffers		();
 		setupDescriptorSetLayout	();

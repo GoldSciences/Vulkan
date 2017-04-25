@@ -12,8 +12,22 @@ namespace vks
 {
 	namespace debug
 	{
+#if !defined(__ANDROID__)
+		// On desktop the LunarG loaders exposes a meta layer that contains all layers
 		int										validationLayerCount			= 1;
-		const char								* validationLayerNames[]		= {"VK_LAYER_LUNARG_standard_validation"}; // This is a meta layer that enables all of the standard validation layers in the correct order: threading, parameter_validation, device_limits, object_tracker, image, core_validation, swapchain, and unique_objects
+		const char								* validationLayerNames[]		= {"VK_LAYER_LUNARG_standard_validation"};
+#else
+		// On Android we need to explicitly select all layers
+		int32_t									validationLayerCount			= 6;
+		const char								* validationLayerNames[]		= 
+			{	"VK_LAYER_GOOGLE_threading"
+			,	"VK_LAYER_LUNARG_parameter_validation"
+			,	"VK_LAYER_LUNARG_object_tracker"
+			,	"VK_LAYER_LUNARG_core_validation"
+			,	"VK_LAYER_LUNARG_swapchain"
+			,	"VK_LAYER_GOOGLE_unique_objects"
+			};
+#endif
 
 		PFN_vkCreateDebugReportCallbackEXT		CreateDebugReportCallback		= VK_NULL_HANDLE;
 		PFN_vkDestroyDebugReportCallbackEXT		DestroyDebugReportCallback		= VK_NULL_HANDLE;
@@ -21,7 +35,7 @@ namespace vks
 
 		VkDebugReportCallbackEXT				msgCallback;
 
-		VkBool32								messageCallback				
+		VkBool32								messageCallback					
 			(	VkDebugReportFlagsEXT		flags
 			,	VkDebugReportObjectTypeEXT	objType
 			,	uint64_t					srcObject
@@ -32,15 +46,34 @@ namespace vks
 			,	void						* pUserData
 			)
 		{
-			std::string									prefix("");												// Select prefix depending on flags passed to the callback. Note that multiple flags may be set for a single validation message
-			
-			if (flags & VK_DEBUG_REPORT_ERROR_BIT_EXT)					prefix += "ERROR:"		;	// Error that may result in undefined behaviour
-			if (flags & VK_DEBUG_REPORT_WARNING_BIT_EXT)				prefix += "WARNING:"	;	// Warnings may hint at unexpected / non-spec API usage
-			if (flags & VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT)	prefix += "PERFORMANCE:";	// May indicate sub-optimal usage of the API
-			if (flags & VK_DEBUG_REPORT_INFORMATION_BIT_EXT)			prefix += "INFO:"		;	// Informal messages that may become handy during debugging
-			if (flags & VK_DEBUG_REPORT_DEBUG_BIT_EXT)					prefix += "DEBUG:"		;	// Diagnostic info from the Vulkan loader and layers. Usually not helpful in terms of API usage, but may help to debug layer and loader problems 
-			
-			std::cout << prefix << " [" << pLayerPrefix << "] Code " << msgCode << " : " << pMsg << "\n";	// Display message to default output (console if activated)
+			// Select prefix depending on flags passed to the callback
+			// Note that multiple flags may be set for a single validation message
+			std::string									prefix							("");
+			if (flags & VK_DEBUG_REPORT_ERROR_BIT_EXT)					prefix += "ERROR:"			;	// Error that may result in undefined behaviour
+			if (flags & VK_DEBUG_REPORT_WARNING_BIT_EXT)				prefix += "WARNING:"		;	// Warnings may hint at unexpected / non-spec API usage
+			if (flags & VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT)	prefix += "PERFORMANCE:"	;	// May indicate sub-optimal usage of the API
+			if (flags & VK_DEBUG_REPORT_INFORMATION_BIT_EXT)			prefix += "INFO:"			;	// Informal messages that may become handy during debugging
+			if (flags & VK_DEBUG_REPORT_DEBUG_BIT_EXT)					prefix += "DEBUG:"			;	// Diagnostic info from the Vulkan loader and layers. Usually not helpful in terms of API usage, but may help to debug layer and loader problems 
+
+			// Display message to default output (console/logcat)
+			std::stringstream							debugMessage;
+			debugMessage << prefix << " [" << pLayerPrefix << "] Code " << msgCode << " : " << pMsg;
+
+#if defined(__ANDROID__)
+			if (flags & VK_DEBUG_REPORT_ERROR_BIT_EXT) {
+				LOGE("%s", debugMessage.str().c_str());
+			}
+			else {
+				LOGD("%s", debugMessage.str().c_str());
+			}
+#else
+			if (flags & VK_DEBUG_REPORT_ERROR_BIT_EXT) {
+				std::cerr << debugMessage.str() << "\n";
+			}
+			else {
+				std::cout << debugMessage.str() << "\n";
+			}
+#endif
 
 			fflush(stdout);
 
@@ -55,12 +88,12 @@ namespace vks
 			DestroyDebugReportCallback				= reinterpret_cast<PFN_vkDestroyDebugReportCallbackEXT	>(vkGetInstanceProcAddr(instance, "vkDestroyDebugReportCallbackEXT"	));
 			dbgBreakCallback						= reinterpret_cast<PFN_vkDebugReportMessageEXT			>(vkGetInstanceProcAddr(instance, "vkDebugReportMessageEXT"			));
 
-			VkDebugReportCallbackCreateInfoEXT			dbgCreateInfo	= {};
+			VkDebugReportCallbackCreateInfoEXT			dbgCreateInfo					= {};
 			dbgCreateInfo.sType						= VK_STRUCTURE_TYPE_DEBUG_REPORT_CREATE_INFO_EXT;
 			dbgCreateInfo.pfnCallback				= (PFN_vkDebugReportCallbackEXT)messageCallback;
 			dbgCreateInfo.flags						= flags;
 
-			VkResult									err				= CreateDebugReportCallback(instance, &dbgCreateInfo, nullptr, (callBack != VK_NULL_HANDLE) ? &callBack : &msgCallback);
+			VkResult									err								= CreateDebugReportCallback(instance, &dbgCreateInfo, nullptr, (callBack != VK_NULL_HANDLE) ? &callBack : &msgCallback);
 			assert(!err);
 		}
 

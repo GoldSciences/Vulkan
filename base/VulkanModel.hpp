@@ -9,7 +9,6 @@
 #include <string>
 #include <fstream>
 #include <vector>
-#include <map>
 
 #include "vulkan/vulkan.h"
 
@@ -127,7 +126,12 @@ namespace vks
 			// Meshes are stored inside the apk on Android (compressed)
 			// So they need to be loaded via the asset manager
 
-			AAsset* asset					= AAssetManager_open(androidApp->activity->assetManager, filename.c_str(), AASSET_MODE_STREAMING);
+
+			AAsset* asset = AAssetManager_open(androidApp->activity->assetManager, filename.c_str(), AASSET_MODE_STREAMING);
+			if (!asset) {
+				LOGE("Could not load mesh from \"%s\"!", filename.c_str());
+				return false;
+			}
 			assert(asset);
 			size_t								size					= AAsset_getLength(asset);
 

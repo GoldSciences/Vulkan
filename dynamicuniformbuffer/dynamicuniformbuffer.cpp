@@ -180,7 +180,7 @@ public:
 		VulkanExampleBase::submitFrame();
 	}
 
-	void														generateTriangle						()								{
+	void														generateCube							()								{
 		// Setup vertices indices for a colored cube
 		std::vector<Vertex>												_vertices								=
 			{	{ { -1.0f, -1.0f,  1.0f },{ 1.0f, 0.0f, 0.0f } }
@@ -385,7 +385,7 @@ public:
 
 	void														prepare									()								{
 		VulkanExampleBase::prepare	();
-		generateTriangle			();
+		generateCube();
 		setupVertexDescriptions		();
 		prepareUniformBuffers		();
 		setupDescriptorSetLayout	();

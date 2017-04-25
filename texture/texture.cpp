@@ -61,10 +61,11 @@ public:
 	VkDescriptorSet												descriptorSet						= VK_NULL_HANDLE;
 	VkDescriptorSetLayout										descriptorSetLayout					= VK_NULL_HANDLE;
 
-																VulkanExample						()																: VulkanExampleBase(ENABLE_VALIDATION)	{
+																VulkanExample						()																: VulkanExampleBase(ENABLE_VALIDATION)
+	{
 		zoom														= -2.5f;
 		rotation													= { 0.0f, 15.0f, 0.0f };
-		title														= "Vulkan Example - Texturing";
+		title														= "Vulkan Example - Texture loading";
 		enableTextOverlay											= true;
 	}
 
@@ -377,10 +378,34 @@ public:
 		vkFreeMemory		(device, texture_.deviceMemory	, nullptr);
 	}
 
+	void														loadTextures						()																{
+		// Vulkan core supports three different compressed texture formats
+		// As the support differs between implemementations we need to check device features and select a proper format and file
+		std::string														filename;
+		VkFormat														format;
+		if (deviceFeatures.textureCompressionBC) {
+			filename													= "metalplate01_bc2_unorm.ktx";
+			format														= VK_FORMAT_BC2_UNORM_BLOCK;
+		}
+		else if (deviceFeatures.textureCompressionASTC_LDR) {
+			filename													= "metalplate01_astc_8x8_unorm.ktx";
+			format														= VK_FORMAT_ASTC_8x8_UNORM_BLOCK;
+		}
+		else if (deviceFeatures.textureCompressionETC2) {
+			filename													= "metalplate01_etc2_unorm.ktx";
+			format														= VK_FORMAT_ETC2_R8G8B8A8_UNORM_BLOCK;
+		}
+		else {
+			vks::tools::exitFatal("Device does not support any compressed texture format!", "Error");
+		}
+
+		loadTexture(getAssetPath() + "textures/" + filename, format, false);
+	}
+
 	void														buildCommandBuffers					()																{
 		VkCommandBufferBeginInfo										cmdBufInfo							= vks::initializers::commandBufferBeginInfo();
 
-		VkClearValue													clearValues[2];
+		VkClearValue													clearValues[2]						= {};
 		clearValues[0].color										= defaultClearColor;
 		clearValues[1].depthStencil									= { 1.0f, 0 };
 
@@ -577,10 +602,10 @@ public:
 
 	void														prepare								()																{
 		VulkanExampleBase::prepare	();
+		loadTextures				();
 		generateQuad				();
 		setupVertexDescriptions		();
 		prepareUniformBuffers		();
-		loadTexture(getAssetPath() + "textures/pattern_02_bc2.ktx", VK_FORMAT_BC2_UNORM_BLOCK, false);
 		setupDescriptorSetLayout	();
 		preparePipelines			();
 		setupDescriptorPool			();

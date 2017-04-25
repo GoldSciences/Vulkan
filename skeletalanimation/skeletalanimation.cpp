@@ -7,12 +7,7 @@
 #include "VulkanTexture.hpp"
 #include "VulkanModel.hpp"
 
-#include <glm/gtc/type_ptr.hpp>
-
-#include <assimp/Importer.hpp> 
-#include <assimp/scene.h>     
-#include <assimp/postprocess.h>
-#include <assimp/cimport.h>
+#include <map>
 
 #define VERTEX_BUFFER_BIND_ID	0
 #define ENABLE_VALIDATION		false
@@ -46,8 +41,8 @@ vks::VertexLayout											vertexLayout					= vks::VertexLayout(
 // Per-vertex bone IDs and weights
 struct VertexBoneData
 {
-	std::array<uint32_t, MAX_BONES_PER_VERTEX>					IDs;
-	std::array<float, MAX_BONES_PER_VERTEX>						weights;
+	std::array<uint32_t	, MAX_BONES_PER_VERTEX>					IDs;
+	std::array<float	, MAX_BONES_PER_VERTEX>					weights;
 
 	// Ad bone weighting to vertex info
 	void														add								(uint32_t boneID, float weight)														{

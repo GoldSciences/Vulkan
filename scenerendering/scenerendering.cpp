@@ -119,6 +119,16 @@ private:
 			std::cout << "Material \"" << materials[i].name << "\"" << std::endl;
 
 			// Textures
+			std::string														texFormatSuffix;
+			VkFormat														texFormat;
+			// Get supported compressed texture format
+				 if (vulkanDevice->features.textureCompressionBC		) { texFormatSuffix	= "_bc3_unorm"		; texFormat		= VK_FORMAT_BC3_UNORM_BLOCK			; }
+			else if (vulkanDevice->features.textureCompressionASTC_LDR	) { texFormatSuffix	= "_astc_8x8_unorm"	; texFormat		= VK_FORMAT_ASTC_8x8_UNORM_BLOCK	; }
+			else if (vulkanDevice->features.textureCompressionETC2		) { texFormatSuffix	= "_etc2_unorm"		; texFormat		= VK_FORMAT_ETC2_R8G8B8_UNORM_BLOCK	; }
+			else {
+				vks::tools::exitFatal("Device does not support any compressed texture format!", "Error");
+			}
+
 			aiString														texturefile;
 			// Diffuse
 			aScene->mMaterials[i]->GetTexture(aiTextureType_DIFFUSE, 0, &texturefile);
@@ -126,20 +136,17 @@ private:
 				std::cout << "  Diffuse: \"" << texturefile.C_Str() << "\"" << std::endl;
 				std::string														fileName					= std::string(texturefile.C_Str());
 				std::replace(fileName.begin(), fileName.end(), '\\', '/');
-				materials[i].diffuse.loadFromFile(assetPath + fileName, VK_FORMAT_BC3_UNORM_BLOCK, vulkanDevice, queue);
+				fileName.insert(fileName.find(".ktx"), texFormatSuffix);
+				materials[i].diffuse.loadFromFile(assetPath + fileName, texFormat, vulkanDevice, queue);
 			}
-			else
-			{
+			else {
 				std::cout << "  Material has no diffuse, using dummy texture!" << std::endl;
 				// todo : separate pipeline and layout
-				materials[i].diffuse.loadFromFile(assetPath + "dummy.ktx", VK_FORMAT_BC2_UNORM_BLOCK, vulkanDevice, queue);
+				materials[i].diffuse.loadFromFile(assetPath + "dummy_rgba_unorm.ktx", VK_FORMAT_R8G8B8A8_UNORM, vulkanDevice, queue);
 			}
 
-			// For scenes with multiple textures per material we would need to check for additional texture types, e.g.:
-			// aiTextureType_HEIGHT, aiTextureType_OPACITY, aiTextureType_SPECULAR, etc.
-
-			// Assign pipeline
-			materials[i].pipeline										= (materials[i].properties.opacity == 0.0f) ? &pipelines.solid : &pipelines.blending;
+			// For scenes with multiple textures per material we would need to check for additional texture types, e.g.: aiTextureType_HEIGHT, aiTextureType_OPACITY, aiTextureType_SPECULAR, etc.
+			materials[i].pipeline										= (materials[i].properties.opacity == 0.0f) ? &pipelines.solid : &pipelines.blending;	// Assign pipeline
 		}
 
 		// Generate descriptor sets for the materials
@@ -428,17 +435,25 @@ public:
 		std::vector<VkVertexInputAttributeDescription>				attributeDescriptions;
 	}															vertices;
 
-																~VulkanExample					()													{ delete(scene);						}
-																VulkanExample					()													: VulkanExampleBase(ENABLE_VALIDATION)	{
+																~VulkanExample					()													{ delete(scene); }
+																VulkanExample					()													: VulkanExampleBase(ENABLE_VALIDATION)
+	{
+		title														= "Vulkan Example - Scene rendering";
 		rotationSpeed												= 0.5f;
 		enableTextOverlay											= true;
 		camera.type													= Camera::CameraType::firstperson;
 		camera.movementSpeed										= 7.5f;
 		camera.position												= { 15.0f, -13.5f, 0.0f };
-		camera.setRotation		(glm::vec3(5.0f, 90.0f, 0.0f));
-		camera.setPerspective	(60.0f, (float)width / (float)height, 0.1f, 256.0f);
-		title														= "Vulkan Example - Scene rendering";
-		enabledFeatures.fillModeNonSolid							= VK_TRUE;
+		camera.setRotation(glm::vec3(5.0f, 90.0f, 0.0f));
+		camera.setPerspective(60.0f, (float)width / (float)height, 0.1f, 256.0f);
+	}
+
+
+	// Enable physical device features required for this example				
+	virtual void												getEnabledFeatures				()													{
+		
+		if (deviceFeatures.fillModeNonSolid)	// Fill mode non solid is required for wireframe display
+			enabledFeatures.fillModeNonSolid							= VK_TRUE;
 	}
 
 	void														reBuildCommandBuffers			()													{
@@ -547,11 +562,13 @@ public:
 		VK_CHECK_RESULT(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &scene->pipelines.blending));
 
 		// Wire frame rendering pipeline
-		rasterizationState.cullMode									= VK_CULL_MODE_BACK_BIT;
-		blendAttachmentState.blendEnable							= VK_FALSE;
-		rasterizationState.polygonMode								= VK_POLYGON_MODE_LINE;
-		rasterizationState.lineWidth								= 1.0f;
-		VK_CHECK_RESULT(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &scene->pipelines.wireframe));
+		if (deviceFeatures.fillModeNonSolid) {
+			rasterizationState.cullMode									= VK_CULL_MODE_BACK_BIT;
+			blendAttachmentState.blendEnable							= VK_FALSE;
+			rasterizationState.polygonMode								= VK_POLYGON_MODE_LINE;
+			rasterizationState.lineWidth								= 1.0f;
+			VK_CHECK_RESULT(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &scene->pipelines.wireframe));
+		}
 	}
 
 	void														updateUniformBuffers			()													{
@@ -607,8 +624,10 @@ public:
 		{
 		case KEY_SPACE:
 		case GAMEPAD_BUTTON_A:
-			wireframe													= !wireframe;
-			reBuildCommandBuffers();
+			if (deviceFeatures.fillModeNonSolid) {
+				wireframe													= !wireframe;
+				reBuildCommandBuffers();
+			}
 			break;
 		case KEY_P:
 			scene->renderSingleScenePart								= !scene->renderSingleScenePart;
@@ -632,16 +651,19 @@ public:
 		}
 	}
 
-	virtual void												getOverlayText					(VulkanTextOverlay *textOverlay_)					{
+	virtual void getOverlayText(VulkanTextOverlay *textOverlay)
+	{
+		if (deviceFeatures.fillModeNonSolid) {
 #if defined(__ANDROID__)
-		textOverlay_->addText("Press \"Button A\" to toggle wireframe", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
+			textOverlay->addText("Press \"Button A\" to toggle wireframe", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
 #else
-		textOverlay_->addText("Press \"space\" to toggle wireframe", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
-		if ((scene) && (scene->renderSingleScenePart))
-			textOverlay_->addText("Rendering mesh " + std::to_string(scene->scenePartIndex + 1) + " of " + std::to_string(static_cast<uint32_t>(scene->meshes.size())) + "(\"p\" to toggle)", 5.0f, 100.0f, VulkanTextOverlay::alignLeft);
-		else
-			textOverlay_->addText("Rendering whole scene (\"p\" to toggle)", 5.0f, 100.0f, VulkanTextOverlay::alignLeft);
+			textOverlay->addText("Press \"space\" to toggle wireframe", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
+			if ((scene) && (scene->renderSingleScenePart))
+				textOverlay->addText("Rendering mesh " + std::to_string(scene->scenePartIndex + 1) + " of " + std::to_string(static_cast<uint32_t>(scene->meshes.size())) + "(\"p\" to toggle)", 5.0f, 100.0f, VulkanTextOverlay::alignLeft);
+			else
+				textOverlay->addText("Rendering whole scene (\"p\" to toggle)", 5.0f, 100.0f, VulkanTextOverlay::alignLeft);
 #endif
+		}
 	}
 };
 

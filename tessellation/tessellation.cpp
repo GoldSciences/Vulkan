@@ -56,7 +56,7 @@ public:
 		float														tessAlpha							= 1.0f;
 	}															uboTessEval;
 
-	struct {
+	struct Pipelines {
 		VkPipeline													solid								= VK_NULL_HANDLE;
 		VkPipeline													wire								= VK_NULL_HANDLE;
 		VkPipeline													solidPassThrough					= VK_NULL_HANDLE;
@@ -67,30 +67,30 @@ public:
 	
 	VkPipelineLayout											pipelineLayout						= VK_NULL_HANDLE;
 	VkDescriptorSet												descriptorSet						= VK_NULL_HANDLE;
-	VkDescriptorSetLayout										descriptorSetLayout					= VK_NULL_HANDLE;				
+	VkDescriptorSetLayout										descriptorSetLayout					= VK_NULL_HANDLE;
 
-																VulkanExample						() : VulkanExampleBase(ENABLE_VALIDATION)			{
+																VulkanExample() : VulkanExampleBase(ENABLE_VALIDATION)
+	{
 		zoom														= -6.5f;
 		rotation													= glm::vec3(-350.0f, 60.0f, 0.0f);
 		cameraPos													= glm::vec3(-3.0f, 2.3f, 0.0f);
 		title														= "Vulkan Example - Tessellation shader (PN Triangles)";
 		enableTextOverlay											= true;
-		// Enable physical device features required for this example				
-		
-		enabledFeatures.tessellationShader							= VK_TRUE;	// Tell the driver that we are going to use geometry shaders
-		enabledFeatures.fillModeNonSolid							= VK_TRUE;	// Example also uses a wireframe pipeline, enable non-solid fill modes
 	}
 
 																~VulkanExample						()													{
 		// Clean up used Vulkan resources 
 		// Note : Inherited destructor cleans up resources stored in base class
-		vkDestroyPipeline				(device, pipelines.solid			, nullptr);
-		vkDestroyPipeline				(device, pipelines.wire				, nullptr);
-		vkDestroyPipeline				(device, pipelines.solidPassThrough	, nullptr);
-		vkDestroyPipeline				(device, pipelines.wirePassThrough	, nullptr);
+		vkDestroyPipeline				(device, pipelines.solid, nullptr);
+		if (pipelines.wire != VK_NULL_HANDLE)
+			vkDestroyPipeline				(device, pipelines.wire, nullptr);
 
-		vkDestroyPipelineLayout			(device, pipelineLayout				, nullptr);
-		vkDestroyDescriptorSetLayout	(device, descriptorSetLayout		, nullptr);
+		vkDestroyPipeline				(device, pipelines.solidPassThrough, nullptr);
+		if (pipelines.wirePassThrough != VK_NULL_HANDLE)
+			vkDestroyPipeline				(device, pipelines.wirePassThrough, nullptr);
+
+		vkDestroyPipelineLayout			(device, pipelineLayout, nullptr);
+		vkDestroyDescriptorSetLayout	(device, descriptorSetLayout, nullptr);
 
 		models.object				.destroy();
 		uniformBuffers.tessControl	.destroy();
@@ -98,8 +98,27 @@ public:
 		textures.colorMap			.destroy();
 	}
 
+	// Enable physical device features required for this example				
+	virtual void getEnabledFeatures()
+	{
+		// Example uses tessellation shaders
+		if (deviceFeatures.tessellationShader) 
+			enabledFeatures.tessellationShader						= VK_TRUE;
+		else 
+			vks::tools::exitFatal("Selected GPU does not support tessellation shaders!", "Feature not supported");
+		// Fill mode non solid is required for wireframe display
+		if (deviceFeatures.fillModeNonSolid) 
+			enabledFeatures.fillModeNonSolid						= VK_TRUE;
+		else {
+			// Wireframe not supported, switch to solid pipelines
+			pipelineLeft											= &pipelines.solidPassThrough;
+			pipelineRight											= &pipelines.solid;
+		}
+	}
+
+
 	void														reBuildCommandBuffers				()													{
-		if (!checkCommandBuffers ()) {
+		if (!checkCommandBuffers()) {
 			destroyCommandBuffers();
 			createCommandBuffers ();
 		}
@@ -186,9 +205,9 @@ public:
 	void														setupDescriptorPool					()													{
 		// Example uses two ubos and one combined image sampler
 		std::vector<VkDescriptorPoolSize>								poolSizes							=
-		{	vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 2)
-		,	vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1)
-		};
+			{	vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 2)
+			,	vks::initializers::descriptorPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1)
+			};
 
 		VkDescriptorPoolCreateInfo										descriptorPoolInfo					= vks::initializers::descriptorPoolCreateInfo(static_cast<uint32_t>(poolSizes.size()), poolSizes.data(), 1);
 
@@ -197,10 +216,10 @@ public:
 
 	void														setupDescriptorSetLayout			()													{
 		std::vector<VkDescriptorSetLayoutBinding>						setLayoutBindings					=
-		{	vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT, 0)		// Binding 0 : Tessellation control shader ubo
-		,	vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT, 1)	// Binding 1 : Tessellation evaluation shader ubo
-		,	vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, 2)			// Binding 2 : Fragment shader combined sampler
-		};
+			{	vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT, 0)		// Binding 0 : Tessellation control shader ubo
+			,	vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT, 1)	// Binding 1 : Tessellation evaluation shader ubo
+			,	vks::initializers::descriptorSetLayoutBinding(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, 2)			// Binding 2 : Fragment shader combined sampler
+			};
 
 		VkDescriptorSetLayoutCreateInfo									descriptorLayout					= vks::initializers::descriptorSetLayoutCreateInfo(setLayoutBindings.data(), static_cast<uint32_t>(setLayoutBindings.size()));
 
@@ -216,10 +235,10 @@ public:
 
 		VkDescriptorImageInfo											texDescriptor						= vks::initializers::descriptorImageInfo(textures.colorMap.sampler, textures.colorMap.view, VK_IMAGE_LAYOUT_GENERAL);
 		std::vector<VkWriteDescriptorSet>								writeDescriptorSets					=
-		{	vks::initializers::writeDescriptorSet(descriptorSet, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 0, &uniformBuffers.tessControl.descriptor)		// Binding 0 : Tessellation control shader ubo
-		,	vks::initializers::writeDescriptorSet(descriptorSet, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, &uniformBuffers.tessEval.descriptor)			// Binding 1 : Tessellation evaluation shader ubo
-		,	vks::initializers::writeDescriptorSet(descriptorSet, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 2, &texDescriptor)						// Binding 2 : Color map 
-		};
+			{	vks::initializers::writeDescriptorSet(descriptorSet, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 0, &uniformBuffers.tessControl.descriptor)		// Binding 0 : Tessellation control shader ubo
+			,	vks::initializers::writeDescriptorSet(descriptorSet, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, &uniformBuffers.tessEval.descriptor)			// Binding 1 : Tessellation evaluation shader ubo
+			,	vks::initializers::writeDescriptorSet(descriptorSet, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 2, &texDescriptor)						// Binding 2 : Color map 
+			};
 
 		vkUpdateDescriptorSets(device, static_cast<uint32_t>(writeDescriptorSets.size()), writeDescriptorSets.data(), 0, NULL);
 	}
@@ -233,10 +252,10 @@ public:
 		VkPipelineViewportStateCreateInfo								viewportState						= vks::initializers::pipelineViewportStateCreateInfo(1, 1, 0);
 		VkPipelineMultisampleStateCreateInfo							multisampleState					= vks::initializers::pipelineMultisampleStateCreateInfo(VK_SAMPLE_COUNT_1_BIT, 0);
 		std::vector<VkDynamicState>										dynamicStateEnables					= 
-		{	VK_DYNAMIC_STATE_VIEWPORT
-		,	VK_DYNAMIC_STATE_SCISSOR
-		,	VK_DYNAMIC_STATE_LINE_WIDTH
-		};
+			{	VK_DYNAMIC_STATE_VIEWPORT
+			,	VK_DYNAMIC_STATE_SCISSOR
+			,	VK_DYNAMIC_STATE_LINE_WIDTH
+			};
 		VkPipelineDynamicStateCreateInfo								dynamicState						= vks::initializers::pipelineDynamicStateCreateInfo(dynamicStateEnables.data(), static_cast<uint32_t>(dynamicStateEnables.size()), 0);
 		VkPipelineTessellationStateCreateInfo							tessellationState					= vks::initializers::pipelineTessellationStateCreateInfo(3);
 
@@ -266,8 +285,10 @@ public:
 		// Solid
 		VK_CHECK_RESULT(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipelines.solid));
 		// Wireframe
-		rasterizationState.polygonMode								= VK_POLYGON_MODE_LINE;
-		VK_CHECK_RESULT(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipelines.wire));
+		if (deviceFeatures.fillModeNonSolid) {
+			rasterizationState.polygonMode								= VK_POLYGON_MODE_LINE;
+			VK_CHECK_RESULT(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipelines.wire));
+		}
 
 		// Pass through pipelines
 		// Load pass through tessellation shaders (Vert and frag are reused)
@@ -278,8 +299,10 @@ public:
 		rasterizationState.polygonMode								= VK_POLYGON_MODE_FILL;
 		VK_CHECK_RESULT(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipelines.solidPassThrough));
 		// Wireframe
-		rasterizationState.polygonMode								= VK_POLYGON_MODE_LINE;
-		VK_CHECK_RESULT(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipelines.wirePassThrough));
+		if (deviceFeatures.fillModeNonSolid) {
+			rasterizationState.polygonMode								= VK_POLYGON_MODE_LINE;
+			VK_CHECK_RESULT(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipelines.wirePassThrough));
+		}
 	}
 
 	// Prepare and initialize uniform buffer containing shader uniforms
@@ -321,10 +344,6 @@ public:
 	}
 
 	void														prepare								()													{
-		// Check if device supports tessellation shaders
-		if (!deviceFeatures.tessellationShader)
-			vks::tools::exitFatal("Selected GPU does not support tessellation shaders!", "Feature not supported");
-
 		VulkanExampleBase::prepare	();
 		loadAssets					();
 		setupVertexDescriptions		();
@@ -347,16 +366,15 @@ public:
 
 	virtual void												viewChanged							()													{ updateUniformBuffers(); }
 	virtual void												keyPressed							(uint32_t keyCode)									{
-		switch (keyCode)
-		{
+		switch (keyCode) {
 		case KEY_KPADD			:
-		case GAMEPAD_BUTTON_R1	: changeTessellationLevel( 0.25);	break;
+		case GAMEPAD_BUTTON_R1	: changeTessellationLevel( 0.25);							break;
 		case KEY_KPSUB			:
-		case GAMEPAD_BUTTON_L1	: changeTessellationLevel(-0.25);	break;
+		case GAMEPAD_BUTTON_L1	: changeTessellationLevel(-0.25);							break;
 		case KEY_W				:
-		case GAMEPAD_BUTTON_A	: togglePipelines();				break;
+		case GAMEPAD_BUTTON_A	: if(deviceFeatures.fillModeNonSolid) togglePipelines();	break;
 		case KEY_S				:
-		case GAMEPAD_BUTTON_X	: toggleSplitScreen();				break;
+		case GAMEPAD_BUTTON_X	: toggleSplitScreen();										break;
 		}
 	}
 
@@ -364,11 +382,15 @@ public:
 		std::stringstream												ss;
 		ss << std::setprecision(2) << std::fixed << uboTessControl.tessLevel;
 #if defined(__ANDROID__)
-		textOverlay_->addText("Tessellation level: " + ss.str() + " (Buttons L1/R1 to change)", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
-		textOverlay_->addText("Press \"Button X\" to toggle splitscreen", 5.0f, 100.0f, VulkanTextOverlay::alignLeft);
+		textOverlay->addText("Tessellation level: " + ss.str() + " (Buttons L1/R1 to change)", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
+		if (deviceFeatures.fillModeNonSolid) {
+			textOverlay->addText("Press \"Button X\" to toggle splitscreen", 5.0f, 100.0f, VulkanTextOverlay::alignLeft);
+		}
 #else
-		textOverlay_->addText("Tessellation level: " + ss.str() + " (NUMPAD +/- to change)", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
-		textOverlay_->addText("Press \"s\" to toggle splitscreen", 5.0f, 100.0f, VulkanTextOverlay::alignLeft);
+		textOverlay->addText("Tessellation level: " + ss.str() + " (NUMPAD +/- to change)", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
+		if (deviceFeatures.fillModeNonSolid) {
+			textOverlay->addText("Press \"s\" to toggle splitscreen", 5.0f, 100.0f, VulkanTextOverlay::alignLeft);
+		}
 #endif
 	}
 

@@ -72,32 +72,33 @@ public:
 		glm::vec4													lightPos										= glm::vec4(25.0f, 5.0f, 5.0f, 1.0f);
 	}															uboVS;
 
-	struct {
+
+	struct Pipelines {
 		VkPipeline													solid											= VK_NULL_HANDLE;
 		VkPipeline													wireframe										= VK_NULL_HANDLE;
 	}															pipelines;
 
-	VkPipelineLayout											pipelineLayout									= VK_NULL_HANDLE;
-	VkDescriptorSet												descriptorSet									= VK_NULL_HANDLE;
-	VkDescriptorSetLayout										descriptorSetLayout								= VK_NULL_HANDLE;
+	VkPipelineLayout											pipelineLayout;
+	VkDescriptorSet												descriptorSet;
+	VkDescriptorSetLayout										descriptorSetLayout;
 
-																VulkanExample									()									: VulkanExampleBase(ENABLE_VALIDATION)	{
-		zoom														= -5.5f;
-		zoomSpeed													= 2.5f;
-		rotationSpeed												= 0.5f;
-		rotation													= { -0.5f, -112.75f, 0.0f };
-		cameraPos													= { 0.1f, 1.1f, 0.0f };
-		enableTextOverlay											= true;
-		title														= "Vulkan Example - Model rendering";
-		enabledFeatures.fillModeNonSolid							= VK_TRUE;	// Enable physical device features required for this example				
+																VulkanExample									()									: VulkanExampleBase(ENABLE_VALIDATION)
+	{
+		zoom = -5.5f;
+		zoomSpeed = 2.5f;
+		rotationSpeed = 0.5f;
+		rotation = { -0.5f, -112.75f, 0.0f };
+		cameraPos = { 0.1f, 1.1f, 0.0f };
+		enableTextOverlay = true;
+		title = "Vulkan Example - Model rendering";
 	}
 
 																~VulkanExample									()									{
 		// Clean up used Vulkan resources 
 		// Note : Inherited destructor cleans up resources stored in base class
-		vkDestroyPipeline				(device, pipelines.solid		, nullptr);
-		vkDestroyPipeline				(device, pipelines.wireframe	, nullptr);
-
+		vkDestroyPipeline(device, pipelines.solid, nullptr);
+		if (pipelines.wireframe != VK_NULL_HANDLE)
+			vkDestroyPipeline(device, pipelines.wireframe, nullptr);
 		vkDestroyPipelineLayout			(device, pipelineLayout			, nullptr);
 		vkDestroyDescriptorSetLayout	(device, descriptorSetLayout	, nullptr);
 
@@ -105,6 +106,12 @@ public:
 
 		textures.colorMap		.destroy();
 		uniformBuffers.scene	.destroy();
+	}
+
+	virtual void												getEnabledFeatures								()									{
+		// Fill mode non solid is required for wireframe display
+		if (deviceFeatures.fillModeNonSolid) 
+			enabledFeatures.fillModeNonSolid = VK_TRUE;
 	}
 
 	void														reBuildCommandBuffers							()									{
@@ -261,8 +268,13 @@ public:
 	}
 
 	void														loadAssets										()									{
-		loadModel						(getAssetPath() + "models/voyager/voyager.dae");
-		textures.colorMap.loadFromFile	(getAssetPath() + "models/voyager/voyager.ktx", VK_FORMAT_BC3_UNORM_BLOCK, vulkanDevice, queue);
+		loadModel(getAssetPath() + "models/voyager/voyager.dae");
+			 if (deviceFeatures.textureCompressionBC)		textures.colorMap.loadFromFile(getAssetPath() + "models/voyager/voyager_bc3_unorm.ktx"		, VK_FORMAT_BC3_UNORM_BLOCK				, vulkanDevice, queue);
+		else if (deviceFeatures.textureCompressionASTC_LDR)	textures.colorMap.loadFromFile(getAssetPath() + "models/voyager/voyager_astc_8x8_unorm.ktx"	, VK_FORMAT_ASTC_8x8_UNORM_BLOCK		, vulkanDevice, queue);
+		else if (deviceFeatures.textureCompressionETC2)		textures.colorMap.loadFromFile(getAssetPath() + "models/voyager/voyager_etc2_unorm.ktx"		, VK_FORMAT_ETC2_R8G8B8A8_UNORM_BLOCK	, vulkanDevice, queue);
+		else {
+			vks::tools::exitFatal("Device does not support any compressed texture format!", "Error");
+		}
 	}
 
 	void														setupVertexDescriptions							()									{
@@ -354,10 +366,11 @@ public:
 		VK_CHECK_RESULT(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipelines.solid));
 
 		// Wire frame rendering pipeline
-		rasterizationState.polygonMode								= VK_POLYGON_MODE_LINE;
-		rasterizationState.lineWidth								= 1.0f;
-
-		VK_CHECK_RESULT(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipelines.wireframe));
+		if (deviceFeatures.fillModeNonSolid) {
+			rasterizationState.polygonMode = VK_POLYGON_MODE_LINE;
+			rasterizationState.lineWidth = 1.0f;
+			VK_CHECK_RESULT(vkCreateGraphicsPipelines(device, pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipelines.wireframe));
+		}
 	}
 
 	// Prepare and initialize uniform buffer containing shader uniforms
@@ -410,19 +423,23 @@ public:
 	virtual void												viewChanged										()									{ updateUniformBuffers();	}
 	virtual void												keyPressed										(uint32_t keyCode)					{
 		switch (keyCode) {
-		case KEY_W				:
-		case GAMEPAD_BUTTON_A	:
-			wireframe													= !wireframe;
-			reBuildCommandBuffers();
+		case KEY_W:
+		case GAMEPAD_BUTTON_A:
+			if (deviceFeatures.fillModeNonSolid) {
+				wireframe													= !wireframe;
+				reBuildCommandBuffers();
+			}
 			break;
 		}
 	}
 
-	virtual void												getOverlayText									(VulkanTextOverlay *textOverlay_)	{
+
+	virtual void getOverlayText(VulkanTextOverlay *textOverlay) {
+		if (deviceFeatures.fillModeNonSolid)
 #if defined(__ANDROID__)
-		textOverlay_->addText("Press \"Button A\" to toggle wireframe", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
+			textOverlay->addText("Press \"Button A\" to toggle wireframe", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
 #else
-		textOverlay_->addText("Press \"w\" to toggle wireframe", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
+			textOverlay->addText("Press \"w\" to toggle wireframe", 5.0f, 85.0f, VulkanTextOverlay::alignLeft);
 #endif
 	}
 };

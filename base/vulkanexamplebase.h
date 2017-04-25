@@ -14,6 +14,7 @@
 #include <android/native_activity.h>
 #include <android/asset_manager.h>
 #include <android_native_app_glue.h>
+#include <sys/system_properties.h>
 #include "vulkanandroid.h"
 #elif defined(VK_USE_PLATFORM_WAYLAND_KHR)
 #include <wayland-client.h>
@@ -37,8 +38,8 @@
 #include "VulkanDebug.h"
 
 #include "VulkanDevice.hpp"
-#include "vulkanswapchain.hpp"
-#include "vulkantextoverlay.hpp"
+#include "VulkanSwapChain.hpp"
+#include "VulkanTextOverlay.hpp"
 #include "camera.hpp"
 
 class VulkanExampleBase
@@ -146,9 +147,17 @@ public:
 	HWND								window						= NULL;
 	HINSTANCE							windowInstance				= NULL;
 #elif defined(__ANDROID__)
-	
-	bool								focused						= false;		// true if application has focused, false if moved to background
 
+	// true if application has focused, false if moved to background
+	bool								focused						= false;
+	struct TouchPos {
+		int32_t								x;
+		int32_t								y;
+	}									touchPos;
+	bool								touchDown					= false;
+	double								touchTimer					= 0.0;
+	// Product model and manufacturer of the Android device (via android.Product*)
+	std::string							androidProduct;
 #elif defined(VK_USE_PLATFORM_WAYLAND_KHR)
 	wl_display							* display					= nullptr;
 	wl_registry							* registry					= nullptr;
@@ -226,7 +235,7 @@ public:
 	virtual void						keyPressed					(uint32_t)													{}		// Called if a key is pressed. Can be overriden in derived class to do custom key handling
 	virtual void						windowResized				()															{}		// Called when the window has been resized. Can be overriden in derived class to recreate or rebuild resources attached to the frame buffer / swapchain
 	virtual void						buildCommandBuffers			()															{}		// Pure virtual function to be overriden by the dervice class. Called in case of an event where e.g. the framebuffer has to be rebuild and thus all command buffers that may reference this
-
+	virtual void						getEnabledFeatures			()															{}		// Called after the physical device features have been read, used to set features to enable on the device
 	void								createCommandPool			();																	// Creates a new (graphics) command pool object storing command buffers
 	virtual void						setupDepthStencil			();																	// Setup default depth and stencil views
 	virtual void						setupFrameBuffer			();																	// Create framebuffers for all requested swap chain images. Can be overriden in derived class to setup a custom framebuffer (e.g. for MSAA)
@@ -258,8 +267,8 @@ public:
 
 extern "C"
 {
-	int	createVulkanExample	(VulkanExampleBase** _vulkanExample);
-	int	deleteVulkanExample	(VulkanExampleBase** _vulkanExample);
+	int									createVulkanExample			(VulkanExampleBase** _vulkanExample);
+	int									deleteVulkanExample			(VulkanExampleBase** _vulkanExample);
 }
 
 #define VULKAN_EXAMPLE_EXPORT_FUNCTIONS()	\
